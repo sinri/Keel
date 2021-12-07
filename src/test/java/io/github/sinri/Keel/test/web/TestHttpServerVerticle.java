@@ -12,14 +12,14 @@ public class TestHttpServerVerticle extends HttpServerVerticle {
         server.requestHandler(request -> {
             KeelHttpRequestHandler handler = new KeelHttpRequestHandler(request);
 
-//            Keel.getLogger(this.getClass()).info("Method: "+request.method()+" raw: "+request.rawMethod());
-//            Keel.getLogger(this.getClass()).info("Uri: "+request.uri()+" absolute: "+request.absoluteURI());
-//            Keel.getLogger(this.getClass()).info("Host: "+request.host());
-//            Keel.getLogger(this.getClass()).info("Path: "+request.path());
-//            Keel.getLogger(this.getClass()).info("Query: "+request.query());
-//            Keel.getLogger(this.getClass()).info("Use SSL: "+request.isSSL());
-//            Keel.getLogger(this.getClass()).info("Local: "+request.localAddress());
-//            Keel.getLogger(this.getClass()).info("Remote: "+request.remoteAddress());
+            Keel.getLogger(this.getClass()).info("Method: " + request.method() + " netty: " + request.method().toNetty().asciiName());
+            Keel.getLogger(this.getClass()).info("Uri: " + request.uri() + " absolute: " + request.absoluteURI());
+            Keel.getLogger(this.getClass()).info("Host: " + request.host());
+            Keel.getLogger(this.getClass()).info("Path: " + request.path());
+            Keel.getLogger(this.getClass()).info("Query: " + request.query());
+            Keel.getLogger(this.getClass()).info("Use SSL: " + request.isSSL());
+            Keel.getLogger(this.getClass()).info("Local: " + request.localAddress());
+            Keel.getLogger(this.getClass()).info("Remote: " + request.remoteAddress());
 
             Keel.getLogger(this.getClass()).info(handler.getMethod() + " " + handler.getScheme() + "://" + handler.getUriHost() + ":" + handler.getUriPort() + " " + handler.getPath());
 

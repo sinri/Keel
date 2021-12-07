@@ -4,10 +4,11 @@ import io.github.sinri.Keel.Keel;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.json.DecodeException;
 import io.vertx.core.json.JsonObject;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class KeelHttpRequestHandler {
     }
 
     public String getMethod() {
-        return rawRequest.rawMethod();
+        return rawRequest.method().toString();
     }
 
     public String getUriHost() {
@@ -67,6 +68,7 @@ public class KeelHttpRequestHandler {
     public Map<String, String> getQueries() {
         if (queries == null) {
             String query = rawRequest.query();
+            if (query == null) query = "";
             Keel.getLogger(this.getClass()).fine("raw query: " + query);
             String[] pairs = query.split("&");
 
@@ -78,12 +80,7 @@ public class KeelHttpRequestHandler {
                     String[] kv = pair.split("=");
                     if (kv.length > 0) {
                         String value = kv.length > 1 ? kv[1] : "";
-                        try {
-                            value = URLDecoder.decode(value, "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            //e.printStackTrace();
-                            Keel.getLogger(this.getClass()).warning(e.getMessage());
-                        }
+                        value = URLDecoder.decode(value, StandardCharsets.UTF_8);
                         queries.put(kv[0], value);
                     }
                 }
@@ -101,8 +98,12 @@ public class KeelHttpRequestHandler {
 
     public void doAfterReadingWholeBodyAsJson(Handler<JsonObject> bodyHandler) {
         rawRequest.bodyHandler(totalBuffer -> {
-            JsonObject jsonObject = totalBuffer.toJsonObject();
-            bodyHandler.handle(jsonObject);
+            try {
+                JsonObject jsonObject = totalBuffer.toJsonObject();
+                bodyHandler.handle(jsonObject);
+            } catch (DecodeException exception) {
+                bodyHandler.handle(null);
+            }
         });
     }
 
@@ -113,25 +114,25 @@ public class KeelHttpRequestHandler {
                 .end(jsonObject.toString());
     }
 
-    public void repondOkAsJson(JsonObject data) {
+    public void respondOkAsJson(JsonObject data) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("code", "OK").put("data", data);
         respondAsJson(jsonObject, 200);
     }
 
-    public void repondOkAsJson(String data) {
+    public void respondOkAsJson(String data) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("code", "OK").put("data", data);
         respondAsJson(jsonObject, 200);
     }
 
-    public void repondFailAsJson(JsonObject data) {
+    public void respondFailAsJson(JsonObject data) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("code", "FAIL").put("data", data);
         respondAsJson(jsonObject, 200);
     }
 
-    public void repondFailAsJson(String data) {
+    public void respondFailAsJson(String data) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("code", "FAIL").put("data", data);
         respondAsJson(jsonObject, 200);
