@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="Keel" target="8" />
+      <module name="Keel" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
