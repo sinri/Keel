@@ -9,5 +9,8 @@
         <module name="Keel" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="Keel" target="11" />
+    </bytecodeTargetLevel>
   </component>
 </project>

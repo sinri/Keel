@@ -1,2 +1,2 @@
 # Keel
-A web site framework with VERT.X
+A website framework with VERT.X for ex-PHP-ers, exactly Ark Framework Users.
