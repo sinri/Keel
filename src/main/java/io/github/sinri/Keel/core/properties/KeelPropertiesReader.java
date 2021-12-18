@@ -3,20 +3,19 @@ package io.github.sinri.Keel.core.properties;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 public class KeelPropertiesReader {
-    private static final HashMap<String, KeelPropertiesReader> readerMap = new HashMap<>();
+
     protected Properties properties;
 
-    private KeelPropertiesReader() {
+    public KeelPropertiesReader() {
         properties = new Properties();
     }
 
-    public static void registerReaderWithFile(String readerName, String propertiesFileName) {
+    public static KeelPropertiesReader loadReaderWithFile(String propertiesFileName) {
         KeelPropertiesReader reader = new KeelPropertiesReader();
         try {
             // here, the file named as `propertiesFileName` should be put along with JAR
@@ -31,12 +30,29 @@ public class KeelPropertiesReader {
                 throw new RuntimeException("Cannot find the embedded file config.properties.", ex);
             }
         }
-        readerMap.put(readerName, reader);
+        //readerMap.put(readerName, reader);
+        return reader;
     }
 
-    public static KeelPropertiesReader getReader(String readerName) {
-        return readerMap.get(readerName);
+    public void appendPropertiesFromFile(String propertiesFileName) {
+        try {
+            // here, the file named as `propertiesFileName` should be put along with JAR
+            File configPropertiesFile = new File(propertiesFileName);
+            properties.load(new FileReader(configPropertiesFile));
+        } catch (IOException e) {
+            Logger.getLogger("KeelPropertiesReader").warning("Cannot find the file config.properties. Use the embedded one.");
+            try {
+                properties.load(KeelPropertiesReader.class.getClassLoader().getResourceAsStream(propertiesFileName));
+                // System.out.println("reader.properties -> "+reader.properties);
+            } catch (IOException ex) {
+                throw new RuntimeException("Cannot find the embedded file config.properties.", ex);
+            }
+        }
     }
+
+//    public static KeelPropertiesReader getReader(String readerName) {
+//        return readerMap.get(readerName);
+//    }
 
     public String getProperty(String key) {
         return properties.getProperty(key);

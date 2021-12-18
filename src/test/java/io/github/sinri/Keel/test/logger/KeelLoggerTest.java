@@ -1,13 +1,15 @@
 package io.github.sinri.Keel.test.logger;
 
+import io.github.sinri.Keel.Keel;
 import io.github.sinri.Keel.core.logger.KeelLogger;
-import io.github.sinri.Keel.core.properties.KeelPropertiesReader;
+import io.vertx.core.VertxOptions;
 import io.vertx.ext.unit.TestSuite;
 
 public class KeelLoggerTest {
 
     public static void main(String[] args) {
-        KeelPropertiesReader.registerReaderWithFile("KeelLogger", "KeelLogger.properties");
+        Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(2));
+        Keel.loadPropertiesFromFile("test.properties");
 
         TestSuite suite = TestSuite.create("KeelLoggerTestSuite");
         suite.test("stdout", context -> {
@@ -46,7 +48,7 @@ public class KeelLoggerTest {
 //                    }
 //                })
                 .test("with-properties", testContext -> {
-                    KeelLogger logger = KeelLogger.use("x");
+                    KeelLogger logger = Keel.logger("x");
                     testContext.assertEquals(logger.getRotateDateTimeFormat(), "yyyyMMddHH");
                     logger.debug("debug");
                     logger.info("info");

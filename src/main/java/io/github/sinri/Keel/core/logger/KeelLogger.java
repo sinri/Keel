@@ -1,6 +1,5 @@
 package io.github.sinri.Keel.core.logger;
 
-import io.github.sinri.Keel.core.properties.KeelPropertiesReader;
 import io.vertx.core.json.JsonObject;
 
 import java.io.BufferedWriter;
@@ -9,13 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class KeelLogger {
 
-    private static final Map<String, KeelLogger> loggerMap = new HashMap<>();
     protected File logRootDirectory = null;
     protected String aspect = "default";
     protected KeelLogLevel lowestLevel = KeelLogLevel.INFO;
@@ -38,37 +33,6 @@ public class KeelLogger {
     }
 
     public KeelLogger() {
-    }
-
-    public static KeelLogger use(String aspect) {
-        if (loggerMap.containsKey(aspect)) {
-            return loggerMap.get(aspect);
-        }
-
-        KeelPropertiesReader reader = KeelPropertiesReader.getReader("KeelLogger");
-        String dir = reader.getProperty(List.of(aspect, "dir"));
-        //System.out.println("dir -> "+dir);
-
-        KeelLogger logger;
-        if (dir == null) {
-            logger = new KeelLogger(aspect);
-        } else {
-            logger = new KeelLogger(new File(dir), aspect);
-        }
-
-        String level = reader.getProperty(List.of(aspect, "level"));
-        if (level != null) {
-            KeelLogLevel lowestLogLevel = KeelLogLevel.valueOf(level);
-            //System.out.println("lowestLogLevel -> "+lowestLogLevel);
-            logger.setLowestLevel(lowestLogLevel);
-        }
-        String rotate = reader.getProperty(List.of(aspect, "rotate"));
-        if (rotate != null) {
-            logger.setRotateDateTimeFormat(rotate);
-        }
-
-        loggerMap.put(aspect, logger);
-        return logger;
     }
 
     /**
