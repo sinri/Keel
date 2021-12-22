@@ -7,6 +7,7 @@ import io.github.sinri.Keel.mysql.KeelMySQLConfig;
 import io.github.sinri.Keel.mysql.KeelMySQLKit;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.core.eventbus.EventBus;
 
 import java.io.File;
 import java.util.HashMap;
@@ -36,6 +37,10 @@ public class Keel {
             throw new RuntimeException("The shared vertx instance was not initialized. Run `Keel.initializeVertx()` first!");
         }
         return vertx;
+    }
+
+    public static EventBus getEventBus() {
+        return vertx.eventBus();
     }
 
     public static KeelLogger logger(String aspect) {

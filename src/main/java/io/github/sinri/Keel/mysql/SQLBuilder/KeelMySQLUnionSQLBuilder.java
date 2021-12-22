@@ -35,14 +35,14 @@ public class KeelMySQLUnionSQLBuilder {
     }
 
     public KeelMySQLUnionSQLBuilder union(List<String> list) {
-        for (var selection : list) {
+        for (String selection : list) {
             union(selection);
         }
         return this;
     }
 
     public KeelMySQLUnionSQLBuilder unionAll(List<String> list) {
-        for (var selection : list) {
+        for (String selection : list) {
             unionAll(selection);
         }
         return this;

@@ -5,8 +5,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
+//import java.util.logging.Logger; // ->   (程序包 java.util.logging 已在模块 java.logging 中声明, 但模块 com.fasterxml.jackson.core 未读取它)
 
+/**
+ * Reader for Properties Files used in Keel Project
+ */
 public class KeelPropertiesReader {
 
     protected Properties properties;
@@ -22,7 +25,7 @@ public class KeelPropertiesReader {
             File configPropertiesFile = new File(propertiesFileName);
             reader.properties.load(new FileReader(configPropertiesFile));
         } catch (IOException e) {
-            Logger.getLogger("KeelPropertiesReader").warning("Cannot find the file config.properties. Use the embedded one.");
+            System.err.println("Cannot find the file config.properties. Use the embedded one.");
             try {
                 reader.properties.load(KeelPropertiesReader.class.getClassLoader().getResourceAsStream(propertiesFileName));
                 // System.out.println("reader.properties -> "+reader.properties);
@@ -40,7 +43,7 @@ public class KeelPropertiesReader {
             File configPropertiesFile = new File(propertiesFileName);
             properties.load(new FileReader(configPropertiesFile));
         } catch (IOException e) {
-            Logger.getLogger("KeelPropertiesReader").warning("Cannot find the file config.properties. Use the embedded one.");
+            System.err.println("Cannot find the file config.properties. Use the embedded one.");
             try {
                 properties.load(KeelPropertiesReader.class.getClassLoader().getResourceAsStream(propertiesFileName));
                 // System.out.println("reader.properties -> "+reader.properties);

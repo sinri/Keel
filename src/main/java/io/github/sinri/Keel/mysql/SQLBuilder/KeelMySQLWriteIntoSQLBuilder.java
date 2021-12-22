@@ -57,9 +57,9 @@ public class KeelMySQLWriteIntoSQLBuilder {
     }
 
     public KeelMySQLWriteIntoSQLBuilder addDataMatrix(List<List<Object>> batch) {
-        for (var row : batch) {
+        for (List<Object> row : batch) {
             List<String> t = new ArrayList<>();
-            for (var item : row) {
+            for (Object item : row) {
                 t.add(new KeelMySQLQuoter(item).toString());
             }
             this.batchValues.add(t);
@@ -69,7 +69,7 @@ public class KeelMySQLWriteIntoSQLBuilder {
 
     public KeelMySQLWriteIntoSQLBuilder addDataRow(List<Object> row) {
         List<String> t = new ArrayList<>();
-        for (var item : row) {
+        for (Object item : row) {
             t.add(new KeelMySQLQuoter(item).toString());
         }
         this.batchValues.add(t);
@@ -105,7 +105,7 @@ public class KeelMySQLWriteIntoSQLBuilder {
         } else {
             sql += "\nVALUES\n";
             List<String> items = new ArrayList<>();
-            for (var row : batchValues) {
+            for (List<String> row : batchValues) {
                 items.add("(" + KeelHelper.joinStringArray(row, ",") + ")");
             }
             sql += KeelHelper.joinStringArray(items, ",\n");

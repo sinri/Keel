@@ -2,6 +2,9 @@ package io.github.sinri.Keel.core;
 
 import java.util.List;
 
+/**
+ * Keel Helper
+ */
 public class KeelHelper {
     public static String joinStringArray(List<?> x, String separator) {
         StringBuilder result = new StringBuilder();

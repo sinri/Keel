@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * The Logger For Keel Project
+ */
 public class KeelLogger {
 
     protected File logRootDirectory = null;
