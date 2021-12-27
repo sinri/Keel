@@ -24,7 +24,7 @@ public class SelectBuilderTest {
                                 )
                 )
                 .whereForCompare(keelMySQLCompareCondition -> keelMySQLCompareCondition.compareExpression("t2.name").contains("keyword"))
-                .whereForAmongst(amongstCondition -> amongstCondition.elementAsExpression("t2.option").not().amongstValue(List.of("123", 456)))
+                .whereForAmongst(amongstCondition -> amongstCondition.elementAsExpression("t2.option").not().amongstValueList(List.of("123", 456)))
                 .where(
                         new CompareCondition("t2.name")
                                 .contains("keyword")

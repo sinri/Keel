@@ -17,6 +17,7 @@ public class KeelMySQLConfig {
     protected final boolean useAffectedRows;
 
     protected final int poolMaxSize;
+    protected final boolean poolShared;
 
     public KeelMySQLConfig(String dataSourceName, Map<String, String> map) {
         this.dataSourceName = dataSourceName;
@@ -29,6 +30,7 @@ public class KeelMySQLConfig {
         this.useAffectedRows = !"false".equalsIgnoreCase(map.get("useAffectedRows"));
 
         this.poolMaxSize = Integer.parseInt(map.getOrDefault("pool.maxSize", "10"));
+        this.poolShared = map.getOrDefault("pool.shared", "NO").equalsIgnoreCase("YES");
     }
 
     public KeelMySQLConfig(String dataSourceName, KeelPropertiesReader reader) {
@@ -44,6 +46,7 @@ public class KeelMySQLConfig {
         this.useAffectedRows = !"false".equalsIgnoreCase(reader.getProperty(prefix + "useAffectedRows"));
 
         this.poolMaxSize = Integer.parseInt(reader.getProperty(prefix + "pool.maxSize", "10"));
+        this.poolShared = reader.getProperty(prefix + "pool.shared", "NO").equalsIgnoreCase("YES");
     }
 
     public MySQLConnectOptions buildMySQLConnectOptions() {
@@ -58,7 +61,7 @@ public class KeelMySQLConfig {
     }
 
     public PoolOptions buildPoolOptions() {
-        return new PoolOptions().setMaxSize(this.poolMaxSize);
+        return new PoolOptions().setMaxSize(this.poolMaxSize).setShared(this.poolShared);
     }
 
 }

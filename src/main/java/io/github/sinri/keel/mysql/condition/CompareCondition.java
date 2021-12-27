@@ -45,7 +45,7 @@ public class CompareCondition extends KeelMySQLCondition {
     }
 
     public CompareCondition compareValue(Object leftSide) {
-        this.leftSide = String.valueOf(new KeelMySQLQuoter(leftSide));
+        this.leftSide = String.valueOf(new KeelMySQLQuoter(String.valueOf(leftSide)));
         return this;
     }
 
@@ -60,7 +60,7 @@ public class CompareCondition extends KeelMySQLCondition {
     }
 
     public CompareCondition againstValue(Object rightSide) {
-        this.rightSide = String.valueOf(new KeelMySQLQuoter(rightSide));
+        this.rightSide = String.valueOf(new KeelMySQLQuoter(String.valueOf(rightSide)));
         return this;
     }
 

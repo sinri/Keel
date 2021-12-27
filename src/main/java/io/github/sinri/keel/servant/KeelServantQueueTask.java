@@ -24,12 +24,15 @@ public abstract class KeelServantQueueTask {
         return lockTask()
                 .onFailure(throwable -> {
                     getLogger().error(getClass() + " [" + getTaskReference() + "] LOCK FAILED: " + throwable.getMessage());
+                    getLogger().exception(throwable);
                 })
-                .compose(
-                        locked -> execute()
-                                .onFailure(throwable -> markTaskAsCompleted(this.EPITAPH_ERROR, throwable.getMessage()))
-                                .compose(feedback -> markTaskAsCompleted(this.EPITAPH_DONE, feedback))
-                );
+                .compose(locked -> execute())
+                .compose(feedback -> markTaskAsCompleted(this.EPITAPH_DONE, feedback))
+                .recover(throwable -> {
+                    getLogger().error(getClass() + " [" + getTaskReference() + "] EXECUTE FAILED: " + throwable.getMessage());
+                    getLogger().exception(throwable);
+                    return markTaskAsCompleted(this.EPITAPH_ERROR, throwable.getMessage());
+                });
     }
 
     public Future<Void> markTaskAsCompleted(String epitaph, String feedback) {

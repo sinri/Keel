@@ -237,4 +237,11 @@ public class KeelLogger {
     public void fatal(String msg) {
         log(KeelLogLevel.FATAL, msg, null);
     }
+
+    public void exception(Throwable throwable) {
+        error(throwable.getMessage(), new JsonObject().put("error_class", throwable.getClass().getName()));
+        for (var s : throwable.getStackTrace()) {
+            print("\t" + s.toString(), "\n");
+        }
+    }
 }

@@ -2,6 +2,7 @@ package io.github.sinri.keel.mysql.matrix;
 
 
 import io.vertx.core.json.JsonArray;
+import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.data.Numeric;
@@ -26,6 +27,18 @@ public class ResultMatrix {
 
     public RowSet<Row> getRowSet() {
         return rowSet;
+    }
+
+    public int getTotalFetchedRows() {
+        return rowSet.size();
+    }
+
+    public int getTotalAffectedRows() {
+        return rowSet.rowCount();
+    }
+
+    public long getLastInsertedID() {
+        return rowSet.property(MySQLClient.LAST_INSERTED_ID);
     }
 
     public JsonArray toJsonArray() {

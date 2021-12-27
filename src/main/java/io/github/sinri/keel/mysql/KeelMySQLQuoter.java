@@ -32,14 +32,12 @@ public class KeelMySQLQuoter {
             quoted = "FALSE";
     }
 
-    public KeelMySQLQuoter(Object o) {
-        if (o == null) {
+    public KeelMySQLQuoter(String s) {
+        if (s == null) {
             quoted = "NULL";
-        } else if (o instanceof Number) {
-            quoted = o.toString();
         } else {
             // if (y instanceof String) or else
-            quoted = quoteEscapedString(escapeString(String.valueOf(o.toString())));
+            quoted = quoteEscapedString(escapeString(s));
         }
     }
 
@@ -51,8 +49,6 @@ public class KeelMySQLQuoter {
             }
             if (y instanceof Number) {
                 q.append(new KeelMySQLQuoter((Number) y));
-            } else if (y instanceof String) {
-                q.append(new KeelMySQLQuoter(y));
             } else {
                 q.append(new KeelMySQLQuoter(y.toString()));
             }

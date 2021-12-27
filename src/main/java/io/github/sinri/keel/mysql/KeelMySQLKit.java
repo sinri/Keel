@@ -218,7 +218,8 @@ public class KeelMySQLKit {
         return future;
     }
 
-    public void executeInTransaction(
+    @Deprecated
+    public void executeInTransaction_V1(
             Function<SqlConnection, Future<Object>> transactionBody,
             Function<Object, Void> doneFunction,
             Function<Throwable, Void> errorFunction
@@ -253,5 +254,20 @@ public class KeelMySQLKit {
                 }));
             });
         });
+    }
+
+    public void executeInTransaction(
+            Function<SqlConnection, Future<Object>> transactionBody,
+            Function<Object, Void> doneFunction,
+            Function<Throwable, Void> errorFunction
+    ) {
+        // rewrite since 1.1
+        getPool().withTransaction(transactionBody)
+                .onSuccess(doneFunction::apply)
+                .onFailure(errorFunction::apply);
+    }
+
+    public Future<Object> executeInConnection(Function<SqlConnection, Future<Object>> queryFunction) {
+        return getPool().withConnection(queryFunction);
     }
 }

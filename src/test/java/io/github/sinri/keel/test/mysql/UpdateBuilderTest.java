@@ -10,7 +10,10 @@ public class UpdateBuilderTest {
         update.table("d", "t")
                 .setWithValue("a", "b\nc")
                 .setWithExpression("b", "abs(c)")
-                .whereForAmongst(amongstCondition -> amongstCondition.elementAsExpression("c").amongstValue(List.of(3, "4")))
+                .whereForAmongst(
+                        amongstCondition -> amongstCondition.elementAsExpression("c")
+                                .amongstValueList(List.of(3, "4"))
+                )
                 .orderByDesc("b")
                 .limit(4);
         System.out.println(update);

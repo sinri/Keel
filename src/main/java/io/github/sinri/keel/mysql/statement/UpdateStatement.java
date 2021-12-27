@@ -57,7 +57,12 @@ public class UpdateStatement {
         return this;
     }
 
-    public UpdateStatement setWithValue(String column, Object value) {
+    public UpdateStatement setWithValue(String column, Number value) {
+        assignments.add(column + "=" + (new KeelMySQLQuoter(value)));
+        return this;
+    }
+
+    public UpdateStatement setWithValue(String column, String value) {
         assignments.add(column + "=" + (new KeelMySQLQuoter(value)));
         return this;
     }

@@ -60,7 +60,7 @@ public class WriteIntoStatement {
         for (List<Object> row : batch) {
             List<String> t = new ArrayList<>();
             for (Object item : row) {
-                t.add(new KeelMySQLQuoter(item).toString());
+                t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
             }
             this.batchValues.add(t);
         }
@@ -70,7 +70,7 @@ public class WriteIntoStatement {
     public WriteIntoStatement addDataRow(List<Object> row) {
         List<String> t = new ArrayList<>();
         for (Object item : row) {
-            t.add(new KeelMySQLQuoter(item).toString());
+            t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
         }
         this.batchValues.add(t);
         return this;

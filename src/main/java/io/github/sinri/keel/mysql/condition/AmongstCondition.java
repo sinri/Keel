@@ -29,19 +29,36 @@ public class AmongstCondition extends KeelMySQLCondition {
         return this;
     }
 
-    public AmongstCondition elementAsValue(Object element) {
+    public AmongstCondition elementAsValue(String element) {
         this.element = new KeelMySQLQuoter(element).toString();
         return this;
     }
 
-    public AmongstCondition amongstValue(List<Object> targetSet) {
+    public AmongstCondition elementAsValue(Number element) {
+        this.element = new KeelMySQLQuoter(element).toString();
+        return this;
+    }
+
+    public AmongstCondition amongstValueList(List<?> targetSet) {
         for (Object next : targetSet) {
-            this.targetSet.add(new KeelMySQLQuoter(next).toString());
+            this.targetSet.add(new KeelMySQLQuoter(String.valueOf(next)).toString());
         }
         return this;
     }
 
-    public AmongstCondition amongstValue(Object value) {
+    public AmongstCondition amongstValueArray(Object[] targetSet) {
+        for (Object next : targetSet) {
+            this.targetSet.add(new KeelMySQLQuoter(String.valueOf(next)).toString());
+        }
+        return this;
+    }
+
+    public AmongstCondition amongstValue(String value) {
+        this.targetSet.add(new KeelMySQLQuoter(value).toString());
+        return this;
+    }
+
+    public AmongstCondition amongstValue(Number value) {
         this.targetSet.add(new KeelMySQLQuoter(value).toString());
         return this;
     }

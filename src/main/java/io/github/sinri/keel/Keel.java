@@ -51,20 +51,33 @@ public class Keel {
         String dir = propertiesReader.getProperty(List.of("log", aspect, "dir"));
         //System.out.println("dir -> "+dir);
 
-        KeelLogger logger;
+        // check default?
         if (dir == null) {
+            dir = propertiesReader.getProperty(List.of("log", "*", "dir"));
+        }
+
+        KeelLogger logger;
+        if (dir == null || dir.trim().equals("")) {
             logger = new KeelLogger(aspect);
         } else {
             logger = new KeelLogger(new File(dir), aspect);
         }
 
         String level = propertiesReader.getProperty(List.of("log", aspect, "level"));
+        // check default?
+        if (level == null) {
+            level = propertiesReader.getProperty(List.of("log", "*", "level"));
+        }
         if (level != null) {
             KeelLogLevel lowestLogLevel = KeelLogLevel.valueOf(level);
             //System.out.println("lowestLogLevel -> "+lowestLogLevel);
             logger.setLowestLevel(lowestLogLevel);
         }
         String rotate = propertiesReader.getProperty(List.of("log", aspect, "rotate"));
+        // check default?
+        if (rotate == null) {
+            rotate = propertiesReader.getProperty(List.of("log", "*", "rotate"));
+        }
         if (rotate != null) {
             logger.setRotateDateTimeFormat(rotate);
         }
