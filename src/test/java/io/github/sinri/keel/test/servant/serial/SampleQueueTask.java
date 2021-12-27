@@ -17,6 +17,14 @@ public class SampleQueueTask extends KeelServantQueueTask {
     }
 
     @Override
+    public Future<Void> lockTask() {
+        if (this.taskId % 3 == 0) {
+            return Future.failedFuture("I let it be un-lock-able!");
+        }
+        return Future.succeededFuture();
+    }
+
+    @Override
     public Future<String> execute() {
         try {
             Thread.sleep(500);
@@ -27,5 +35,10 @@ public class SampleQueueTask extends KeelServantQueueTask {
             return Future.succeededFuture(getTaskReference() + " DONE");
         }
         return Future.failedFuture(getTaskReference() + " FAILED");
+    }
+
+    @Override
+    public Future<Void> markTaskAsCompleted(String epitaph, String feedback) {
+        return super.markTaskAsCompleted(epitaph, feedback);
     }
 }

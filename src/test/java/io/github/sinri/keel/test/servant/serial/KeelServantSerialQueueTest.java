@@ -14,18 +14,6 @@ public class KeelServantSerialQueueTest extends KeelServantSerialQueue {
     }
 
     @Override
-    public Future<String> whenExecuteFailed(Throwable throwable) {
-        System.out.println("KeelServantSerialQueueTest whenExecuteFailed " + throwable);
-        return Future.succeededFuture(null);
-    }
-
-    @Override
-    public Future<String> whenExecuteDone(String feedback) {
-        System.out.println("KeelServantSerialQueueTest whenExecuteDone " + feedback);
-        return Future.succeededFuture(null);
-    }
-
-    @Override
     public Future<KeelServantQueueTask> getNextTask() {
         int task_id = random.nextInt();
         if (task_id % 6 != 0) {
