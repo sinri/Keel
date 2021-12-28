@@ -1,4 +1,4 @@
-package io.github.sinri.keel.test.servant.serial;
+package io.github.sinri.keel.test.servant;
 
 import io.github.sinri.keel.servant.KeelServantQueueTask;
 import io.vertx.core.Future;

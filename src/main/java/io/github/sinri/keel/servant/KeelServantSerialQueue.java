@@ -7,15 +7,17 @@ import io.vertx.core.Future;
 abstract public class KeelServantSerialQueue {
 
     private final long sleepPeriod;
+    private final KeelLogger logger;
 
-    public KeelServantSerialQueue(long sleepPeriod) {
+    public KeelServantSerialQueue(long sleepPeriod, KeelLogger logger) {
         this.sleepPeriod = sleepPeriod;
+        this.logger = logger;
     }
 
     abstract public Future<KeelServantQueueTask> getNextTask();
 
     protected KeelLogger getLogger() {
-        return new KeelLogger();
+        return logger;
     }
 
     final protected void runCore(long timerID) {

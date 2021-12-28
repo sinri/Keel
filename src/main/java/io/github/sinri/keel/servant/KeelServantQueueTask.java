@@ -13,13 +13,15 @@ public abstract class KeelServantQueueTask {
     /**
      * Do any lock action here, and tell the next whether succeeded
      *
-     * @return A future with true or false
+     * @return A future with true or false, never  return failed future
      */
     public Future<Boolean> lockTask() {
         return Future.succeededFuture(true);
-        // return Future.succeededFuture(true);
     }
 
+    /**
+     * @return the success future with feedback, or failed future
+     */
     abstract public Future<String> execute();
 
     public KeelLogger getLogger() {
