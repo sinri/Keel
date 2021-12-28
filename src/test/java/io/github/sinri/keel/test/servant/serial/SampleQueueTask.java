@@ -17,11 +17,11 @@ public class SampleQueueTask extends KeelServantQueueTask {
     }
 
     @Override
-    public Future<Void> lockTask() {
+    public Future<Boolean> lockTask() {
         if (this.taskId % 3 == 0) {
-            return Future.failedFuture("I let it be un-lock-able!");
+            return Future.succeededFuture(false);
         }
-        return Future.succeededFuture();
+        return Future.succeededFuture(true);
     }
 
     @Override

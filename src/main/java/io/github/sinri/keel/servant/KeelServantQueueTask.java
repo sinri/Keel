@@ -10,8 +10,14 @@ public abstract class KeelServantQueueTask {
 
     abstract public String getTaskReference();
 
-    public Future<Void> lockTask() {
-        return Future.succeededFuture();
+    /**
+     * Do any lock action here, and tell the next whether succeeded
+     *
+     * @return A future with true or false
+     */
+    public Future<Boolean> lockTask() {
+        return Future.succeededFuture(true);
+        // return Future.succeededFuture(true);
     }
 
     abstract public Future<String> execute();
@@ -22,16 +28,19 @@ public abstract class KeelServantQueueTask {
 
     public final Future<Void> finalExecute() {
         return lockTask()
-//                .onFailure(throwable -> {
-//                    getLogger().error(getClass() + " [" + getTaskReference() + "] LOCK FAILED: " + throwable.getMessage());
-//                    getLogger().exception(throwable);
-//                })
-                .compose(locked -> execute())
-                .compose(feedback -> markTaskAsCompleted(this.EPITAPH_DONE, feedback))
-                .recover(throwable -> {
-                    getLogger().error(getClass() + " [" + getTaskReference() + "] EXECUTE FAILED: " + throwable.getMessage());
-                    getLogger().exception(throwable);
-                    return markTaskAsCompleted(this.EPITAPH_ERROR, throwable.getMessage());
+                .compose(locked -> {
+                    if (!locked) {
+                        getLogger().warning(getClass() + " [" + getTaskReference() + "] LOCK FAILED");
+                        return Future.failedFuture("LOCKED FAILED FOR [" + getTaskReference() + "] " + getClass());
+                    } else {
+                        return execute()
+                                .compose(feedback -> markTaskAsCompleted(this.EPITAPH_DONE, feedback))
+                                .recover(throwable -> {
+                                    getLogger().error(getClass() + " [" + getTaskReference() + "] EXECUTE FAILED: " + throwable.getMessage());
+                                    getLogger().exception(throwable);
+                                    return markTaskAsCompleted(this.EPITAPH_ERROR, throwable.getMessage());
+                                });
+                    }
                 });
     }
 
