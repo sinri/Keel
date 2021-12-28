@@ -22,10 +22,10 @@ public abstract class KeelServantQueueTask {
 
     public final Future<Void> finalExecute() {
         return lockTask()
-                .onFailure(throwable -> {
-                    getLogger().error(getClass() + " [" + getTaskReference() + "] LOCK FAILED: " + throwable.getMessage());
-                    getLogger().exception(throwable);
-                })
+//                .onFailure(throwable -> {
+//                    getLogger().error(getClass() + " [" + getTaskReference() + "] LOCK FAILED: " + throwable.getMessage());
+//                    getLogger().exception(throwable);
+//                })
                 .compose(locked -> execute())
                 .compose(feedback -> markTaskAsCompleted(this.EPITAPH_DONE, feedback))
                 .recover(throwable -> {

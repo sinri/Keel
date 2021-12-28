@@ -10,7 +10,7 @@ public class KeelServantSerialQueueTest extends KeelServantSerialQueue {
     static Random random = new Random();
 
     public static void main(String[] args) {
-        new KeelServantSerialQueueTest().run();
+        new KeelServantSerialQueueTest().run(1000);
     }
 
     @Override
