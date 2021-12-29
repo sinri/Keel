@@ -8,10 +8,12 @@ public class DeleteBuilderTest {
     public static void main(String[] args) {
         DeleteStatement delete = new DeleteStatement();
         delete.from("x")
-                .whereForOrGroup(
-                        groupCondition -> groupCondition
-                                .add(new RawCondition("p<b"))
-                                .add(new CompareCondition(CompareCondition.OP_EQ).compareExpression("f").againstValue("rfv"))
+                .where(
+                        conditionsComponent -> conditionsComponent
+                                .union(groupCondition -> groupCondition
+                                        .add(new RawCondition("p<b"))
+                                        .add(new CompareCondition(CompareCondition.OP_EQ).compareExpression("f").againstValue("rfv"))
+                                )
                 )
                 .orderByAsc("p")
                 .limit(4);

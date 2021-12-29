@@ -1,7 +1,10 @@
 package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.KeelHelper;
-import io.github.sinri.keel.mysql.condition.*;
+import io.github.sinri.keel.mysql.condition.CompareCondition;
+import io.github.sinri.keel.mysql.condition.GroupCondition;
+import io.github.sinri.keel.mysql.condition.KeelMySQLCondition;
+import io.github.sinri.keel.mysql.condition.RawCondition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,9 +13,11 @@ import java.util.function.Function;
 public class SelectStatement {
     private final List<String> tables = new ArrayList<>();
     private final List<String> columns = new ArrayList<>();
-    private final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
+    //    private final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
+    final ConditionsComponent whereConditionsComponent = new ConditionsComponent();
     private final List<String> categories = new ArrayList<>();
-    private final List<KeelMySQLCondition> havingConditions = new ArrayList<>();
+    //    private final List<KeelMySQLCondition> havingConditions = new ArrayList<>();
+    final ConditionsComponent havingConditionsComponent = new ConditionsComponent();
     private final List<String> sortRules = new ArrayList<>();
     private long offset = 0;
     private long limit = 0;
@@ -74,39 +79,49 @@ public class SelectStatement {
         return this;
     }
 
-    public SelectStatement where(KeelMySQLCondition condition) {
-        whereConditions.add(condition);
+    /**
+     * @param function
+     * @return
+     * @since 1.4
+     */
+    public SelectStatement where(Function<ConditionsComponent, ConditionsComponent> function) {
+        function.apply(whereConditionsComponent);
         return this;
     }
 
-    public SelectStatement whereForRaw(Function<RawCondition, RawCondition> f) {
-        RawCondition condition = new RawCondition();
-        whereConditions.add(f.apply(condition));
-        return this;
-    }
-
-    public SelectStatement whereForCompare(Function<CompareCondition, CompareCondition> f) {
-        CompareCondition condition = new CompareCondition();
-        whereConditions.add(f.apply(condition));
-        return this;
-    }
-
-    public SelectStatement whereForAmongst(Function<AmongstCondition, AmongstCondition> f) {
-        whereConditions.add(f.apply(new AmongstCondition()));
-        return this;
-    }
-
-    public SelectStatement whereForAndGroup(Function<GroupCondition, GroupCondition> f) {
-        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_AND);
-        whereConditions.add(f.apply(condition));
-        return this;
-    }
-
-    public SelectStatement whereForOrGroup(Function<GroupCondition, GroupCondition> f) {
-        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_OR);
-        whereConditions.add(f.apply(condition));
-        return this;
-    }
+//    public SelectStatement where(KeelMySQLCondition condition) {
+//        whereConditions.add(condition);
+//        return this;
+//    }
+//
+//    public SelectStatement whereForRaw(Function<RawCondition, RawCondition> f) {
+//        RawCondition condition = new RawCondition();
+//        whereConditions.add(f.apply(condition));
+//        return this;
+//    }
+//
+//    public SelectStatement whereForCompare(Function<CompareCondition, CompareCondition> f) {
+//        CompareCondition condition = new CompareCondition();
+//        whereConditions.add(f.apply(condition));
+//        return this;
+//    }
+//
+//    public SelectStatement whereForAmongst(Function<AmongstCondition, AmongstCondition> f) {
+//        whereConditions.add(f.apply(new AmongstCondition()));
+//        return this;
+//    }
+//
+//    public SelectStatement whereForAndGroup(Function<GroupCondition, GroupCondition> f) {
+//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_AND);
+//        whereConditions.add(f.apply(condition));
+//        return this;
+//    }
+//
+//    public SelectStatement whereForOrGroup(Function<GroupCondition, GroupCondition> f) {
+//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_OR);
+//        whereConditions.add(f.apply(condition));
+//        return this;
+//    }
 
     public SelectStatement groupBy(String x) {
         categories.add(x);
@@ -118,10 +133,15 @@ public class SelectStatement {
         return this;
     }
 
-    public SelectStatement having(KeelMySQLCondition condition) {
-        havingConditions.add(condition);
+    public SelectStatement having(Function<ConditionsComponent, ConditionsComponent> function) {
+        function.apply(havingConditionsComponent);
         return this;
     }
+
+//    public SelectStatement having(KeelMySQLCondition condition) {
+//        havingConditions.add(condition);
+//        return this;
+//    }
 
     public SelectStatement orderByAsc(String x) {
         sortRules.add(x);
@@ -156,15 +176,21 @@ public class SelectStatement {
         if (!tables.isEmpty()) {
             sql.append("\n").append("FROM ").append(KeelHelper.joinStringArray(tables, "\n"));
         }
-        if (!whereConditions.isEmpty()) {
-            sql.append("\n").append("WHERE ").append(KeelHelper.joinStringArray(whereConditions, "\nAND "));
+        if (!whereConditionsComponent.isEmpty()) {
+            sql.append("\n").append("WHERE ").append(whereConditionsComponent);
         }
+//        if (!whereConditions.isEmpty()) {
+//            sql.append("\n").append("WHERE ").append(KeelHelper.joinStringArray(whereConditions, "\nAND "));
+//        }
         if (!categories.isEmpty()) {
             sql.append("\n").append("GROUP BY ").append(KeelHelper.joinStringArray(categories, ","));
         }
-        if (!havingConditions.isEmpty()) {
-            sql.append("\n").append("HAVING ").append(KeelHelper.joinStringArray(havingConditions, " AND "));
+        if (!havingConditionsComponent.isEmpty()) {
+            sql.append("\n").append("HAVING ").append(havingConditionsComponent);
         }
+//        if (!havingConditions.isEmpty()) {
+//            sql.append("\n").append("HAVING ").append(KeelHelper.joinStringArray(havingConditions, " AND "));
+//        }
         if (!sortRules.isEmpty()) {
             sql.append("\n").append("ORDER BY ").append(KeelHelper.joinStringArray(sortRules, ","));
         }

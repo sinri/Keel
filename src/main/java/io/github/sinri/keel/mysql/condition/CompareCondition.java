@@ -39,6 +39,29 @@ public class CompareCondition extends KeelMySQLCondition {
         return this;
     }
 
+    /**
+     * @param leftSide    expression or value
+     * @param needQuoting TRUE for value, FALSE for expression
+     * @return CompareCondition
+     * @since 1.4
+     */
+    public CompareCondition compare(Object leftSide, Boolean needQuoting) {
+        if (needQuoting) {
+            return compareValue(leftSide);
+        } else {
+            return compareExpression(leftSide);
+        }
+    }
+
+    /**
+     * @param leftSide expression (would not be quoted)
+     * @return CompareCondition
+     * @since 1.4
+     */
+    public CompareCondition compare(Object leftSide) {
+        return compareExpression(leftSide);
+    }
+
     public CompareCondition compareExpression(Object leftSide) {
         this.leftSide = leftSide.toString();
         return this;
@@ -52,6 +75,29 @@ public class CompareCondition extends KeelMySQLCondition {
     public CompareCondition operator(String operator) {
         this.operator = operator;
         return this;
+    }
+
+    /**
+     * @param rightSide   expression or value
+     * @param needQuoting TRUE for value, FALSE for expression
+     * @return CompareCondition
+     * @since 1.4
+     */
+    public CompareCondition against(Object rightSide, Boolean needQuoting) {
+        if (needQuoting) {
+            return againstValue(rightSide);
+        } else {
+            return againstExpression(rightSide);
+        }
+    }
+
+    /**
+     * @param rightSide value (would be quoted)
+     * @return CompareCondition
+     * @since 1.4
+     */
+    public CompareCondition against(Object rightSide) {
+        return againstValue(rightSide);
     }
 
     public CompareCondition againstExpression(Object rightSide) {
@@ -107,6 +153,21 @@ public class CompareCondition extends KeelMySQLCondition {
         String x = KeelMySQLQuoter.escapeStringWithWildcards(rightSide);
         this.rightSide = "'%" + x + "'";
         return this;
+    }
+
+    /**
+     * A macro for quick coding
+     *
+     * @param fieldName field name, would not be quoted
+     * @param value     string or number, would be quoted
+     * @return this class instance
+     * @since 1.4
+     */
+    public CompareCondition filedEqualsValue(String fieldName, Object value) {
+        if (value == null) {
+            return this.isNull().compareExpression(fieldName);
+        }
+        return this.operator(OP_EQ).compareExpression(fieldName).againstValue(value);
     }
 
     @Override

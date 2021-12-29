@@ -1,7 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.KeelHelper;
-import io.github.sinri.keel.mysql.condition.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,10 @@ public class DeleteStatement {
 
     String schema;
     String table;
-    final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
+
+    // final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
+    final ConditionsComponent whereConditionsComponent = new ConditionsComponent();
+
     final List<String> sortRules = new ArrayList<>();
     long limit = 0;
 
@@ -38,39 +40,49 @@ public class DeleteStatement {
         return this;
     }
 
-    public DeleteStatement where(KeelMySQLCondition condition) {
-        whereConditions.add(condition);
+    /**
+     * @param function
+     * @return
+     * @since 1.4
+     */
+    public DeleteStatement where(Function<ConditionsComponent, ConditionsComponent> function) {
+        function.apply(whereConditionsComponent);
         return this;
     }
 
-    public DeleteStatement whereForRaw(Function<RawCondition, RawCondition> f) {
-        RawCondition condition = new RawCondition();
-        whereConditions.add(f.apply(condition));
-        return this;
-    }
-
-    public DeleteStatement whereForCompare(Function<CompareCondition, CompareCondition> f) {
-        CompareCondition condition = new CompareCondition();
-        whereConditions.add(f.apply(condition));
-        return this;
-    }
-
-    public DeleteStatement whereForAmongst(Function<AmongstCondition, AmongstCondition> f) {
-        whereConditions.add(f.apply(new AmongstCondition()));
-        return this;
-    }
-
-    public DeleteStatement whereForAndGroup(Function<GroupCondition, GroupCondition> f) {
-        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_AND);
-        whereConditions.add(f.apply(condition));
-        return this;
-    }
-
-    public DeleteStatement whereForOrGroup(Function<GroupCondition, GroupCondition> f) {
-        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_OR);
-        whereConditions.add(f.apply(condition));
-        return this;
-    }
+//    public DeleteStatement where(KeelMySQLCondition condition) {
+//        whereConditions.add(condition);
+//        return this;
+//    }
+//
+//    public DeleteStatement whereForRaw(Function<RawCondition, RawCondition> f) {
+//        RawCondition condition = new RawCondition();
+//        whereConditions.add(f.apply(condition));
+//        return this;
+//    }
+//
+//    public DeleteStatement whereForCompare(Function<CompareCondition, CompareCondition> f) {
+//        CompareCondition condition = new CompareCondition();
+//        whereConditions.add(f.apply(condition));
+//        return this;
+//    }
+//
+//    public DeleteStatement whereForAmongst(Function<AmongstCondition, AmongstCondition> f) {
+//        whereConditions.add(f.apply(new AmongstCondition()));
+//        return this;
+//    }
+//
+//    public DeleteStatement whereForAndGroup(Function<GroupCondition, GroupCondition> f) {
+//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_AND);
+//        whereConditions.add(f.apply(condition));
+//        return this;
+//    }
+//
+//    public DeleteStatement whereForOrGroup(Function<GroupCondition, GroupCondition> f) {
+//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_OR);
+//        whereConditions.add(f.apply(condition));
+//        return this;
+//    }
 
     public DeleteStatement orderByAsc(String x) {
         sortRules.add(x);
@@ -93,9 +105,12 @@ public class DeleteStatement {
             sql += schema + ".";
         }
         sql += table;
-        if (!whereConditions.isEmpty()) {
-            sql += "\nWHERE ";
-            sql += KeelHelper.joinStringArray(whereConditions, " and ");
+//        if (!whereConditions.isEmpty()) {
+//            sql += "\nWHERE ";
+//            sql += KeelHelper.joinStringArray(whereConditions, " and ");
+//        }
+        if (!whereConditionsComponent.isEmpty()) {
+            sql += "\n" + whereConditionsComponent;
         }
         if (!sortRules.isEmpty()) {
             sql += "\nORDER BY " + KeelHelper.joinStringArray(sortRules, ",");

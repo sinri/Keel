@@ -23,15 +23,15 @@ public class SelectBuilderTest {
                                                 .againstExpression("t2.id")
                                 )
                 )
-                .whereForCompare(keelMySQLCompareCondition -> keelMySQLCompareCondition.compareExpression("t2.name").contains("keyword"))
-                .whereForAmongst(amongstCondition -> amongstCondition.elementAsExpression("t2.option").not().amongstValueList(List.of("123", 456)))
                 .where(
-                        new CompareCondition("t2.name")
-                                .contains("keyword")
+                        conditionsComponent -> conditionsComponent
+                                .comparison(compareCondition -> compareCondition.compare("t2.name").contains("keyword"))
+                                .among(amongstCondition -> amongstCondition.element("t2.option").not().amongst(List.of("123", 456)))
                 )
                 .groupBy("t2.name").groupBy("t1.type")
                 .having(
-                        new CompareCondition(CompareCondition.OP_EQ).compareExpression("total").againstValue(2)
+                        conditionsComponent -> conditionsComponent
+                                .comparison(CompareCondition.OP_EQ, comparison -> comparison.compare("total").againstValue(2))
                 )
                 .limit(5, 5);
 
