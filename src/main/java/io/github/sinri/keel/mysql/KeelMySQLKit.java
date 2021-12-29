@@ -1,6 +1,7 @@
 package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
+import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.mysqlclient.MySQLClient;
@@ -267,7 +268,18 @@ public class KeelMySQLKit {
                 .onFailure(errorFunction::apply);
     }
 
-    public Future<Object> executeInConnection(Function<SqlConnection, Future<Object>> queryFunction) {
-        return getPool().withConnection(queryFunction);
+    /**
+     * @param selection the SELECT STATEMENT BUILDER
+     * @return the future for ResultMatrix, nullable
+     * @since 1.4
+     */
+    public Future<ResultMatrix> queryInConnection(SelectStatement selection) {
+        return getPool().withConnection(
+                sqlConnection -> KeelMySQLKit.executeSqlForResultMatrix(
+                        sqlConnection,
+                        selection.toString(),
+                        false
+                )
+        );
     }
 }
