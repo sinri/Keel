@@ -40,7 +40,7 @@ public class KeelControllerStyleRouterKit {
             PathParsedHandlerClassMethod result = parsePathToHandler(requestPath);
             result.run(ctx, filterList);
         } catch (NoSuchMethodException e) {
-            Keel.logger().warning(
+            Keel.outputLogger(getClass().getName()).warning(
                     "UNEXPECTED REQUEST: "
                             + ctx.request().method().toNetty() + " " + ctx.request().uri()
                             + " CAUSED BY " + e.getClass() + " : " + e.getCause()
@@ -64,11 +64,11 @@ public class KeelControllerStyleRouterKit {
             // current className + pathComponent is class ?
             try {
                 String testClassName = className + "." + pathComponent;
-                Keel.logger().debug("testClassName: " + testClassName);
+                Keel.outputLogger(getClass().getName()).debug("testClassName: " + testClassName);
                 Class<?> handlerClass = Class.forName(testClassName);
                 Method[] methods = handlerClass.getMethods();
                 for (Method method : methods) {
-                    Keel.logger().debug("Method: " + method.getName() + " with " + method.getParameterCount());
+                    Keel.outputLogger(getClass().getName()).debug("Method: " + method.getName() + " with " + method.getParameterCount());
                     if (
                             method.getName().equals(pathComponents[i + 1])
                                     && method.getParameterCount() == pathComponents.length - i - 2

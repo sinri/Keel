@@ -19,7 +19,7 @@ public class KeelMySQLKit {
     private final MySQLPool pool;
 
     public KeelMySQLKit(Vertx vertx, KeelMySQLConfig configForMySQL) {
-        Keel.logger().info("useAffectedRows: " + configForMySQL.useAffectedRows);
+        Keel.outputLogger(getClass().getName()).info("useAffectedRows: " + configForMySQL.useAffectedRows);
         pool = MySQLPool.pool(
                 vertx,
                 configForMySQL.buildMySQLConnectOptions(),

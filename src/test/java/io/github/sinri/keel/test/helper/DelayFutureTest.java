@@ -11,7 +11,7 @@ public class DelayFutureTest {
         Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(2));
         Keel.loadPropertiesFromFile("test.properties");
 
-        KeelLogger logger = Keel.logger("DelayFutureTest");
+        KeelLogger logger = Keel.outputLogger("DelayFutureTest");
         logger.info("go");
         Future<Object> future = Future.succeededFuture("a")
                 .compose(x -> {

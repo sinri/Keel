@@ -48,7 +48,7 @@ public class KeelLoggerTest {
 //                    }
 //                })
                 .test("with-properties", testContext -> {
-                    KeelLogger logger = Keel.logger("x");
+                    KeelLogger logger = Keel.outputLogger("x");
                     testContext.assertEquals(logger.getRotateDateTimeFormat(), "yyyyMMddHH");
                     logger.debug("debug");
                     logger.info("info");

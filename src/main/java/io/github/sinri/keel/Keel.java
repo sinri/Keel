@@ -84,8 +84,8 @@ public class Keel {
         return logger;
     }
 
-    public static KeelLogger logger() {
-        return new KeelLogger();
+    public static KeelLogger outputLogger(String aspect) {
+        return new KeelLogger(aspect);
     }
 
     public static KeelMySQLKit getMySQLKit(String key) {
