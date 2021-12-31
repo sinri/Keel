@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web;
 
+import io.github.sinri.keel.Keel;
 import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;
 
@@ -39,7 +40,7 @@ public class KeelControllerStyleRouterKit {
             PathParsedHandlerClassMethod result = parsePathToHandler(requestPath);
             result.run(ctx, filterList);
         } catch (NoSuchMethodException e) {
-            System.out.println(
+            Keel.logger().warning(
                     "UNEXPECTED REQUEST: "
                             + ctx.request().method().toNetty() + " " + ctx.request().uri()
                             + " CAUSED BY " + e.getClass() + " : " + e.getCause()
@@ -63,11 +64,11 @@ public class KeelControllerStyleRouterKit {
             // current className + pathComponent is class ?
             try {
                 String testClassName = className + "." + pathComponent;
-                System.out.println("testClassName: " + testClassName);
+                Keel.logger().debug("testClassName: " + testClassName);
                 Class<?> handlerClass = Class.forName(testClassName);
                 Method[] methods = handlerClass.getMethods();
                 for (Method method : methods) {
-                    System.out.println("Method: " + method.getName() + " with " + method.getParameterCount());
+                    Keel.logger().debug("Method: " + method.getName() + " with " + method.getParameterCount());
                     if (
                             method.getName().equals(pathComponents[i + 1])
                                     && method.getParameterCount() == pathComponents.length - i - 2

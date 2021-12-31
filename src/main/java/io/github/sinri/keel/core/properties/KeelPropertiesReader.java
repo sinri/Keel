@@ -28,12 +28,10 @@ public class KeelPropertiesReader {
             System.err.println("Cannot find the file config.properties. Use the embedded one.");
             try {
                 reader.properties.load(KeelPropertiesReader.class.getClassLoader().getResourceAsStream(propertiesFileName));
-                // System.out.println("reader.properties -> "+reader.properties);
             } catch (IOException ex) {
                 throw new RuntimeException("Cannot find the embedded file config.properties.", ex);
             }
         }
-        //readerMap.put(readerName, reader);
         return reader;
     }
 
@@ -46,7 +44,6 @@ public class KeelPropertiesReader {
             System.err.println("Cannot find the file config.properties. Use the embedded one.");
             try {
                 properties.load(KeelPropertiesReader.class.getClassLoader().getResourceAsStream(propertiesFileName));
-                // System.out.println("reader.properties -> "+reader.properties);
             } catch (IOException ex) {
                 throw new RuntimeException("Cannot find the embedded file config.properties.", ex);
             }

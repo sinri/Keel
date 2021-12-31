@@ -49,7 +49,6 @@ public class Keel {
         }
 
         String dir = propertiesReader.getProperty(List.of("log", aspect, "dir"));
-        //System.out.println("dir -> "+dir);
 
         // check default?
         if (dir == null) {
@@ -70,7 +69,6 @@ public class Keel {
         }
         if (level != null) {
             KeelLogLevel lowestLogLevel = KeelLogLevel.valueOf(level);
-            //System.out.println("lowestLogLevel -> "+lowestLogLevel);
             logger.setLowestLevel(lowestLogLevel);
         }
         String rotate = propertiesReader.getProperty(List.of("log", aspect, "rotate"));
@@ -84,6 +82,10 @@ public class Keel {
 
         loggerMap.put(aspect, logger);
         return logger;
+    }
+
+    public static KeelLogger logger() {
+        return new KeelLogger();
     }
 
     public static KeelMySQLKit getMySQLKit(String key) {

@@ -21,6 +21,7 @@ public class KeelLogger {
     protected boolean keepWriterReady = true;
     protected File readyFile = null;
     protected BufferedWriter readyWriter = null;
+    protected boolean showThreadID = true;
 
     public KeelLogger(File logRootDirectory, String aspect) {
         this.logRootDirectory = logRootDirectory;
@@ -65,6 +66,16 @@ public class KeelLogger {
 
     public KeelLogger setLowestLevel(KeelLogLevel lowestLevel) {
         this.lowestLevel = lowestLevel;
+        return this;
+    }
+
+    /**
+     * @param showThreadID a boolean, whether the log descriptor should prompt the thread ID
+     * @return this
+     * @since 1.5
+     */
+    public KeelLogger setShowThreadID(boolean showThreadID) {
+        this.showThreadID = showThreadID;
         return this;
     }
 
@@ -126,6 +137,7 @@ public class KeelLogger {
         String content = getCurrentDateExpression("yyyy-MM-dd HH:mm:ss") + " "
                 + "[" + level.name() + "] "
                 + "<" + aspect + "> "
+                + (showThreadID ? ("[" + Thread.currentThread().getId() + "] ") : "")
                 + msg;
         if (context != null) {
             content += " | " + context;

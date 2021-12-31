@@ -1,5 +1,6 @@
 package io.github.sinri.keel.mysql;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.vertx.core.Future;
@@ -18,7 +19,7 @@ public class KeelMySQLKit {
     private final MySQLPool pool;
 
     public KeelMySQLKit(Vertx vertx, KeelMySQLConfig configForMySQL) {
-        System.out.println("useAffectedRows: " + configForMySQL.useAffectedRows);
+        Keel.logger().info("useAffectedRows: " + configForMySQL.useAffectedRows);
         pool = MySQLPool.pool(
                 vertx,
                 configForMySQL.buildMySQLConnectOptions(),

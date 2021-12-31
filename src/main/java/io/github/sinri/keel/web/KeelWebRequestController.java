@@ -15,7 +15,7 @@ public class KeelWebRequestController {
         this.ctx = ctx;
         this.logger = new KeelLogger(KeelLogger.class.getName());
 
-        System.out.println("do something before call method!");
+        // Keel.logger().debug("do something before call method!");
     }
 
     protected String readParamForTheFirst(String name, String defaultValue) {
