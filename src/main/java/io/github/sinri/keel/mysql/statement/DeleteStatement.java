@@ -1,12 +1,15 @@
 package io.github.sinri.keel.mysql.statement;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
+import io.vertx.core.Future;
+import io.vertx.sqlclient.SqlConnection;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class DeleteStatement {
+public class DeleteStatement extends AbstractStatement {
     /**
      * DELETE [LOW_PRIORITY] [QUICK] [IGNORE] FROM tbl_name [[AS] tbl_alias]
      * [PARTITION (partition_name [, partition_name] ...)]
@@ -119,5 +122,19 @@ public class DeleteStatement {
             sql += "\nlimit " + limit;
         }
         return sql;
+    }
+
+    /**
+     * @param sqlConnection get from pool
+     * @return future with affected rows; -1 when failed
+     * @since 1.7
+     */
+    public Future<Integer> executeForAffectedRows(SqlConnection sqlConnection) {
+        return execute(sqlConnection)
+                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getTotalAffectedRows()))
+                .recover(throwable -> {
+                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
+                    return Future.succeededFuture(-1);
+                });
     }
 }

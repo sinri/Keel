@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class SelectStatement {
+public class SelectStatement extends AbstractStatement {
     private final List<String> tables = new ArrayList<>();
     private final List<String> columns = new ArrayList<>();
     //    private final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
@@ -302,6 +302,4 @@ public class SelectStatement {
             return String.valueOf(column);
         }
     }
-
-
 }

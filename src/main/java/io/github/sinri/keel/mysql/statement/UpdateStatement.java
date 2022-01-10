@@ -1,14 +1,17 @@
 package io.github.sinri.keel.mysql.statement;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
+import io.vertx.core.Future;
+import io.vertx.sqlclient.SqlConnection;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class UpdateStatement {
+public class UpdateStatement extends AbstractStatement {
     /**
      * UPDATE [LOW_PRIORITY] [IGNORE] table_reference
      * SET assignment_list
@@ -141,5 +144,19 @@ public class UpdateStatement {
             sql += "\nLIMIT " + limit;
         }
         return sql;
+    }
+
+    /**
+     * @param sqlConnection get from pool
+     * @return future with affected rows; -1 when failed
+     * @since 1.7
+     */
+    public Future<Integer> executeForAffectedRows(SqlConnection sqlConnection) {
+        return execute(sqlConnection)
+                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getTotalAffectedRows()))
+                .recover(throwable -> {
+                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
+                    return Future.succeededFuture(-1);
+                });
     }
 }

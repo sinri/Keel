@@ -1,14 +1,17 @@
 package io.github.sinri.keel.mysql.statement;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
+import io.vertx.core.Future;
+import io.vertx.sqlclient.SqlConnection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WriteIntoStatement {
+public class WriteIntoStatement extends AbstractStatement {
     /**
      * insert [ignore] into schema.table (column...) values (value...),... ON DUPLICATE KEY UPDATE assignment_list
      * insert [ignore] into schema.table (column...) [select ...| table ...] ON DUPLICATE KEY UPDATE assignment_list
@@ -16,16 +19,15 @@ public class WriteIntoStatement {
 
     public static final String INSERT = "INSERT";
     public static final String REPLACE = "REPLACE";
-
+    final List<String> columns = new ArrayList<>();
+    final List<List<String>> batchValues = new ArrayList<>();
+    final Map<String, String> onDuplicateKeyUpdateAssignmentMap = new HashMap<>();
     String writeType = INSERT;
     String ignoreMark = "";
     String schema;
     String table;
-    final List<String> columns = new ArrayList<>();
-    final List<List<String>> batchValues = new ArrayList<>();
     String sourceSelectSQL;
     String sourceTableName;
-    final Map<String, String> onDuplicateKeyUpdateAssignmentMap = new HashMap<>();
 
     public WriteIntoStatement() {
 
@@ -155,5 +157,33 @@ public class WriteIntoStatement {
             sql += KeelHelper.joinStringArray(items, ",\n");
         }
         return sql;
+    }
+
+    /**
+     * @param sqlConnection get from pool
+     * @return future with affected rows, but -1 would be returned if any error occurs
+     * @since 1.7
+     */
+    public Future<Integer> executeForAffectedRows(SqlConnection sqlConnection) {
+        return execute(sqlConnection)
+                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getTotalAffectedRows()))
+                .recover(throwable -> {
+                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
+                    return Future.succeededFuture(-1);
+                });
+    }
+
+    /**
+     * @param sqlConnection get from pool
+     * @return future with last inserted id, but -1 would be returned if any error occurs
+     * @since 1.7
+     */
+    public Future<Long> executeForLastInsertedID(SqlConnection sqlConnection) {
+        return execute(sqlConnection)
+                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getLastInsertedID()))
+                .recover(throwable -> {
+                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForLastInsertedID failed [" + throwable.getMessage() + "] when executing SQL: " + this);
+                    return Future.succeededFuture(-1L);
+                });
     }
 }

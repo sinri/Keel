@@ -5,7 +5,7 @@ import io.github.sinri.keel.core.KeelHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UnionStatement {
+public class UnionStatement extends AbstractStatement {
     final List<String> selections = new ArrayList<>();
 
     public UnionStatement() {

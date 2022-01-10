@@ -56,6 +56,14 @@ public class KeelMySQLKit {
                 + ":" + makeStandardWidthField(datetime.getSecond(), 2);
     }
 
+    /**
+     * @return Y-m-d H:i:s
+     * @since 1.7
+     */
+    public static String nowAsMySQLDatetime() {
+        return toMySQLDatetime(LocalDateTime.now());
+    }
+
     public MySQLPool getPool() {
         return pool;
     }
