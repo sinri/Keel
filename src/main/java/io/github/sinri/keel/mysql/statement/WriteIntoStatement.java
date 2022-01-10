@@ -76,6 +76,44 @@ public class WriteIntoStatement {
         return this;
     }
 
+    /**
+     * @param mapForOneRow
+     * @return
+     * @since 1.6
+     */
+    public WriteIntoStatement macroWriteOneRowWithMap(Map<String, Object> mapForOneRow) {
+        columns.clear();
+        this.batchValues.clear();
+        List<String> dataRow = new ArrayList<>();
+        mapForOneRow.forEach((key, value) -> {
+            columns.add(key);
+            dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+        });
+        this.batchValues.add(dataRow);
+        return this;
+    }
+
+    /**
+     * @param mapListForRows
+     * @return
+     * @since 1.6
+     */
+    public WriteIntoStatement macroWriteRowsWithMapList(List<Map<String, Object>> mapListForRows) {
+        columns.clear();
+        this.batchValues.clear();
+
+        mapListForRows.forEach(map -> {
+            List<String> dataRow = new ArrayList<>();
+            map.forEach((key, value) -> {
+                columns.add(key);
+                dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+            });
+            this.batchValues.add(dataRow);
+        });
+
+        return this;
+    }
+
     public WriteIntoStatement fromSelection(String selectionSQL) {
         this.sourceSelectSQL = selectionSQL;
         return this;
