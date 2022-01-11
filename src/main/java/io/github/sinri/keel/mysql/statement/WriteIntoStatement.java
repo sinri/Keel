@@ -4,12 +4,15 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WriteIntoStatement extends AbstractStatement {
     /**
@@ -79,8 +82,25 @@ public class WriteIntoStatement extends AbstractStatement {
     }
 
     /**
-     * @param mapForOneRow
-     * @return
+     * @param row One Json Object for one row
+     * @return WriteIntoStatement
+     * @since 1.7
+     */
+    public WriteIntoStatement macroWriteOneRowWithJsonObject(JsonObject row) {
+        columns.clear();
+        this.batchValues.clear();
+        List<String> dataRow = new ArrayList<>();
+        row.forEach(entry -> {
+            columns.add(entry.getKey());
+            dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+        });
+        this.batchValues.add(dataRow);
+        return this;
+    }
+
+    /**
+     * @param mapForOneRow map for one row
+     * @return WriteIntoStatement
      * @since 1.6
      */
     public WriteIntoStatement macroWriteOneRowWithMap(Map<String, Object> mapForOneRow) {
@@ -96,21 +116,48 @@ public class WriteIntoStatement extends AbstractStatement {
     }
 
     /**
-     * @param mapListForRows
-     * @return
+     * @param rows Json Array contains rows, one Json Object for one row
+     * @return WriteIntoStatement
+     * @since 1.7
+     */
+    public WriteIntoStatement macroWriteRowsWithMapList(JsonArray rows) {
+        columns.clear();
+        this.batchValues.clear();
+        AtomicBoolean isFirstRow = new AtomicBoolean(true);
+        rows.forEach(map -> {
+            List<String> dataRow = new ArrayList<>();
+
+            if (map instanceof JsonObject) {
+                ((JsonObject) map).forEach(entry -> {
+                    if (isFirstRow.get()) columns.add(entry.getKey());
+                    dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+                });
+                isFirstRow.set(false);
+            }
+            this.batchValues.add(dataRow);
+        });
+
+        return this;
+    }
+
+    /**
+     * @param mapListForRows map list for rows
+     * @return WriteIntoStatement
      * @since 1.6
      */
     public WriteIntoStatement macroWriteRowsWithMapList(List<Map<String, Object>> mapListForRows) {
         columns.clear();
         this.batchValues.clear();
+        AtomicBoolean isFirstRow = new AtomicBoolean(true);
 
         mapListForRows.forEach(map -> {
             List<String> dataRow = new ArrayList<>();
             map.forEach((key, value) -> {
-                columns.add(key);
+                if (isFirstRow.get()) columns.add(key);
                 dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
             });
             this.batchValues.add(dataRow);
+            isFirstRow.set(false);
         });
 
         return this;
