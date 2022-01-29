@@ -174,31 +174,25 @@ public class SelectStatement extends AbstractStatement {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ").append(KeelHelper.joinStringArray(columns, ","));
         if (!tables.isEmpty()) {
-            sql.append("\n").append("FROM ").append(KeelHelper.joinStringArray(tables, "\n"));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("FROM ").append(KeelHelper.joinStringArray(tables, AbstractStatement.SQL_COMPONENT_SEPARATOR));
         }
         if (!whereConditionsComponent.isEmpty()) {
-            sql.append("\n").append("WHERE ").append(whereConditionsComponent);
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("WHERE ").append(whereConditionsComponent);
         }
-//        if (!whereConditions.isEmpty()) {
-//            sql.append("\n").append("WHERE ").append(KeelHelper.joinStringArray(whereConditions, "\nAND "));
-//        }
         if (!categories.isEmpty()) {
-            sql.append("\n").append("GROUP BY ").append(KeelHelper.joinStringArray(categories, ","));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("GROUP BY ").append(KeelHelper.joinStringArray(categories, ","));
         }
         if (!havingConditionsComponent.isEmpty()) {
-            sql.append("\n").append("HAVING ").append(havingConditionsComponent);
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("HAVING ").append(havingConditionsComponent);
         }
-//        if (!havingConditions.isEmpty()) {
-//            sql.append("\n").append("HAVING ").append(KeelHelper.joinStringArray(havingConditions, " AND "));
-//        }
         if (!sortRules.isEmpty()) {
-            sql.append("\n").append("ORDER BY ").append(KeelHelper.joinStringArray(sortRules, ","));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("ORDER BY ").append(KeelHelper.joinStringArray(sortRules, ","));
         }
         if (limit > 0) {
-            sql.append("\n").append("LIMIT ").append(limit).append(" OFFSET ").append(offset);
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("LIMIT ").append(limit).append(" OFFSET ").append(offset);
         }
         if (!"".equals(lockMode)) {
-            sql.append("\n").append(lockMode);
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append(lockMode);
         }
 
         return String.valueOf(sql);

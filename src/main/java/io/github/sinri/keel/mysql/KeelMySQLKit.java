@@ -2,6 +2,7 @@ package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
+import io.github.sinri.keel.mysql.matrix.ResultMatrixWithVertx;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
@@ -197,7 +198,7 @@ public class KeelMySQLKit {
             boolean useRecover
     ) {
         Future<ResultMatrix> future = sqlConnection.preparedQuery(sqlTemplate).execute(data).compose(rows -> {
-            ResultMatrix resultMatrix = new ResultMatrix(rows);
+            ResultMatrix resultMatrix = new ResultMatrixWithVertx(rows);
             return Future.succeededFuture(resultMatrix);
         });
         if (useRecover) {
@@ -219,7 +220,7 @@ public class KeelMySQLKit {
             boolean useRecover
     ) {
         Future<ResultMatrix> future = sqlConnection.preparedQuery(sqlTemplate).execute().compose(rows -> {
-            ResultMatrix resultMatrix = new ResultMatrix(rows);
+            ResultMatrix resultMatrix = new ResultMatrixWithVertx(rows);
             return Future.succeededFuture(resultMatrix);
         });
         if (useRecover) {

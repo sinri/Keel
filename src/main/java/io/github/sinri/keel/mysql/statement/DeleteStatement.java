@@ -108,18 +108,14 @@ public class DeleteStatement extends AbstractStatement {
             sql += schema + ".";
         }
         sql += table;
-//        if (!whereConditions.isEmpty()) {
-//            sql += "\nWHERE ";
-//            sql += KeelHelper.joinStringArray(whereConditions, " and ");
-//        }
         if (!whereConditionsComponent.isEmpty()) {
-            sql += "\n" + whereConditionsComponent;
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "WHERE " + whereConditionsComponent;
         }
         if (!sortRules.isEmpty()) {
-            sql += "\nORDER BY " + KeelHelper.joinStringArray(sortRules, ",");
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + KeelHelper.joinStringArray(sortRules, ",");
         }
         if (limit > 0) {
-            sql += "\nlimit " + limit;
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "limit " + limit;
         }
         return sql;
     }

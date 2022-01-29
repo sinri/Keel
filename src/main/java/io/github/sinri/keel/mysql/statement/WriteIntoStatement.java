@@ -186,22 +186,22 @@ public class WriteIntoStatement extends AbstractStatement {
         sql += table;
         sql += " (" + KeelHelper.joinStringArray(columns, ",") + ")";
         if (sourceTableName != null) {
-            sql += "\nTABLE " + sourceTableName;
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "TABLE " + sourceTableName;
         } else if (sourceSelectSQL != null) {
-            sql += "\n" + sourceSelectSQL;
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + sourceSelectSQL;
         } else {
-            sql += "\nVALUES\n";
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "VALUES" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             for (List<String> row : batchValues) {
                 items.add("(" + KeelHelper.joinStringArray(row, ",") + ")");
             }
-            sql += KeelHelper.joinStringArray(items, ",\n");
+            sql += KeelHelper.joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         if (!onDuplicateKeyUpdateAssignmentMap.isEmpty()) {
-            sql += "\nON DUPLICATE KEY UPDATE\n";
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ON DUPLICATE KEY UPDATE" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             onDuplicateKeyUpdateAssignmentMap.forEach((key, value) -> items.add(key + " = " + value));
-            sql += KeelHelper.joinStringArray(items, ",\n");
+            sql += KeelHelper.joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         return sql;
     }

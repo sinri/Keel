@@ -130,18 +130,15 @@ public class UpdateStatement extends AbstractStatement {
             sql += " " + schema + ".";
         }
         sql += table;
-        sql += "\nSET " + KeelHelper.joinStringArray(assignments, ",");
+        sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "SET " + KeelHelper.joinStringArray(assignments, ",");
         if (!whereConditionsComponent.isEmpty()) {
-            sql += "\nWHERE " + whereConditionsComponent;
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "WHERE " + whereConditionsComponent;
         }
-//        if (!whereConditions.isEmpty()) {
-//            sql += "\nWHERE " + KeelHelper.joinStringArray(whereConditions, " and ");
-//        }
         if (!sortRules.isEmpty()) {
-            sql += "\nORDER BY " + KeelHelper.joinStringArray(sortRules, ",");
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + KeelHelper.joinStringArray(sortRules, ",");
         }
         if (limit > 0) {
-            sql += "\nLIMIT " + limit;
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "LIMIT " + limit;
         }
         return sql;
     }

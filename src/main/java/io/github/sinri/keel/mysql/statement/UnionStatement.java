@@ -13,23 +13,23 @@ public class UnionStatement extends AbstractStatement {
     }
 
     public UnionStatement(String firstSelection) {
-        selections.add("(\n" + firstSelection + "\n)");
+        selections.add("(" + AbstractStatement.SQL_COMPONENT_SEPARATOR + firstSelection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
     }
 
     public UnionStatement union(String selection) {
         if (this.selections.isEmpty()) {
-            selections.add("(\n" + selection + "\n)");
+            selections.add("(" + AbstractStatement.SQL_COMPONENT_SEPARATOR + selection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
         } else {
-            selections.add(" UNION (\n" + selection + "\n)");
+            selections.add(" UNION (" + AbstractStatement.SQL_COMPONENT_SEPARATOR + selection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
         }
         return this;
     }
 
     public UnionStatement unionAll(String selection) {
         if (this.selections.isEmpty()) {
-            selections.add("(\n" + selection + "\n)");
+            selections.add("(" + AbstractStatement.SQL_COMPONENT_SEPARATOR + selection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
         } else {
-            selections.add(" UNION ALL (\n" + selection + "\n)");
+            selections.add(" UNION ALL (" + AbstractStatement.SQL_COMPONENT_SEPARATOR + selection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
         }
         return this;
     }

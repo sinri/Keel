@@ -64,4 +64,15 @@ public class KeelMySQLConfig {
         return new PoolOptions().setMaxSize(this.poolMaxSize).setShared(this.poolShared);
     }
 
+    public String buildJDBCConnectionString() {
+        return "jdbc:mysql://" + host + ":" + port + "/" + schema + "?useSSL=false&useUnicode=true&characterEncoding=utf8";
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }
