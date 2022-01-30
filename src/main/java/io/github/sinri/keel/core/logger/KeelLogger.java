@@ -7,7 +7,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The Logger For Keel Project
@@ -24,8 +26,21 @@ public class KeelLogger {
     protected boolean showThreadID = true;
 
     public KeelLogger(File logRootDirectory, String aspect) {
-        this.logRootDirectory = logRootDirectory;
-        this.aspect = aspect;
+        String[] aspectParts = aspect.split("[/\\\\]+");
+        List<String> list = new ArrayList<>();
+        for (var x : aspectParts) {
+            if (x == null || x.trim().equalsIgnoreCase("")) continue;
+            list.add(x);
+        }
+        if (list.size() > 1) {
+            for (int i = 0; i < list.size() - 1; i++) {
+                this.logRootDirectory = new File(logRootDirectory.getAbsolutePath() + File.separator + list.get(i));
+            }
+            this.aspect = aspectParts[list.size() - 1];
+        } else {
+            this.logRootDirectory = logRootDirectory;
+            this.aspect = aspect;
+        }
     }
 
     public KeelLogger(String aspect) {
@@ -120,6 +135,7 @@ public class KeelLogger {
         String realPath = aspectDir.getAbsolutePath()
                 + File.separator
                 + aspect + "-" + getCurrentDateExpression(rotateDateTimeFormat) + ".log";
+
         if (keepWriterReady) {
             if (readyFile == null || !readyFile.getAbsolutePath().equals(realPath)) {
                 readyFile = new File(realPath);
