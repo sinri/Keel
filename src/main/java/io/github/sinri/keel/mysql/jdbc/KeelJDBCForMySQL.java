@@ -20,10 +20,11 @@ public class KeelJDBCForMySQL {
         //System.out.println("JDBC: "+this.jdbcConnectionString);
     }
 
-    public ConnectionWrapper makeConnection() {
+    public ConnectionWrapper makeConnectionWrapper(boolean autoCommit) {
         Connection connection;
         try {
             connection = DriverManager.getConnection(jdbcConnectionString, username, password);
+            connection.setAutoCommit(autoCommit);
         } catch (SQLException e) {
             Keel.logger("JDBC").exception(e);
             connection = null;
@@ -31,10 +32,11 @@ public class KeelJDBCForMySQL {
         return ConnectionWrapper.wrap(connection);
     }
 
-    public ConnectionStatementWrapper makeStatement() {
+    public ConnectionStatementWrapper makeStatementWrapper(boolean autoCommit) {
         Connection connection;
         try {
             connection = DriverManager.getConnection(jdbcConnectionString, username, password);
+            connection.setAutoCommit(autoCommit);
         } catch (SQLException e) {
             Keel.logger("JDBC").exception(e);
             connection = null;
@@ -43,7 +45,7 @@ public class KeelJDBCForMySQL {
     }
 
     public ResultMatrix queryForSelection(String sql) {
-        try (ConnectionStatementWrapper statement = makeStatement()) {
+        try (ConnectionStatementWrapper statement = makeStatementWrapper(true)) {
             ResultSet resultSet = statement.getStatement().executeQuery(sql);
             ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC(resultSet);
             resultSet.close();
@@ -54,8 +56,15 @@ public class KeelJDBCForMySQL {
         }
     }
 
+    public ResultMatrix queryForSelection(String sql, Statement statement) throws SQLException {
+        ResultSet resultSet = statement.executeQuery(sql);
+        ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC(resultSet);
+        resultSet.close();
+        return resultMatrixWithJDBC;
+    }
+
     public ResultMatrix executeForInsertion(String sql) {
-        try (ConnectionStatementWrapper statement = makeStatement()) {
+        try (ConnectionStatementWrapper statement = makeStatementWrapper(true)) {
             int afx = statement.getStatement().executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 
             long autoIncKeyFromApi = -1;
@@ -78,8 +87,27 @@ public class KeelJDBCForMySQL {
         }
     }
 
+    public ResultMatrix executeForInsertion(String sql, Statement statement) throws SQLException {
+        int afx = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+
+        long autoIncKeyFromApi = -1;
+
+        ResultSet rs = statement.getGeneratedKeys();
+
+        if (rs.next()) {
+            autoIncKeyFromApi = rs.getLong(1);
+        }
+
+        rs.close();
+
+        ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC();
+        resultMatrixWithJDBC.setAffectedRows(afx);
+        resultMatrixWithJDBC.setLastInsertedID(autoIncKeyFromApi);
+        return resultMatrixWithJDBC;
+    }
+
     public ResultMatrix executeForModification(String sql) {
-        try (ConnectionStatementWrapper statement = makeStatement()) {
+        try (ConnectionStatementWrapper statement = makeStatementWrapper(true)) {
             int afx = statement.getStatement().executeUpdate(sql);
             ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC();
             resultMatrixWithJDBC.setAffectedRows(afx);
@@ -88,6 +116,45 @@ public class KeelJDBCForMySQL {
             Keel.logger("JDBC").exception(e);
             return null;
         }
+    }
+
+    public ResultMatrix executeForModification(String sql, Statement statement) throws SQLException {
+        int afx = statement.executeUpdate(sql);
+        ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC();
+        resultMatrixWithJDBC.setAffectedRows(afx);
+        return resultMatrixWithJDBC;
+    }
+
+    public Statement createStatement(boolean autoCommit) throws SQLException {
+        Connection connection = DriverManager.getConnection(jdbcConnectionString, username, password);
+        connection.setAutoCommit(autoCommit);
+        return connection.createStatement();
+    }
+
+    public void closeStatement(Statement statement) throws SQLException {
+        Connection connection = statement.getConnection();
+        statement.close();
+        statement.close();
+    }
+
+    public Statement begin() throws SQLException {
+        Connection connection = DriverManager.getConnection(jdbcConnectionString, username, password);
+        connection.setAutoCommit(false);
+        return connection.createStatement();
+    }
+
+    public void commit(Statement statement) throws SQLException {
+        Connection connection = statement.getConnection();
+        connection.commit();
+        statement.close();
+        statement.close();
+    }
+
+    public void rollback(Statement statement) throws SQLException {
+        Connection connection = statement.getConnection();
+        connection.rollback();
+        statement.close();
+        statement.close();
     }
 
     public static class ConnectionWrapper implements AutoCloseable {
