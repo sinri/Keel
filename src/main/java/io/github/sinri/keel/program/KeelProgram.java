@@ -58,7 +58,16 @@ abstract public class KeelProgram {
 
     abstract protected List<Option> defineCLIOptions(String action);
 
+    /**
+     * @param args   arguments as list
+     * @param action the action
+     * @since 1.9 default as block mode
+     */
     public final void executeFromCLI(List<String> args, String action) {
+        executeFromCLI(args, action, true);
+    }
+
+    public final void executeFromCLI(List<String> args, String action, boolean runBlocked) {
         List<Option> options = defineCLIOptions(action);
         CLI cli = CLI.create(getClass().getName());
         for (var option : options) {
@@ -78,12 +87,24 @@ abstract public class KeelProgram {
         x.put("options", y);
         getLogger().info(getClass() + " executeFromCLI starting", x);
 
-        execute(action).eventually(v -> Keel.getVertx().close());
+        if (runBlocked) {
+            blockedExecute(action);
+        } else {
+            execute(action).eventually(v -> Keel.getVertx().close());
+        }
     }
+
 
     /**
      * @param action the action
      * @return should not be null
+     * @deprecated since 1.9 blocked is better?
      */
     abstract protected Future<Void> execute(String action);
+
+    /**
+     * @param action the action
+     * @since 1.9
+     */
+    abstract protected void blockedExecute(String action);
 }
