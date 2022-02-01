@@ -45,7 +45,7 @@ abstract public class KeelProgram {
     }
 
     protected KeelLogger generateLogger() {
-        return Keel.logger(getClass().getSimpleName());
+        return Keel.logger("program/" + getClass().getSimpleName());
     }
 
     protected KeelLogger getLogger() {
