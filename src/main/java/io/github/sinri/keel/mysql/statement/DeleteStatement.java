@@ -2,9 +2,13 @@ package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -53,40 +57,6 @@ public class DeleteStatement extends AbstractStatement {
         return this;
     }
 
-//    public DeleteStatement where(KeelMySQLCondition condition) {
-//        whereConditions.add(condition);
-//        return this;
-//    }
-//
-//    public DeleteStatement whereForRaw(Function<RawCondition, RawCondition> f) {
-//        RawCondition condition = new RawCondition();
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-//
-//    public DeleteStatement whereForCompare(Function<CompareCondition, CompareCondition> f) {
-//        CompareCondition condition = new CompareCondition();
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-//
-//    public DeleteStatement whereForAmongst(Function<AmongstCondition, AmongstCondition> f) {
-//        whereConditions.add(f.apply(new AmongstCondition()));
-//        return this;
-//    }
-//
-//    public DeleteStatement whereForAndGroup(Function<GroupCondition, GroupCondition> f) {
-//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_AND);
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-//
-//    public DeleteStatement whereForOrGroup(Function<GroupCondition, GroupCondition> f) {
-//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_OR);
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-
     public DeleteStatement orderByAsc(String x) {
         sortRules.add(x);
         return this;
@@ -132,5 +102,10 @@ public class DeleteStatement extends AbstractStatement {
                     Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
                     return Future.succeededFuture(-1);
                 });
+    }
+
+    @Override
+    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
+        return KeelJDBCForMySQL.executeForModification(this.toString(), statement);
     }
 }

@@ -37,12 +37,10 @@ public abstract class KeelServantParallelQueue {
     }
 
     final public void run(boolean batchSeek) {
-        Keel.getVertx().setTimer(sleepPeriod, timerID -> {
-            runOneTrail(batchSeek).compose(goForNext -> {
-                run(batchSeek);
-                return Future.succeededFuture();
-            });
-        });
+        Keel.getVertx().setTimer(sleepPeriod, timerID -> runOneTrail(batchSeek).compose(goForNext -> {
+            run(batchSeek);
+            return Future.succeededFuture();
+        }));
     }
 
     final protected Future<Boolean> runOneTrail(boolean batchSeek) {

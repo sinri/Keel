@@ -64,10 +64,6 @@ public class ResultMatrixWithVertx implements ResultMatrix {
         return rowList.get(index).toJson();
     }
 
-//    public Row getFirstRow() {
-//        return rowList.get(0);
-//    }
-
     public String getOneColumnOfFirstRowAsString(String columnName) {
         return rowList.get(0).getString(columnName);
     }

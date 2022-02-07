@@ -5,7 +5,11 @@ import io.github.sinri.keel.mysql.condition.CompareCondition;
 import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.KeelMySQLCondition;
 import io.github.sinri.keel.mysql.condition.RawCondition;
+import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -89,40 +93,6 @@ public class SelectStatement extends AbstractStatement {
         return this;
     }
 
-//    public SelectStatement where(KeelMySQLCondition condition) {
-//        whereConditions.add(condition);
-//        return this;
-//    }
-//
-//    public SelectStatement whereForRaw(Function<RawCondition, RawCondition> f) {
-//        RawCondition condition = new RawCondition();
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-//
-//    public SelectStatement whereForCompare(Function<CompareCondition, CompareCondition> f) {
-//        CompareCondition condition = new CompareCondition();
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-//
-//    public SelectStatement whereForAmongst(Function<AmongstCondition, AmongstCondition> f) {
-//        whereConditions.add(f.apply(new AmongstCondition()));
-//        return this;
-//    }
-//
-//    public SelectStatement whereForAndGroup(Function<GroupCondition, GroupCondition> f) {
-//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_AND);
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-//
-//    public SelectStatement whereForOrGroup(Function<GroupCondition, GroupCondition> f) {
-//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_OR);
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-
     public SelectStatement groupBy(String x) {
         categories.add(x);
         return this;
@@ -137,11 +107,6 @@ public class SelectStatement extends AbstractStatement {
         function.apply(havingConditionsComponent);
         return this;
     }
-
-//    public SelectStatement having(KeelMySQLCondition condition) {
-//        havingConditions.add(condition);
-//        return this;
-//    }
 
     public SelectStatement orderByAsc(String x) {
         sortRules.add(x);
@@ -295,5 +260,10 @@ public class SelectStatement extends AbstractStatement {
             }
             return String.valueOf(column);
         }
+    }
+
+    @Override
+    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
+        return KeelJDBCForMySQL.queryForSelection(this.toString(), statement);
     }
 }

@@ -3,9 +3,13 @@ package io.github.sinri.keel.mysql.statement;
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
+import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -75,40 +79,6 @@ public class UpdateStatement extends AbstractStatement {
         return this;
     }
 
-//    public UpdateStatement where(KeelMySQLCondition condition) {
-//        whereConditions.add(condition);
-//        return this;
-//    }
-//
-//    public UpdateStatement whereForRaw(Function<RawCondition, RawCondition> f) {
-//        RawCondition condition = new RawCondition();
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-//
-//    public UpdateStatement whereForCompare(Function<CompareCondition, CompareCondition> f) {
-//        CompareCondition condition = new CompareCondition();
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-//
-//    public UpdateStatement whereForAmongst(Function<AmongstCondition, AmongstCondition> f) {
-//        whereConditions.add(f.apply(new AmongstCondition()));
-//        return this;
-//    }
-//
-//    public UpdateStatement whereForAndGroup(Function<GroupCondition, GroupCondition> f) {
-//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_AND);
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-//
-//    public UpdateStatement whereForOrGroup(Function<GroupCondition, GroupCondition> f) {
-//        GroupCondition condition = new GroupCondition(GroupCondition.JUNCTION_FOR_OR);
-//        whereConditions.add(f.apply(condition));
-//        return this;
-//    }
-
     public UpdateStatement orderByAsc(String x) {
         sortRules.add(x);
         return this;
@@ -155,5 +125,10 @@ public class UpdateStatement extends AbstractStatement {
                     Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
                     return Future.succeededFuture(-1);
                 });
+    }
+
+    @Override
+    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
+        return KeelJDBCForMySQL.executeForModification(this.toString(), statement);
     }
 }

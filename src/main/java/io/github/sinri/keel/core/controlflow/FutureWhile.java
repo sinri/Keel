@@ -11,8 +11,8 @@ import java.util.function.Function;
 public class FutureWhile<T> {
     protected T lastValue;
     protected boolean deadInWhile;
-    protected Function<FutureWhile<T>, Boolean> whileStopJudgeFunction;
-    protected Function<T, Future<T>> cycleFunction;
+    protected final Function<FutureWhile<T>, Boolean> whileStopJudgeFunction;
+    protected final Function<T, Future<T>> cycleFunction;
 
     public FutureWhile(
             T initValue,

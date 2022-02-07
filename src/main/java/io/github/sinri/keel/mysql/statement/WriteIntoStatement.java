@@ -3,11 +3,15 @@ package io.github.sinri.keel.mysql.statement;
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
+import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -232,5 +236,10 @@ public class WriteIntoStatement extends AbstractStatement {
                     Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForLastInsertedID failed [" + throwable.getMessage() + "] when executing SQL: " + this);
                     return Future.succeededFuture(-1L);
                 });
+    }
+
+    @Override
+    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
+        return KeelJDBCForMySQL.executeForInsertion(this.toString(), statement);
     }
 }

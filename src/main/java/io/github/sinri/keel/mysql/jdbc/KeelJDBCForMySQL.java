@@ -56,7 +56,14 @@ public class KeelJDBCForMySQL {
         }
     }
 
-    public ResultMatrix queryForSelection(String sql, Statement statement) throws SQLException {
+    /**
+     * @param sql
+     * @param statement
+     * @return
+     * @throws SQLException
+     * @since 1.9 became static
+     */
+    public static ResultMatrix queryForSelection(String sql, Statement statement) throws SQLException {
         ResultSet resultSet = statement.executeQuery(sql);
         ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC(resultSet);
         resultSet.close();
@@ -87,7 +94,14 @@ public class KeelJDBCForMySQL {
         }
     }
 
-    public ResultMatrix executeForInsertion(String sql, Statement statement) throws SQLException {
+    /**
+     * @param sql
+     * @param statement
+     * @return
+     * @throws SQLException
+     * @since 1.9 became static
+     */
+    public static ResultMatrix executeForInsertion(String sql, Statement statement) throws SQLException {
         int afx = statement.executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
 
         long autoIncKeyFromApi = -1;
@@ -118,7 +132,14 @@ public class KeelJDBCForMySQL {
         }
     }
 
-    public ResultMatrix executeForModification(String sql, Statement statement) throws SQLException {
+    /**
+     * @param sql       SQL
+     * @param statement Statement
+     * @return
+     * @throws SQLException
+     * @since 1.9 became static
+     */
+    public static ResultMatrix executeForModification(String sql, Statement statement) throws SQLException {
         int afx = statement.executeUpdate(sql);
         ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC();
         resultMatrixWithJDBC.setAffectedRows(afx);
@@ -131,7 +152,12 @@ public class KeelJDBCForMySQL {
         return connection.createStatement();
     }
 
-    public void closeStatement(Statement statement) throws SQLException {
+    /**
+     * @param statement
+     * @throws SQLException
+     * @since 1.9 became static
+     */
+    public static void closeStatement(Statement statement) throws SQLException {
         Connection connection = statement.getConnection();
         statement.close();
         statement.close();
@@ -143,14 +169,24 @@ public class KeelJDBCForMySQL {
         return connection.createStatement();
     }
 
-    public void commit(Statement statement) throws SQLException {
+    /**
+     * @param statement the statement
+     * @throws SQLException
+     * @since 1.9 became static
+     */
+    public static void commit(Statement statement) throws SQLException {
         Connection connection = statement.getConnection();
         connection.commit();
         statement.close();
         statement.close();
     }
 
-    public void rollback(Statement statement) throws SQLException {
+    /**
+     * @param statement the statement
+     * @throws SQLException
+     * @since 1.9 became static
+     */
+    public static void rollback(Statement statement) throws SQLException {
         Connection connection = statement.getConnection();
         connection.rollback();
         statement.close();

@@ -70,14 +70,8 @@ public class KeelAwait<T> {
 
         while (true) {
             if (this.awaitStatus == AwaitStatus.INIT) {
-//                Keel.outputLogger("KeelAwait").info("YIELD start");
-//                Thread.yield();
-//                Keel.outputLogger("KeelAwait").info("YIELD end");
-
                 try {
-//                    Keel.outputLogger("KeelAwait").info("SLEEP start");
                     Thread.sleep(waitTime);
-//                    Keel.outputLogger("KeelAwait").info("SLEEP end");
                 } catch (InterruptedException e) {
                     Keel.outputLogger("KeelAwait").exception(e);
                 }

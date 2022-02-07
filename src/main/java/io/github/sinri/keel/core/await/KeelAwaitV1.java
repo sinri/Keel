@@ -29,9 +29,7 @@ public class KeelAwaitV1<T> {
         messageId = this.toString();
 
         MessageConsumer<AwaitStatus> objectMessageConsumer = Keel.getEventBus().consumer(messageId);
-        objectMessageConsumer.handler(integerMessage -> {
-            awaitStatus = integerMessage.body();
-        });
+        objectMessageConsumer.handler(integerMessage -> awaitStatus = integerMessage.body());
 
         awaitStatus = AwaitStatus.INIT;
         result = null;
@@ -69,10 +67,6 @@ public class KeelAwaitV1<T> {
             }
         }
     }
-
-//    public static <T> T x(T a){
-//
-//    }
 
     private enum AwaitStatus {
         INIT, DONE, ERROR;
