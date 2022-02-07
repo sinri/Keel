@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * @since 1.9 all the callback function could return null safely. by Sinri 2020-02-07
+ */
 public class ConditionsComponent {
     protected final List<KeelMySQLCondition> conditions;
 
@@ -19,32 +22,49 @@ public class ConditionsComponent {
     }
 
     public ConditionsComponent comparison(Function<CompareCondition, CompareCondition> function) {
-        conditions.add(function.apply(new CompareCondition()));
+        CompareCondition condition = function.apply(new CompareCondition());
+        if (condition != null) {
+            conditions.add(condition);
+        }
         return this;
     }
 
     public ConditionsComponent comparison(String operator, Function<CompareCondition, CompareCondition> function) {
-        conditions.add(function.apply(new CompareCondition(operator)));
+        CompareCondition condition = function.apply(new CompareCondition(operator));
+        if (condition != null) {
+            conditions.add(condition);
+        }
         return this;
     }
 
     public ConditionsComponent among(Function<AmongstCondition, AmongstCondition> function) {
-        conditions.add(function.apply(new AmongstCondition()));
+        AmongstCondition condition = function.apply(new AmongstCondition());
+        if (condition != null) {
+            conditions.add(condition);
+        }
         return this;
     }
 
     public ConditionsComponent intersection(Function<GroupCondition, GroupCondition> function) {
-        conditions.add(function.apply(new GroupCondition(GroupCondition.JUNCTION_FOR_AND)));
+        GroupCondition condition = function.apply(new GroupCondition(GroupCondition.JUNCTION_FOR_AND));
+        if (condition != null) {
+            conditions.add(condition);
+        }
         return this;
     }
 
     public ConditionsComponent union(Function<GroupCondition, GroupCondition> function) {
-        conditions.add(function.apply(new GroupCondition(GroupCondition.JUNCTION_FOR_OR)));
+        GroupCondition condition = function.apply(new GroupCondition(GroupCondition.JUNCTION_FOR_OR));
+        if (condition != null) {
+            conditions.add(condition);
+        }
         return this;
     }
 
     public ConditionsComponent raw(String raw) {
-        conditions.add(new RawCondition(raw));
+        if (raw != null && !raw.isEmpty()) {
+            conditions.add(new RawCondition(raw));
+        }
         return this;
     }
 
