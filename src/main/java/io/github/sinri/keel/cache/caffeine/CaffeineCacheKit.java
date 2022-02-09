@@ -3,16 +3,22 @@ package io.github.sinri.keel.cache.caffeine;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
+import io.github.sinri.keel.cache.KeelCacheInterface;
 import org.checkerframework.checker.index.qual.NonNegative;
 
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-public class CaffeineCacheKitV2<K, V> {
+/**
+ * @param <K> class for key
+ * @param <V> class for value
+ * @since 1.9
+ */
+public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
     protected Cache<K, ValueWrapper<V>> cache;
 
-    public CaffeineCacheKitV2() {
+    public CaffeineCacheKit() {
         this.cache = Caffeine.newBuilder()
                 .expireAfter(new Expiry<K, ValueWrapper<V>>() {
                     @Override
@@ -59,7 +65,19 @@ public class CaffeineCacheKitV2<K, V> {
         return valueWrapper.getValue();
     }
 
-    public static class ValueWrapper<P> {
+    public void remove(K key) {
+        this.cache.invalidate(key);
+    }
+
+    public void removeAll() {
+        this.cache.invalidateAll();
+    }
+
+    public void cleanUp() {
+        this.cache.cleanUp();
+    }
+
+    protected static class ValueWrapper<P> {
         private final P value;
         private final long death;
         private final long birth;

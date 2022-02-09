@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 
 import java.util.concurrent.TimeUnit;
 
+@Deprecated
 public class CaffeineCacheKitV1<T> {
     protected Cache<String, T> cache;
 

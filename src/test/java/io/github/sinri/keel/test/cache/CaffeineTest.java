@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.cache;
 
-import io.github.sinri.keel.cache.caffeine.CaffeineCacheKitV1;
+import io.github.sinri.keel.cache.caffeine.CaffeineCacheKit;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.json.JsonObject;
 
@@ -8,17 +8,17 @@ import java.time.LocalDateTime;
 
 public class CaffeineTest {
     static KeelLogger logger = new KeelLogger();
-    static CaffeineCacheKitV1<String> x = new CaffeineCacheKitV1<>();
+    static CaffeineCacheKit<String, String> x = new CaffeineCacheKit<>();
 
     public static void main(String[] args) {
-        try {
-            test1();
-            test2();
-            test3();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            test1();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
+        test2();
+//        test3();
     }
 
     private static void test1() throws InterruptedException {
@@ -26,39 +26,41 @@ public class CaffeineTest {
         logReadResult(key, null);
 
         String time1 = LocalDateTime.now().toString();
-        x.save(key, time1);
+        x.save(key, time1, 4);
         logReadResult(key, time1);
 
-        Thread.sleep(6000);
+        Thread.sleep(3000);
         logReadResult(key, time1);
 
-        Thread.sleep(6000);
+        Thread.sleep(3000);
         logReadResult(key, null);
 
     }
 
 
     private static void test2() {
-        String key = "k2";
-
-        x.save(key, "1");
-        logReadResult(key, "1");
-        x.save(key, "2");
-        logReadResult(key, "2");
-        x.save(key, "3");
-        logReadResult(key, "3");
-        x.save(key, "4");
-        logReadResult(key, "4");
-        x.save(key, "5");
-        logReadResult(key, "5");
+        logger.info("test for a lot of cache start");
+        for (long i = 0; i < 10000000; i++) {
+            x.save("TEST2-" + i, "VALUE FOR " + i, 20);
+        }
+        logger.info("test for a lot of cache end");
     }
 
     private static void test3() {
         for (int i = 1; i <= 6; i++) {
-            x.save("3." + i, "" + i);
+            x.save("3." + i, "" + i, 10);
 
             for (int j = 1; j <= 6; j++) {
                 logReadResult("3." + j, j <= i ? ("" + j) : null);
+            }
+
+            if (i == 4) {
+                x.remove("3.1");
+                logger.warning("remove 3.1");
+            }
+            if (i == 5) {
+                x.removeAll();
+                logger.warning("remove all");
             }
         }
     }
