@@ -17,7 +17,11 @@ abstract public class AbstractStatement {
      */
     public abstract String toString();
 
-    public static String SQL_COMPONENT_SEPARATOR = " ";//"\n";
+    protected static String SQL_COMPONENT_SEPARATOR = " ";//"\n";
+
+    public static void setSqlComponentSeparator(String sqlComponentSeparator) {
+        SQL_COMPONENT_SEPARATOR = sqlComponentSeparator;
+    }
 
     /**
      * @param sqlConnection Fetched from Pool

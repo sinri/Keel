@@ -267,6 +267,11 @@ public class KeelMySQLKit {
         });
     }
 
+    /**
+     * @param transactionBody
+     * @param doneFunction
+     * @param errorFunction
+     */
     public void executeInTransaction(
             Function<SqlConnection, Future<Object>> transactionBody,
             Function<Object, Void> doneFunction,

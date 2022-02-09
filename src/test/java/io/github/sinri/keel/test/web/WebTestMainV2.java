@@ -16,7 +16,8 @@ public class WebTestMainV2 {
         // static route
         khs.getRouter().get("/").handler(ctx -> ctx.response().end("HERE IS ROOT"));
         // automatic Controller - Method route
-        KeelControllerStyleRouterKit keelControllerStyleRouterKit = new KeelControllerStyleRouterKit("io.github.sinri.Keel.test.web.controller");
+        KeelControllerStyleRouterKit keelControllerStyleRouterKit = new KeelControllerStyleRouterKit("io.github.sinri.keel.test.web.controller");
+        keelControllerStyleRouterKit.setLogger(Keel.outputLogger("KeelControllerStyleRouterKit"));
         khs.getRouter()
                 .route()
                 .handler(BodyHandler.create())

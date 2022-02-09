@@ -16,7 +16,7 @@ import java.util.function.Function;
  * @since 1.9
  */
 public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
-    protected Cache<K, ValueWrapper<V>> cache;
+    protected final Cache<K, ValueWrapper<V>> cache;
 
     public CaffeineCacheKit() {
         this.cache = Caffeine.newBuilder()

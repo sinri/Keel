@@ -20,6 +20,9 @@ public class KeelJDBCForMySQL {
         //System.out.println("JDBC: "+this.jdbcConnectionString);
     }
 
+    private final ThreadLocalStatementWrapper threadLocalStatementWrapper = new ThreadLocalStatementWrapper(this);
+
+    @Deprecated
     public ConnectionWrapper makeConnectionWrapper(boolean autoCommit) {
         Connection connection;
         try {
@@ -32,6 +35,7 @@ public class KeelJDBCForMySQL {
         return ConnectionWrapper.wrap(connection);
     }
 
+    @Deprecated
     public ConnectionStatementWrapper makeStatementWrapper(boolean autoCommit) {
         Connection connection;
         try {
@@ -42,18 +46,6 @@ public class KeelJDBCForMySQL {
             connection = null;
         }
         return ConnectionStatementWrapper.wrap(connection);
-    }
-
-    public ResultMatrix queryForSelection(String sql) {
-        try (ConnectionStatementWrapper statement = makeStatementWrapper(true)) {
-            ResultSet resultSet = statement.getStatement().executeQuery(sql);
-            ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC(resultSet);
-            resultSet.close();
-            return resultMatrixWithJDBC;
-        } catch (Exception e) {
-            Keel.logger("JDBC").exception(e);
-            return null;
-        }
     }
 
     /**
@@ -70,23 +62,12 @@ public class KeelJDBCForMySQL {
         return resultMatrixWithJDBC;
     }
 
-    public ResultMatrix executeForInsertion(String sql) {
+    @Deprecated
+    public ResultMatrix queryForSelection(String sql) {
         try (ConnectionStatementWrapper statement = makeStatementWrapper(true)) {
-            int afx = statement.getStatement().executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
-
-            long autoIncKeyFromApi = -1;
-
-            ResultSet rs = statement.getStatement().getGeneratedKeys();
-
-            if (rs.next()) {
-                autoIncKeyFromApi = rs.getLong(1);
-            }
-
-            rs.close();
-
-            ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC();
-            resultMatrixWithJDBC.setAffectedRows(afx);
-            resultMatrixWithJDBC.setLastInsertedID(autoIncKeyFromApi);
+            ResultSet resultSet = statement.getStatement().executeQuery(sql);
+            ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC(resultSet);
+            resultSet.close();
             return resultMatrixWithJDBC;
         } catch (Exception e) {
             Keel.logger("JDBC").exception(e);
@@ -120,11 +101,24 @@ public class KeelJDBCForMySQL {
         return resultMatrixWithJDBC;
     }
 
-    public ResultMatrix executeForModification(String sql) {
+    @Deprecated
+    public ResultMatrix executeForInsertion(String sql) {
         try (ConnectionStatementWrapper statement = makeStatementWrapper(true)) {
-            int afx = statement.getStatement().executeUpdate(sql);
+            int afx = statement.getStatement().executeUpdate(sql, Statement.RETURN_GENERATED_KEYS);
+
+            long autoIncKeyFromApi = -1;
+
+            ResultSet rs = statement.getStatement().getGeneratedKeys();
+
+            if (rs.next()) {
+                autoIncKeyFromApi = rs.getLong(1);
+            }
+
+            rs.close();
+
             ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC();
             resultMatrixWithJDBC.setAffectedRows(afx);
+            resultMatrixWithJDBC.setLastInsertedID(autoIncKeyFromApi);
             return resultMatrixWithJDBC;
         } catch (Exception e) {
             Keel.logger("JDBC").exception(e);
@@ -193,6 +187,24 @@ public class KeelJDBCForMySQL {
         statement.close();
     }
 
+    @Deprecated
+    public ResultMatrix executeForModification(String sql) {
+        try (ConnectionStatementWrapper statement = makeStatementWrapper(true)) {
+            int afx = statement.getStatement().executeUpdate(sql);
+            ResultMatrixWithJDBC resultMatrixWithJDBC = new ResultMatrixWithJDBC();
+            resultMatrixWithJDBC.setAffectedRows(afx);
+            return resultMatrixWithJDBC;
+        } catch (Exception e) {
+            Keel.logger("JDBC").exception(e);
+            return null;
+        }
+    }
+
+    public ThreadLocalStatementWrapper getThreadLocalStatementWrapper() {
+        return threadLocalStatementWrapper;
+    }
+
+    @Deprecated
     public static class ConnectionWrapper implements AutoCloseable {
         protected final Connection connection;
 
@@ -200,6 +212,7 @@ public class KeelJDBCForMySQL {
             this.connection = connection;
         }
 
+        @Deprecated
         public static ConnectionWrapper wrap(Connection connection) {
             return new ConnectionWrapper(connection);
         }
@@ -217,6 +230,7 @@ public class KeelJDBCForMySQL {
         }
     }
 
+    @Deprecated
     public static class ConnectionStatementWrapper extends ConnectionWrapper implements AutoCloseable {
         protected Statement statement = null;
 
@@ -250,4 +264,5 @@ public class KeelJDBCForMySQL {
             }
         }
     }
+
 }

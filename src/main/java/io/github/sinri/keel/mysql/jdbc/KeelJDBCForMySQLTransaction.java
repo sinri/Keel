@@ -10,6 +10,7 @@ import java.util.function.Function;
 /**
  * @param <T>
  * @since 1.8
+ * @deprecated since 1.9
  */
 public class KeelJDBCForMySQLTransaction<T> {
     private final Connection connection;
@@ -53,6 +54,10 @@ public class KeelJDBCForMySQLTransaction<T> {
 
         this.execute_for_executor();
         this.close();
+    }
+
+    public Statement getStatement() {
+        return statement;
     }
 
     public boolean isDidCommit() {
