@@ -5,6 +5,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.data.Numeric;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -149,5 +150,21 @@ public class ResultMatrixWithJDBC implements ResultMatrix {
             columns.add(row.getInteger(columnName));
         }
         return columns;
+    }
+
+    public <T extends AbstractTableRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) {
+        try {
+            return ResultMatrix.buildTableRow(getRowByIndex(index), classOfTableRow);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T extends AbstractTableRow> List<T> buildTableRowList(Class<T> classOfTableRow) {
+        try {
+            return ResultMatrix.buildTableRowList(getRowList(), classOfTableRow);
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

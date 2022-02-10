@@ -5,16 +5,17 @@ import io.github.sinri.keel.mysql.condition.CompareCondition;
 import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.KeelMySQLCondition;
 import io.github.sinri.keel.mysql.condition.RawCondition;
-import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
-import io.github.sinri.keel.mysql.matrix.ResultMatrix;
+import io.github.sinri.keel.mysql.matrix.AbstractTableRow;
+import io.vertx.core.json.JsonObject;
 
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-public class SelectStatement extends AbstractStatement {
+public class SelectStatement extends AbstractReadStatement {
     private final List<String> tables = new ArrayList<>();
     private final List<String> columns = new ArrayList<>();
     //    private final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
@@ -262,8 +263,36 @@ public class SelectStatement extends AbstractStatement {
         }
     }
 
-    @Override
-    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
-        return KeelJDBCForMySQL.queryForSelection(this.toString(), statement);
+
+    /**
+     * @param statement
+     * @param index
+     * @param classOfTableRow
+     * @param <T>
+     * @return
+     * @throws SQLException
+     * @since 1.10
+     * @deprecated
+     */
+    public <T extends AbstractTableRow> T blockedExecuteForTableRowByIndex(Statement statement, int index, Class<T> classOfTableRow) throws SQLException {
+        JsonObject rowByIndex = blockedExecute(statement).getRowByIndex(index);
+        try {
+            return classOfTableRow.getConstructor(JsonObject.class).newInstance(rowByIndex);
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param statement
+     * @param classOfTableRow
+     * @param <T>
+     * @return
+     * @throws SQLException
+     * @since 1.10
+     * @deprecated
+     */
+    public <T extends AbstractTableRow> T blockedExecuteForFirstTableRow(Statement statement, Class<T> classOfTableRow) throws SQLException {
+        return blockedExecuteForTableRowByIndex(statement, 0, classOfTableRow);
     }
 }

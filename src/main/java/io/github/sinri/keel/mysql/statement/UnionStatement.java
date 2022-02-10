@@ -1,15 +1,11 @@
 package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.KeelHelper;
-import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
-import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UnionStatement extends AbstractStatement {
+public class UnionStatement extends AbstractReadStatement {
     final List<String> selections = new ArrayList<>();
 
     public UnionStatement() {
@@ -56,8 +52,4 @@ public class UnionStatement extends AbstractStatement {
         return KeelHelper.joinStringArray(selections, " ");
     }
 
-    @Override
-    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
-        return KeelJDBCForMySQL.queryForSelection(this.toString(), statement);
-    }
 }

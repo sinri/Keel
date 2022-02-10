@@ -4,8 +4,6 @@ import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
 import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
-import io.vertx.core.Future;
-import io.vertx.sqlclient.SqlConnection;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class UpdateStatement extends AbstractStatement {
+public class UpdateStatement extends AbstractModifyStatement {
     /**
      * UPDATE [LOW_PRIORITY] [IGNORE] table_reference
      * SET assignment_list
@@ -112,24 +110,12 @@ public class UpdateStatement extends AbstractStatement {
         return sql;
     }
 
-    /**
-     * @param sqlConnection get from pool
-     * @return future with affected rows; failed future when failed
-     * @since 1.7
-     * @since 1.10 removed recover
-     */
-    public Future<Integer> executeForAffectedRows(SqlConnection sqlConnection) {
-        return execute(sqlConnection)
-                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getTotalAffectedRows()))
-//                .recover(throwable -> {
-//                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
-//                    return Future.succeededFuture(-1);
-//                })
-                ;
-    }
+
 
     @Override
     public ResultMatrix blockedExecute(Statement statement) throws SQLException {
         return KeelJDBCForMySQL.executeForModification(this.toString(), statement);
     }
+
+
 }
