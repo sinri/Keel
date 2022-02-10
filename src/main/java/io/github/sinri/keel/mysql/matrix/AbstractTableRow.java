@@ -1,13 +1,12 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.core.DuplexExecutor;
+import io.github.sinri.keel.mysql.MySQLExecutor;
+import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
-import io.vertx.sqlclient.SqlConnection;
 
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
 /**
@@ -21,42 +20,38 @@ public abstract class AbstractTableRow {
         this.tableRow = tableRow;
     }
 
-    public static <T extends AbstractTableRow> DuplexExecutor<List<T>> buildTableRowListWithReadStatement(
+    public static <T extends AbstractTableRow> MySQLExecutor<List<T>> buildTableRowListFetcher(
             AbstractReadStatement readStatement,
-            SqlConnection sqlConnection,
-            Statement statement,
             Class<T> classOfTableRow
     ) {
-        return DuplexExecutor.build(
-                asyncVoid -> readStatement.execute(sqlConnection)
+        return MySQLExecutor.build(
+                sqlConnection -> readStatement.execute(sqlConnection)
                         .compose(resultMatrix -> Future.succeededFuture(resultMatrix.buildTableRowList(classOfTableRow))),
-                listSyncExecuteResult -> {
-                    try {
-                        listSyncExecuteResult.setResult(readStatement.blockedExecute(statement).buildTableRowList(classOfTableRow));
-                    } catch (SQLException e) {
-                        listSyncExecuteResult.setError(e);
-                    }
-                    return listSyncExecuteResult;
-                }
+                statement -> readStatement.blockedExecute(statement).buildTableRowList(classOfTableRow)
         );
     }
 
-    public static <T extends AbstractTableRow> DuplexExecutor<T> buildTableRowWithReadStatement(
+    public static <T extends AbstractTableRow> MySQLExecutor<T> buildTableRowFetcher(
             AbstractReadStatement readStatement,
-            SqlConnection sqlConnection,
-            Statement statement,
             Class<T> classOfTableRow
     ) {
-        return DuplexExecutor.build(
-                asyncVoid -> readStatement.execute(sqlConnection)
-                        .compose(resultMatrix -> Future.succeededFuture(resultMatrix.buildTableRowByIndex(0, classOfTableRow))),
-                listSyncExecuteResult -> {
+        return MySQLExecutor.build(
+                sqlConnection -> readStatement.execute(sqlConnection)
+                        .compose(resultMatrix -> {
+                            T t;
+                            try {
+                                t = resultMatrix.buildTableRowByIndex(0, classOfTableRow);
+                            } catch (KeelSQLResultRowIndexError e) {
+                                return Future.failedFuture(e);
+                            }
+                            return Future.succeededFuture(t);
+                        }),
+                statement -> {
                     try {
-                        listSyncExecuteResult.setResult(readStatement.blockedExecute(statement).buildTableRowByIndex(0, classOfTableRow));
-                    } catch (SQLException e) {
-                        listSyncExecuteResult.setError(e);
+                        return readStatement.blockedExecute(statement).buildTableRowByIndex(0, classOfTableRow);
+                    } catch (KeelSQLResultRowIndexError e) {
+                        throw new SQLException(e);
                     }
-                    return listSyncExecuteResult;
                 }
         );
     }

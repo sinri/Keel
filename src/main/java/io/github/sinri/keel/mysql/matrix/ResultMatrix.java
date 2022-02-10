@@ -1,6 +1,7 @@
 package io.github.sinri.keel.mysql.matrix;
 
 
+import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.data.Numeric;
@@ -26,9 +27,9 @@ public interface ResultMatrix {
 
     JsonArray toJsonArray();
 
-    JsonObject getFirstRow();
+    JsonObject getFirstRow() throws KeelSQLResultRowIndexError;
 
-    JsonObject getRowByIndex(int index);
+    JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError;
 
     /**
      * @param row
@@ -71,10 +72,9 @@ public interface ResultMatrix {
      * @return
      * @since 1.10
      */
-    <T extends AbstractTableRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow);
+    <T extends AbstractTableRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
 
     /**
-     * @param index
      * @param classOfTableRow
      * @param <T>
      * @return
@@ -82,13 +82,13 @@ public interface ResultMatrix {
      */
     <T extends AbstractTableRow> List<T> buildTableRowList(Class<T> classOfTableRow);
 
-    String getOneColumnOfFirstRowAsString(String columnName);
+    String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError;
 
-    Numeric getOneColumnOfFirstRowAsNumeric(String columnName);
+    Numeric getOneColumnOfFirstRowAsNumeric(String columnName) throws KeelSQLResultRowIndexError;
 
-    Integer getOneColumnOfFirstRowAsInteger(String columnName);
+    Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelSQLResultRowIndexError;
 
-    Long getOneColumnOfFirstRowAsLong(String columnName);
+    Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelSQLResultRowIndexError;
 
     List<String> getOneColumnAsString(String columnName);
 

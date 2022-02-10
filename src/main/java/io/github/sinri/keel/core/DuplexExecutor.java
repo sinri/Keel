@@ -9,6 +9,7 @@ import java.util.function.Function;
  *
  * @param <T>
  * @since 1.9
+ * @deprecated since 1.10 the Function based duplex executor is replaced by MySQLExecutor
  */
 public class DuplexExecutor<T> {
     protected Function<SyncExecuteResult<T>, SyncExecuteResult<T>> syncExecutor;
@@ -67,7 +68,8 @@ public class DuplexExecutor<T> {
      */
     public T executeSync() throws Exception {
         if (syncExecutor != null) {
-            return syncExecutor.apply(new SyncExecuteResult<>()).getResult();
+            SyncExecuteResult<T> executeResult = syncExecutor.apply(new SyncExecuteResult<>());
+            return executeResult.getResult();
         }
         throw new RuntimeException("DataFetcher::syncQueryFunction is not set yet");
     }

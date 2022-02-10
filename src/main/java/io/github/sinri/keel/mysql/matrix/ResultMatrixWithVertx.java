@@ -1,5 +1,6 @@
 package io.github.sinri.keel.mysql.matrix;
 
+import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mysqlclient.MySQLClient;
@@ -57,15 +58,19 @@ public class ResultMatrixWithVertx implements ResultMatrix {
         return l;
     }
 
-    public JsonObject getFirstRow() {
+    public JsonObject getFirstRow() throws KeelSQLResultRowIndexError {
         return getRowByIndex(0);
     }
 
-    public JsonObject getRowByIndex(int index) {
-        return rowList.get(index).toJson();
+    public JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError {
+        try {
+            return rowList.get(index).toJson();
+        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+            throw new KeelSQLResultRowIndexError(indexOutOfBoundsException);
+        }
     }
 
-    public <T extends AbstractTableRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) {
+    public <T extends AbstractTableRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
         try {
             return ResultMatrix.buildTableRow(getRowByIndex(index), classOfTableRow);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -81,20 +86,20 @@ public class ResultMatrixWithVertx implements ResultMatrix {
         }
     }
 
-    public String getOneColumnOfFirstRowAsString(String columnName) {
-        return rowList.get(0).getString(columnName);
+    public String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError {
+        return getFirstRow().getString(columnName);
     }
 
-    public Numeric getOneColumnOfFirstRowAsNumeric(String columnName) {
-        return rowList.get(0).getNumeric(columnName);
+    public Numeric getOneColumnOfFirstRowAsNumeric(String columnName) throws KeelSQLResultRowIndexError {
+        return Numeric.create(getFirstRow().getNumber(columnName));
     }
 
-    public Integer getOneColumnOfFirstRowAsInteger(String columnName) {
-        return rowList.get(0).getInteger(columnName);
+    public Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelSQLResultRowIndexError {
+        return getFirstRow().getInteger(columnName);
     }
 
-    public Long getOneColumnOfFirstRowAsLong(String columnName) {
-        return rowList.get(0).getLong(columnName);
+    public Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelSQLResultRowIndexError {
+        return getFirstRow().getLong(columnName);
     }
 
     public List<String> getOneColumnAsString(String columnName) {

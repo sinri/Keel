@@ -5,6 +5,7 @@ import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.github.sinri.keel.mysql.KeelMySQLConfig;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
+import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
@@ -18,6 +19,7 @@ public class Keel {
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
     private static final Map<String, KeelLogger> loggerMap = new HashMap<>();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
+    private static final Map<String, KeelJDBCForMySQL> mysqlKitWithJDBCMap = new HashMap<>();
     private static Vertx vertx;
 
     public static void loadPropertiesFromFile(String propertiesFileName) {
@@ -95,5 +97,37 @@ public class Keel {
             mysqlKitMap.put(key, keelMySQLKit);
         }
         return mysqlKitMap.get(key);
+    }
+
+    /**
+     * @return
+     * @since 1.10
+     */
+    public static KeelMySQLKit getMySQLKit() {
+        String defaultName = propertiesReader.getProperty("mysql.default_name");
+        return getMySQLKit(defaultName);
+    }
+
+    /**
+     * @param key
+     * @return
+     * @since 1.10
+     */
+    public static KeelJDBCForMySQL getMySQLKitWithJDBC(String key) {
+        if (!mysqlKitWithJDBCMap.containsKey(key)) {
+            KeelMySQLConfig config = new KeelMySQLConfig(key, propertiesReader);
+            KeelJDBCForMySQL keelJDBCForMySQL = new KeelJDBCForMySQL(config);
+            mysqlKitWithJDBCMap.put(key, keelJDBCForMySQL);
+        }
+        return mysqlKitWithJDBCMap.get(key);
+    }
+
+    /**
+     * @return
+     * @since 1.10
+     */
+    public static KeelJDBCForMySQL getMySQLKitWithJDBC() {
+        String defaultName = propertiesReader.getProperty("mysql.default_name");
+        return getMySQLKitWithJDBC(defaultName);
     }
 }

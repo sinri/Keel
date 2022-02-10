@@ -5,6 +5,7 @@ import io.github.sinri.keel.mysql.condition.CompareCondition;
 import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.KeelMySQLCondition;
 import io.github.sinri.keel.mysql.condition.RawCondition;
+import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.github.sinri.keel.mysql.matrix.AbstractTableRow;
 import io.vertx.core.json.JsonObject;
 
@@ -275,7 +276,12 @@ public class SelectStatement extends AbstractReadStatement {
      * @deprecated
      */
     public <T extends AbstractTableRow> T blockedExecuteForTableRowByIndex(Statement statement, int index, Class<T> classOfTableRow) throws SQLException {
-        JsonObject rowByIndex = blockedExecute(statement).getRowByIndex(index);
+        JsonObject rowByIndex = null;
+        try {
+            rowByIndex = blockedExecute(statement).getRowByIndex(index);
+        } catch (KeelSQLResultRowIndexError e) {
+            return null;
+        }
         try {
             return classOfTableRow.getConstructor(JsonObject.class).newInstance(rowByIndex);
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {

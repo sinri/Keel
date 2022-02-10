@@ -3,6 +3,7 @@ package io.github.sinri.keel.test.web.controller;
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.condition.CompareCondition;
+import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.github.sinri.keel.mysql.statement.WriteIntoStatement;
 import io.github.sinri.keel.web.KeelWebRequestController;
@@ -146,7 +147,11 @@ public class MySQLController extends KeelWebRequestController {
         System.out.println("testD1 sql " + selectStatement.toString());
         return selectStatement.execute(sqlConnection)
                 .compose(resultMatrix -> {
-                    return Future.succeededFuture(resultMatrix.getOneColumnOfFirstRowAsString("name"));
+                    try {
+                        return Future.succeededFuture(resultMatrix.getOneColumnOfFirstRowAsString("name"));
+                    } catch (KeelSQLResultRowIndexError e) {
+                        return Future.failedFuture(e);
+                    }
                 });
     }
 
@@ -163,7 +168,11 @@ public class MySQLController extends KeelWebRequestController {
         System.out.println("testD2 sql " + selectStatement.toString());
         return selectStatement.execute(sqlConnection)
                 .compose(resultMatrix -> {
-                    return Future.succeededFuture(resultMatrix.getOneColumnOfFirstRowAsNumeric("value"));
+                    try {
+                        return Future.succeededFuture(resultMatrix.getOneColumnOfFirstRowAsNumeric("value"));
+                    } catch (KeelSQLResultRowIndexError e) {
+                        return Future.failedFuture(e);
+                    }
                 });
     }
 

@@ -1,6 +1,7 @@
 package io.github.sinri.keel.mysql.matrix;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.data.Numeric;
@@ -87,32 +88,36 @@ public class ResultMatrixWithJDBC implements ResultMatrix {
     }
 
     @Override
-    public JsonObject getFirstRow() {
+    public JsonObject getFirstRow() throws KeelSQLResultRowIndexError {
         return getRowByIndex(0);
     }
 
     @Override
-    public JsonObject getRowByIndex(int index) {
-        return rowList.get(index);
+    public JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError {
+        try {
+            return rowList.get(index);
+        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+            throw new KeelSQLResultRowIndexError(indexOutOfBoundsException);
+        }
     }
 
     @Override
-    public String getOneColumnOfFirstRowAsString(String columnName) {
+    public String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError {
         return getFirstRow().getString(columnName);
     }
 
     @Override
-    public Numeric getOneColumnOfFirstRowAsNumeric(String columnName) {
+    public Numeric getOneColumnOfFirstRowAsNumeric(String columnName) throws KeelSQLResultRowIndexError {
         return Numeric.create(getFirstRow().getNumber(columnName));
     }
 
     @Override
-    public Integer getOneColumnOfFirstRowAsInteger(String columnName) {
+    public Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelSQLResultRowIndexError {
         return getFirstRow().getInteger(columnName);
     }
 
     @Override
-    public Long getOneColumnOfFirstRowAsLong(String columnName) {
+    public Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelSQLResultRowIndexError {
         return getFirstRow().getLong(columnName);
     }
 
@@ -152,7 +157,7 @@ public class ResultMatrixWithJDBC implements ResultMatrix {
         return columns;
     }
 
-    public <T extends AbstractTableRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) {
+    public <T extends AbstractTableRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
         try {
             return ResultMatrix.buildTableRow(getRowByIndex(index), classOfTableRow);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
