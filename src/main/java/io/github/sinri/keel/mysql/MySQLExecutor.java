@@ -45,7 +45,7 @@ public class MySQLExecutor<T> {
     }
 
     /**
-     * Read properties for "mysql.default_name",
+     * Read properties for "mysql.default_data_source_name",
      * the value would be used to determine which mysql JDBC instance to get the current statement
      *
      * @return MySQL Execute Result

@@ -104,7 +104,7 @@ public class Keel {
      * @since 1.10
      */
     public static KeelMySQLKit getMySQLKit() {
-        String defaultName = propertiesReader.getProperty("mysql.default_name");
+        String defaultName = propertiesReader.getProperty("mysql.default_data_source_name");
         return getMySQLKit(defaultName);
     }
 
@@ -127,7 +127,7 @@ public class Keel {
      * @since 1.10
      */
     public static KeelJDBCForMySQL getMySQLKitWithJDBC() {
-        String defaultName = propertiesReader.getProperty("mysql.default_name");
+        String defaultName = propertiesReader.getProperty("mysql.default_data_source_name");
         return getMySQLKitWithJDBC(defaultName);
     }
 }
