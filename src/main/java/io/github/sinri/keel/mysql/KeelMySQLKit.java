@@ -9,11 +9,11 @@ import io.vertx.core.Vertx;
 import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.SqlConnection;
-import io.vertx.sqlclient.Transaction;
 import io.vertx.sqlclient.Tuple;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class KeelMySQLKit {
@@ -229,50 +229,13 @@ public class KeelMySQLKit {
         return future;
     }
 
-    @Deprecated
-    public void executeInTransaction_V1(
-            Function<SqlConnection, Future<Object>> transactionBody,
-            Function<Object, Void> doneFunction,
-            Function<Throwable, Void> errorFunction
-    ) {
-        pool.getConnection(sqlConnectionAsyncResult -> {
-            if (sqlConnectionAsyncResult.failed()) {
-                errorFunction.apply(sqlConnectionAsyncResult.cause());
-                return;
-            }
-            SqlConnection sqlConnection = sqlConnectionAsyncResult.result();
-            sqlConnection.begin(transactionAsyncResult -> {
-                if (transactionAsyncResult.failed()) {
-                    errorFunction.apply(sqlConnectionAsyncResult.cause());
-                    return;
-                }
-
-                Transaction transaction = transactionAsyncResult.result();
-
-                Future<Object> transactionResultFuture = transactionBody.apply(sqlConnection);
-                transactionResultFuture.onSuccess(result -> transaction.commit(commitAsyncResult -> {
-                    if (commitAsyncResult.failed()) {
-                        errorFunction.apply(commitAsyncResult.cause());
-                    } else {
-                        doneFunction.apply(result);
-                    }
-                    // after result confirmed committing, or error, connection should be closed.
-                    sqlConnection.close();
-                })).onFailure(throwable -> transaction.rollback(rollbackAsyncResult -> {
-                    errorFunction.apply(throwable);
-                    // after rollback, connection should be closed.
-                    sqlConnection.close();
-                }));
-            });
-        });
-    }
-
     /**
      * @param transactionBody
      * @param doneFunction
      * @param errorFunction
+     * @deprecated since 1.10
      */
-    public void executeInTransaction(
+    public void executeInTransaction_V2(
             Function<SqlConnection, Future<Object>> transactionBody,
             Function<Object, Void> doneFunction,
             Function<Throwable, Void> errorFunction
@@ -281,6 +244,27 @@ public class KeelMySQLKit {
         getPool().withTransaction(transactionBody)
                 .onSuccess(doneFunction::apply)
                 .onFailure(errorFunction::apply);
+    }
+
+    /**
+     * @param transactionBody the function with sql connection for future
+     * @param <T>             the final result class/type
+     * @return future with final result if committed, or failed future if rollback
+     * @since 1.10
+     */
+    public <T> Future<T> executeInTransaction(Function<SqlConnection, Future<T>> transactionBody) {
+        AtomicReference<T> finalResult = new AtomicReference<>();
+        AtomicReference<Throwable> cause = new AtomicReference<>();
+        return getPool()
+                .withTransaction(transactionBody)
+                .onSuccess(finalResult::set)
+                .onFailure(cause::set)
+                .eventually(v -> {
+                    if (cause.get() == null) {
+                        return Future.succeededFuture(finalResult.get());
+                    }
+                    return Future.failedFuture(cause.get());
+                });
     }
 
     /**

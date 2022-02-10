@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
 import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
@@ -115,16 +114,18 @@ public class UpdateStatement extends AbstractStatement {
 
     /**
      * @param sqlConnection get from pool
-     * @return future with affected rows; -1 when failed
+     * @return future with affected rows; failed future when failed
      * @since 1.7
+     * @since 1.10 removed recover
      */
     public Future<Integer> executeForAffectedRows(SqlConnection sqlConnection) {
         return execute(sqlConnection)
                 .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getTotalAffectedRows()))
-                .recover(throwable -> {
-                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
-                    return Future.succeededFuture(-1);
-                });
+//                .recover(throwable -> {
+//                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
+//                    return Future.succeededFuture(-1);
+//                })
+                ;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
 import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
@@ -212,30 +211,34 @@ public class WriteIntoStatement extends AbstractStatement {
 
     /**
      * @param sqlConnection get from pool
-     * @return future with affected rows, but -1 would be returned if any error occurs
+     * @return future with affected rows; if any error occurs, failed future returned instead.
      * @since 1.7
+     * @since 1.10, removed the recover block
      */
     public Future<Integer> executeForAffectedRows(SqlConnection sqlConnection) {
         return execute(sqlConnection)
                 .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getTotalAffectedRows()))
-                .recover(throwable -> {
-                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
-                    return Future.succeededFuture(-1);
-                });
+//                .recover(throwable -> {
+//                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
+//                    return Future.succeededFuture(-1);
+//                })
+                ;
     }
 
     /**
      * @param sqlConnection get from pool
-     * @return future with last inserted id, but -1 would be returned if any error occurs
+     * @return future with last inserted id; if any error occurs, failed future returned instead.
      * @since 1.7
+     * @since 1.10, removed the recover block
      */
     public Future<Long> executeForLastInsertedID(SqlConnection sqlConnection) {
         return execute(sqlConnection)
                 .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getLastInsertedID()))
-                .recover(throwable -> {
-                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForLastInsertedID failed [" + throwable.getMessage() + "] when executing SQL: " + this);
-                    return Future.succeededFuture(-1L);
-                });
+//                .recover(throwable -> {
+//                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForLastInsertedID failed [" + throwable.getMessage() + "] when executing SQL: " + this);
+//                    return Future.succeededFuture(-1L);
+//                })
+                ;
     }
 
     @Override
