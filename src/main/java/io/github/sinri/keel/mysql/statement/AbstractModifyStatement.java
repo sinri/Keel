@@ -19,6 +19,14 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
         return blockedExecute(statement).getLastInsertedID();
     }
 
+    public int blockedExecuteForAffectedRows() throws SQLException {
+        return blockedExecute().getTotalAffectedRows();
+    }
+
+    public long blockedExecuteForLastInsertedID() throws SQLException {
+        return blockedExecute().getLastInsertedID();
+    }
+
     /**
      * @param sqlConnection get from pool
      * @return future with affected rows; failed future when failed

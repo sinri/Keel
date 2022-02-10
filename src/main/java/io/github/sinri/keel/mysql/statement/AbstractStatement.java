@@ -1,5 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.matrix.ResultMatrixWithVertx;
 import io.vertx.core.Future;
@@ -40,4 +41,14 @@ abstract public class AbstractStatement {
      * @since 1.9
      */
     abstract public ResultMatrix blockedExecute(Statement statement) throws SQLException;
+
+    /**
+     * @return the ResultMatrix
+     * @throws SQLException if any SQL error occurs
+     * @since 1.10
+     */
+    public ResultMatrix blockedExecute() throws SQLException {
+        Statement currentThreadLocalStatement = Keel.getMySQLKitWithJDBC().getThreadLocalStatementWrapper().getCurrentThreadLocalStatement();
+        return blockedExecute(currentThreadLocalStatement);
+    }
 }
