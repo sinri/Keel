@@ -43,6 +43,16 @@ abstract public class AbstractStatement {
     abstract public ResultMatrix blockedExecute(Statement statement) throws SQLException;
 
     /**
+     * @param statement the JDBC statement
+     * @return the ResultMatrix
+     * @throws SQLException if any SQL error occurs
+     * @since 1.10 as alias of `ResultMatrix blockedExecute(Statement statement)`
+     */
+    public final ResultMatrix execute(Statement statement) throws SQLException {
+        return blockedExecute(statement);
+    }
+
+    /**
      * @return the ResultMatrix
      * @throws SQLException if any SQL error occurs
      * @since 1.10
@@ -50,5 +60,14 @@ abstract public class AbstractStatement {
     public ResultMatrix blockedExecute() throws SQLException {
         Statement currentThreadLocalStatement = Keel.getMySQLKitWithJDBC().getThreadLocalStatementWrapper().getCurrentThreadLocalStatement();
         return blockedExecute(currentThreadLocalStatement);
+    }
+
+    /**
+     * @return the ResultMatrix
+     * @throws SQLException if any SQL error occurs
+     * @since 1.10 as alias of `ResultMatrix blockedExecute()`
+     */
+    public final ResultMatrix execute() throws SQLException {
+        return blockedExecute();
     }
 }
