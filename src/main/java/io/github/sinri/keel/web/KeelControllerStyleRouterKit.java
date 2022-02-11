@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web;
 
-import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -17,12 +16,21 @@ import java.util.List;
 public class KeelControllerStyleRouterKit {
     private final String controllerPackage;
     private final List<KeelWebRequestFilter> filterList = new ArrayList<>();
-    private KeelLogger logger;
+    private KeelLogger logger = KeelLogger.buildSilentLogger();
 
     public KeelControllerStyleRouterKit(String controllerPackage) {
         // such as "com.leqee.oc.tachiba.handler"
         this.controllerPackage = controllerPackage;
-        this.logger = new KeelLogger().setLowestLevel(KeelLogLevel.FATAL);
+    }
+
+    /**
+     * @param controllerPackage such as "com.leqee.oc.tachiba.handler"
+     * @param filterList        list of filters
+     * @since 1.1
+     */
+    public KeelControllerStyleRouterKit(String controllerPackage, List<KeelWebRequestFilter> filterList) {
+        this.controllerPackage = controllerPackage;
+        this.filterList.addAll(filterList);
     }
 
     public static KeelApiAnnotation getKeelApiAnnotationForMethod(Method method) {
@@ -52,23 +60,13 @@ public class KeelControllerStyleRouterKit {
         return logger;
     }
 
-    /**
-     * @param controllerPackage such as "com.leqee.oc.tachiba.handler"
-     * @param filterList        list of filters
-     * @since 1.1
-     */
-    public KeelControllerStyleRouterKit(String controllerPackage, List<KeelWebRequestFilter> filterList) {
-        this.controllerPackage = controllerPackage;
-        this.filterList.addAll(filterList);
+    public void setLogger(KeelLogger logger) {
+        this.logger = logger;
     }
 
     public KeelControllerStyleRouterKit addFilter(KeelWebRequestFilter filter) {
         this.filterList.add(filter);
         return this;
-    }
-
-    public void setLogger(KeelLogger logger) {
-        this.logger = logger;
     }
 
     public void processRouterRequest(RoutingContext ctx) {

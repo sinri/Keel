@@ -133,7 +133,12 @@ public class SelectStatement extends AbstractReadStatement {
 
     public String toString() {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT ").append(KeelHelper.joinStringArray(columns, ","));
+        sql.append("SELECT ");
+        if (columns.isEmpty()) {
+            sql.append("*");
+        } else {
+            sql.append(KeelHelper.joinStringArray(columns, ","));
+        }
         if (!tables.isEmpty()) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("FROM ").append(KeelHelper.joinStringArray(tables, AbstractStatement.SQL_COMPONENT_SEPARATOR));
         }

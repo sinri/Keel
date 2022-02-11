@@ -55,6 +55,14 @@ public class KeelLogger {
     }
 
     /**
+     * @return a silent logger
+     * @since 1.10
+     */
+    public static KeelLogger buildSilentLogger() {
+        return new KeelLogger().setLowestLevel(KeelLogLevel.SILENT);
+    }
+
+    /**
      * FORMAT: "yyyyMMdd" or "yyyy-MM-dd HH:mm:ss", etc.
      */
     public static String getCurrentDateExpression(String format) {
@@ -147,7 +155,7 @@ public class KeelLogger {
     }
 
     public void log(KeelLogLevel level, String msg, JsonObject context) {
-        if (!level.isMoreSeriousThan(lowestLevel)) {
+        if (level.isSilent() || !level.isMoreSeriousThan(lowestLevel)) {
             return;
         }
         String content = getCurrentDateExpression("yyyy-MM-dd HH:mm:ss") + " "
@@ -161,6 +169,11 @@ public class KeelLogger {
         print(content);
     }
 
+    /**
+     * It would always print the content to STDOUT, but any occurred errors would be printed to STDERR.
+     *
+     * @param content the String content
+     */
     public void print(String content) {
         if (logRootDirectory == null) {
             System.out.println(content);
@@ -189,6 +202,12 @@ public class KeelLogger {
         }
     }
 
+    /**
+     * It would always print the content to STDOUT, but any occurred errors would be printed to STDERR.
+     *
+     * @param content the String content
+     * @param ending  the String ending
+     */
     public void print(String content, String ending) {
         if (logRootDirectory == null) {
             System.out.print(content);
@@ -267,7 +286,22 @@ public class KeelLogger {
     }
 
     public void exception(Throwable throwable) {
-        error(throwable.getMessage(), new JsonObject().put("error_class", throwable.getClass().getName()));
+        exception(null, throwable);
+    }
+
+    /**
+     * @param msg       since 1.10, a prefix String msg is supported
+     * @param throwable the Throwable to print its details
+     * @since 1.10
+     */
+    public void exception(String msg, Throwable throwable) {
+        String prefix;
+        if (msg == null || msg.isEmpty()) {
+            prefix = "";
+        } else {
+            prefix = msg + " × ";
+        }
+        error(prefix + throwable.getMessage(), new JsonObject().put("error_class", throwable.getClass().getName()));
         for (var s : throwable.getStackTrace()) {
             print("\t" + s.toString(), "\n");
         }
