@@ -37,6 +37,20 @@ public class MySQLExecutor<T> {
         throw new RuntimeException(getClass().getName() + "::executeAsync asyncMySQLExecutor not initialized");
     }
 
+    /**
+     * Read properties for "mysql.default_data_source_name",
+     * the value would be used to determine which mysql vertx instance to get the current sql connection
+     *
+     * @return future for result
+     * @implNote this would not be put into any MySQL transaction!
+     */
+    public Future<T> executeAsync() {
+        if (this.asyncMySQLExecutor != null) {
+            return Keel.getMySQLKit().getPool().withConnection(sqlConnection -> this.asyncMySQLExecutor.execute(sqlConnection));
+        }
+        throw new RuntimeException(getClass().getName() + "::executeAsync asyncMySQLExecutor not initialized");
+    }
+
     public T executeSync(Statement statement) throws SQLException {
         if (this.syncMySQLExecutor != null) {
             return this.syncMySQLExecutor.execute(statement);
