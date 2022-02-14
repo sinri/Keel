@@ -22,6 +22,14 @@ public class MySQLExecutor<T> {
         return duplexExecutorForMySQL;
     }
 
+    public static <R> MySQLExecutor<R> buildForNull(Class<R> classOfR) {
+        return MySQLExecutor.build(sqlConnection -> Future.succeededFuture(null), statement -> null);
+    }
+
+    public static <R> MySQLExecutor<R> buildForFixed(R fixed) {
+        return MySQLExecutor.build(sqlConnection -> Future.succeededFuture(fixed), statement -> fixed);
+    }
+
     protected void setAsyncMySQLExecutor(AsyncMySQLExecutor<T> asyncMySQLExecutor) {
         this.asyncMySQLExecutor = asyncMySQLExecutor;
     }

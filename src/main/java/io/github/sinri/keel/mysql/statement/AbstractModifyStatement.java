@@ -6,6 +6,7 @@ import io.vertx.sqlclient.SqlConnection;
 
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.function.Function;
 
 /**
  * @since 1.10
@@ -52,6 +53,29 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
         return MySQLExecutor.build(
                 this::executeForAffectedRows,
                 this::blockedExecuteForAffectedRows
+        );
+    }
+
+    /**
+     * @param afxChecker
+     * @param recoveredValue
+     * @param <R>
+     * @return
+     * @since 1.10
+     */
+    public <R> MySQLExecutor<R> getExecutorForAffectedRows(Function<Integer, R> afxChecker, R recoveredValue) {
+        return MySQLExecutor.build(
+                sqlConnection -> executeForAffectedRows(sqlConnection)
+                        .compose(afx -> Future.succeededFuture(afxChecker.apply(afx)))
+                        .recover(throwable -> Future.succeededFuture(recoveredValue)),
+                statement -> {
+                    try {
+                        int afx = blockedExecuteForAffectedRows(statement);
+                        return afxChecker.apply(afx);
+                    } catch (SQLException sqlException) {
+                        return recoveredValue;
+                    }
+                }
         );
     }
 }

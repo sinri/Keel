@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 public class WriteIntoStatement extends AbstractModifyStatement {
     /**
@@ -182,6 +183,15 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         return this;
     }
 
+    /**
+     * @param fieldName the raw column name
+     * @return as `onDuplicateKeyUpdate` does
+     * @since 1.10
+     */
+    public WriteIntoStatement onDuplicateKeyUpdate(String fieldName) {
+        return this.onDuplicateKeyUpdate(fieldName, "values(" + fieldName + ")");
+    }
+
     public String toString() {
         String sql = writeType + " " + ignoreMark + " INTO ";
         if (schema != null) {
@@ -224,6 +234,29 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         return MySQLExecutor.build(
                 this::executeForLastInsertedID,
                 this::blockedExecuteForLastInsertedID
+        );
+    }
+
+    /**
+     * @param idChecker
+     * @param recoveredValue
+     * @param <R>
+     * @return
+     * @since 1.10
+     */
+    public <R> MySQLExecutor<R> getExecutorForLastInsertedID(Function<Long, R> idChecker, R recoveredValue) {
+        return MySQLExecutor.build(
+                sqlConnection -> executeForLastInsertedID(sqlConnection)
+                        .compose(id -> Future.succeededFuture(idChecker.apply(id)))
+                        .recover(throwable -> Future.succeededFuture(recoveredValue)),
+                statement -> {
+                    try {
+                        long id = blockedExecuteForLastInsertedID(statement);
+                        return idChecker.apply(id);
+                    } catch (SQLException sqlException) {
+                        return recoveredValue;
+                    }
+                }
         );
     }
 
