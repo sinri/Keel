@@ -188,8 +188,48 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @return as `onDuplicateKeyUpdate` does
      * @since 1.10
      */
-    public WriteIntoStatement onDuplicateKeyUpdate(String fieldName) {
+    public WriteIntoStatement onDuplicateKeyUpdateField(String fieldName) {
         return this.onDuplicateKeyUpdate(fieldName, "values(" + fieldName + ")");
+    }
+
+    /**
+     * @param fieldNameList the raw column name list
+     * @return as `onDuplicateKeyUpdate` does
+     * @since 1.10
+     */
+    public WriteIntoStatement onDuplicateKeyUpdateFields(List<String> fieldNameList) {
+        for (var fieldName : fieldNameList) {
+            this.onDuplicateKeyUpdate(fieldName, "values(" + fieldName + ")");
+        }
+        return this;
+    }
+
+    /**
+     * @param fieldName the raw column name
+     * @return as `onDuplicateKeyUpdate` does
+     * @since 1.10
+     */
+    public WriteIntoStatement onDuplicateKeyUpdateExceptField(String fieldName) {
+        for (var x : columns) {
+            if (x.equalsIgnoreCase(fieldName)) {
+                continue;
+            }
+            this.onDuplicateKeyUpdate(x, "values(" + x + ")");
+        }
+        return this;
+    }
+
+    /**
+     * @param fieldNameList the raw column name list
+     * @return as `onDuplicateKeyUpdate` does
+     * @since 1.10
+     */
+    public WriteIntoStatement onDuplicateKeyUpdateExceptFields(List<String> fieldNameList) {
+        for (var x : columns) {
+            if (fieldNameList.contains(x)) continue;
+            this.onDuplicateKeyUpdate(x, "values(" + x + ")");
+        }
+        return this;
     }
 
     public String toString() {
