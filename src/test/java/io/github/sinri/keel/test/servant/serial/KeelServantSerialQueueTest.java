@@ -20,7 +20,7 @@ public class KeelServantSerialQueueTest extends KeelServantSerialQueue {
 
     public static void main(String[] args) {
         Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(2));
-        Keel.loadPropertiesFromFile("test.properties");
+        Keel.loadPropertiesFromFile("test.sample.properties");
         new KeelServantSerialQueueTest(3000L).run();
     }
 

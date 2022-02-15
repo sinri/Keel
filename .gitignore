@@ -89,3 +89,5 @@ hs_err_pid*
 .idea/
 *.iml
 log/
+src/main/resources/config.properties
+src/test/resources/config.properties

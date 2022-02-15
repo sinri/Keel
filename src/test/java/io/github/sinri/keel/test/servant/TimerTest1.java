@@ -10,7 +10,7 @@ import java.util.Calendar;
 public class TimerTest1 {
     public static void main(String[] args) throws InterruptedException {
         Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(2));
-        Keel.loadPropertiesFromFile("test.properties");
+        Keel.loadPropertiesFromFile("test.sample.properties");
 
         KeelServantTimer keelServantTimer = new KeelServantTimer(Keel.getVertx());
 

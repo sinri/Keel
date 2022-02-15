@@ -8,7 +8,7 @@ public class ServantTest1 {
 
     public static void main(String[] args) throws InterruptedException {
         Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(2));
-        Keel.loadPropertiesFromFile("test.properties");
+        Keel.loadPropertiesFromFile("test.sample.properties");
 
         KeelServant servant = createServant();
         calling();

@@ -21,7 +21,7 @@ public class KeelServantParallelQueueTest extends KeelServantParallelQueue {
 
     public static void main(String[] args) {
         Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(2));
-        Keel.loadPropertiesFromFile("test.properties");
+        Keel.loadPropertiesFromFile("test.sample.properties");
         new KeelServantParallelQueueTest(3000L, 3).run();
     }
 

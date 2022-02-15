@@ -12,7 +12,7 @@ public class SharedTestBootstrap {
 
     public static void initialize() {
         Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(16));
-        Keel.loadPropertiesFromFile("test.properties");
+        Keel.loadPropertiesFromFile("config.properties");
 
         mySQLKit = new KeelMySQLKit(Keel.getVertx(), new KeelMySQLConfig("local", Keel.getPropertiesReader()));
         jdbcForMySQL = new KeelJDBCForMySQL(new KeelMySQLConfig("local", Keel.getPropertiesReader()));

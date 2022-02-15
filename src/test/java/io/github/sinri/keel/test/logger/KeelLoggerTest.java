@@ -9,7 +9,7 @@ public class KeelLoggerTest {
 
     public static void main(String[] args) {
         Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(2));
-        Keel.loadPropertiesFromFile("test.properties");
+        Keel.loadPropertiesFromFile("test.sample.properties");
 
         TestSuite suite = TestSuite.create("KeelLoggerTestSuite");
         suite.test("stdout", context -> {

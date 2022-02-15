@@ -9,7 +9,7 @@ import io.vertx.core.VertxOptions;
 public class DelayFutureTest {
     public static void main(String[] args) {
         Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(2));
-        Keel.loadPropertiesFromFile("test.properties");
+        Keel.loadPropertiesFromFile("test.sample.properties");
 
         KeelLogger logger = Keel.outputLogger("DelayFutureTest");
         logger.info("go");

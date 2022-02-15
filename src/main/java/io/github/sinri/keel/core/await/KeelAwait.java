@@ -10,7 +10,9 @@ import io.vertx.core.eventbus.MessageConsumer;
 import java.util.function.Function;
 
 /**
- * @param <T>
+ * This class is a trick to realize the `await` using `Thread.sleep` and EventBus.
+ *
+ * @param <T> the class of the object to wait for
  * @since 1.9
  */
 public class KeelAwait<T> {

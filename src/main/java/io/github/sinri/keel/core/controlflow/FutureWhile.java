@@ -5,7 +5,9 @@ import io.vertx.core.Future;
 import java.util.function.Function;
 
 /**
- * @param <T>
+ * Repeat one thing within Future Style alike using `while`.
+ *
+ * @param <T> class of the object to finally get
  * @since 1.7
  */
 public class FutureWhile<T> {
@@ -14,6 +16,23 @@ public class FutureWhile<T> {
     protected final Function<FutureWhile<T>, Boolean> whileStopJudgeFunction;
     protected final Function<T, Future<T>> cycleFunction;
 
+    /**
+     * Create a new FutureWhile instance!
+     * First, think about the synchronized grammar:
+     * ```
+     * x=initValue;
+     * while(!whileStopJudgeFunction(x)){
+     *     x=cycleFunction(x)
+     * }
+     * // finally get x
+     * ```
+     * This class is a wrapper and toolkit for the `initValue`, `whileStopJudgeFunction` and `cycleFunction`,
+     * and finally provide the final value of `x`.
+     *
+     * @param initValue
+     * @param whileStopJudgeFunction
+     * @param cycleFunction
+     */
     public FutureWhile(
             T initValue,
             Function<FutureWhile<T>, Boolean> whileStopJudgeFunction,

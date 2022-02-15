@@ -4,7 +4,7 @@ import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 
 public class PropertiesReaderTest {
     public static void main(String[] args) {
-        KeelPropertiesReader keelPropertiesReader = KeelPropertiesReader.loadReaderWithFile("test.properties");
+        KeelPropertiesReader keelPropertiesReader = KeelPropertiesReader.loadReaderWithFile("test.sample.properties");
         System.out.println("mysql.default_data_source_name -> " + keelPropertiesReader.getProperty("mysql.default_data_source_name"));
 
 

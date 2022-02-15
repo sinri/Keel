@@ -104,7 +104,11 @@
             <artifactId>caffeine</artifactId>
             <version>3.0.5</version>
         </dependency>
-
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-mail-client</artifactId>
+            <version>4.2.4</version>
+        </dependency>
     </dependencies>
 
     <profiles>
