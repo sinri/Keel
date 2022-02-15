@@ -50,7 +50,7 @@ public class MySQLExecutor<T> {
      * the value would be used to determine which mysql vertx instance to get the current sql connection
      *
      * @return future for result
-     * @implNote this would not be put into any MySQL transaction!
+     * Note this would not be put into any MySQL transaction!
      */
     public Future<T> executeAsync() {
         if (this.asyncMySQLExecutor != null) {
