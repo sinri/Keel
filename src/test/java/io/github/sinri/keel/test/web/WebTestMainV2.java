@@ -6,6 +6,7 @@ import io.github.sinri.keel.web.KeelControllerStyleRouterKit;
 import io.github.sinri.keel.web.KeelHttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.handler.BodyHandler;
+import io.vertx.ext.web.handler.StaticHandler;
 
 import java.util.ArrayList;
 
@@ -25,9 +26,13 @@ public class WebTestMainV2 {
         );
         keelControllerStyleRouterKit.setLogger(Keel.outputLogger("KeelControllerStyleRouterKit"));
         khs.getRouter()
-                .route()
+                .route("/api/*")
                 .handler(BodyHandler.create())
                 .handler(keelControllerStyleRouterKit::processRouterRequest);
+        // static content: web_root is under `resources` directory
+        khs.getRouter()
+                .route("/static/*")
+                .handler(StaticHandler.create("web_root"));
 
         khs.listen();
     }

@@ -16,12 +16,13 @@ import java.util.List;
 public class KeelControllerStyleRouterKit {
     private final String pathPrefix;
     private final String controllerPackage;
-    private final List<KeelWebRequestFilter> filterList = new ArrayList<>();
+    private final List<KeelWebRequestFilter> filterList;
     private KeelLogger logger = KeelLogger.buildSilentLogger();
 
     public KeelControllerStyleRouterKit(String controllerPackage) {
         // such as "com.leqee.oc.tachiba.handler"
         this.controllerPackage = controllerPackage;
+        this.filterList = new ArrayList<>();
         this.pathPrefix = "";
     }
 
@@ -32,7 +33,7 @@ public class KeelControllerStyleRouterKit {
      */
     public KeelControllerStyleRouterKit(String controllerPackage, List<KeelWebRequestFilter> filterList) {
         this.controllerPackage = controllerPackage;
-        this.filterList.addAll(filterList);
+        this.filterList = filterList;
         this.pathPrefix = "";
     }
 
@@ -44,7 +45,7 @@ public class KeelControllerStyleRouterKit {
      */
     public KeelControllerStyleRouterKit(String pathPrefix, String controllerPackage, List<KeelWebRequestFilter> filterList) {
         this.controllerPackage = controllerPackage;
-        this.filterList.addAll(filterList);
+        this.filterList = filterList;
         this.pathPrefix = pathPrefix;
     }
 
