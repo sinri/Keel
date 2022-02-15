@@ -5,14 +5,12 @@ import io.vertx.ext.web.RoutingContext;
 
 /**
  * @since 1.1
+ * @since 1.10 became abstract
  */
-public class KeelWebRequestFilter {
+public abstract class KeelWebRequestFilter {
     public String filterName() {
         return getClass().getName();
     }
 
-    public Future<Void> shouldHandleThisRequest(RoutingContext ctx) {
-        // if you should not handle it, throw!
-        return Future.succeededFuture();
-    }
+    abstract public Future<Void> shouldHandleThisRequest(RoutingContext ctx);
 }

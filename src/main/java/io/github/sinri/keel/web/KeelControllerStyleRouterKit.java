@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class KeelControllerStyleRouterKit {
+    private final String pathPrefix;
     private final String controllerPackage;
     private final List<KeelWebRequestFilter> filterList = new ArrayList<>();
     private KeelLogger logger = KeelLogger.buildSilentLogger();
@@ -21,6 +22,7 @@ public class KeelControllerStyleRouterKit {
     public KeelControllerStyleRouterKit(String controllerPackage) {
         // such as "com.leqee.oc.tachiba.handler"
         this.controllerPackage = controllerPackage;
+        this.pathPrefix = "";
     }
 
     /**
@@ -31,6 +33,19 @@ public class KeelControllerStyleRouterKit {
     public KeelControllerStyleRouterKit(String controllerPackage, List<KeelWebRequestFilter> filterList) {
         this.controllerPackage = controllerPackage;
         this.filterList.addAll(filterList);
+        this.pathPrefix = "";
+    }
+
+    /**
+     * @param pathPrefix        such as '/api/'
+     * @param controllerPackage such as "com.leqee.oc.tachiba.handler"
+     * @param filterList        list of filters
+     * @since 1.10
+     */
+    public KeelControllerStyleRouterKit(String pathPrefix, String controllerPackage, List<KeelWebRequestFilter> filterList) {
+        this.controllerPackage = controllerPackage;
+        this.filterList.addAll(filterList);
+        this.pathPrefix = pathPrefix;
     }
 
     public static KeelApiAnnotation getKeelApiAnnotationForMethod(Method method) {
@@ -89,7 +104,9 @@ public class KeelControllerStyleRouterKit {
     private PathParsedHandlerClassMethod parsePathToHandler(String requestMethod, String requestPath) throws NoSuchMethodException {
 //        getLogger().info("requestPath: " + requestPath);
         // here, the `requestPath` should not be empty or '/'
-        String[] pathComponents = requestPath.split("/");
+        String requestPathWithoutPrefix = requestPath.substring(this.pathPrefix.length());
+        //System.out.println("parsePathToHandler from "+requestPath+" to "+requestPathWithoutPrefix);
+        String[] pathComponents = requestPathWithoutPrefix.split("/");
         StringBuilder className = new StringBuilder(controllerPackage);
 
         for (int i = 0; i < pathComponents.length - 1; i++) {
@@ -189,75 +206,76 @@ public class KeelControllerStyleRouterKit {
         public void run(RoutingContext ctx, List<KeelWebRequestFilter> filterList) {
             KeelApiAnnotation annotation = getKeelApiAnnotationForMethod(method);
 
-            Future<Void> filterFuture = new KeelWebRequestFilter().shouldHandleThisRequest(ctx);
-            filterFuture.onFailure(throwable -> ctx.response().setStatusCode(403).end(throwable.getMessage()));
+            Future<Void> filterFuture = Future.succeededFuture();
             for (var filter : filterList) {
                 filterFuture = filterFuture.compose(x -> filter.shouldHandleThisRequest(ctx));
             }
-            filterFuture.onSuccess(x -> {
-                try {
-                    // now do not check if it is an extension of TachibaRequestHandler
-                    try {
-                        KeelWebRequestController controller = (KeelWebRequestController) handlerClass.getDeclaredConstructor(RoutingContext.class).newInstance(ctx);
-
-                        Object invoked = null;
+            filterFuture
+                    .onFailure(throwable -> ctx.response().setStatusCode(403).end("Thrown by filter: " + throwable.getMessage()))
+                    .onSuccess(x -> {
                         try {
+                            // now do not check if it is an extension of TachibaRequestHandler
+                            try {
+                                KeelWebRequestController controller = (KeelWebRequestController) handlerClass.getDeclaredConstructor(RoutingContext.class).newInstance(ctx);
+
+                                Object invoked = null;
+                                try {
 //                                    getLogger().info("GO invoke");
-                            invoked = method.invoke(controller, this.parameters.toArray());
+                                    invoked = method.invoke(controller, this.parameters.toArray());
 //                                    getLogger().info("WENT invoke");
-                        } catch (InvocationTargetException invocationTargetException) {
-                            getLogger().error("method invoked but threw Exception from it, so InvocationTargetException occurred");
-                            getLogger().exception(invocationTargetException);
-                            Throwable targetException = invocationTargetException.getTargetException();
-                            if (targetException != null) {
-                                controller.sayFail("Met InvocationTargetException with Cause: " + targetException.getMessage());
-                            } else {
-                                controller.sayFail("Met InvocationTargetException without Cause");
+                                } catch (InvocationTargetException invocationTargetException) {
+                                    getLogger().error("method invoked but threw Exception from it, so InvocationTargetException occurred");
+                                    getLogger().exception(invocationTargetException);
+                                    Throwable targetException = invocationTargetException.getTargetException();
+                                    if (targetException != null) {
+                                        controller.sayFail("Met InvocationTargetException with Cause: " + targetException.getMessage());
+                                    } else {
+                                        controller.sayFail("Met InvocationTargetException without Cause");
+                                    }
+                                }
+                                if (invoked != null) {
+                                    if (invoked instanceof Future) {
+                                        ((Future<?>) invoked)
+                                                .onSuccess(result -> {
+                                                    if (
+                                                            annotation.responseContentType().equals("application/json")
+                                                                    || annotation.responseContentType().startsWith("application/json;")
+                                                    ) {
+                                                        controller.sayOK(result);
+                                                    } else {
+                                                        ctx.response()
+                                                                .setStatusCode(200)
+                                                                .putHeader("Content-Type", annotation.responseContentType())
+                                                                .end(String.valueOf(result));
+                                                    }
+                                                })
+                                                .onFailure(throwable -> {
+                                                    getLogger().exception(throwable);
+                                                    if (
+                                                            annotation.responseContentType().equals("application/json")
+                                                                    || annotation.responseContentType().startsWith("application/json;")
+                                                    ) {
+                                                        controller.sayFail(throwable.getClass().getName() + ": " + throwable.getMessage());
+                                                    } else {
+                                                        ctx.response()
+                                                                .setStatusCode(200)
+                                                                .putHeader("Content-Type", annotation.responseContentType())
+                                                                .end(throwable.getClass().getName() + ": " + throwable.getMessage());
+                                                    }
+                                                });
+                                    } else {
+                                        controller.sayOK(invoked);
+                                    }
+                                }
+                            } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+                                getLogger().exception(e);
+                                ctx.response().setStatusCode(404).end(e.getClass().getName() + " " + e.getMessage());
                             }
+                        } catch (Exception anyError) {
+                            getLogger().exception(anyError);
+                            ctx.response().setStatusCode(500).end(anyError.getClass().getName() + " " + anyError.getMessage());
                         }
-                        if (invoked != null) {
-                            if (invoked instanceof Future) {
-                                ((Future<?>) invoked)
-                                        .onSuccess(result -> {
-                                            if (
-                                                    annotation.responseContentType().equals("application/json")
-                                                            || annotation.responseContentType().startsWith("application/json;")
-                                            ) {
-                                                controller.sayOK(result);
-                                            } else {
-                                                ctx.response()
-                                                        .setStatusCode(200)
-                                                        .putHeader("Content-Type", annotation.responseContentType())
-                                                        .end(String.valueOf(result));
-                                            }
-                                        })
-                                        .onFailure(throwable -> {
-                                            getLogger().exception(throwable);
-                                            if (
-                                                    annotation.responseContentType().equals("application/json")
-                                                            || annotation.responseContentType().startsWith("application/json;")
-                                            ) {
-                                                controller.sayFail(throwable.getClass().getName() + ": " + throwable.getMessage());
-                                            } else {
-                                                ctx.response()
-                                                        .setStatusCode(200)
-                                                        .putHeader("Content-Type", annotation.responseContentType())
-                                                        .end(throwable.getClass().getName() + ": " + throwable.getMessage());
-                                            }
-                                        });
-                            } else {
-                                controller.sayOK(invoked);
-                            }
-                        }
-                    } catch (InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-                        getLogger().exception(e);
-                        ctx.response().setStatusCode(404).end(e.getClass().getName() + " " + e.getMessage());
-                    }
-                } catch (Exception anyError) {
-                    getLogger().exception(anyError);
-                    ctx.response().setStatusCode(500).end(anyError.getClass().getName() + " " + anyError.getMessage());
-                }
-            });
+                    });
         }
     }
 

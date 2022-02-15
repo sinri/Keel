@@ -75,4 +75,12 @@ public class KeelMySQLConfig {
     public String getPassword() {
         return password;
     }
+
+    /**
+     * @return the data source name
+     * @since 1.10
+     */
+    public String getDataSourceName() {
+        return dataSourceName;
+    }
 }

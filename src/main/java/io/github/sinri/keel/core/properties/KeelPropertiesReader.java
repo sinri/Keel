@@ -3,8 +3,10 @@ package io.github.sinri.keel.core.properties;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 //import java.util.logging.Logger; // ->   (程序包 java.util.logging 已在模块 java.logging 中声明, 但模块 com.fasterxml.jackson.core 未读取它)
 
 /**
@@ -16,6 +18,14 @@ public class KeelPropertiesReader {
 
     public KeelPropertiesReader() {
         properties = new Properties();
+    }
+
+    /**
+     * @param properties the raw Properties instance
+     * @since 1.10
+     */
+    public KeelPropertiesReader(Properties properties) {
+        this.properties = properties;
     }
 
     public static KeelPropertiesReader loadReaderWithFile(String propertiesFileName) {
@@ -74,5 +84,34 @@ public class KeelPropertiesReader {
         }
         key.deleteCharAt(0);
         return properties.getProperty(key.toString(), defaultValue);
+    }
+
+    /**
+     * @param keyPrefix such as A.B
+     * @return such as C=X, C.DEF=Y
+     * @since 1.10
+     * For A.B.C=X, A.B.C.DEF=Y
+     */
+    public KeelPropertiesReader filter(String keyPrefix) {
+        Properties x = new Properties();
+        properties.forEach((key, value) -> {
+            if (key.toString().startsWith(keyPrefix + ".")) {
+                // System.out.println("FILTER "+key+" -> "+value);
+                x.put(key.toString().substring(keyPrefix.length() + 1), value);
+            }
+        });
+        return new KeelPropertiesReader(x);
+    }
+
+    /**
+     * @return the key set
+     * @since 1.10
+     */
+    public Set<String> getPlainKeySet() {
+        Set<String> keys = new HashSet<>();
+        properties.forEach((key, value) -> {
+            keys.add(key.toString());
+        });
+        return keys;
     }
 }

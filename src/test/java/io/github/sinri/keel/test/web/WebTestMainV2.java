@@ -7,6 +7,8 @@ import io.github.sinri.keel.web.KeelHttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.handler.BodyHandler;
 
+import java.util.ArrayList;
+
 public class WebTestMainV2 {
     public static void main(String[] args) {
         SharedTestBootstrap.initialize();
@@ -16,7 +18,11 @@ public class WebTestMainV2 {
         // static route
         khs.getRouter().get("/").handler(ctx -> ctx.response().end("HERE IS ROOT"));
         // automatic Controller - Method route
-        KeelControllerStyleRouterKit keelControllerStyleRouterKit = new KeelControllerStyleRouterKit("io.github.sinri.keel.test.web.controller");
+        KeelControllerStyleRouterKit keelControllerStyleRouterKit = new KeelControllerStyleRouterKit(
+                "/api/",
+                "io.github.sinri.keel.test.web.controller",
+                new ArrayList<>()
+        );
         keelControllerStyleRouterKit.setLogger(Keel.outputLogger("KeelControllerStyleRouterKit"));
         khs.getRouter()
                 .route()
