@@ -8,6 +8,22 @@ import java.util.List;
  * Keel Helper
  */
 public class KeelHelper {
+    /**
+     * @param x         array
+     * @param separator separator
+     * @param <T>       the class of item in array
+     * @return the joined string
+     * @since 1.11
+     */
+    public static <T> String joinStringArray(T[] x, String separator) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < x.length; i++) {
+            if (i > 0) result.append(separator);
+            result.append(x[i].toString());
+        }
+        return result.toString();
+    }
+
     public static String joinStringArray(List<?> x, String separator) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < x.size(); i++) {

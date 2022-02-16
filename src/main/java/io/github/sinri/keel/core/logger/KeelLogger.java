@@ -1,5 +1,6 @@
 package io.github.sinri.keel.core.logger;
 
+import io.github.sinri.keel.core.KeelHelper;
 import io.vertx.core.json.JsonObject;
 
 import java.io.BufferedWriter;
@@ -17,7 +18,8 @@ import java.util.List;
 public class KeelLogger {
 
     protected File logRootDirectory = null;
-    protected String aspect = "default";
+    protected List<String> aspectComponentList = new ArrayList<>();
+    protected String categoryPrefix = null;
     protected KeelLogLevel lowestLevel = KeelLogLevel.INFO;
     protected String rotateDateTimeFormat = "yyyyMMdd";
     protected boolean keepWriterReady = true;
@@ -25,33 +27,28 @@ public class KeelLogger {
     protected BufferedWriter readyWriter = null;
     protected boolean showThreadID = true;
 
+    public KeelLogger(File logRootDirectory, String aspect, String categoryPrefix) {
+        this.logRootDirectory = logRootDirectory;
+        this.parseAspect(aspect);
+        this.categoryPrefix = categoryPrefix;
+    }
+
     public KeelLogger(File logRootDirectory, String aspect) {
-        String[] aspectParts = aspect.split("[/\\\\]+");
-        List<String> list = new ArrayList<>();
-        for (var x : aspectParts) {
-            if (x == null || x.trim().equalsIgnoreCase("")) continue;
-            list.add(x);
-        }
-        if (list.size() > 1) {
-            for (int i = 0; i < list.size() - 1; i++) {
-                this.logRootDirectory = new File(logRootDirectory.getAbsolutePath() + File.separator + list.get(i));
-            }
-            this.aspect = aspectParts[list.size() - 1];
-        } else {
-            this.logRootDirectory = logRootDirectory;
-            this.aspect = aspect;
-        }
+        this.logRootDirectory = logRootDirectory;
+        this.parseAspect(aspect);
     }
 
     public KeelLogger(String aspect) {
-        this.aspect = aspect;
+        this.parseAspect(aspect);
     }
 
     public KeelLogger(File logRootDirectory) {
         this.logRootDirectory = logRootDirectory;
+        this.parseAspect("");
     }
 
     public KeelLogger() {
+        this.parseAspect("");
     }
 
     /**
@@ -63,12 +60,41 @@ public class KeelLogger {
     }
 
     /**
-     * FORMAT: "yyyyMMdd" or "yyyy-MM-dd HH:mm:ss", etc.
+     * @param format "yyyyMMdd" or "yyyy-MM-dd HH:mm:ss", etc. if null, return null
+     * @return the date string or null
      */
     public static String getCurrentDateExpression(String format) {
+        if (format == null || format.isEmpty()) {
+            return null;
+        }
         Date currentTime = new Date();
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(currentTime);
+    }
+
+    protected void parseAspect(String aspect) {
+        String[] aspectParts = aspect.split("[/\\\\]+");
+        aspectComponentList.clear();
+        for (var x : aspectParts) {
+            if (x == null || x.trim().equalsIgnoreCase("")) continue;
+            aspectComponentList.add(x);
+        }
+        if (aspectComponentList.isEmpty()) {
+            aspectComponentList.add("default");
+        }
+    }
+
+    /**
+     * @param categoryPrefix category prefix
+     * @return this
+     * @since 1.11
+     */
+    public KeelLogger setCategoryPrefix(String categoryPrefix) {
+        this.categoryPrefix = categoryPrefix;
+        if (this.keepWriterReady) {
+            resetReadyWriter();
+        }
+        return this;
     }
 
     public String getRotateDateTimeFormat() {
@@ -80,6 +106,9 @@ public class KeelLogger {
      */
     public KeelLogger setRotateDateTimeFormat(String rotateDateTimeFormat) {
         this.rotateDateTimeFormat = rotateDateTimeFormat;
+        if (this.keepWriterReady) {
+            resetReadyWriter();
+        }
         return this;
     }
 
@@ -107,19 +136,40 @@ public class KeelLogger {
     }
 
     public KeelLogger setKeepWriterReady(boolean keepWriterReady) {
-        this.keepWriterReady = keepWriterReady;
-        if (!this.keepWriterReady && readyWriter != null) {
-            try {
-                readyWriter.close();
-            } catch (IOException e) {
-                //e.printStackTrace();
-                System.err.println(e.getMessage());
-            }
+        if (this.keepWriterReady != keepWriterReady) {
+            resetReadyWriter();
         }
+        this.keepWriterReady = keepWriterReady;
         return this;
     }
 
-    protected File getOutputTargetFile() throws IOException {
+    /**
+     * From Aspect and Category Prefix
+     * Aspect: a | a/b
+     * Category Prefix: EMPTY | x
+     *
+     * @return computed Relative Directory Path
+     */
+    protected String computeRelativeDirPath() {
+        return KeelHelper.joinStringArray(aspectComponentList, File.separator);
+    }
+
+    protected String computeFileName() {
+        String prefix;
+        if (this.categoryPrefix != null && !this.categoryPrefix.isEmpty()) {
+            prefix = this.categoryPrefix;
+        } else {
+            prefix = aspectComponentList.get(aspectComponentList.size() - 1);
+        }
+        String currentDateExpression = getCurrentDateExpression(rotateDateTimeFormat);
+        if (currentDateExpression != null) {
+            return prefix + "-" + currentDateExpression + ".log";
+        } else {
+            return prefix + ".log";
+        }
+    }
+
+    protected File getOutputTargetFile() {
         if (logRootDirectory == null) {
             // directly output to stdout, FORMAT
             // DATETIME [LEVEL] <ASPECT> MSG | CONTEXT
@@ -133,24 +183,49 @@ public class KeelLogger {
                 return logRootDirectory;
             }
         }
-        File aspectDir = new File(logRootDirectory.getAbsolutePath() + File.separator + aspect);
-        if (!aspectDir.exists()) {
-            if (!aspectDir.mkdirs()) {
-                throw new IOException("Cannot MKDIRS: " + aspectDir.getAbsolutePath());
+
+        File dir = new File(logRootDirectory.getAbsolutePath() + File.separator + computeRelativeDirPath());
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                new KeelLogger("KeelLogger").warning("Cannot MKDIRS: " + dir.getAbsolutePath());
+                //throw new IOException("Cannot MKDIRS: " + dir.getAbsolutePath());
             }
         }
 
-        String realPath = aspectDir.getAbsolutePath()
-                + File.separator
-                + aspect + "-" + getCurrentDateExpression(rotateDateTimeFormat) + ".log";
+        String realPath = dir.getAbsolutePath() + File.separator + computeFileName();
+        // TODO remove debug
+        System.out.println("getOutputTargetFile realPath: " + realPath);
 
+        return new File(realPath);
+    }
+
+    protected BufferedWriter getWriter(File outputTargetFile) throws IOException {
         if (keepWriterReady) {
-            if (readyFile == null || !readyFile.getAbsolutePath().equals(realPath)) {
-                readyFile = new File(realPath);
+            if (readyWriter != null) {
+                if (readyFile == null || !outputTargetFile.getAbsolutePath().equals(readyFile.getAbsolutePath())) {
+                    resetReadyWriter();
+                }
             }
-            return readyFile;
+            if (readyWriter == null) {
+                readyWriter = new BufferedWriter(new FileWriter(outputTargetFile, true));
+                readyFile = outputTargetFile;
+            }
+            return readyWriter;
         } else {
-            return new File(realPath);
+            return new BufferedWriter(new FileWriter(outputTargetFile, true));
+        }
+    }
+
+    protected void resetReadyWriter() {
+        try {
+            if (readyWriter != null) {
+                readyWriter.close();
+            }
+        } catch (IOException e) {
+            new KeelLogger("KeelLogger").warning("Failed to close readyWriter: " + e.getMessage());
+        } finally {
+            readyWriter = null;
+            readyFile = null;
         }
     }
 
@@ -158,9 +233,13 @@ public class KeelLogger {
         if (level.isSilent() || !level.isMoreSeriousThan(lowestLevel)) {
             return;
         }
+        String subject = aspectComponentList.get(aspectComponentList.size() - 1);
+        if (categoryPrefix != null && !categoryPrefix.isEmpty()) {
+            subject += ":" + categoryPrefix;
+        }
         String content = getCurrentDateExpression("yyyy-MM-dd HH:mm:ss") + " "
                 + "[" + level.name() + "] "
-                + "<" + aspect + "> "
+                + "<" + subject + "> "
                 + (showThreadID ? ("[" + Thread.currentThread().getId() + "] ") : "")
                 + msg;
         if (context != null) {
@@ -175,30 +254,45 @@ public class KeelLogger {
      * @param content the String content
      */
     public void print(String content) {
-        if (logRootDirectory == null) {
+        File outputTargetFile = getOutputTargetFile();
+        if (outputTargetFile == null) {
             System.out.println(content);
         } else {
-            if (keepWriterReady) {
-                try {
-                    if (readyWriter == null) {
-                        readyWriter = new BufferedWriter(new FileWriter(getOutputTargetFile(), true));
-                    }
-                    readyWriter.write(content);
-                    readyWriter.newLine();
-                    readyWriter.flush();
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                    System.err.println(e.getMessage());
+            try {
+                BufferedWriter writer = getWriter(outputTargetFile);
+                writer.write(content);
+                writer.newLine();
+                writer.flush();
+                if (!keepWriterReady) {
+                    writer.close();
                 }
-            } else {
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter(getOutputTargetFile(), true))) {
-                    bw.write(content);
-                    bw.newLine();
-                } catch (IOException e) {
-                    // e.printStackTrace();
-                    System.err.println(e.getMessage());
-                }
+            } catch (IOException e) {
+                new KeelLogger("KeelLogger").exception(e);
+                System.out.println(content);
             }
+
+//            if (keepWriterReady) {
+//                try {
+//                    if (readyWriter == null) {
+//                        readyWriter = new BufferedWriter(new FileWriter(getOutputTargetFile(), true));
+//                    }
+//                    readyWriter.write(content);
+//                    readyWriter.newLine();
+//                    readyWriter.flush();
+//                } catch (IOException e) {
+//                    //e.printStackTrace();
+//                    new KeelLogger().exception(e);
+//                }
+//            } else {
+//                try (BufferedWriter bw = new BufferedWriter(new FileWriter(getOutputTargetFile(), true))) {
+//                    bw.write(content);
+//                    bw.newLine();
+//                } catch (IOException e) {
+//                    // e.printStackTrace();
+////                    System.err.println(e.getMessage());
+//                    new KeelLogger().exception(e);
+//                }
+//            }
         }
     }
 
@@ -209,31 +303,48 @@ public class KeelLogger {
      * @param ending  the String ending
      */
     public void print(String content, String ending) {
+        File outputTargetFile = getOutputTargetFile();
         if (logRootDirectory == null) {
             System.out.print(content);
             System.out.print(ending);
         } else {
-            if (keepWriterReady) {
-                try {
-                    if (readyWriter == null) {
-                        readyWriter = new BufferedWriter(new FileWriter(getOutputTargetFile(), true));
-                    }
-                    readyWriter.write(content);
-                    readyWriter.write(ending);
-                    readyWriter.flush();
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                    System.err.println(e.getMessage());
+            try {
+                BufferedWriter writer = getWriter(outputTargetFile);
+                writer.write(content);
+                writer.write(ending);
+                writer.flush();
+                if (!keepWriterReady) {
+                    writer.close();
                 }
-            } else {
-                try (BufferedWriter bw = new BufferedWriter(new FileWriter(getOutputTargetFile(), true))) {
-                    bw.write(content);
-                    bw.write(ending);
-                } catch (IOException e) {
-                    // e.printStackTrace();
-                    System.err.println(e.getMessage());
-                }
+            } catch (IOException e) {
+                new KeelLogger("KeelLogger").exception(e);
+                System.out.print(content);
+                System.out.print(ending);
             }
+
+//            if (keepWriterReady) {
+//                try {
+//                    if (readyWriter == null) {
+//                        readyWriter = new BufferedWriter(new FileWriter(getOutputTargetFile(), true));
+//                    }
+//                    readyWriter.write(content);
+//                    readyWriter.write(ending);
+//                    readyWriter.flush();
+//                } catch (IOException e) {
+//                    //e.printStackTrace();
+////                    System.err.println(e.getMessage());
+//                    new KeelLogger().exception(e);
+//                }
+//            } else {
+//                try (BufferedWriter bw = new BufferedWriter(new FileWriter(getOutputTargetFile(), true))) {
+//                    bw.write(content);
+//                    bw.write(ending);
+//                } catch (IOException e) {
+//                    // e.printStackTrace();
+////                    System.err.println(e.getMessage());
+//                    new KeelLogger().exception(e);
+//                }
+//            }
         }
     }
 
