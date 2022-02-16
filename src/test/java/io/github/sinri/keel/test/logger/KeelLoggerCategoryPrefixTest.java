@@ -11,6 +11,9 @@ public class KeelLoggerCategoryPrefixTest {
         Keel.logger("a/b").notice("a/b");
         Keel.logger("a").setCategoryPrefix("x").notice("a+x");
         Keel.logger("a/b").setCategoryPrefix("x").notice("a/b+x");
+        Keel.logger("a/b").setCategoryPrefix("y").notice("a/b+y 1");
+        Keel.logger("a/b").notice("a/b+y 2");
+        Keel.logger("a/b").setCategoryPrefix("z").notice("a/b+z");
 
         Keel.getVertx().close();
     }

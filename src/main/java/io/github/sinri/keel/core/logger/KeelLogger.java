@@ -193,8 +193,6 @@ public class KeelLogger {
         }
 
         String realPath = dir.getAbsolutePath() + File.separator + computeFileName();
-        // TODO remove debug
-        System.out.println("getOutputTargetFile realPath: " + realPath);
 
         return new File(realPath);
     }
@@ -270,29 +268,6 @@ public class KeelLogger {
                 new KeelLogger("KeelLogger").exception(e);
                 System.out.println(content);
             }
-
-//            if (keepWriterReady) {
-//                try {
-//                    if (readyWriter == null) {
-//                        readyWriter = new BufferedWriter(new FileWriter(getOutputTargetFile(), true));
-//                    }
-//                    readyWriter.write(content);
-//                    readyWriter.newLine();
-//                    readyWriter.flush();
-//                } catch (IOException e) {
-//                    //e.printStackTrace();
-//                    new KeelLogger().exception(e);
-//                }
-//            } else {
-//                try (BufferedWriter bw = new BufferedWriter(new FileWriter(getOutputTargetFile(), true))) {
-//                    bw.write(content);
-//                    bw.newLine();
-//                } catch (IOException e) {
-//                    // e.printStackTrace();
-////                    System.err.println(e.getMessage());
-//                    new KeelLogger().exception(e);
-//                }
-//            }
         }
     }
 
@@ -321,30 +296,6 @@ public class KeelLogger {
                 System.out.print(content);
                 System.out.print(ending);
             }
-
-//            if (keepWriterReady) {
-//                try {
-//                    if (readyWriter == null) {
-//                        readyWriter = new BufferedWriter(new FileWriter(getOutputTargetFile(), true));
-//                    }
-//                    readyWriter.write(content);
-//                    readyWriter.write(ending);
-//                    readyWriter.flush();
-//                } catch (IOException e) {
-//                    //e.printStackTrace();
-////                    System.err.println(e.getMessage());
-//                    new KeelLogger().exception(e);
-//                }
-//            } else {
-//                try (BufferedWriter bw = new BufferedWriter(new FileWriter(getOutputTargetFile(), true))) {
-//                    bw.write(content);
-//                    bw.write(ending);
-//                } catch (IOException e) {
-//                    // e.printStackTrace();
-////                    System.err.println(e.getMessage());
-//                    new KeelLogger().exception(e);
-//                }
-//            }
         }
     }
 
