@@ -6,7 +6,6 @@ import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -42,7 +41,7 @@ public abstract class AbstractTableRow {
                             try {
                                 t = resultMatrix.buildTableRowByIndex(0, classOfTableRow);
                             } catch (KeelSQLResultRowIndexError e) {
-                                return Future.failedFuture(e);
+                                return Future.succeededFuture(null);
                             }
                             return Future.succeededFuture(t);
                         }),
@@ -50,7 +49,7 @@ public abstract class AbstractTableRow {
                     try {
                         return readStatement.blockedExecute(statement).buildTableRowByIndex(0, classOfTableRow);
                     } catch (KeelSQLResultRowIndexError e) {
-                        throw new SQLException(e);
+                        return null;
                     }
                 }
         );
