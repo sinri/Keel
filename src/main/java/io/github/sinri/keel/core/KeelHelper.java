@@ -1,5 +1,7 @@
 package io.github.sinri.keel.core;
 
+import io.vertx.core.buffer.Buffer;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -63,35 +65,93 @@ public class KeelHelper {
         }
     }
 
-    private static String encodeHexWithLowerDigits(final byte[] data) {
-        final char[] DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    final static char[] HEX_DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    final static char[] HEX_DIGITS_UPPER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
-        final int dataOffset = 0;
-        final int dataLen = data.length;
-        final char[] out = new char[dataLen << 1];
-        final int outOffset = 0;
-        // two characters form the hex value.
-        for (int i = dataOffset, j = outOffset; i < dataOffset + dataLen; i++) {
-            out[j++] = DIGITS_LOWER[(0xF0 & data[i]) >>> 4];
-            out[j++] = DIGITS_LOWER[0x0F & data[i]];
+    /**
+     * @param buffer
+     * @param rowSize
+     * @return
+     * @since 1.11
+     */
+    public static String bufferToHexMatrix(Buffer buffer, int rowSize) {
+        StringBuilder matrix = new StringBuilder();
+        String s = encodeHexWithUpperDigits(buffer);
+        for (int i = 0; i < s.length(); i += 2) {
+            matrix.append(s, i, i + 2).append(" ");
+            if ((i / 2) % rowSize == rowSize - 1) {
+                matrix.append("\n");
+            }
         }
-
-        return new String(out);
+        return matrix.toString();
     }
 
-    private static String encodeHexWithUpperDigits(final byte[] data) {
-        final char[] DIGITS_UPPER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
-
-        final int dataOffset = 0;
-        final int dataLen = data.length;
-        final char[] out = new char[dataLen << 1];
-        final int outOffset = 0;
-        // two characters form the hex value.
-        for (int i = dataOffset, j = outOffset; i < dataOffset + dataLen; i++) {
-            out[j++] = DIGITS_UPPER[(0xF0 & data[i]) >>> 4];
-            out[j++] = DIGITS_UPPER[0x0F & data[i]];
+    private static String encodeHexWithDigits(final char[] HEX_DIGITS, Buffer buffer, int since, int length) {
+        StringBuilder hex = new StringBuilder();
+        for (int i = since; i < since + length; i++) {
+            hex
+                    .append(HEX_DIGITS[(0xF0 & buffer.getByte(i)) >>> 4])
+                    .append(HEX_DIGITS[0x0F & buffer.getByte(i)])
+            ;
         }
+        return hex.toString();
+    }
 
-        return new String(out);
+    /**
+     * @param data
+     * @return
+     * @since 1.11
+     */
+    public static String encodeHexWithLowerDigits(final byte[] data) {
+        return encodeHexWithLowerDigits(Buffer.buffer(data));
+    }
+
+    /**
+     * @param buffer
+     * @return
+     * @since 1.11
+     */
+    public static String encodeHexWithLowerDigits(Buffer buffer) {
+        return encodeHexWithLowerDigits(buffer, 0, buffer.length());
+    }
+
+    /**
+     * @param buffer
+     * @param since
+     * @param length
+     * @return
+     * @since 1.11
+     */
+    public static String encodeHexWithLowerDigits(Buffer buffer, int since, int length) {
+        return encodeHexWithDigits(HEX_DIGITS_LOWER, buffer, since, length);
+    }
+
+    /**
+     * @param data
+     * @return
+     * @since 1.11
+     */
+    public static String encodeHexWithUpperDigits(final byte[] data) {
+        return encodeHexWithUpperDigits(Buffer.buffer(data));
+    }
+
+    /**
+     * @param buffer
+     * @return
+     * @since 1.11
+     */
+    public static String encodeHexWithUpperDigits(Buffer buffer) {
+        return encodeHexWithUpperDigits(buffer, 0, buffer.length());
+    }
+
+    /**
+     * @param buffer
+     * @param since
+     * @param length
+     * @return
+     * @since 1.11
+     */
+    public static String encodeHexWithUpperDigits(Buffer buffer, int since, int length) {
+        return encodeHexWithDigits(HEX_DIGITS_UPPER, buffer, since, length);
     }
 }

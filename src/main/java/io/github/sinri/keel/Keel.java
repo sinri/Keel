@@ -11,6 +11,7 @@ import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +46,22 @@ public class Keel {
         return vertx.eventBus();
     }
 
-    public static KeelLogger logger(String aspect) {
-        if (loggerMap.containsKey(aspect)) {
-            return loggerMap.get(aspect);
-        }
+    /**
+     * @param aspect the aspect
+     * @return a new KeelLogger instance (would not be shared)
+     * @since 1.11
+     */
+    public static KeelLogger standaloneLogger(String aspect) {
+        return standaloneLogger(aspect, Charset.defaultCharset());
+    }
 
+    /**
+     * @param aspect  aspect
+     * @param charset the charset
+     * @return a new KeelLogger instance (would not be shared)
+     * @since 1.11
+     */
+    public static KeelLogger standaloneLogger(String aspect, Charset charset) {
         String dir = propertiesReader.getProperty(List.of("log", aspect, "dir"));
 
         // check default?
@@ -63,6 +75,8 @@ public class Keel {
         } else {
             logger = new KeelLogger(new File(dir), aspect);
         }
+
+        logger.setFileOutputCharset(charset);
 
         String level = propertiesReader.getProperty(List.of("log", aspect, "level"));
         // check default?
@@ -82,12 +96,42 @@ public class Keel {
             logger.setRotateDateTimeFormat(rotate);
         }
 
+        return logger;
+    }
+
+    /**
+     * Get a shared KeelLogger instance.
+     *
+     * @param aspect aspect
+     * @return KeelLogger, if already shared, use existed.
+     */
+    public static KeelLogger logger(String aspect) {
+        return logger(aspect, Charset.defaultCharset());
+    }
+
+    /**
+     * Get a shared KeelLogger instance.
+     *
+     * @param aspect aspect
+     * @return KeelLogger, if already shared, use existed.
+     */
+    public static KeelLogger logger(String aspect, Charset charset) {
+        if (loggerMap.containsKey(aspect)) {
+            return loggerMap.get(aspect);
+        }
+
+        KeelLogger logger = standaloneLogger(aspect, charset);
+
         loggerMap.put(aspect, logger);
         return logger;
     }
 
     public static KeelLogger outputLogger(String aspect) {
         return new KeelLogger(aspect);
+    }
+
+    public static KeelLogger outputLogger(String aspect, Charset charset) {
+        return new KeelLogger(aspect).setFileOutputCharset(charset);
     }
 
     public static KeelMySQLKit getMySQLKit(String key) {

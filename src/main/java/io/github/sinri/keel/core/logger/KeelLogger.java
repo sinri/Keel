@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,6 +27,10 @@ public class KeelLogger {
     protected File readyFile = null;
     protected BufferedWriter readyWriter = null;
     protected boolean showThreadID = true;
+    /**
+     * @since 1.11
+     */
+    protected Charset fileOutputCharset = Charset.defaultCharset();
 
     public KeelLogger(File logRootDirectory, String aspect, String categoryPrefix) {
         this.logRootDirectory = logRootDirectory;
@@ -197,6 +202,26 @@ public class KeelLogger {
         return new File(realPath);
     }
 
+    /**
+     * @return the Charset for file outputting
+     * @since 1.11
+     */
+    protected Charset getFileOutputCharset() {
+        return fileOutputCharset;
+    }
+
+    /**
+     * It would not take effect if `Keep Writer` mode is used and the writer is already initialized.
+     *
+     * @param fileOutputCharset the Charset instance
+     * @return this
+     * @since 1.11
+     */
+    public KeelLogger setFileOutputCharset(Charset fileOutputCharset) {
+        this.fileOutputCharset = fileOutputCharset;
+        return this;
+    }
+
     protected BufferedWriter getWriter(File outputTargetFile) throws IOException {
         if (keepWriterReady) {
             if (readyWriter != null) {
@@ -205,12 +230,12 @@ public class KeelLogger {
                 }
             }
             if (readyWriter == null) {
-                readyWriter = new BufferedWriter(new FileWriter(outputTargetFile, true));
+                readyWriter = new BufferedWriter(new FileWriter(outputTargetFile, getFileOutputCharset(), true));
                 readyFile = outputTargetFile;
             }
             return readyWriter;
         } else {
-            return new BufferedWriter(new FileWriter(outputTargetFile, true));
+            return new BufferedWriter(new FileWriter(outputTargetFile, getFileOutputCharset(), true));
         }
     }
 
@@ -247,6 +272,18 @@ public class KeelLogger {
     }
 
     /**
+     * @param level   KeelLogLevel
+     * @param content content
+     * @since 1.11
+     */
+    public void print(KeelLogLevel level, String content) {
+        if (level.isSilent() || !level.isMoreSeriousThan(lowestLevel)) {
+            return;
+        }
+        print(content);
+    }
+
+    /**
      * It would always print the content to STDOUT, but any occurred errors would be printed to STDERR.
      *
      * @param content the String content
@@ -269,6 +306,19 @@ public class KeelLogger {
                 System.out.println(content);
             }
         }
+    }
+
+    /**
+     * @param level   KeelLogLevel
+     * @param content content
+     * @param ending  ending
+     * @since 1.11
+     */
+    public void print(KeelLogLevel level, String content, String ending) {
+        if (level.isSilent() || !level.isMoreSeriousThan(lowestLevel)) {
+            return;
+        }
+        print(content, ending);
     }
 
     /**
