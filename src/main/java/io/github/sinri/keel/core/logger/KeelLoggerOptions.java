@@ -7,32 +7,17 @@ import java.io.File;
 import java.nio.charset.Charset;
 
 public class KeelLoggerOptions extends KeelConfigurationBasement {
-//    protected String aspect;
-//    protected File logRootDirectory;
-//    protected KeelLogLevel lowestLevel;
-//    protected String rotateDateTimeFormat;
-//    protected boolean keepWriterReady;
-//    protected boolean showThreadID;
-//    protected Charset fileOutputCharset;
 
     public KeelLoggerOptions() {
         super(new JsonObject()
                 .put("aspect", "default")
-                .put("logRootDirectory", null)
+                .put("dir", null)
                 .put("lowestLevel", "INFO")
                 .put("rotateDateTimeFormat", "yyyyMMdd")
                 .put("keepWriterReady", "YES")
                 .put("showThreadID", "YES")
                 .put("fileOutputCharset", null)
         );
-
-//        this.aspect = "default";
-//        this.logRootDirectory = null;
-//        this.lowestLevel = KeelLogLevel.INFO;
-//        this.rotateDateTimeFormat = "yyyyMMdd";
-//        this.keepWriterReady = true;
-//        this.showThreadID = true;
-//        this.fileOutputCharset = Charset.defaultCharset();
     }
 
     public KeelLoggerOptions(JsonObject jsonObject) {
@@ -48,14 +33,14 @@ public class KeelLoggerOptions extends KeelConfigurationBasement {
         return this;
     }
 
-    public File getLogRootDirectory() {
-        String x = this.getJsonObject().getString("logRootDirectory");
+    public File getDir() {
+        String x = this.getJsonObject().getString("dir");
         if (x == null) return null;
         return new File(x);
     }
 
-    public KeelLoggerOptions setLogRootDirectory(File logRootDirectory) {
-        this.getJsonObject().put("logRootDirectory", logRootDirectory);
+    public KeelLoggerOptions setDir(File dir) {
+        this.getJsonObject().put("dir", dir);
         return this;
     }
 

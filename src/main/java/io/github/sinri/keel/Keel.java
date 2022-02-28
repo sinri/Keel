@@ -1,6 +1,5 @@
 package io.github.sinri.keel;
 
-import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
@@ -10,11 +9,10 @@ import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonObject;
 
-import java.io.File;
 import java.nio.charset.Charset;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Keel {
@@ -53,7 +51,16 @@ public class Keel {
      * @since 1.11
      */
     public static KeelLogger standaloneLogger(String aspect) {
-        return standaloneLogger(aspect, Charset.defaultCharset());
+        JsonObject x = Keel.getPropertiesReader().filter("log").toJsonObject();
+        KeelLoggerOptions keelLoggerOptions;
+        if (x.containsKey(aspect)) {
+            keelLoggerOptions = new KeelLoggerOptions(x.getJsonObject(aspect));
+        } else if (x.containsKey("*")) {
+            keelLoggerOptions = new KeelLoggerOptions(x.getJsonObject("*"));
+        } else {
+            keelLoggerOptions = new KeelLoggerOptions();
+        }
+        return new KeelLogger(keelLoggerOptions);
     }
 
     /**
@@ -61,41 +68,21 @@ public class Keel {
      * @param charset the charset
      * @return a new KeelLogger instance (would not be shared)
      * @since 1.11
+     * @deprecated after logger redesign
      */
+    @Deprecated
     public static KeelLogger standaloneLogger(String aspect, Charset charset) {
-        String dir = propertiesReader.getProperty(List.of("log", aspect, "dir"));
-
-        // check default?
-        if (dir == null) {
-            dir = propertiesReader.getProperty(List.of("log", "*", "dir"));
+        JsonObject x = Keel.getPropertiesReader().filter("log").toJsonObject();
+        KeelLoggerOptions keelLoggerOptions;
+        if (x.containsKey(aspect)) {
+            keelLoggerOptions = new KeelLoggerOptions(x.getJsonObject(aspect));
+        } else if (x.containsKey("*")) {
+            keelLoggerOptions = new KeelLoggerOptions(x.getJsonObject("*"));
+        } else {
+            keelLoggerOptions = new KeelLoggerOptions();
         }
-
-        KeelLoggerOptions options = new KeelLoggerOptions();
-        if (dir != null && !dir.trim().equals("")) {
-            options.setLogRootDirectory(new File(dir));
-        }
-        options.setFileOutputCharset(charset);
-
-        String level = propertiesReader.getProperty(List.of("log", aspect, "level"));
-        // check default?
-        if (level == null) {
-            level = propertiesReader.getProperty(List.of("log", "*", "level"));
-        }
-        if (level != null) {
-            KeelLogLevel lowestLogLevel = KeelLogLevel.valueOf(level);
-            options.setLowestLevel(lowestLogLevel);
-        }
-
-        String rotate = propertiesReader.getProperty(List.of("log", aspect, "rotate"));
-        // check default?
-        if (rotate == null) {
-            rotate = propertiesReader.getProperty(List.of("log", "*", "rotate"));
-        }
-        if (rotate != null) {
-            options.setRotateDateTimeFormat(rotate);
-        }
-
-        return new KeelLogger(options);
+        keelLoggerOptions.setFileOutputCharset(charset);
+        return new KeelLogger(keelLoggerOptions);
     }
 
     /**
