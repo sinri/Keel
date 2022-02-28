@@ -100,6 +100,7 @@ abstract public class KeelProgram {
      * @return should not be null
      * @deprecated since 1.9 blocked is better?
      */
+    @Deprecated
     abstract protected Future<Void> execute(String action);
 
     /**

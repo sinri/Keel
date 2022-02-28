@@ -1,12 +1,15 @@
 package io.github.sinri.keel.core.properties;
 
+import io.github.sinri.keel.core.KeelHelper;
+import io.vertx.core.json.JsonObject;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 //import java.util.logging.Logger; // ->   (程序包 java.util.logging 已在模块 java.logging 中声明, 但模块 com.fasterxml.jackson.core 未读取它)
 
 /**
@@ -87,10 +90,12 @@ public class KeelPropertiesReader {
     }
 
     /**
-     * @param keyPrefix such as A.B
+     * @param keyPrefix Prefix of key to filter out, do not add dot to tail
      * @return such as C=X, C.DEF=Y
      * @since 1.10
      * For A.B.C=X, A.B.C.DEF=Y
+     * Prefix as A.B
+     * Result as C=X, C.DEF=Y
      */
     public KeelPropertiesReader filter(String keyPrefix) {
         Properties x = new Properties();
@@ -98,6 +103,26 @@ public class KeelPropertiesReader {
             if (key.toString().startsWith(keyPrefix + ".")) {
                 // System.out.println("FILTER "+key+" -> "+value);
                 x.put(key.toString().substring(keyPrefix.length() + 1), value);
+            }
+        });
+        return new KeelPropertiesReader(x);
+    }
+
+    /**
+     * @param regex REGEX, do not add dot to tail (`[a-z]+\.[0-9]+` would be changed to `^[a-z]+\.[0-9]+`, the dot amongst regex should be escaped)
+     * @return Result sub reader
+     * For A.B.C=X, A.B.C.DEF=Y
+     * Filter Regex = `A\.[A-Z]`
+     * Result C=X, C.DEF=Y
+     */
+    public KeelPropertiesReader filterUsingRegex(String regex) {
+        Properties x = new Properties();
+        Pattern pattern = Pattern.compile("^" + regex + "\\.");
+        properties.forEach((key, value) -> {
+            Matcher matcher = pattern.matcher(String.valueOf(key));
+            if (matcher.find()) {
+                // System.out.println("FILTER "+key+" -> "+value);
+                x.put(key.toString().substring(matcher.group().length() + 1), value);
             }
         });
         return new KeelPropertiesReader(x);
@@ -113,5 +138,34 @@ public class KeelPropertiesReader {
             keys.add(key.toString());
         });
         return keys;
+    }
+
+    /**
+     * @return Json Object for the properties
+     * @since 1.11
+     */
+    public JsonObject toJsonObject() {
+        JsonObject jsonObject = new JsonObject();
+        Set<String> plainKeySet = getPlainKeySet();
+        for (var plainKey : plainKeySet) {
+            String[] components = plainKey.split("\\.");
+            List<String> keychain = Arrays.asList(components);
+            KeelHelper.writeIntoJsonObject(jsonObject, keychain, getProperty(plainKey));
+        }
+        return jsonObject;
+    }
+
+    /**
+     * @param classOfT
+     * @param <T>
+     * @return
+     * @since 1.11
+     */
+    public <T extends KeelConfigurationBasement> T toConfiguration(Class<T> classOfT) {
+        try {
+            return classOfT.getConstructor(JsonObject.class).newInstance(this.toJsonObject());
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

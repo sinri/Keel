@@ -1,6 +1,7 @@
 package io.github.sinri.keel.core;
 
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonObject;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -8,10 +9,13 @@ import java.util.List;
 
 /**
  * Keel Helper
+ * It provides some static methods to support the widely used functions.
  */
 public class KeelHelper {
     /**
-     * @param x         array
+     * 给定一个数组x，用separator作为分隔符，将x中的所有元素的字符串化值拼接起来。
+     *
+     * @param x         an array
      * @param separator separator
      * @param <T>       the class of item in array
      * @return the joined string
@@ -26,6 +30,13 @@ public class KeelHelper {
         return result.toString();
     }
 
+    /**
+     * 给定一个列表x，用separator作为分隔符，将x中的所有元素的字符串化值拼接起来。
+     *
+     * @param x         a list
+     * @param separator separator
+     * @return the joined string
+     */
     public static String joinStringArray(List<?> x, String separator) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < x.size(); i++) {
@@ -36,6 +47,8 @@ public class KeelHelper {
     }
 
     /**
+     * 获取raw对应的以数字和小写字母描述的MD5摘要值。
+     *
      * @param raw raw string
      * @return md5 with lower digits
      * @since 1.1
@@ -51,6 +64,8 @@ public class KeelHelper {
     }
 
     /**
+     * 获取raw对应的以数字和大写字母描述的MD5摘要值。
+     *
      * @param raw raw string
      * @return MD5 with upper digits
      * @since 1.1
@@ -69,9 +84,12 @@ public class KeelHelper {
     final static char[] HEX_DIGITS_UPPER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     /**
-     * @param buffer
-     * @param rowSize
-     * @return
+     * 获取一个Buffer的十六进制表达，每个字节以两个字符表示（字母大写）。
+     * 字节间空格分隔；每行容纳一定量的字节数。
+     *
+     * @param buffer  an instance of Buffer defined in Vertx
+     * @param rowSize how many bytes in one row
+     * @return the matrix of hex as string
      * @since 1.11
      */
     public static String bufferToHexMatrix(Buffer buffer, int rowSize) {
@@ -98,8 +116,8 @@ public class KeelHelper {
     }
 
     /**
-     * @param data
-     * @return
+     * @param data an array of byte
+     * @return expression with hex using lower digits as string
      * @since 1.11
      */
     public static String encodeHexWithLowerDigits(final byte[] data) {
@@ -107,8 +125,8 @@ public class KeelHelper {
     }
 
     /**
-     * @param buffer
-     * @return
+     * @param buffer an instance of Buffer defined in Vertx
+     * @return expression with hex using lower digits as string
      * @since 1.11
      */
     public static String encodeHexWithLowerDigits(Buffer buffer) {
@@ -116,10 +134,10 @@ public class KeelHelper {
     }
 
     /**
-     * @param buffer
-     * @param since
-     * @param length
-     * @return
+     * @param buffer an instance of Buffer defined in Vertx
+     * @param since  the start index
+     * @param length the length
+     * @return expression of the substring with hex using lower digits as string
      * @since 1.11
      */
     public static String encodeHexWithLowerDigits(Buffer buffer, int since, int length) {
@@ -127,8 +145,8 @@ public class KeelHelper {
     }
 
     /**
-     * @param data
-     * @return
+     * @param data an array of bytes
+     * @return expression with hex using upper digits as string
      * @since 1.11
      */
     public static String encodeHexWithUpperDigits(final byte[] data) {
@@ -136,8 +154,8 @@ public class KeelHelper {
     }
 
     /**
-     * @param buffer
-     * @return
+     * @param buffer an instance of Buffer defined in Vertx
+     * @return expression of the substring with hex using upper digits as string
      * @since 1.11
      */
     public static String encodeHexWithUpperDigits(Buffer buffer) {
@@ -145,13 +163,35 @@ public class KeelHelper {
     }
 
     /**
-     * @param buffer
-     * @param since
-     * @param length
-     * @return
+     * @param buffer an instance of Buffer defined in Vertx
+     * @param since  the start index
+     * @param length the length
+     * @return expression of the substring with hex using upper digits as string
      * @since 1.11
      */
     public static String encodeHexWithUpperDigits(Buffer buffer, int since, int length) {
         return encodeHexWithDigits(HEX_DIGITS_UPPER, buffer, since, length);
+    }
+
+    /**
+     * @param jsonObject JsonObject
+     * @param keychain   List of nested keys
+     * @param value      value to write
+     * @return target json object
+     * @since 1.11
+     */
+    public static JsonObject writeIntoJsonObject(final JsonObject jsonObject, final List<String> keychain, final Object value) {
+        if (keychain.size() <= 0) {
+            return jsonObject;
+        }
+        if (keychain.size() == 1) {
+            jsonObject.put(keychain.get(0), value);
+            return jsonObject;
+        }
+        String x = keychain.get(0);
+        if (jsonObject.getJsonObject(x) == null) {
+            jsonObject.put(x, new JsonObject());
+        }
+        return writeIntoJsonObject(jsonObject.getJsonObject(x), keychain.subList(1, keychain.size()), value);
     }
 }

@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -13,7 +14,7 @@ public class KeelWebRequestController {
 
     public KeelWebRequestController(RoutingContext ctx) {
         this.ctx = ctx;
-        this.logger = new KeelLogger(KeelLogger.class.getName());
+        this.logger = Keel.logger("web/controller/" + KeelLogger.class.getName());
 
         // Keel.logger().debug("do something before call method!");
     }

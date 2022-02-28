@@ -2,6 +2,7 @@ package io.github.sinri.keel;
 
 import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.github.sinri.keel.mysql.KeelMySQLConfig;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
@@ -69,14 +70,11 @@ public class Keel {
             dir = propertiesReader.getProperty(List.of("log", "*", "dir"));
         }
 
-        KeelLogger logger;
-        if (dir == null || dir.trim().equals("")) {
-            logger = new KeelLogger(aspect);
-        } else {
-            logger = new KeelLogger(new File(dir), aspect);
+        KeelLoggerOptions options = new KeelLoggerOptions();
+        if (dir != null && !dir.trim().equals("")) {
+            options.setLogRootDirectory(new File(dir));
         }
-
-        logger.setFileOutputCharset(charset);
+        options.setFileOutputCharset(charset);
 
         String level = propertiesReader.getProperty(List.of("log", aspect, "level"));
         // check default?
@@ -85,18 +83,19 @@ public class Keel {
         }
         if (level != null) {
             KeelLogLevel lowestLogLevel = KeelLogLevel.valueOf(level);
-            logger.setLowestLevel(lowestLogLevel);
+            options.setLowestLevel(lowestLogLevel);
         }
+
         String rotate = propertiesReader.getProperty(List.of("log", aspect, "rotate"));
         // check default?
         if (rotate == null) {
             rotate = propertiesReader.getProperty(List.of("log", "*", "rotate"));
         }
         if (rotate != null) {
-            logger.setRotateDateTimeFormat(rotate);
+            options.setRotateDateTimeFormat(rotate);
         }
 
-        return logger;
+        return new KeelLogger(options);
     }
 
     /**
@@ -127,11 +126,11 @@ public class Keel {
     }
 
     public static KeelLogger outputLogger(String aspect) {
-        return new KeelLogger(aspect);
+        return new KeelLogger(new KeelLoggerOptions().setAspect(aspect));
     }
 
     public static KeelLogger outputLogger(String aspect, Charset charset) {
-        return new KeelLogger(aspect).setFileOutputCharset(charset);
+        return new KeelLogger(new KeelLoggerOptions().setAspect(aspect).setFileOutputCharset(charset));
     }
 
     public static KeelMySQLKit getMySQLKit(String key) {

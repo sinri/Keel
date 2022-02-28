@@ -1,7 +1,6 @@
 package io.github.sinri.keel.core.semaphore;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -21,7 +20,7 @@ public class KeelShareDataSemaphore {
     public KeelShareDataSemaphore(String name, int permits) {
         this.name = name;
         this.permits = permits;
-        this.logger = new KeelLogger().setLowestLevel(KeelLogLevel.WARNING);
+        this.logger = KeelLogger.buildSilentLogger();
     }
 
     public KeelShareDataSemaphore(String name, int permits, KeelLogger logger) {

@@ -245,6 +245,7 @@ public class KeelMySQLKit {
      * @param errorFunction
      * @deprecated since 1.10
      */
+    @Deprecated
     public void executeInTransaction_V2(
             Function<SqlConnection, Future<Object>> transactionBody,
             Function<Object, Void> doneFunction,

@@ -1,7 +1,6 @@
 package io.github.sinri.keel.test.servant.serial;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.servant.KeelServantQueueTask;
 import io.github.sinri.keel.servant.KeelServantSerialQueue;
@@ -24,10 +23,10 @@ public class KeelServantSerialQueueTest extends KeelServantSerialQueue {
         new KeelServantSerialQueueTest(3000L).run();
     }
 
-    @Override
-    protected KeelLogger getLogger() {
-        return super.getLogger().setLowestLevel(KeelLogLevel.DEBUG);
-    }
+//    @Override
+//    protected KeelLogger getLogger() {
+//        return super.getLogger().setLowestLevel(KeelLogLevel.DEBUG);
+//    }
 
     @Override
     public Future<KeelServantQueueTask> getNextTask() {

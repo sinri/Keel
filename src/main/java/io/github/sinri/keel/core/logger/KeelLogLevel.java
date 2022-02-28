@@ -11,6 +11,10 @@ public enum KeelLogLevel {
         return this.ordinal() >= standardLevel.ordinal();
     }
 
+    public boolean isNegligibleThan(KeelLogLevel standardLevel) {
+        return this.ordinal() < standardLevel.ordinal();
+    }
+
     /**
      * @return should always be silent
      * @since 1.10
