@@ -36,13 +36,12 @@ public class KeelLoggerOptions extends KeelOptions {
      */
     public static KeelLoggerOptions generateOptionsForAspectWithPropertiesReader(String aspect) {
         JsonObject x = Keel.getPropertiesReader().filter("log").toJsonObject();
-        KeelLoggerOptions keelLoggerOptions;
+        KeelLoggerOptions keelLoggerOptions = new KeelLoggerOptions();
+        if (x.containsKey("*")) {
+            keelLoggerOptions.overwriteProperties(x.getJsonObject("*"));
+        }
         if (x.containsKey(aspect)) {
-            keelLoggerOptions = new KeelLoggerOptions(x.getJsonObject(aspect));
-        } else if (x.containsKey("*")) {
-            keelLoggerOptions = new KeelLoggerOptions(x.getJsonObject("*"));
-        } else {
-            keelLoggerOptions = new KeelLoggerOptions();
+            keelLoggerOptions.overwriteProperties(x.getJsonObject(aspect));
         }
         keelLoggerOptions.setAspect(aspect);
         return keelLoggerOptions;

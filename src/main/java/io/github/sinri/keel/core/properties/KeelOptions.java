@@ -7,6 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * Keel Options as POJO
+ * Its `properties`, as POJO, just store the String Values.
+ * You may use `get` methods to get them as the expected format.
  */
 abstract public class KeelOptions {
     final static public String BOOL_YES = "YES";
@@ -19,7 +21,7 @@ abstract public class KeelOptions {
 
     abstract protected void initializeProperties();
 
-    private void overwriteProperties(JsonObject jsonObject) {
+    public final void overwriteProperties(JsonObject jsonObject) {
         jsonObject.forEach(stringObjectEntry -> {
             try {
                 Field field = this.getClass().getField(stringObjectEntry.getKey());
