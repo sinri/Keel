@@ -18,24 +18,20 @@ import java.util.function.Function;
 
 public class KeelMySQLKit {
     private final MySQLPool pool;
-    private final KeelMySQLConfig config;
+    private final KeelMySQLOptions options;
 
-    public KeelMySQLKit(Vertx vertx, KeelMySQLConfig configForMySQL) {
-        this.config = configForMySQL;
-        Keel.outputLogger(getClass().getName()).info("useAffectedRows: " + configForMySQL.useAffectedRows);
+    public KeelMySQLKit(Vertx vertx, KeelMySQLOptions options) {
+        this.options = options;
+        Keel.outputLogger(getClass().getName()).info("useAffectedRows: " + options.useAffectedRows);
         pool = MySQLPool.pool(
                 vertx,
-                configForMySQL.buildMySQLConnectOptions(),
-                configForMySQL.buildPoolOptions()
+                options.buildMySQLConnectOptions(),
+                options.buildPoolOptions()
         );
     }
 
-    /**
-     * @return the KeelMySQLConfig instance
-     * @since 1.10
-     */
-    public KeelMySQLConfig getConfig() {
-        return config;
+    public KeelMySQLOptions getOptions() {
+        return options;
     }
 
     protected static String makePlaceholderString(int x) {

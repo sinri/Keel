@@ -1,88 +1,130 @@
 package io.github.sinri.keel.core.logger;
 
-import io.github.sinri.keel.core.properties.KeelConfigurationBasement;
+import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.properties.KeelOptions;
 import io.vertx.core.json.JsonObject;
 
 import java.io.File;
 import java.nio.charset.Charset;
 
-public class KeelLoggerOptions extends KeelConfigurationBasement {
+/**
+ * 这是一个遵循 KeelOptions 定义的 POJO 类，用于 KeelLogger 的初始化。
+ * 此文件可以从 properties 配置文件中获取。
+ * 本类提供了静态方法以从 Keel 的标准配置文件中查找给定的 aspect 对应的配置并根据结果来生成实例。
+ * 注意，aspect 不是 property，而是POJO中所有 properties 的归类名。
+ */
+public class KeelLoggerOptions extends KeelOptions {
+    public String dir;
+    public String level;//lowestLevel
+    public String rotate;//rotateDateTimeFormat
+    public String keepWriterReady;
+    public String showThreadID;
+    public String fileOutputCharset;
+    protected String aspect;
 
     public KeelLoggerOptions() {
-        super(new JsonObject()
-                .put("aspect", "default")
-                .put("dir", null)
-                .put("lowestLevel", "INFO")
-                .put("rotateDateTimeFormat", "yyyyMMdd")
-                .put("keepWriterReady", "YES")
-                .put("showThreadID", "YES")
-                .put("fileOutputCharset", null)
-        );
+        super(new JsonObject());
     }
 
     public KeelLoggerOptions(JsonObject jsonObject) {
         super(jsonObject);
     }
 
+    /**
+     * @param aspect the string of aspect
+     * @return KeelLoggerOptions, read and composed of the content read by reader
+     */
+    public static KeelLoggerOptions generateOptionsForAspectWithPropertiesReader(String aspect) {
+        JsonObject x = Keel.getPropertiesReader().filter("log").toJsonObject();
+        KeelLoggerOptions keelLoggerOptions;
+        if (x.containsKey(aspect)) {
+            keelLoggerOptions = new KeelLoggerOptions(x.getJsonObject(aspect));
+        } else if (x.containsKey("*")) {
+            keelLoggerOptions = new KeelLoggerOptions(x.getJsonObject("*"));
+        } else {
+            keelLoggerOptions = new KeelLoggerOptions();
+        }
+        keelLoggerOptions.setAspect(aspect);
+        return keelLoggerOptions;
+    }
+
     public String getAspect() {
-        return this.getJsonObject().getString("aspect");
+        return aspect;
     }
 
     public KeelLoggerOptions setAspect(String aspect) {
-        this.getJsonObject().put("aspect", aspect);
+        this.aspect = aspect;
         return this;
     }
 
+    @Override
+    protected void initializeProperties() {
+        this.aspect = "default";
+        this.dir = null;
+        this.level = "INFO";
+        this.rotate = "yyyyMMdd";
+        this.keepWriterReady = BOOL_YES;
+        this.showThreadID = BOOL_YES;
+        this.fileOutputCharset = null;
+    }
+
     public File getDir() {
-        String x = this.getJsonObject().getString("dir");
-        if (x == null) return null;
-        return new File(x);
+        if (this.dir == null) return null;
+        return new File(this.dir);
+    }
+
+    public KeelLoggerOptions setDir(String dir) {
+        if (dir == null || dir.isEmpty()) {
+            this.dir = null;
+        } else {
+            this.dir = dir;
+        }
+        return this;
     }
 
     public KeelLoggerOptions setDir(File dir) {
-        this.getJsonObject().put("dir", dir);
+        if (dir == null) {
+            this.dir = null;
+        } else {
+            this.dir = dir.getAbsolutePath();
+        }
         return this;
     }
 
     public KeelLogLevel getLowestLevel() {
-        String lowestLevel = this.getJsonObject().getString("lowestLevel");
-        return KeelLogLevel.valueOf(lowestLevel);
+        return KeelLogLevel.valueOf(this.level);
     }
 
     public KeelLoggerOptions setLowestLevel(KeelLogLevel lowestLevel) {
-        this.getJsonObject().put("lowestLevel", lowestLevel.name());
+        this.level = lowestLevel.name();
         return this;
     }
 
-    public String getRotateDateTimeFormat() {
-        return this.getJsonObject().getString("rotateDateTimeFormat");
-    }
-
     public KeelLoggerOptions setRotateDateTimeFormat(String rotateDateTimeFormat) {
-        this.getJsonObject().put("rotateDateTimeFormat", rotateDateTimeFormat);
+        this.rotate = rotateDateTimeFormat;
         return this;
     }
 
     public boolean isKeepWriterReady() {
-        return "YES".equalsIgnoreCase(this.getJsonObject().getString("keepWriterReady"));
+        return BOOL_YES.equalsIgnoreCase(this.keepWriterReady);
     }
 
     public KeelLoggerOptions setKeepWriterReady(boolean keepWriterReady) {
-        this.getJsonObject().put("keepWriterReady", keepWriterReady ? "YES" : "NO");
+        this.keepWriterReady = keepWriterReady ? BOOL_YES : BOOL_NO;
         return this;
     }
 
     public boolean isShowThreadID() {
-        return "YES".equalsIgnoreCase(this.getJsonObject().getString("showThreadID"));
+        return "BOOL_YES".equalsIgnoreCase(this.showThreadID);
     }
 
     public KeelLoggerOptions setShowThreadID(boolean showThreadID) {
-        this.getJsonObject().put("showThreadID", showThreadID ? "YES" : "NO");
+        this.showThreadID = showThreadID ? BOOL_YES : BOOL_NO;
         return this;
     }
 
     public Charset getFileOutputCharset() {
-        String x = this.getJsonObject().getString("fileOutputCharset");
+        String x = this.fileOutputCharset;
         if (x == null) {
             return Charset.defaultCharset();
         }
@@ -90,7 +132,7 @@ public class KeelLoggerOptions extends KeelConfigurationBasement {
     }
 
     public KeelLoggerOptions setFileOutputCharset(Charset fileOutputCharset) {
-        this.getJsonObject().put("fileOutputCharset", fileOutputCharset.name());
+        this.fileOutputCharset = fileOutputCharset.name();
         return this;
     }
 }

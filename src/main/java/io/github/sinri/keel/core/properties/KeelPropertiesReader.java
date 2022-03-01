@@ -156,12 +156,12 @@ public class KeelPropertiesReader {
     }
 
     /**
-     * @param classOfT
-     * @param <T>
-     * @return
+     * @param classOfT class of the target class of subclass of KeelOptions
+     * @param <T>      the target class of subclass of KeelOptions
+     * @return the generated instance of the target class of subclass of KeelOptions
      * @since 1.11
      */
-    public <T extends KeelConfigurationBasement> T toConfiguration(Class<T> classOfT) {
+    public <T extends KeelOptions> T toConfiguration(Class<T> classOfT) {
         try {
             return classOfT.getConstructor(JsonObject.class).newInstance(this.toJsonObject());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {

@@ -43,7 +43,7 @@ public class KeelLoggerDelegate {
     }
 
     protected void parseAspect() {
-        String[] aspectParts = this.options.getAspect().split("[/\\\\]+");
+        String[] aspectParts = this.options.aspect.split("[/\\\\]+");
         aspectComponentList.clear();
         for (var x : aspectParts) {
             if (x == null || x.trim().equalsIgnoreCase("")) continue;
@@ -92,7 +92,7 @@ public class KeelLoggerDelegate {
     }
 
     protected String computeFileName() {
-        String rotateDateTimeFormat = this.options.getRotateDateTimeFormat();
+        String rotateDateTimeFormat = this.options.rotate;
         String prefix;
         if (this.categoryPrefix != null && !this.categoryPrefix.isEmpty()) {
             prefix = this.categoryPrefix;
@@ -108,7 +108,7 @@ public class KeelLoggerDelegate {
     }
 
     protected File getOutputTargetFile() {
-        File logRootDirectory = this.options.getLogRootDirectory();
+        File logRootDirectory = this.options.getDir();
         if (logRootDirectory == null) {
             // directly output to stdout, FORMAT
             // DATETIME [LEVEL] <ASPECT> MSG | CONTEXT
@@ -230,7 +230,7 @@ public class KeelLoggerDelegate {
      */
     public void print(String content, String ending) {
         File outputTargetFile = getOutputTargetFile();
-        if (this.options.getLogRootDirectory() == null) {
+        if (this.options.getDir() == null) {
             System.out.print(content);
             System.out.print(ending);
         } else {

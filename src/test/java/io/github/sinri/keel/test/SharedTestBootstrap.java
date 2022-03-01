@@ -1,7 +1,6 @@
 package io.github.sinri.keel.test;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.mysql.KeelMySQLConfig;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
 import io.vertx.core.VertxOptions;
@@ -14,8 +13,8 @@ public class SharedTestBootstrap {
         Keel.initializeVertx(new VertxOptions().setWorkerPoolSize(16));
         Keel.loadPropertiesFromFile("config.properties");
 
-        mySQLKit = new KeelMySQLKit(Keel.getVertx(), new KeelMySQLConfig("local", Keel.getPropertiesReader()));
-        jdbcForMySQL = new KeelJDBCForMySQL(new KeelMySQLConfig("local", Keel.getPropertiesReader()));
+        mySQLKit = Keel.getMySQLKit("local");
+        jdbcForMySQL = Keel.getMySQLKitWithJDBC("local");
     }
 
     public static KeelMySQLKit getMySQLKit() {

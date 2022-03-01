@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.jdbc;
 
-import io.github.sinri.keel.mysql.KeelMySQLConfig;
+import io.github.sinri.keel.mysql.KeelMySQLOptions;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.matrix.ResultMatrixWithJDBC;
 
@@ -12,10 +12,10 @@ public class KeelJDBCForMySQL {
     private final String username;
     private final String password;
 
-    public KeelJDBCForMySQL(KeelMySQLConfig config) {
-        this.jdbcConnectionString = config.buildJDBCConnectionString();
-        this.username = config.getUsername();
-        this.password = config.getPassword();
+    public KeelJDBCForMySQL(KeelMySQLOptions options) {
+        this.jdbcConnectionString = options.buildJDBCConnectionString();
+        this.username = options.getUsername();
+        this.password = options.getPassword();
     }
 
     private final ThreadLocalStatementWrapper threadLocalStatementWrapper = new ThreadLocalStatementWrapper(this);
