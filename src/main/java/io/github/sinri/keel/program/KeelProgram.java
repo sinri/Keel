@@ -98,10 +98,13 @@ abstract public class KeelProgram {
     /**
      * @param action the action
      * @return should not be null
-     * @deprecated since 1.9 blocked is better?
+     * @deprecated since 1.9 blocked is better? since 1.11 it is not abstract
      */
     @Deprecated
-    abstract protected Future<Void> execute(String action);
+    protected Future<Void> execute(String action) {
+        // it is not used
+        return Future.succeededFuture();
+    }
 
     /**
      * @param action the action
