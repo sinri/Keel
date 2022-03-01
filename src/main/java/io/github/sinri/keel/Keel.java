@@ -81,7 +81,7 @@ public class Keel {
     }
 
     /**
-     * @return getMySQLKit(" mysql.default_data_source_name ");
+     * @return getMySQLKit(mysql.default_data_source_name);
      * @since 1.10
      */
     public static KeelMySQLKit getMySQLKit() {
@@ -104,7 +104,7 @@ public class Keel {
     }
 
     /**
-     * @return getMySQLKitWithJDBC(" mysql.default_data_source_name ");
+     * @return getMySQLKitWithJDBC(mysql.default_data_source_name);
      * @since 1.10
      */
     public static KeelJDBCForMySQL getMySQLKitWithJDBC() {

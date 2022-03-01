@@ -33,7 +33,7 @@ public class KeelSmtpKit {
     }
 
     public KeelSmtpKit() {
-        this.smtpName = Keel.getPropertiesReader().getProperty("email.smtp.default_name");
+        this.smtpName = Keel.getPropertiesReader().getProperty("email.smtp.default_smtp_name");
         this.mailConfig = buildMailConfig(smtpName);
         this.mailClient = MailClient.create(Keel.getVertx(), this.mailConfig);
     }
