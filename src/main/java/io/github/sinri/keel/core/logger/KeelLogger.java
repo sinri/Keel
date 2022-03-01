@@ -98,7 +98,23 @@ public class KeelLogger {
         }
         error(prefix + throwable.getMessage(), new JsonObject().put("error_class", throwable.getClass().getName()));
         for (var s : throwable.getStackTrace()) {
-            this.delegate.print("\t" + s.toString(), "\n");
+            this.delegate.print(KeelLogLevel.ERROR, "\t" + s.toString(), null);
         }
+    }
+
+    public void print(KeelLogLevel level, String content, String ending) {
+        this.delegate.print(level, content, ending);
+    }
+
+    public void print(KeelLogLevel level, String content) {
+        this.delegate.print(level, content, System.lineSeparator());
+    }
+
+    public void print(String content, String ending) {
+        this.delegate.print(KeelLogLevel.INFO, content, ending);
+    }
+
+    public void print(String content) {
+        this.delegate.print(KeelLogLevel.INFO, content, System.lineSeparator());
     }
 }

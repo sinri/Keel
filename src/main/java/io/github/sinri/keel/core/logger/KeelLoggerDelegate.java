@@ -169,42 +169,40 @@ public class KeelLoggerDelegate {
         if (context != null) {
             content += " | " + context;
         }
-        print(content);
-    }
-
-    /**
-     * @param level   KeelLogLevel
-     * @param content content
-     * @since 1.11
-     */
-    public void print(KeelLogLevel level, String content) {
-        if (level.isSilent() || level.isNegligibleThan(this.options.getLowestLevel())) {
-            return;
-        }
-        print(content);
+        print(content, null);
     }
 
     /**
      * It would always print the content to STDOUT, but any occurred errors would be printed to STDERR.
      *
      * @param content the String content
+     * @param ending  Ending String as line separator, or null to use default
      */
-    public void print(String content) {
+    private void print(String content, String ending) {
         File outputTargetFile = getOutputTargetFile();
         if (outputTargetFile == null) {
-            System.out.println(content);
+            if (ending == null) {
+                System.out.println(content);
+            } else {
+                System.out.print(content);
+                System.out.print(ending);
+            }
         } else {
             try {
                 BufferedWriter writer = getWriter(outputTargetFile);
                 writer.write(content);
-                writer.newLine();
+                if (ending == null) {
+                    writer.newLine();
+                } else {
+                    writer.write(ending);
+                }
                 writer.flush();
                 if (!this.options.isKeepWriterReady()) {
                     writer.close();
                 }
             } catch (IOException e) {
                 new KeelLogger().exception(e);
-                System.out.println(content);
+                System.err.println(content);
             }
         }
     }
@@ -212,7 +210,7 @@ public class KeelLoggerDelegate {
     /**
      * @param level   KeelLogLevel
      * @param content content
-     * @param ending  ending
+     * @param ending  Ending String as line separator, or null to use default
      * @since 1.11
      */
     public void print(KeelLogLevel level, String content, String ending) {
@@ -220,33 +218,5 @@ public class KeelLoggerDelegate {
             return;
         }
         print(content, ending);
-    }
-
-    /**
-     * It would always print the content to STDOUT, but any occurred errors would be printed to STDERR.
-     *
-     * @param content the String content
-     * @param ending  the String ending
-     */
-    public void print(String content, String ending) {
-        File outputTargetFile = getOutputTargetFile();
-        if (this.options.getDir() == null) {
-            System.out.print(content);
-            System.out.print(ending);
-        } else {
-            try {
-                BufferedWriter writer = getWriter(outputTargetFile);
-                writer.write(content);
-                writer.write(ending);
-                writer.flush();
-                if (!this.options.isKeepWriterReady()) {
-                    writer.close();
-                }
-            } catch (IOException e) {
-                new KeelLogger().exception(e);
-                System.out.print(content);
-                System.out.print(ending);
-            }
-        }
     }
 }

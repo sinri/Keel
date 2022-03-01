@@ -10,7 +10,7 @@
 
     <groupId>io.github.sinri</groupId>
     <artifactId>Keel</artifactId>
-    <version>1.11-SNAPSHOT</version>
+    <version>1.11.1-SNAPSHOT</version>
     <!--    <version>1.10</version>-->
 
     <name>Keel</name>
