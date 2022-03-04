@@ -90,4 +90,6 @@ hs_err_pid*
 *.iml
 log/
 src/main/resources/config.properties
+src/main/resources/config.yml
 src/test/resources/config.properties
+src/test/resources/config.yml

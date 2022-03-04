@@ -1,0 +1,50 @@
+# [KeelLoggerOptions]
+log:
+  default:
+    dir: "/dev/null"
+    # level: NOTICE
+    # rotate: yyyyMMddHH
+    # keepWriterReady: YES
+    # showThreadID: NO
+    # fileOutputCharset: UTF8
+  instances:
+    - sample-aspect:
+        dir: /Users/leqee/code/Keel/log
+        # choices of level: DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL, SILENT
+        level: NOTICE
+        rotate: yyyyMMddHH
+        keepWriterReady: YES
+        showThreadID: NO
+        fileOutputCharset: UTF8
+
+# [KeelMySQLOptions]
+mysql:
+  default: sample_database
+  instances:
+    - data_source:
+        host: 127.0.0.1
+        port: 3306
+        username: username
+        password: "***"
+        schema: test
+        charset: utf8
+        useAffectedRows: YES
+        pool:
+          maxSize: 16
+          shared: NO
+
+# For KeelSmtpKit
+email:
+  smtp:
+    default: sample_sender
+    instances:
+      hostname: mail.sample.com
+      port: 25
+      username: sample@sample.com
+      password: "***"
+      # choices of ssl: ON, OFF
+      ssl: ON
+      keepAlive: OFF
+      maxPoolSize: 16
+      trustAll: OFF
+      # userAgent: "***"

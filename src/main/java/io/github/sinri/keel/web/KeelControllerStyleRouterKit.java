@@ -3,7 +3,9 @@ package io.github.sinri.keel.web;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -76,8 +78,22 @@ public class KeelControllerStyleRouterKit {
         return logger;
     }
 
-    public void setLogger(KeelLogger logger) {
-        this.logger = logger;
+    /**
+     * @param router            Router
+     * @param pathPrefix        such as `/api/`
+     * @param controllerPackage such as `com.organization.project.controller`
+     * @param filterList        List of Filters
+     * @param logger            KeelLogger Instance
+     * @since 1.12
+     */
+    public static void installToRouter(Router router, String pathPrefix, String controllerPackage, List<KeelWebRequestFilter> filterList, KeelLogger logger) {
+        if (!pathPrefix.endsWith("/")) {
+            pathPrefix = pathPrefix + "/";
+        }
+        KeelControllerStyleRouterKit keelControllerStyleRouterKit = new KeelControllerStyleRouterKit(pathPrefix, controllerPackage, filterList).setLogger(logger);
+        router.route(pathPrefix + "*")
+                .handler(BodyHandler.create())
+                .handler(keelControllerStyleRouterKit::processRouterRequest);
     }
 
     public KeelControllerStyleRouterKit addFilter(KeelWebRequestFilter filter) {
@@ -102,82 +118,9 @@ public class KeelControllerStyleRouterKit {
         }
     }
 
-    private PathParsedHandlerClassMethod parsePathToHandler(String requestMethod, String requestPath) throws NoSuchMethodException {
-//        getLogger().info("requestPath: " + requestPath);
-        // here, the `requestPath` should not be empty or '/'
-        String requestPathWithoutPrefix = requestPath.substring(this.pathPrefix.length());
-        //System.out.println("parsePathToHandler from "+requestPath+" to "+requestPathWithoutPrefix);
-        String[] pathComponents = requestPathWithoutPrefix.split("/");
-        StringBuilder className = new StringBuilder(controllerPackage);
-
-        for (int i = 0; i < pathComponents.length - 1; i++) {
-            String pathComponent = pathComponents[i];
-
-            if (pathComponent == null || pathComponent.trim().equals("")) {
-                continue;
-            }
-            // current className + pathComponent is class ?
-            try {
-                String testClassName = className + "." + pathComponent;
-                getLogger().info("testClassName: " + testClassName);
-                Class<?> handlerClass = Class.forName(testClassName);
-                Method[] methods = handlerClass.getMethods();
-                for (Method method : methods) {
-                    if (!Modifier.isPublic(method.getModifiers())) {
-                        continue;
-                    }
-                    if (Modifier.isStatic(method.getModifiers())) {
-                        continue;
-                    }
-                    if (!KeelWebRequestController.class.isAssignableFrom(method.getDeclaringClass())) {
-                        continue;
-                    }
-
-                    KeelApiAnnotation annotation = getKeelApiAnnotationForMethod(method);
-                    if (annotation.acceptedRequestMethods().length > 0) {
-                        boolean methodNotSupported = true;
-                        for (var rm : annotation.acceptedRequestMethods()) {
-                            if (rm.equalsIgnoreCase(requestMethod)) {
-                                methodNotSupported = false;
-                                break;
-                            }
-                        }
-                        if (methodNotSupported) {
-                            continue;
-                        }
-                    }
-
-                    getLogger().info(
-                            "API " + method.getClass() + "::" + method.getName(),
-                            new JsonObject()
-                                    .put("parameters", method.getParameterCount())
-                                    .put("return", method.getReturnType().toString())
-                                    .put("KeelApiAnnotation", new JsonObject()
-                                            .put("acceptedRequestMethods", Arrays.asList(annotation.acceptedRequestMethods()))
-                                            .put("responseContentType", annotation.responseContentType())
-                                    )
-                    );
-
-                    if (
-                            method.getName().equals(pathComponents[i + 1])
-                                    && method.getParameterCount() == pathComponents.length - i - 2
-                    ) {
-                        // YES!
-                        PathParsedHandlerClassMethod pathParsedHandlerClassMethod = new PathParsedHandlerClassMethod(handlerClass, method);
-                        pathParsedHandlerClassMethod.setLogger(getLogger());
-                        for (int j = i + 2; j < pathComponents.length; j++) {
-                            pathParsedHandlerClassMethod.addParameter(pathComponents[j]);
-                        }
-                        return pathParsedHandlerClassMethod;
-                    }
-                }
-            } catch (ClassNotFoundException e) {
-                getLogger().warning("ClassNotFoundException: " + e.getMessage());
-                // seek next
-                className.append(".").append(pathComponent);
-            }
-        }
-        throw new NoSuchMethodException();
+    public KeelControllerStyleRouterKit setLogger(KeelLogger logger) {
+        this.logger = logger;
+        return this;
     }
 
     private static class PathParsedHandlerClassMethod {
@@ -280,4 +223,82 @@ public class KeelControllerStyleRouterKit {
         }
     }
 
+    private PathParsedHandlerClassMethod parsePathToHandler(String requestMethod, String requestPath) throws NoSuchMethodException {
+//        getLogger().info("requestPath: " + requestPath);
+        // here, the `requestPath` should not be empty or '/'
+        System.out.println("! requestPath=" + requestPath + " this.pathPrefix=" + this.pathPrefix);
+        String requestPathWithoutPrefix = requestPath.substring(this.pathPrefix.length());
+        //System.out.println("parsePathToHandler from "+requestPath+" to "+requestPathWithoutPrefix);
+        String[] pathComponents = requestPathWithoutPrefix.split("/");
+        StringBuilder className = new StringBuilder(controllerPackage);
+
+        for (int i = 0; i < pathComponents.length - 1; i++) {
+            String pathComponent = pathComponents[i];
+
+            if (pathComponent == null || pathComponent.trim().equals("")) {
+                continue;
+            }
+            // current className + pathComponent is class ?
+            try {
+                String testClassName = className + "." + pathComponent;
+                getLogger().info("testClassName: " + testClassName);
+                Class<?> handlerClass = Class.forName(testClassName);
+                Method[] methods = handlerClass.getMethods();
+                for (Method method : methods) {
+                    if (!Modifier.isPublic(method.getModifiers())) {
+                        continue;
+                    }
+                    if (Modifier.isStatic(method.getModifiers())) {
+                        continue;
+                    }
+                    if (!KeelWebRequestController.class.isAssignableFrom(method.getDeclaringClass())) {
+                        continue;
+                    }
+
+                    KeelApiAnnotation annotation = getKeelApiAnnotationForMethod(method);
+                    if (annotation.acceptedRequestMethods().length > 0) {
+                        boolean methodNotSupported = true;
+                        for (var rm : annotation.acceptedRequestMethods()) {
+                            if (rm.equalsIgnoreCase(requestMethod)) {
+                                methodNotSupported = false;
+                                break;
+                            }
+                        }
+                        if (methodNotSupported) {
+                            continue;
+                        }
+                    }
+
+                    getLogger().info(
+                            "API " + method.getClass() + "::" + method.getName(),
+                            new JsonObject()
+                                    .put("parameters", method.getParameterCount())
+                                    .put("return", method.getReturnType().toString())
+                                    .put("KeelApiAnnotation", new JsonObject()
+                                            .put("acceptedRequestMethods", Arrays.asList(annotation.acceptedRequestMethods()))
+                                            .put("responseContentType", annotation.responseContentType())
+                                    )
+                    );
+
+                    if (
+                            method.getName().equals(pathComponents[i + 1])
+                                    && method.getParameterCount() == pathComponents.length - i - 2
+                    ) {
+                        // YES!
+                        PathParsedHandlerClassMethod pathParsedHandlerClassMethod = new PathParsedHandlerClassMethod(handlerClass, method);
+                        pathParsedHandlerClassMethod.setLogger(getLogger());
+                        for (int j = i + 2; j < pathComponents.length; j++) {
+                            pathParsedHandlerClassMethod.addParameter(pathComponents[j]);
+                        }
+                        return pathParsedHandlerClassMethod;
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                getLogger().warning("ClassNotFoundException: " + e.getMessage());
+                // seek next
+                className.append(".").append(pathComponent);
+            }
+        }
+        throw new NoSuchMethodException();
+    }
 }

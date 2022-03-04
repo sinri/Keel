@@ -17,8 +17,8 @@ public class KeelLoggerOptions extends KeelOptions {
     public String dir;
     public String level;//lowestLevel
     public String rotate;//rotateDateTimeFormat
-    public String keepWriterReady;
-    public String showThreadID;
+    public boolean keepWriterReady;
+    public boolean showThreadID;
     public String fileOutputCharset;
     protected String aspect;
 
@@ -38,10 +38,10 @@ public class KeelLoggerOptions extends KeelOptions {
         JsonObject x = Keel.getPropertiesReader().filter("log").toJsonObject();
         KeelLoggerOptions keelLoggerOptions = new KeelLoggerOptions();
         if (x.containsKey("*")) {
-            keelLoggerOptions.overwriteProperties(x.getJsonObject("*"));
+            keelLoggerOptions.overwritePropertiesWithJsonObject(x.getJsonObject("*"));
         }
         if (x.containsKey(aspect)) {
-            keelLoggerOptions.overwriteProperties(x.getJsonObject(aspect));
+            keelLoggerOptions.overwritePropertiesWithJsonObject(x.getJsonObject(aspect));
         }
         keelLoggerOptions.setAspect(aspect);
         return keelLoggerOptions;
@@ -62,8 +62,8 @@ public class KeelLoggerOptions extends KeelOptions {
         this.dir = null;
         this.level = "INFO";
         this.rotate = "yyyyMMdd";
-        this.keepWriterReady = BOOL_YES;
-        this.showThreadID = BOOL_YES;
+        this.keepWriterReady = true;
+        this.showThreadID = true;
         this.fileOutputCharset = null;
     }
 
@@ -105,20 +105,20 @@ public class KeelLoggerOptions extends KeelOptions {
     }
 
     public boolean isKeepWriterReady() {
-        return BOOL_YES.equalsIgnoreCase(this.keepWriterReady);
+        return this.keepWriterReady;
     }
 
     public KeelLoggerOptions setKeepWriterReady(boolean keepWriterReady) {
-        this.keepWriterReady = keepWriterReady ? BOOL_YES : BOOL_NO;
+        this.keepWriterReady = keepWriterReady;
         return this;
     }
 
     public boolean isShowThreadID() {
-        return "BOOL_YES".equalsIgnoreCase(this.showThreadID);
+        return this.showThreadID;
     }
 
     public KeelLoggerOptions setShowThreadID(boolean showThreadID) {
-        this.showThreadID = showThreadID ? BOOL_YES : BOOL_NO;
+        this.showThreadID = showThreadID;
         return this;
     }
 

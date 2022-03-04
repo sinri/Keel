@@ -8,14 +8,14 @@ import io.vertx.sqlclient.PoolOptions;
 
 public class KeelMySQLOptions extends KeelOptions {
     public String host;
-    public String port;
+    public int port;
     public String username;
     public String password;
     public String schema;
     public String charset;
-    public String useAffectedRows;
-    public String poolMaxSize;
-    public String poolShared;
+    public boolean useAffectedRows;
+    public int poolMaxSize;
+    public boolean poolShared;
     protected String dataSourceName;
 
     public KeelMySQLOptions(JsonObject jsonObject) {
@@ -40,31 +40,31 @@ public class KeelMySQLOptions extends KeelOptions {
     @Override
     protected void initializeProperties() {
         this.host = "127.0.0.1";
-        this.port = "3306";
+        this.port = 3306;
         this.username = "anonymous";
         this.password = "";
         this.schema = "test";
         this.charset = "utf8";
-        this.useAffectedRows = BOOL_YES;
-        this.poolMaxSize = "8";
-        this.poolShared = BOOL_NO;
+        this.useAffectedRows = true;
+        this.poolMaxSize = 8;
+        this.poolShared = false;
     }
 
     public MySQLConnectOptions buildMySQLConnectOptions() {
         return new MySQLConnectOptions()
-                .setPort(Integer.parseInt(port))
+                .setPort(port)
                 .setHost(host)
                 .setDatabase(schema)
                 .setUser(username)
                 .setPassword(password)
                 .setCharset(charset)
-                .setUseAffectedRows(BOOL_YES.equals(useAffectedRows));
+                .setUseAffectedRows(useAffectedRows);
     }
 
     public PoolOptions buildPoolOptions() {
         return new PoolOptions()
-                .setMaxSize(Integer.parseInt(this.poolMaxSize))
-                .setShared(Boolean.parseBoolean(this.poolShared));
+                .setMaxSize(this.poolMaxSize)
+                .setShared(this.poolShared);
     }
 
     public String buildJDBCConnectionString() {

@@ -14,7 +14,10 @@ import java.util.regex.Pattern;
 
 /**
  * Reader for Properties Files used in Keel Project
+ *
+ * @deprecated let us use YAML as configuration as of 1.12!
  */
+@Deprecated
 public class KeelPropertiesReader {
 
     protected final Properties properties;
@@ -166,6 +169,154 @@ public class KeelPropertiesReader {
             return classOfT.getConstructor(JsonObject.class).newInstance(this.toJsonObject());
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Node computeKeyTree() {
+        Set<String> longKeySet = getPlainKeySet();
+        Node tree = new Node();
+        tree.setNodeName("ROOT");
+
+        Pattern arraySuffixPattern = Pattern.compile("^([^\\[]+)\\[(\\d+)]$");
+
+        longKeySet.forEach(longKey -> {
+            String[] components = longKey.split("\\.");
+
+            Node parent = tree;
+            for (String component : components) {
+                Matcher matcher = arraySuffixPattern.matcher(component);
+                String nodeName = component;
+                boolean isArray = matcher.find();
+                String index = nodeName;
+
+                Node node = null;
+                if (isArray) {
+                    nodeName = matcher.group(1);
+                    index = matcher.group(2);
+
+                    var arrayNode = parent.getChildren().get(nodeName);
+                    if (arrayNode != null) {
+                        node = arrayNode.getChildren().get(index);
+                    } else {
+                        arrayNode = new Node();
+                        arrayNode.setNodeName(nodeName);
+                        arrayNode.setArray(true);
+                        parent.addChildAt(nodeName, arrayNode);
+                    }
+                    if (node == null) {
+                        node = new Node();
+                        node.setNodeName(index);
+                        parent.getChildren().get(nodeName).addChildAt(index, node);
+                    }
+                } else {
+                    node = parent.getChildren().get(nodeName);
+                    if (node == null) {
+                        node = new Node();
+                        node.setNodeName(index);
+                        parent.addChildAt(index, node);
+                    }
+                }
+
+                parent = node;
+            }
+        });
+
+        return tree;
+    }
+
+    public static class Node {
+        protected boolean isArray;
+        protected String nodeName;
+        protected Map<String, Node> children = new TreeMap<>();
+        protected Node parent = null;
+
+        public void addChildAt(String index, Node childNode) {
+            this.getChildren().put(index, childNode);
+            childNode.setParent(this);
+        }
+
+        public JsonObject toJsonObject(KeelPropertiesReader reader) {
+            JsonObject jsonObject = new JsonObject();
+
+            jsonObject.put("name", getNodeName());
+            jsonObject.put("key", propertiesLongKey());
+            if (!getChildren().isEmpty()) {
+                JsonObject x = new JsonObject();
+                getChildren().forEach((index, node) -> {
+                    x.put(String.valueOf(index), node.toJsonObject(reader));
+                });
+                jsonObject.put("children", x);
+                jsonObject.put("is_array", isArray());
+            } else {
+                jsonObject.put("value", this.readPropertiesValue(reader));
+            }
+            return jsonObject;
+        }
+
+        public boolean isArray() {
+            return isArray;
+        }
+
+        public Node setArray(boolean array) {
+            isArray = array;
+            return this;
+        }
+
+        public String getNodeName() {
+            return nodeName;
+        }
+
+        public Node setNodeName(String nodeName) {
+            this.nodeName = nodeName;
+            return this;
+        }
+
+        public Map<String, Node> getChildren() {
+            return children;
+        }
+
+        public Node setChildren(Map<String, Node> children) {
+            this.children = children;
+            return this;
+        }
+
+        public Node getParent() {
+            return parent;
+        }
+
+        public Node setParent(Node parent) {
+            this.parent = parent;
+            return this;
+        }
+
+        public String propertiesLongKey() {
+            List<Node> nodeList = new ArrayList<>();
+            nodeList.add(this);
+
+            while (nodeList.get(nodeList.size() - 1).parent != null) {
+                nodeList.add(nodeList.get(nodeList.size() - 1).parent);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            boolean nextIsArrayIndex = false;
+            for (var i = nodeList.size() - 2; i >= 0; i--) {
+                var x = nodeList.get(i);
+                if (nextIsArrayIndex) {
+                    sb.append("[").append(x.nodeName).append("]");
+                } else {
+                    if (sb.length() > 0) {
+                        sb.append(".");
+                    }
+                    sb.append(x.nodeName);
+                }
+                nextIsArrayIndex = x.isArray;
+            }
+
+            return sb.toString();
+        }
+
+        public String readPropertiesValue(KeelPropertiesReader reader) {
+            return reader.getProperty(propertiesLongKey());
         }
     }
 }
