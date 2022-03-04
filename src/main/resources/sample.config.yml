@@ -1,6 +1,6 @@
 # [KeelLoggerOptions]
-log:
-  default:
+logger:
+  fallback:
     dir: "/dev/null"
     # level: NOTICE
     # rotate: yyyyMMddHH
@@ -19,7 +19,7 @@ log:
 
 # [KeelMySQLOptions]
 mysql:
-  default: sample_database
+  primary: sample_database
   instances:
     - data_source:
         host: 127.0.0.1
@@ -36,7 +36,7 @@ mysql:
 # For KeelSmtpKit
 email:
   smtp:
-    default: sample_sender
+    primary: sample_sender
     instances:
       hostname: mail.sample.com
       port: 25

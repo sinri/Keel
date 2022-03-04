@@ -29,7 +29,6 @@ abstract public class KeelOptions {
         initializeProperties();
     }
 
-    @Deprecated
     public KeelOptions(JsonObject jsonObject) {
         initializeProperties();
         overwritePropertiesWithJsonObject(jsonObject);
@@ -79,10 +78,7 @@ abstract public class KeelOptions {
 //        }
     }
 
-    @Deprecated
-    protected void initializeProperties() {
-
-    }
+    abstract protected void initializeProperties();
 
 //    /**
 //     * Note: One YAML document in one file!
@@ -115,7 +111,6 @@ abstract public class KeelOptions {
 //                });
 //    }
 
-    @Deprecated
     public final void overwritePropertiesWithJsonObject(JsonObject jsonObject) {
         jsonObject.forEach(stringObjectEntry -> {
             try {

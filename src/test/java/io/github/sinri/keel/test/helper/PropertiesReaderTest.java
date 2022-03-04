@@ -12,7 +12,7 @@ public class PropertiesReaderTest {
         System.out.println("test.array1=" + keelPropertiesReader.getProperty("test.array1"));
         System.out.println("test.array1[1]=" + keelPropertiesReader.getProperty("test.array1[1]"));
 
-        System.out.println(keelPropertiesReader.computeKeyTree().toJsonObject(keelPropertiesReader).toString());
+        //System.out.println(keelPropertiesReader.computeKeyTree().toJsonObject(keelPropertiesReader).toString());
 
         KeelPropertiesReader keelPropertiesReader1 = keelPropertiesReader.filter("mysql");
 

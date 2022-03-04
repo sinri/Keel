@@ -23,7 +23,7 @@ public class KeelLoggerOptions extends KeelOptions {
     protected String aspect;
 
     public KeelLoggerOptions() {
-        super(new JsonObject());
+        super();
     }
 
     public KeelLoggerOptions(JsonObject jsonObject) {
