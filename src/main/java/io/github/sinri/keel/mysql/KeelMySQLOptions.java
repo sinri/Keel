@@ -2,7 +2,6 @@ package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.properties.KeelOptions;
-import io.vertx.core.json.JsonObject;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
@@ -18,10 +17,16 @@ public class KeelMySQLOptions extends KeelOptions {
     public boolean poolShared;
     protected String dataSourceName;
 
-    public KeelMySQLOptions(JsonObject jsonObject) {
-        super();
-        initializeProperties();
-        overwritePropertiesWithJsonObject(jsonObject);
+    public KeelMySQLOptions() {
+        this.host = "127.0.0.1";
+        this.port = 3306;
+        this.username = "anonymous";
+        this.password = "";
+        this.schema = "test";
+        this.charset = "utf8";
+        this.useAffectedRows = true;
+        this.poolMaxSize = 8;
+        this.poolShared = false;
     }
 
     public static KeelMySQLOptions generateOptionsForDataSourceWithPropertiesReader(String dataSourceName) {
@@ -37,18 +42,6 @@ public class KeelMySQLOptions extends KeelOptions {
     public KeelMySQLOptions setDataSourceName(String dataSourceName) {
         this.dataSourceName = dataSourceName;
         return this;
-    }
-
-    protected void initializeProperties() {
-        this.host = "127.0.0.1";
-        this.port = 3306;
-        this.username = "anonymous";
-        this.password = "";
-        this.schema = "test";
-        this.charset = "utf8";
-        this.useAffectedRows = true;
-        this.poolMaxSize = 8;
-        this.poolShared = false;
     }
 
     public MySQLConnectOptions buildMySQLConnectOptions() {

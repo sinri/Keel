@@ -3,15 +3,14 @@ package io.github.sinri.keel.core.properties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.github.sinri.keel.core.KeelHelper;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * Keel Options as POJO
@@ -24,30 +23,13 @@ abstract public class KeelOptions {
     final static public String BOOL_YES = "YES";
     final static public String BOOL_NO = "NO";
 
-    public KeelOptions() {
-        //initializeProperties();
-    }
-
-//    public KeelOptions(JsonObject jsonObject) {
-//        // initializeProperties();
-//        overwritePropertiesWithJsonObject(jsonObject);
-//    }
 
     public static <T extends KeelOptions> T loadWithYamlFilePath(String yamlFilePath, Class<T> classOfT) {
         byte[] bytes;
         try {
-            bytes = Files.readAllBytes(Path.of(yamlFilePath));
+            bytes = KeelHelper.readFileAsByteArray(yamlFilePath, true);
         } catch (IOException e) {
-            URL resource = KeelOptions.class.getClassLoader().getResource(yamlFilePath);
-            if (resource == null) {
-                throw new RuntimeException("Embedded one is not found after not found in FS");
-            }
-            try {
-                String file = resource.getFile();
-                bytes = Files.readAllBytes(Path.of(file));
-            } catch (IOException ex) {
-                throw new RuntimeException("read embedded config failed", ex);
-            }
+            return null;
         }
 
         var mapper = new ObjectMapper(new YAMLFactory());
@@ -56,8 +38,19 @@ abstract public class KeelOptions {
         try {
             return mapper.readValue(new String(bytes, StandardCharsets.UTF_8), classOfT);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("YAML parse to JSON failed", e);
+            return null;
         }
+    }
+
+    public static <T extends KeelOptions> T loadWithJsonObjectFilePath(String jsonObjectFilePath, Class<T> classOfT) {
+        byte[] bytes;
+        try {
+            bytes = KeelHelper.readFileAsByteArray(jsonObjectFilePath, true);
+        } catch (IOException e) {
+            return null;
+        }
+
+        return loadWithJsonObject(new JsonObject(Buffer.buffer(bytes)), classOfT);
     }
 
     public static <T extends KeelOptions> T loadWithJsonObject(JsonObject jsonObject, Class<T> classOfT) {
@@ -70,11 +63,6 @@ abstract public class KeelOptions {
             return null;
         }
     }
-
-//    @Deprecated
-//    protected void initializeProperties() {
-//        // deprecated
-//    }
 
     public final void overwritePropertiesWithJsonObject(JsonObject jsonObject) {
         jsonObject.forEach(stringObjectEntry -> {

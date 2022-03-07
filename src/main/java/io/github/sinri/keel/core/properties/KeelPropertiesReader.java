@@ -163,7 +163,9 @@ public class KeelPropertiesReader {
      */
     public <T extends KeelOptions> T toConfiguration(Class<T> classOfT) {
         try {
-            return classOfT.getConstructor(JsonObject.class).newInstance(this.toJsonObject());
+            T options = classOfT.getConstructor().newInstance();
+            options.overwritePropertiesWithJsonObject(this.toJsonObject());
+            return options;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             throw new RuntimeException(e);
         }

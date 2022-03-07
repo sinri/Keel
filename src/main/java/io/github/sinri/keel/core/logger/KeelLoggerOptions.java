@@ -23,14 +23,13 @@ public class KeelLoggerOptions extends KeelOptions {
     protected String aspect;
 
     public KeelLoggerOptions() {
-        super();
-    }
-
-    public KeelLoggerOptions(JsonObject jsonObject) {
-        super();
-
-        initializeProperties();
-        overwritePropertiesWithJsonObject(jsonObject);
+        this.aspect = "default";
+        this.dir = null;
+        this.level = "INFO";
+        this.rotate = "yyyyMMdd";
+        this.keepWriterReady = true;
+        this.showThreadID = true;
+        this.fileOutputCharset = null;
     }
 
     /**
@@ -57,16 +56,6 @@ public class KeelLoggerOptions extends KeelOptions {
     public KeelLoggerOptions setAspect(String aspect) {
         this.aspect = aspect;
         return this;
-    }
-
-    protected void initializeProperties() {
-        this.aspect = "default";
-        this.dir = null;
-        this.level = "INFO";
-        this.rotate = "yyyyMMdd";
-        this.keepWriterReady = true;
-        this.showThreadID = true;
-        this.fileOutputCharset = null;
     }
 
     public File getDir() {

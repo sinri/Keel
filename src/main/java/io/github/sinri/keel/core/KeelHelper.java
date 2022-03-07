@@ -1,8 +1,13 @@
 package io.github.sinri.keel.core;
 
+import io.github.sinri.keel.core.properties.KeelOptions;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -193,5 +198,22 @@ public class KeelHelper {
             jsonObject.put(x, new JsonObject());
         }
         return writeIntoJsonObject(jsonObject.getJsonObject(x), keychain.subList(1, keychain.size()), value);
+    }
+
+    public static byte[] readFileAsByteArray(String filePath, boolean seekInsideJarWhenNotFound) throws IOException {
+        try {
+            return Files.readAllBytes(Path.of(filePath));
+        } catch (IOException e) {
+            if (seekInsideJarWhenNotFound) {
+                URL resource = KeelOptions.class.getClassLoader().getResource(filePath);
+                if (resource == null) {
+                    throw new IOException("Embedded one is not found after not found in FS: " + filePath, e);
+                }
+                String file = resource.getFile();
+                return Files.readAllBytes(Path.of(file));
+            } else {
+                throw e;
+            }
+        }
     }
 }
