@@ -19,7 +19,9 @@ public class KeelMySQLOptions extends KeelOptions {
     protected String dataSourceName;
 
     public KeelMySQLOptions(JsonObject jsonObject) {
-        super(jsonObject);
+        super();
+        initializeProperties();
+        overwritePropertiesWithJsonObject(jsonObject);
     }
 
     public static KeelMySQLOptions generateOptionsForDataSourceWithPropertiesReader(String dataSourceName) {
@@ -37,7 +39,6 @@ public class KeelMySQLOptions extends KeelOptions {
         return this;
     }
 
-    @Override
     protected void initializeProperties() {
         this.host = "127.0.0.1";
         this.port = 3306;

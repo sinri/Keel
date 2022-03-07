@@ -10,9 +10,7 @@ import java.net.URL;
 
 public class OptionsTest {
     public static void main(String[] args) {
-        FirstLevelOptions firstLevelOptions = KeelOptions.loadWithYamlFilePath("test.yml", FirstLevelOptions.class);
-        System.out.println(firstLevelOptions);
-
+        //test3();
     }
 
     public static void test1() {
@@ -49,5 +47,14 @@ public class OptionsTest {
             e.printStackTrace();
         }
         System.out.println(firstLevelOptions);
+    }
+
+    public static void test3() {
+        FirstLevelOptions firstLevelOptions = KeelOptions.loadWithYamlFilePath("test.yml", FirstLevelOptions.class);
+        System.out.println(firstLevelOptions);
+    }
+
+    public static void test4() {
+
     }
 }

@@ -8,10 +8,13 @@ public class SecondLevelOptions extends KeelOptions {
 
     public SecondLevelOptions() {
         super();
+        initializeProperties();
     }
 
     public SecondLevelOptions(JsonObject jsonObject) {
-        super(jsonObject);
+        super();
+        initializeProperties();
+        overwritePropertiesWithJsonObject(jsonObject);
     }
 
     public String getFilterName() {
@@ -23,7 +26,6 @@ public class SecondLevelOptions extends KeelOptions {
         return this;
     }
 
-    @Override
     protected void initializeProperties() {
         filterName = "default";
     }

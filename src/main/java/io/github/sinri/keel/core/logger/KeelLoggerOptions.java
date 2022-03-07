@@ -27,7 +27,10 @@ public class KeelLoggerOptions extends KeelOptions {
     }
 
     public KeelLoggerOptions(JsonObject jsonObject) {
-        super(jsonObject);
+        super();
+
+        initializeProperties();
+        overwritePropertiesWithJsonObject(jsonObject);
     }
 
     /**
@@ -56,7 +59,6 @@ public class KeelLoggerOptions extends KeelOptions {
         return this;
     }
 
-    @Override
     protected void initializeProperties() {
         this.aspect = "default";
         this.dir = null;

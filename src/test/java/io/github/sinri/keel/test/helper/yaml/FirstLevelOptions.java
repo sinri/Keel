@@ -14,10 +14,13 @@ public class FirstLevelOptions extends KeelOptions {
 
     public FirstLevelOptions() {
         super();
+        initializeProperties();
     }
 
     public FirstLevelOptions(JsonObject jsonObject) {
-        super(jsonObject);
+        super();
+        initializeProperties();
+        overwritePropertiesWithJsonObject(jsonObject);
     }
 
     public String getHost() {
@@ -47,7 +50,6 @@ public class FirstLevelOptions extends KeelOptions {
         return this;
     }
 
-    @Override
     protected void initializeProperties() {
         host = "127.0.0.1";
         port = 80;

@@ -25,13 +25,13 @@ abstract public class KeelOptions {
     final static public String BOOL_NO = "NO";
 
     public KeelOptions() {
-        initializeProperties();
+        //initializeProperties();
     }
 
-    public KeelOptions(JsonObject jsonObject) {
-        initializeProperties();
-        overwritePropertiesWithJsonObject(jsonObject);
-    }
+//    public KeelOptions(JsonObject jsonObject) {
+//        // initializeProperties();
+//        overwritePropertiesWithJsonObject(jsonObject);
+//    }
 
     public static <T extends KeelOptions> T loadWithYamlFilePath(String yamlFilePath, Class<T> classOfT) {
         byte[] bytes;
@@ -60,7 +60,21 @@ abstract public class KeelOptions {
         }
     }
 
-    abstract protected void initializeProperties();
+    public static <T extends KeelOptions> T loadWithJsonObject(JsonObject jsonObject, Class<T> classOfT) {
+        try {
+            T options = classOfT.getConstructor().newInstance();
+            options.overwritePropertiesWithJsonObject(jsonObject);
+            return options;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+//    @Deprecated
+//    protected void initializeProperties() {
+//        // deprecated
+//    }
 
     public final void overwritePropertiesWithJsonObject(JsonObject jsonObject) {
         jsonObject.forEach(stringObjectEntry -> {
@@ -83,14 +97,12 @@ abstract public class KeelOptions {
                     field.setFloat(this, Float.parseFloat(value.toString()));
                 } else if (type == double.class || type == Double.class) {
                     field.setDouble(this, Double.parseDouble(value.toString()));
-                } else if (KeelOptions.class.isAssignableFrom(type)) {
-                    if (value instanceof JsonObject) {
-                        try {
-                            JsonObject x = (JsonObject) value;
-                            field.set(this, type.getConstructor(JsonObject.class).newInstance(x));
-                        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException e) {
-                            // just ignore
-                        }
+                } else if (KeelOptions.class.isAssignableFrom(type) && value instanceof JsonObject) {
+                    try {
+                        JsonObject x = (JsonObject) value;
+                        field.set(this, type.getConstructor(JsonObject.class).newInstance(x));
+                    } catch (InstantiationException | InvocationTargetException | NoSuchMethodException e) {
+                        // just ignore
                     }
                 } else if (field.getType().isInstance(value)) {
                     field.set(this, value);
