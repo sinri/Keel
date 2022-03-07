@@ -1,6 +1,5 @@
 package io.github.sinri.keel.core.properties;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.github.sinri.keel.core.KeelHelper;
@@ -24,32 +23,17 @@ abstract public class KeelOptions {
     final static public String BOOL_NO = "NO";
 
 
-    public static <T extends KeelOptions> T loadWithYamlFilePath(String yamlFilePath, Class<T> classOfT) {
-        byte[] bytes;
-        try {
-            bytes = KeelHelper.readFileAsByteArray(yamlFilePath, true);
-        } catch (IOException e) {
-            return null;
-        }
+    public static <T extends KeelOptions> T loadWithYamlFilePath(String yamlFilePath, Class<T> classOfT) throws IOException {
+        byte[] bytes = KeelHelper.readFileAsByteArray(yamlFilePath, true);
 
         var mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
 
-        try {
-            return mapper.readValue(new String(bytes, StandardCharsets.UTF_8), classOfT);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
+        return mapper.readValue(new String(bytes, StandardCharsets.UTF_8), classOfT);
     }
 
-    public static <T extends KeelOptions> T loadWithJsonObjectFilePath(String jsonObjectFilePath, Class<T> classOfT) {
-        byte[] bytes;
-        try {
-            bytes = KeelHelper.readFileAsByteArray(jsonObjectFilePath, true);
-        } catch (IOException e) {
-            return null;
-        }
-
+    public static <T extends KeelOptions> T loadWithJsonObjectFilePath(String jsonObjectFilePath, Class<T> classOfT) throws IOException {
+        byte[] bytes = KeelHelper.readFileAsByteArray(jsonObjectFilePath, true);
         return loadWithJsonObject(new JsonObject(Buffer.buffer(bytes)), classOfT);
     }
 
@@ -96,10 +80,9 @@ abstract public class KeelOptions {
                     field.set(this, value);
                 }
                 // else ignore
-            } catch (NoSuchFieldException e) {
-                // just ignore!
-            } catch (IllegalAccessException e) {
+            } catch (NoSuchFieldException | IllegalAccessException e) {
                 // just ignore
+                e.printStackTrace();
             }
         });
     }

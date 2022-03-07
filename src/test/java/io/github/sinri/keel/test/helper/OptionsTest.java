@@ -13,7 +13,7 @@ public class OptionsTest {
         //test3();
     }
 
-    public static void test1() {
+    public static void test1() throws IOException {
         FirstLevelOptions firstLevelOptions = KeelOptions.loadWithYamlFilePath("test.yml", FirstLevelOptions.class);
         System.out.println(firstLevelOptions);
 
@@ -49,7 +49,7 @@ public class OptionsTest {
         System.out.println(firstLevelOptions);
     }
 
-    public static void test3() {
+    public static void test3() throws IOException {
         FirstLevelOptions firstLevelOptions = KeelOptions.loadWithYamlFilePath("test.yml", FirstLevelOptions.class);
         System.out.println(firstLevelOptions);
     }
