@@ -19,6 +19,7 @@ public class WebTestMainV2 {
         // static route
         khs.getRouter().get("/").handler(ctx -> ctx.response().end("HERE IS ROOT"));
         // automatic Controller - Method route
+
         KeelControllerStyleRouterKit.installToRouter(
                 khs.getRouter(),
                 "/api/",

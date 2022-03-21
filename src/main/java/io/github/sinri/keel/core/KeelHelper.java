@@ -5,6 +5,8 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -215,5 +217,21 @@ public class KeelHelper {
                 throw e;
             }
         }
+    }
+
+    /**
+     * @param method
+     * @param classOfAnnotation
+     * @param defaultAnnotation
+     * @param <T>               class of target annotation
+     * @return target annotation
+     * @since 1.13
+     */
+    public static <T extends Annotation> T getAnnotationOfMethod(Method method, Class<T> classOfAnnotation, T defaultAnnotation) {
+        T annotation = method.getAnnotation(classOfAnnotation);
+        if (annotation == null) {
+            return defaultAnnotation;
+        }
+        return annotation;
     }
 }

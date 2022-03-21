@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web;
 
+import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -21,61 +22,34 @@ public class KeelControllerStyleRouterKit {
     private final List<KeelWebRequestFilter> filterList;
     private KeelLogger logger = KeelLogger.buildSilentLogger();
 
-    public KeelControllerStyleRouterKit(String controllerPackage) {
-        // such as "com.leqee.oc.tachiba.handler"
-        this.controllerPackage = controllerPackage;
-        this.filterList = new ArrayList<>();
-        this.pathPrefix = "";
-    }
-
-    /**
-     * @param controllerPackage such as "com.leqee.oc.tachiba.handler"
-     * @param filterList        list of filters
-     * @since 1.1
-     */
-    public KeelControllerStyleRouterKit(String controllerPackage, List<KeelWebRequestFilter> filterList) {
-        this.controllerPackage = controllerPackage;
-        this.filterList = filterList;
-        this.pathPrefix = "";
-    }
-
     /**
      * @param pathPrefix        such as '/api/'
      * @param controllerPackage such as "com.leqee.oc.tachiba.handler"
-     * @param filterList        list of filters
      * @since 1.10
      */
-    public KeelControllerStyleRouterKit(String pathPrefix, String controllerPackage, List<KeelWebRequestFilter> filterList) {
+    public KeelControllerStyleRouterKit(String pathPrefix, String controllerPackage) {
         this.controllerPackage = controllerPackage;
-        this.filterList = filterList;
+        this.filterList = new ArrayList<>();
         this.pathPrefix = pathPrefix;
     }
 
     public static KeelApiAnnotation getKeelApiAnnotationForMethod(Method method) {
-        KeelApiAnnotation annotation = method.getAnnotation(KeelApiAnnotation.class);
-        if (annotation == null) {
-            annotation = new KeelApiAnnotation() {
-                @Override
-                public Class<? extends Annotation> annotationType() {
-                    return this.getClass();
-                }
+        return KeelHelper.getAnnotationOfMethod(method, KeelApiAnnotation.class, new KeelApiAnnotation() {
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return this.getClass();
+            }
 
-                @Override
-                public String[] acceptedRequestMethods() {
-                    return new String[0];
-                }
+            @Override
+            public String[] acceptedRequestMethods() {
+                return new String[0];
+            }
 
-                @Override
-                public String responseContentType() {
-                    return "application/json";
-                }
-            };
-        }
-        return annotation;
-    }
-
-    public KeelLogger getLogger() {
-        return logger;
+            @Override
+            public String responseContentType() {
+                return "application/json";
+            }
+        });
     }
 
     /**
@@ -84,22 +58,37 @@ public class KeelControllerStyleRouterKit {
      * @param controllerPackage such as `com.organization.project.controller`
      * @param filterList        List of Filters
      * @param logger            KeelLogger Instance
-     * @since 1.12
+     * @since 1.13 add Parameter: Annotation Parser List
      */
-    public static void installToRouter(Router router, String pathPrefix, String controllerPackage, List<KeelWebRequestFilter> filterList, KeelLogger logger) {
+    public static void installToRouter(
+            Router router,
+            String pathPrefix,
+            String controllerPackage,
+            List<KeelWebRequestFilter> filterList,
+            KeelLogger logger
+    ) {
         if (!pathPrefix.endsWith("/")) {
             pathPrefix = pathPrefix + "/";
         }
-        KeelControllerStyleRouterKit keelControllerStyleRouterKit = new KeelControllerStyleRouterKit(pathPrefix, controllerPackage, filterList).setLogger(logger);
+        KeelControllerStyleRouterKit keelControllerStyleRouterKit = new KeelControllerStyleRouterKit(pathPrefix, controllerPackage)
+                .setLogger(logger);
+        if (filterList != null) {
+            keelControllerStyleRouterKit.filterList.addAll(filterList);
+        }
         router.route(pathPrefix + "*")
                 .handler(BodyHandler.create())
                 .handler(keelControllerStyleRouterKit::processRouterRequest);
+    }
+
+    public KeelLogger getLogger() {
+        return logger;
     }
 
     public KeelControllerStyleRouterKit addFilter(KeelWebRequestFilter filter) {
         this.filterList.add(filter);
         return this;
     }
+
 
     public void processRouterRequest(RoutingContext ctx) {
         String requestPath = ctx.request().path();
@@ -152,7 +141,7 @@ public class KeelControllerStyleRouterKit {
 
             Future<Void> filterFuture = Future.succeededFuture();
             for (var filter : filterList) {
-                filterFuture = filterFuture.compose(x -> filter.shouldHandleThisRequest(ctx));
+                filterFuture = filterFuture.compose(x -> filter.setTargetMethod(method).shouldHandleThisRequest(ctx));
             }
             filterFuture
                     .onFailure(throwable -> ctx.response().setStatusCode(403).end("Thrown by filter: " + throwable.getMessage()))
