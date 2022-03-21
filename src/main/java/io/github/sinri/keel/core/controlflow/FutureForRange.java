@@ -42,4 +42,8 @@ public class FutureForRange {
         }
         return futureAtomicReference.get();
     }
+
+    public static <T> Future<Void> quick(Integer times, Function<Integer, Future<Void>> handleFunction) {
+        return new FutureForRange(times).run(handleFunction);
+    }
 }

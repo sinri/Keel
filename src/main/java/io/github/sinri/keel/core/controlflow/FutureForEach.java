@@ -26,4 +26,8 @@ public class FutureForEach<T> {
         });
         return futureAtomicReference.get();
     }
+
+    public static <T> Future<Void> quick(Collection<T> collection, Function<T, Future<Void>> itemProcessor) {
+        return new FutureForEach<T>(itemProcessor).process(collection);
+    }
 }
