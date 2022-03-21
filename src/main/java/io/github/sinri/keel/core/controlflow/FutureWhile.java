@@ -9,7 +9,10 @@ import java.util.function.Function;
  *
  * @param <T> class of the object to finally get
  * @since 1.7
- * @deprecated 1.13开发阶段，接报发现其中存在同步监听异步的架构性，一时半会没法很好改造
+ * @deprecated <p>
+ * 1.13开发阶段，接报发现其中存在同步监听异步的架构性，一时半会没法很好改造。<br>
+ * 使用FutureRecursion或FutureFor*。
+ * </p>
  */
 public class FutureWhile<T> {
     protected T lastValue;
