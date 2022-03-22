@@ -4,9 +4,12 @@ import io.github.sinri.keel.mysql.MySQLExecutor;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @since 1.10 Designed for a wrapper of each row in ResultMatrix
@@ -65,5 +68,28 @@ public abstract class AbstractTableRow {
 
     public Number getFieldAsNumber(String field) {
         return tableRow.getNumber(field);
+    }
+
+    /**
+     * @param rows collection of AbstractTableRow
+     * @return a json array
+     * @since 1.13
+     */
+    public static JsonArray rowsToJsonArray(Collection<? extends AbstractTableRow> rows) {
+        JsonArray array = new JsonArray();
+        rows.forEach(row -> array.add(row.getTableRow()));
+        return array;
+    }
+
+    /**
+     * @param rows        collection of AbstractTableRow
+     * @param transformer a function, AbstractTableRow->JsonObject
+     * @return a json array
+     * @since 1.13
+     */
+    public static JsonArray rowsToJsonArray(Collection<? extends AbstractTableRow> rows, Function<AbstractTableRow, JsonObject> transformer) {
+        JsonArray array = new JsonArray();
+        rows.forEach(row -> array.add(transformer.apply(row)));
+        return array;
     }
 }
