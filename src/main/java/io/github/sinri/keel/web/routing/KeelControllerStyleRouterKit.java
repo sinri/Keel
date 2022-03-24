@@ -213,9 +213,7 @@ public class KeelControllerStyleRouterKit extends KeelRouterKit {
                     }
                     return respond(annotation, ctx, result);
                 })
-                .onFailure(throwable -> {
-                    respond(annotation, ctx, throwable);
-                });
+                .onFailure(throwable -> respond(annotation, ctx, throwable));
     }
 
     private static class PathParsedHandlerClassMethod {

@@ -1,19 +1,23 @@
 package io.github.sinri.keel.web.fastdocs.page;
 
+import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.jar.JarEntry;
 
-/**
- * @since 1.12
- */
 public class CataloguePageBuilder implements FastDocsContentResponder {
-    private final String rootAbsolutePath;
-
     private final PageBuilderOptions options;
+    private final boolean embedded;
+    private final String actualFileRootOutsideJAR;
 
     public CataloguePageBuilder(PageBuilderOptions options) {
         this.options = options;
@@ -22,89 +26,21 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         if (x == null) {
             throw new IllegalArgumentException("rootMarkdownFilePath is not available in File System");
         }
-        this.rootAbsolutePath = x.getPath();
+        this.embedded = x.toString().contains("!/");
+        this.actualFileRootOutsideJAR = x.getPath();
+        options.logger.info("EMBEDDED: " + embedded + " url: " + x + " actualFileRootOutsideJAR: " + actualFileRootOutsideJAR);
     }
 
-    protected String getPageTitle() {
-        return options.subjectOfDocuments + " - " + options.ctx.request().path().substring(this.options.rootURLPath.length());
+    @Override
+    public void setRoutingContext(RoutingContext ctx) {
+        this.options.ctx = ctx;
     }
 
-    private boolean isFromDoc() {
-        return options.fromDoc != null && !options.fromDoc.isEmpty();
-    }
-
-    protected String getLogoDivContent() {
-        return options.subjectOfDocuments;
-    }
-
-    protected String getCatalogueDivContent() {
-        File root = new File(this.rootAbsolutePath);
-        StringBuilder code = createHTMLCodeForDir(root, 0);
-
-        return code.toString();
-    }
-
-    private StringBuilder createHTMLCodeForDir(File dir, int depth) {
-        StringBuilder sb = new StringBuilder();
-
-        sb.append("<div class='dir_box'>");
-
-        String boxHref;
-        String displayDirName;
-        if (depth > 0) {
-            boxHref = dir.getAbsolutePath().substring(this.rootAbsolutePath.length());
-            displayDirName = dir.getName();
-        } else {
-            boxHref = ".";
-            displayDirName = options.subjectOfDocuments;
-        }
-        boxHref = boxHref + "/index.md";
-
-        sb.append("<div>");
-        sb.append("<div style='display: inline-block;width:20px;border-left: 1px solid lightgrey;'>&nbsp;</div>".repeat(Math.max(0, depth)));
-        sb.append("<div class='dir_box_title' style='display: inline-block;'>")
-                .append("<span>\uD83D\uDCC1&nbsp;</span>")
-                .append("<span>")
-                .append("<a href='").append(boxHref).append("' ").append(isFromDoc() ? "target='_parent'" : "").append(" >").append(displayDirName).append("</a>")
-                .append("</span>")
-                .append("</div>");
-        sb.append("</div>");
-
-        File[] files = dir.listFiles(pathname -> {
-            if (pathname.isDirectory()) {
-                File indexFile = pathname.toPath().resolve("index.md").toFile();
-                if (indexFile.exists() && indexFile.isFile()) {
-                    return true;
-                }
-            }
-            if (pathname.isFile()) {
-                return pathname.getName().endsWith(".md") && !pathname.getName().equalsIgnoreCase("index.md");
-            }
-            return false;
-        });
-        if (files != null && files.length > 0) {
-            sb.append("<div class='dir_box_body' style='display: inline-block;'>");
-            for (var file : files) {
-                if (file.isDirectory()) {
-                    sb.append(createHTMLCodeForDir(file, depth + 1));
-                } else {
-                    sb.append("<div class='dir_box_body_item'>")
-                            .append("<div style='display: inline-block;width:20px;border-left: 1px solid lightgrey;'>&nbsp;</div>".repeat(Math.max(0, depth + 1)))
-                            .append("<span>\uD83D\uDCC4&nbsp;</span>")
-                            .append("<span>")
-                            .append("<a href='").append(file.getAbsolutePath().substring(this.rootAbsolutePath.length())).append("' ").append(isFromDoc() ? "target='_parent'" : "").append(" >").append(file.getName()).append("</a>")
-                            .append("</span>")
-                            .append("</div>");
-                }
-            }
-            sb.append("</div>");
-        }
-        sb.append("</div>");
-        return sb;
-    }
-
-    protected String getFooterDivContent() {
-        return options.footerText + " | Powered by FastDocs";
+    @Override
+    public Future<Void> respond() {
+        return this.options.ctx.response()
+                .putHeader("Content-Type", "text/html;charset=UTF-8")
+                .end(this.buildPage());
     }
 
     protected String buildPage() {
@@ -179,15 +115,204 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
                 "</html>";
     }
 
-    @Override
-    public void setRoutingContext(RoutingContext ctx) {
-        this.options.ctx = ctx;
+    protected String getPageTitle() {
+        return options.subjectOfDocuments + " - " + options.ctx.request().path().substring(this.options.rootURLPath.length());
     }
 
-    @Override
-    public Future<Void> respond() {
-        return this.options.ctx.response()
-                .putHeader("Content-Type", "text/html;charset=UTF-8")
-                .end(this.buildPage());
+    private boolean isFromDoc() {
+        return options.fromDoc != null && !options.fromDoc.isEmpty();
+    }
+
+    protected String getLogoDivContent() {
+        return options.subjectOfDocuments;
+    }
+
+    protected String getCatalogueDivContent() {
+        if (embedded) {
+            return createHTMLCodeForDir(buildTreeInsideJAR()).toString();
+        } else {
+            return createHTMLCodeForDir(buildTreeOutsideJAR()).toString();
+        }
+    }
+
+    protected String getFooterDivContent() {
+        return options.footerText + " | Powered by FastDocs";
+    }
+
+    public StringBuilder createHTMLCodeForDir(TreeNode tree) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<div class='dir_box'>");
+
+        String boxHref;
+        String displayDirName;
+        boxHref = tree.href;
+        if (tree.level > 0) {
+            displayDirName = tree.name;
+        } else {
+            displayDirName = options.subjectOfDocuments;
+        }
+        //boxHref = boxHref + "/index.md";
+
+        sb.append("<div>");
+        sb.append("<div style='display: inline-block;width:20px;border-left: 1px solid lightgrey;'>&nbsp;</div>".repeat(Math.max(0, tree.level)));
+        sb.append("<div class='dir_box_title' style='display: inline-block;'>")
+                .append("<span>\uD83D\uDCC1&nbsp;</span>")
+                .append("<span>")
+                .append("<a href='").append(boxHref).append("' ").append(isFromDoc() ? "target='_parent'" : "").append(" >").append(displayDirName).append("</a>")
+                .append("</span>")
+                .append("</div>");
+        sb.append("</div>");
+
+        // DIRS start
+        if (tree.href.endsWith("/index.md")) {
+            // as dir
+            for (var child : tree.children) {
+                if (child.href.endsWith("/index.md")) {
+                    sb.append(createHTMLCodeForDir(child));
+                } else {
+                    sb.append("<div class='dir_box_body_item'>")
+                            .append("<div style='display: inline-block;width:20px;border-left: 1px solid lightgrey;'>&nbsp;</div>".repeat(Math.max(0, child.level + 1)))
+                            .append("<span>\uD83D\uDCC4&nbsp;</span>")
+                            .append("<span>")
+                            .append("<a href='")
+                            .append(child.href)
+                            .append("' ")
+                            .append(isFromDoc() ? "target='_parent'" : "")
+                            .append(" >")
+                            .append(child.name)
+                            .append("</a>")
+                            .append("</span>")
+                            .append("</div>");
+                }
+            }
+        }
+        // DIRS end
+
+        sb.append("</div>");
+        return sb;
+    }
+
+    protected TreeNode buildTreeInsideJAR() {
+        TreeNode tree = new TreeNode();
+        tree.href = options.rootURLPath + "index.md";
+        tree.level = 0;
+        tree.name = options.subjectOfDocuments;
+        List<JarEntry> jarEntries = KeelHelper.traversalInJar(options.rootMarkdownFilePath);
+        for (var jarEntry : jarEntries) {
+            TreeNode child = buildTreeNodeInJar(jarEntry);
+            if (child != null) {
+                tree.children.add(child);
+            }
+        }
+        options.logger.info("TREE", tree.toJsonObject());
+        return tree;
+    }
+
+    private TreeNode buildTreeNodeInJar(JarEntry jarEntry) {
+        options.logger.info("buildTreeNodeInJar: " + jarEntry.getName() + " isDir: " + jarEntry.isDirectory());
+        TreeNode treeNode = new TreeNode();
+        treeNode.name = String.valueOf(Path.of(jarEntry.getName()).getFileName());
+        if (jarEntry.isDirectory()) {
+            treeNode.href = jarEntry.getName().substring(options.rootMarkdownFilePath.length()) + "/index.md";
+            treeNode.level = Path.of(treeNode.href).getNameCount() - 1;
+            treeNode.href = (options.rootURLPath + treeNode.href).replaceAll("/+", "/");
+
+            List<JarEntry> jarEntries = KeelHelper.traversalInJar(jarEntry.getName());
+            for (var childJarEntry : jarEntries) {
+                var x = buildTreeNodeInJar(childJarEntry);
+                if (x != null) treeNode.children.add(x);
+            }
+        } else {
+            var fileName = Path.of(jarEntry.getName()).getFileName().toString();
+            if (fileName.equalsIgnoreCase("index.md")) {
+                return null;
+            }
+            if (!fileName.endsWith(".md")) {
+                return null;
+            }
+            treeNode.href = jarEntry.getName().substring(options.rootMarkdownFilePath.length());
+            treeNode.level = Path.of(treeNode.href).getNameCount();
+            treeNode.href = (options.rootURLPath + treeNode.href).replaceAll("/+", "/");
+        }
+        return treeNode;
+    }
+
+    protected TreeNode buildTreeOutsideJAR() {
+        File root = new File(actualFileRootOutsideJAR);
+        options.logger.info("buildTreeOutsideJAR " + root.getAbsolutePath());
+
+        TreeNode tree = new TreeNode();
+        tree.href = options.rootURLPath + "index.md";
+        tree.name = options.subjectOfDocuments;
+        tree.level = 0;
+
+        if (root.isDirectory()) {
+            options.logger.info("IS DIR? " + root.isDirectory());
+            File[] files = root.listFiles();
+            if (files != null) {
+                options.logger.info("files total " + files.length);
+                for (var file : files) {
+                    var x = buildTreeNodeOutsideJar(file);
+                    if (x != null) {
+                        tree.children.add(x);
+                    }
+                }
+            }
+        }
+
+        options.logger.info("TREE", tree.toJsonObject());
+        return tree;
+    }
+
+    private TreeNode buildTreeNodeOutsideJar(File item) {
+        options.logger.info("buildTreeNodeOutsideJar " + item.getAbsolutePath());
+        String base = new File(actualFileRootOutsideJAR).getAbsolutePath();
+        TreeNode treeNode = new TreeNode();
+        if (item.isDirectory()) {
+            treeNode.href = (item.getAbsolutePath().substring(base.length()) + "/index.md");
+            treeNode.level = Path.of(treeNode.href).getNameCount() - 1;
+            treeNode.href = (options.rootURLPath + treeNode.href).replaceAll("/+", "/");
+
+            File[] files = item.listFiles();
+            if (files != null) {
+                for (var file : files) {
+                    var x = buildTreeNodeOutsideJar(file);
+                    if (x != null) treeNode.children.add(x);
+                }
+            }
+        } else {
+            if (!item.getName().endsWith(".md")) {
+                return null;
+            }
+            if (item.getName().equalsIgnoreCase("index.md")) {
+                return null;
+            }
+            treeNode.href = (options.rootURLPath + item.getAbsolutePath().substring(base.length()))
+                    .replaceAll("/+", "/");
+            treeNode.level = Path.of(treeNode.href).getNameCount();
+        }
+        treeNode.name = item.getName();
+        return treeNode;
+    }
+
+    protected static class TreeNode {
+        public String href;
+        public String name;
+        public List<TreeNode> children = new ArrayList<>();
+        public int level;
+
+        public JsonObject toJsonObject() {
+            var x = new JsonObject()
+                    .put("href", href)
+                    .put("name", name)
+                    .put("level", level);
+            JsonArray array = new JsonArray();
+            for (var child : children) {
+                array.add(child.toJsonObject());
+            }
+            x.put("children", array);
+            return x;
+        }
     }
 }

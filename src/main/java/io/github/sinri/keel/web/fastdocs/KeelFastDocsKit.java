@@ -94,7 +94,7 @@ public class KeelFastDocsKit {
                 .put("method", ctx.request().method().name())
                 .put("path", ctx.request().path())
                 .put("stream_id", ctx.request().streamId());
-        logger.info("processRouterRequest start", requestInfo);
+        logger.debug("processRouterRequest start", requestInfo);
         if (ctx.request().method() != HttpMethod.GET) {
             ctx.response().setStatusCode(405).end();
             logger.warning("processRouterRequest ends with 405", requestInfo);
@@ -112,16 +112,16 @@ public class KeelFastDocsKit {
         options.rootMarkdownFilePath = this.rootMarkdownFilePath;
 
         if (requestPath.endsWith(".md")) {
-            logger.info("processRouterRequest -> processRequestWithMarkdownPath", requestInfo);
+            logger.debug("processRouterRequest -> processRequestWithMarkdownPath", requestInfo);
             processRequestWithMarkdownPath(options);
         } else if (requestPath.equalsIgnoreCase(this.rootURLPath + "catalogue")) {
-            logger.info("processRouterRequest -> processRequestWithCatalogue", requestInfo);
+            logger.debug("processRouterRequest -> processRequestWithCatalogue", requestInfo);
             processRequestWithCatalogue(options);
         } else if (requestPath.equalsIgnoreCase(this.rootURLPath + "markdown.css")) {
-            logger.info("processRouterRequest -> processRequestWithMarkdownCSS", requestInfo);
+            logger.debug("processRouterRequest -> processRequestWithMarkdownCSS", requestInfo);
             processRequestWithMarkdownCSS(options);
         } else {
-            logger.info("processRouterRequest -> processRequestWithStaticPath", requestInfo);
+            logger.debug("processRouterRequest -> processRequestWithStaticPath", requestInfo);
             processRequestWithStaticPath(options);
         }
     }
@@ -140,9 +140,9 @@ public class KeelFastDocsKit {
         getRelativePathOfRequest(options.ctx)
                 .compose(relativePathOfMarkdownFile -> {
                     String markdownFilePath = this.rootMarkdownFilePath + relativePathOfMarkdownFile;
-                    logger.info("processRequestWithMarkdownPath file: " + markdownFilePath);
+                    logger.debug("processRequestWithMarkdownPath file: " + markdownFilePath);
                     File x = new File(markdownFilePath);
-                    logger.info("abs: " + x.getAbsolutePath());
+                    logger.debug("abs: " + x.getAbsolutePath());
                     String markdownContent;
                     try {
                         InputStream resourceAsStream = KeelPropertiesReader.class.getClassLoader()
@@ -153,7 +153,7 @@ public class KeelFastDocsKit {
                         byte[] bytes = resourceAsStream.readAllBytes();
                         markdownContent = new String(bytes);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.exception(e);
                         return Future.failedFuture("Cannot read target file: " + e.getMessage());
                     }
 
@@ -167,7 +167,7 @@ public class KeelFastDocsKit {
                 })
                 .compose(MarkdownPageBuilder::respond)
                 .compose(v -> {
-                    logger.info("processRequestWithMarkdownPath ends");
+                    logger.debug("processRequestWithMarkdownPath ends");
                     return Future.succeededFuture();
                 });
 
@@ -177,7 +177,7 @@ public class KeelFastDocsKit {
         options.fromDoc = options.ctx.request().getParam("from_doc");
         new CataloguePageBuilder(options).respond()
                 .compose(v -> {
-                    logger.info("processRequestWithCatalogue ends");
+                    logger.debug("processRequestWithCatalogue ends");
                     return Future.succeededFuture();
                 });
     }
@@ -185,7 +185,7 @@ public class KeelFastDocsKit {
     protected void processRequestWithMarkdownCSS(PageBuilderOptions options) {
         new MarkdownCssBuilder(options).respond()
                 .compose(v -> {
-                    logger.info("processRequestWithMarkdownCSS ends");
+                    logger.debug("processRequestWithMarkdownCSS ends");
                     return Future.succeededFuture();
                 });
     }

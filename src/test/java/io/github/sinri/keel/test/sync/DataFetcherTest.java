@@ -1,8 +1,11 @@
 package io.github.sinri.keel.test.sync;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.DuplexExecutor;
+import io.github.sinri.keel.mysql.DuplexExecutorForMySQL;
 import io.github.sinri.keel.mysql.MySQLExecutor;
+import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
+import io.github.sinri.keel.mysql.matrix.ResultMatrixWithJDBC;
+import io.github.sinri.keel.mysql.matrix.ResultMatrixWithVertx;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.Future;
 
@@ -14,38 +17,8 @@ public class DataFetcherTest {
         SharedTestBootstrap.initialize();
 
 //        test1();
-        test2();
-    }
-
-    private static void test1() {
-        DuplexExecutor<String> stringDuoFetcherWrapper = new DuplexExecutor<>();
-        stringDuoFetcherWrapper
-                .setAsyncExecutor(v -> Future.succeededFuture("async"))
-                .setSyncExecutor(stringSyncExecuteResult -> {
-                    try {
-                        //stringSyncExecuteResult.setResult("sync");
-                        throw new Exception("sync error");
-                    } catch (Exception e) {
-                        stringSyncExecuteResult.setError(e);
-                    }
-                    return stringSyncExecuteResult;
-                });
-
-        try {
-            Keel.outputLogger("").info(stringDuoFetcherWrapper.executeSync());
-        } catch (Exception e) {
-            Keel.outputLogger("").error(e.getMessage());
-        }
-
-        stringDuoFetcherWrapper.executeAsync()
-                .compose(s -> {
-                    Keel.outputLogger("").info(s);
-                    return Future.succeededFuture();
-                })
-                .eventually(v -> {
-                    Keel.getVertx().close();
-                    return Future.succeededFuture();
-                });
+//        test2();
+        test3();
     }
 
     private static void test2() {
@@ -83,5 +56,52 @@ public class DataFetcherTest {
                     return Keel.getVertx().close();
                 });
 
+    }
+
+    private static void test3() {
+        var sql = "select 'ooo' as t";
+        DuplexExecutorForMySQL<String> stringMySQLExecutorV2 = new DuplexExecutorForMySQL<String>(
+                sqlConnection -> {
+                    return sqlConnection.query(sql).execute()
+                            .compose(rows -> {
+                                return Future.succeededFuture(new ResultMatrixWithVertx(rows));
+                            })
+                            .compose(resultMatrixWithVertx -> {
+                                try {
+                                    return Future.succeededFuture(resultMatrixWithVertx.getFirstRow().getString("t"));
+                                } catch (KeelSQLResultRowIndexError e) {
+                                    return Future.failedFuture(e);
+                                }
+                            });
+                },
+                statement -> {
+                    try {
+                        return new ResultMatrixWithJDBC(statement.executeQuery(sql))
+                                .getFirstRow()
+                                .getString("t");
+                    } catch (KeelSQLResultRowIndexError e) {
+                        return null;
+                    }
+                }
+        );
+
+        Statement currentThreadLocalStatement = SharedTestBootstrap.getMySqlJDBC().getThreadLocalStatementWrapper().getCurrentThreadLocalStatement();
+        try {
+            String x = stringMySQLExecutorV2.executeSync(currentThreadLocalStatement);
+            System.out.println(x);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        SharedTestBootstrap.getMySQLKit().getPool().withConnection(sqlConnection -> {
+                    return stringMySQLExecutorV2.executeAsync(sqlConnection);
+                })
+                .compose(x -> {
+                    System.out.println(x);
+                    return Future.succeededFuture();
+                })
+                .eventually(v -> {
+                    return Keel.getVertx().close();
+                });
     }
 }

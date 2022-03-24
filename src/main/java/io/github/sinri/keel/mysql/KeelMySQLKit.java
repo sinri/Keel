@@ -236,24 +236,6 @@ public class KeelMySQLKit {
     }
 
     /**
-     * @param transactionBody
-     * @param doneFunction
-     * @param errorFunction
-     * @deprecated since 1.10
-     */
-    @Deprecated
-    public void executeInTransaction_V2(
-            Function<SqlConnection, Future<Object>> transactionBody,
-            Function<Object, Void> doneFunction,
-            Function<Throwable, Void> errorFunction
-    ) {
-        // rewrite since 1.1
-        getPool().withTransaction(transactionBody)
-                .onSuccess(doneFunction::apply)
-                .onFailure(errorFunction::apply);
-    }
-
-    /**
      * @param transactionBody the function with sql connection for future
      * @param <T>             the final result class/type
      * @return future with final result if committed, or failed future if rollback

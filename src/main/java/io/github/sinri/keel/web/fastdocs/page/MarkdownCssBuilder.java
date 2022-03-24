@@ -25,6 +25,7 @@ public class MarkdownCssBuilder implements FastDocsContentResponder {
             try {
                 return new String(resourceAsStream.readAllBytes());
             } catch (IOException e) {
+                return "";
             }
         }
         return "";

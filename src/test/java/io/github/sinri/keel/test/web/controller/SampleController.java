@@ -11,10 +11,10 @@ public class SampleController extends KeelWebRequestController {
         super(ctx);
     }
 
-    public void SampleMethod(String p1) {
-        System.out.println("now call method!");
-        sayOK(new JsonObject().put("p1", p1));
-    }
+//    public void SampleMethod(String p1) {
+//        System.out.println("now call method!");
+//        sayOK(new JsonObject().put("p1", p1));
+//    }
 
     public Future<JsonObject> ReturnJsonObjectMethod(String p1) {
         if (p1.equals("ERROR")) {

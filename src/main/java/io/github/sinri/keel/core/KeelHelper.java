@@ -225,6 +225,14 @@ public class KeelHelper {
     }
 
     /**
+     * @param filePath path string of the target file, or directory
+     * @return the URL of target file; if not there, null return.
+     */
+    public static URL getUrlOfFileInJar(String filePath) {
+        return KeelOptions.class.getClassLoader().getResource(filePath);
+    }
+
+    /**
      * @param method
      * @param classOfAnnotation
      * @param defaultAnnotation
@@ -241,7 +249,7 @@ public class KeelHelper {
     }
 
     /**
-     * Seek in JAR!
+     * Seek in JAR, under the root (exclusive)
      *
      * @param root ends with '/'
      * @return list of JarEntry
@@ -251,7 +259,6 @@ public class KeelHelper {
         try {
             // should root ends with '/'?
             URL url = KeelHelper.class.getClassLoader().getResource(root);
-            System.out.println(url);
             if (url == null) {
                 throw new RuntimeException("Resource is not found");
             }
@@ -259,20 +266,22 @@ public class KeelHelper {
                 throw new RuntimeException("Resource is not in JAR");
             }
             String jarPath = url.toString().substring(0, url.toString().indexOf("!/") + 2);
-            System.out.println(jarPath);
 
             URL jarURL = new URL(jarPath);
             JarURLConnection jarCon = (JarURLConnection) jarURL.openConnection();
             JarFile jarFile = jarCon.getJarFile();
             Enumeration<JarEntry> jarEntries = jarFile.entries();
+            var baseJarEntry = jarFile.getJarEntry(root);
+            var pathOfBaseJarEntry = Path.of(baseJarEntry.getName());
 
             while (jarEntries.hasMoreElements()) {
                 JarEntry entry = jarEntries.nextElement();
-//                String name = entry.getName();
-//                if (name.startsWith(root) && !entry.isDirectory()) {
-//                    doWithInputStream(getClass().getClassLoader().getResourceAsStream(name));
-//                }
-                if (entry.getName().startsWith(root)) {
+
+                Path entryPath = Path.of(entry.getName());
+                if (entryPath.getParent() == null) {
+                    continue;
+                }
+                if (entryPath.getParent().compareTo(pathOfBaseJarEntry) == 0) {
                     jarEntryList.add(entry);
                 }
             }

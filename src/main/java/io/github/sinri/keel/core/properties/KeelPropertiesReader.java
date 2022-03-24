@@ -134,9 +134,7 @@ public class KeelPropertiesReader {
      */
     public Set<String> getPlainKeySet() {
         Set<String> keys = new HashSet<>();
-        properties.forEach((key, value) -> {
-            keys.add(key.toString());
-        });
+        properties.forEach((key, value) -> keys.add(key.toString()));
         return keys;
     }
 
