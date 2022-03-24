@@ -15,4 +15,26 @@ public @interface KeelApiAnnotation {
     String[] acceptedRequestMethods() default {};
 
     String responseContentType() default "application/json";
+
+    /**
+     * used in KeelUrlRuleRouterKit only
+     *
+     * @return URL Rule
+     * @since 1.13
+     */
+    String urlRule() default "";
+
+    /**
+     * used in KeelUrlRuleRouterKit only
+     *
+     * @return VIRTUAL HOST, full Domain or wildcards
+     * @since 1.13
+     */
+    String virtualHost() default "";
+
+    /**
+     * @return if the method would end response routine
+     * @since 1.13
+     */
+    boolean directlyOutput() default false;
 }

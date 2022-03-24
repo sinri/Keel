@@ -68,6 +68,15 @@ public class ConditionsComponent {
         return this;
     }
 
+    /**
+     * @param catholicQueryCriteria CatholicQueryCriteria Instance
+     * @return this
+     * @since 1.13
+     */
+    public ConditionsComponent withCatholicQueryCriteria(CatholicQueryCriteria catholicQueryCriteria) {
+        return catholicQueryCriteria.mergeIntoConditionsComponent(this);
+    }
+
     @Override
     public String toString() {
         if (conditions.isEmpty()) return "";

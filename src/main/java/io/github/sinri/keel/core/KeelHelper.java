@@ -7,12 +7,17 @@ import io.vertx.core.json.JsonObject;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Keel Helper
@@ -233,5 +238,47 @@ public class KeelHelper {
             return defaultAnnotation;
         }
         return annotation;
+    }
+
+    /**
+     * Seek in JAR!
+     *
+     * @param root ends with '/'
+     * @return list of JarEntry
+     */
+    public static List<JarEntry> traversalInJar(String root) {
+        List<JarEntry> jarEntryList = new ArrayList<>();
+        try {
+            // should root ends with '/'?
+            URL url = KeelHelper.class.getClassLoader().getResource(root);
+            System.out.println(url);
+            if (url == null) {
+                throw new RuntimeException("Resource is not found");
+            }
+            if (!url.toString().contains("!/")) {
+                throw new RuntimeException("Resource is not in JAR");
+            }
+            String jarPath = url.toString().substring(0, url.toString().indexOf("!/") + 2);
+            System.out.println(jarPath);
+
+            URL jarURL = new URL(jarPath);
+            JarURLConnection jarCon = (JarURLConnection) jarURL.openConnection();
+            JarFile jarFile = jarCon.getJarFile();
+            Enumeration<JarEntry> jarEntries = jarFile.entries();
+
+            while (jarEntries.hasMoreElements()) {
+                JarEntry entry = jarEntries.nextElement();
+//                String name = entry.getName();
+//                if (name.startsWith(root) && !entry.isDirectory()) {
+//                    doWithInputStream(getClass().getClassLoader().getResourceAsStream(name));
+//                }
+                if (entry.getName().startsWith(root)) {
+                    jarEntryList.add(entry);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return jarEntryList;
     }
 }

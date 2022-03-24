@@ -2,9 +2,11 @@ package io.github.sinri.keel.test.web;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
-import io.github.sinri.keel.web.KeelControllerStyleRouterKit;
+import io.github.sinri.keel.test.web.controller.UrlRuleController;
 import io.github.sinri.keel.web.KeelHttpServer;
 import io.github.sinri.keel.web.fastdocs.KeelFastDocsKit;
+import io.github.sinri.keel.web.routing.KeelControllerStyleRouterKit;
+import io.github.sinri.keel.web.routing.KeelUrlRuleRouterKit;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.handler.StaticHandler;
 
@@ -19,14 +21,13 @@ public class WebTestMainV2 {
         // static route
         khs.getRouter().get("/").handler(ctx -> ctx.response().end("HERE IS ROOT"));
         // automatic Controller - Method route
-
         KeelControllerStyleRouterKit.installToRouter(
-                khs.getRouter(),
-                "/api/",
-                "io.github.sinri.keel.test.web.controller",
-                new ArrayList<>(),
-                Keel.outputLogger("KeelControllerStyleRouterKit")
-        );
+                        khs.getRouter(),
+                        "/api/",
+                        "io.github.sinri.keel.test.web.controller"
+                )
+                .setLogger(Keel.outputLogger("KeelControllerStyleRouterKit"));
+
         // static content: web_root is under `resources` directory
         khs.getRouter()
                 .route("/static/*")
@@ -38,8 +39,14 @@ public class WebTestMainV2 {
                 "/fastdocs/",
                 "web_root/fastdocs/",
                 "FastDocsSample",
-                "Copyright 2022-now Sinri Edogawa"
+                "Copyright 2022-now Sinri Edogawa",
+                Keel.logger("FastDocs")
         );
+
+        // url based
+        KeelUrlRuleRouterKit.installToRouter(khs.getRouter())
+                .setLogger(Keel.outputLogger("KeelUrlRuleRouterKit"))
+                .registerClass(UrlRuleController.class, new ArrayList<>());
 
         khs.listen();
     }

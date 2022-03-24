@@ -32,10 +32,12 @@ public class KeelWebRequestController {
         return readParamForTheFirst(name, null);
     }
 
+    @Deprecated
     protected Future<Void> sayOK() {
         return sayOK(null);
     }
 
+    @Deprecated
     protected Future<Void> sayOK(Object data) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("code", "OK");
@@ -47,6 +49,7 @@ public class KeelWebRequestController {
         return ctx.json(jsonObject);
     }
 
+    @Deprecated
     protected Future<Void> sayFail(Object error) {
         JsonObject jsonObject = new JsonObject();
         jsonObject.put("code", "FAILED");

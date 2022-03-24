@@ -1,5 +1,6 @@
 package io.github.sinri.keel;
 
+import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
@@ -11,7 +12,9 @@ import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.jar.JarEntry;
 
 public class Keel {
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
@@ -110,5 +113,16 @@ public class Keel {
     public static KeelJDBCForMySQL getMySQLKitWithJDBC() {
         String defaultName = propertiesReader.getProperty("mysql.default_data_source_name");
         return getMySQLKitWithJDBC(defaultName);
+    }
+
+    @Deprecated
+    public static void main(String[] args) {
+        // DEBUG
+        List<JarEntry> jarEntries = KeelHelper.traversalInJar("FastDocs/");
+        for (var jarEntry : jarEntries) {
+            System.out.println("jarEntry.getName: " + jarEntry.getName());
+            System.out.println("jarEntry.getRealName: " + jarEntry.getRealName());
+            System.out.println("jarEntry.isDirectory: " + jarEntry.isDirectory());
+        }
     }
 }
