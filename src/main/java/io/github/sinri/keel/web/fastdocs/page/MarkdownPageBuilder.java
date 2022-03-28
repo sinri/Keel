@@ -5,6 +5,8 @@ import io.github.sinri.keel.markdown.KeelMarkdownKit;
 import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +22,9 @@ public class MarkdownPageBuilder implements FastDocsContentResponder {
     }
 
     protected String getPageTitle() {
-        return options.subjectOfDocuments + " - " + options.ctx.request().path().substring(this.options.rootURLPath.length());
+        return options.subjectOfDocuments
+                + " - "
+                + URLDecoder.decode(options.ctx.request().path().substring(this.options.rootURLPath.length()), StandardCharsets.UTF_8);
     }
 
     protected String getLogoDivContent() {
@@ -28,7 +32,10 @@ public class MarkdownPageBuilder implements FastDocsContentResponder {
     }
 
     protected String getComputedBreadcrumbDivContent() {
-        String[] components = options.ctx.request().path().substring(this.options.rootURLPath.length()).split("/");
+        String[] components = URLDecoder.decode(
+                options.ctx.request().path().substring(this.options.rootURLPath.length()),
+                StandardCharsets.UTF_8
+        ).split("/");
         List<String> x = new ArrayList<>();
         StringBuilder href = new StringBuilder(this.options.rootURLPath);
         x.add("<a href='" + href + "index.md" + "'>" + options.subjectOfDocuments + "</a>");

@@ -16,6 +16,8 @@ import io.vertx.ext.web.handler.StaticHandler;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @since 1.12
@@ -111,7 +113,11 @@ public class KeelFastDocsKit {
         options.rootURLPath = this.rootURLPath;
         options.rootMarkdownFilePath = this.rootMarkdownFilePath;
 
-        if (requestPath.endsWith(".md")) {
+        logger.debug("requestPath: " + requestPath);
+        if (requestPath.equals(rootURLPath) || requestPath.equals(rootURLPath + "/")) {
+            logger.debug("processRouterRequest -> 302", requestInfo);
+            ctx.redirect(rootURLPath + (rootURLPath.endsWith("/") ? "" : "/") + "index.md");
+        } else if (requestPath.endsWith(".md")) {
             logger.debug("processRouterRequest -> processRequestWithMarkdownPath", requestInfo);
             processRequestWithMarkdownPath(options);
         } else if (requestPath.equalsIgnoreCase(this.rootURLPath + "catalogue")) {
@@ -132,13 +138,14 @@ public class KeelFastDocsKit {
         if (!requestPath.startsWith(this.rootURLPath)) {
             return Future.failedFuture("Not match url root");
         }
-
-        return Future.succeededFuture(requestPath.substring(this.rootURLPath.length()));
+        var raw = requestPath.substring(this.rootURLPath.length());
+        return Future.succeededFuture(URLDecoder.decode(raw, StandardCharsets.UTF_8));
     }
 
     protected void processRequestWithMarkdownPath(PageBuilderOptions options) {
         getRelativePathOfRequest(options.ctx)
                 .compose(relativePathOfMarkdownFile -> {
+                    logger.debug("processRequestWithMarkdownPath relativePathOfMarkdownFile: " + relativePathOfMarkdownFile);
                     String markdownFilePath = this.rootMarkdownFilePath + relativePathOfMarkdownFile;
                     logger.debug("processRequestWithMarkdownPath file: " + markdownFilePath);
                     File x = new File(markdownFilePath);

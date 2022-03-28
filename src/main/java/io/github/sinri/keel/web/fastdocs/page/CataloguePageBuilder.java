@@ -9,8 +9,11 @@ import io.vertx.ext.web.RoutingContext;
 
 import java.io.File;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.jar.JarEntry;
 
@@ -19,17 +22,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
     private final boolean embedded;
     private final String actualFileRootOutsideJAR;
 
-    public CataloguePageBuilder(PageBuilderOptions options) {
-        this.options = options;
-
-        URL x = KeelPropertiesReader.class.getClassLoader().getResource(this.options.rootMarkdownFilePath);
-        if (x == null) {
-            throw new IllegalArgumentException("rootMarkdownFilePath is not available in File System");
-        }
-        this.embedded = x.toString().contains("!/");
-        this.actualFileRootOutsideJAR = x.getPath();
-        options.logger.info("EMBEDDED: " + embedded + " url: " + x + " actualFileRootOutsideJAR: " + actualFileRootOutsideJAR);
-    }
+    private static String catalogueDivContentCache = null;
 
     @Override
     public void setRoutingContext(RoutingContext ctx) {
@@ -115,8 +108,16 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
                 "</html>";
     }
 
-    protected String getPageTitle() {
-        return options.subjectOfDocuments + " - " + options.ctx.request().path().substring(this.options.rootURLPath.length());
+    public CataloguePageBuilder(PageBuilderOptions options) {
+        this.options = options;
+
+        URL x = KeelPropertiesReader.class.getClassLoader().getResource(this.options.rootMarkdownFilePath);
+        if (x == null) {
+            throw new IllegalArgumentException("rootMarkdownFilePath is not available in File System");
+        }
+        this.embedded = x.toString().contains("!/");
+        this.actualFileRootOutsideJAR = x.getPath();
+        options.logger.debug("EMBEDDED: " + embedded + " url: " + x + " actualFileRootOutsideJAR: " + actualFileRootOutsideJAR);
     }
 
     private boolean isFromDoc() {
@@ -127,12 +128,21 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         return options.subjectOfDocuments;
     }
 
+    protected String getPageTitle() {
+        return options.subjectOfDocuments
+                + " - " +
+                URLDecoder.decode(options.ctx.request().path().substring(this.options.rootURLPath.length()), StandardCharsets.UTF_8);
+    }
+
     protected String getCatalogueDivContent() {
-        if (embedded) {
-            return createHTMLCodeForDir(buildTreeInsideJAR()).toString();
-        } else {
-            return createHTMLCodeForDir(buildTreeOutsideJAR()).toString();
+        if (catalogueDivContentCache == null) {
+            if (embedded) {
+                catalogueDivContentCache = createHTMLCodeForDir(buildTreeInsideJAR()).toString();
+            } else {
+                catalogueDivContentCache = createHTMLCodeForDir(buildTreeOutsideJAR()).toString();
+            }
         }
+        return catalogueDivContentCache;
     }
 
     protected String getFooterDivContent() {
@@ -154,35 +164,44 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         }
         //boxHref = boxHref + "/index.md";
 
-        sb.append("<div>");
+        sb.append("<div class='dir_box_body_item' style='display: inline-flex'>");
         sb.append("<div style='display: inline-block;width:20px;border-left: 1px solid lightgrey;'>&nbsp;</div>".repeat(Math.max(0, tree.level)));
         sb.append("<div class='dir_box_title' style='display: inline-block;'>")
-                .append("<span>\uD83D\uDCC1&nbsp;</span>")
-                .append("<span>")
-                .append("<a href='").append(boxHref).append("' ").append(isFromDoc() ? "target='_parent'" : "").append(" >").append(displayDirName).append("</a>")
-                .append("</span>")
+//                .append("<span>")
+//                .append("\uD83D\uDCC1&nbsp;")
+//                .append("</span>")
+//                .append("<span>")
+                .append("<a href='").append(boxHref).append("' ").append(isFromDoc() ? "target='_parent'" : "").append(" style='white-space: nowrap;display: inline-block;'").append(" >").append("\uD83D\uDCC1&nbsp;").append(displayDirName).append("</a>")
+//                .append("</span>")
                 .append("</div>");
         sb.append("</div>");
 
         // DIRS start
         if (tree.href.endsWith("/index.md")) {
             // as dir
-            for (var child : tree.children) {
+            for (var child : tree.getSortedChildren()) {
                 if (child.href.endsWith("/index.md")) {
                     sb.append(createHTMLCodeForDir(child));
                 } else {
-                    sb.append("<div class='dir_box_body_item'>")
-                            .append("<div style='display: inline-block;width:20px;border-left: 1px solid lightgrey;'>&nbsp;</div>".repeat(Math.max(0, child.level + 1)))
-                            .append("<span>\uD83D\uDCC4&nbsp;</span>")
-                            .append("<span>")
+                    sb.append("<div class='dir_box_body_item' style='display: inline-flex'>");
+                    sb.append("<div style='display: inline-block;width:20px;border-left: 1px solid lightgrey;'>&nbsp;</div>".repeat(Math.max(0, tree.level + 1)));
+                    //                .append("<span>")
+                    //                            .append("\uD83D\uDCC4&nbsp;")
+                    //                .append("</span>")
+                    //                .append("<span>")
+                    sb
+                            //                .append("<span>")
+//                            .append("\uD83D\uDCC4&nbsp;")
+//                .append("</span>")
+//                .append("<span>")
                             .append("<a href='")
                             .append(child.href)
                             .append("' ")
                             .append(isFromDoc() ? "target='_parent'" : "")
-                            .append(" >")
-                            .append(child.name)
+                            .append(" style='white-space: nowrap;display: inline-block;'")
+                            .append(" >").append("\uD83D\uDCC4&nbsp;").append(child.name)
                             .append("</a>")
-                            .append("</span>")
+//                            .append("</span>")
                             .append("</div>");
                 }
             }
@@ -202,15 +221,15 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         for (var jarEntry : jarEntries) {
             TreeNode child = buildTreeNodeInJar(jarEntry);
             if (child != null) {
-                tree.children.add(child);
+                tree.addChild(child);
             }
         }
-        options.logger.info("TREE", tree.toJsonObject());
+        options.logger.debug("TREE", tree.toJsonObject());
         return tree;
     }
 
     private TreeNode buildTreeNodeInJar(JarEntry jarEntry) {
-        options.logger.info("buildTreeNodeInJar: " + jarEntry.getName() + " isDir: " + jarEntry.isDirectory());
+        options.logger.debug("buildTreeNodeInJar: " + jarEntry.getName() + " isDir: " + jarEntry.isDirectory());
         TreeNode treeNode = new TreeNode();
         treeNode.name = String.valueOf(Path.of(jarEntry.getName()).getFileName());
         if (jarEntry.isDirectory()) {
@@ -221,7 +240,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
             List<JarEntry> jarEntries = KeelHelper.traversalInJar(jarEntry.getName());
             for (var childJarEntry : jarEntries) {
                 var x = buildTreeNodeInJar(childJarEntry);
-                if (x != null) treeNode.children.add(x);
+                if (x != null) treeNode.addChild(x);
             }
         } else {
             var fileName = Path.of(jarEntry.getName()).getFileName().toString();
@@ -240,7 +259,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
 
     protected TreeNode buildTreeOutsideJAR() {
         File root = new File(actualFileRootOutsideJAR);
-        options.logger.info("buildTreeOutsideJAR " + root.getAbsolutePath());
+        options.logger.debug("buildTreeOutsideJAR " + root.getAbsolutePath());
 
         TreeNode tree = new TreeNode();
         tree.href = options.rootURLPath + "index.md";
@@ -248,25 +267,25 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         tree.level = 0;
 
         if (root.isDirectory()) {
-            options.logger.info("IS DIR? " + root.isDirectory());
+            options.logger.debug("IS DIR? " + root.isDirectory());
             File[] files = root.listFiles();
             if (files != null) {
-                options.logger.info("files total " + files.length);
+                options.logger.debug("files total " + files.length);
                 for (var file : files) {
                     var x = buildTreeNodeOutsideJar(file);
                     if (x != null) {
-                        tree.children.add(x);
+                        tree.addChild(x);
                     }
                 }
             }
         }
 
-        options.logger.info("TREE", tree.toJsonObject());
+        options.logger.debug("TREE", tree.toJsonObject());
         return tree;
     }
 
     private TreeNode buildTreeNodeOutsideJar(File item) {
-        options.logger.info("buildTreeNodeOutsideJar " + item.getAbsolutePath());
+        options.logger.debug("buildTreeNodeOutsideJar " + item.getAbsolutePath());
         String base = new File(actualFileRootOutsideJAR).getAbsolutePath();
         TreeNode treeNode = new TreeNode();
         if (item.isDirectory()) {
@@ -278,7 +297,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
             if (files != null) {
                 for (var file : files) {
                     var x = buildTreeNodeOutsideJar(file);
-                    if (x != null) treeNode.children.add(x);
+                    if (x != null) treeNode.addChild(x);
                 }
             }
         } else {
@@ -299,8 +318,12 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
     protected static class TreeNode {
         public String href;
         public String name;
-        public List<TreeNode> children = new ArrayList<>();
+        private final List<TreeNode> _children = new ArrayList<>();
         public int level;
+
+        public void addChild(TreeNode child) {
+            _children.add(child);
+        }
 
         public JsonObject toJsonObject() {
             var x = new JsonObject()
@@ -308,11 +331,16 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
                     .put("name", name)
                     .put("level", level);
             JsonArray array = new JsonArray();
-            for (var child : children) {
+            for (var child : _children) {
                 array.add(child.toJsonObject());
             }
             x.put("children", array);
             return x;
+        }
+
+        public List<TreeNode> getSortedChildren() {
+            _children.sort(Comparator.comparing(o -> o.name));
+            return _children;
         }
     }
 }

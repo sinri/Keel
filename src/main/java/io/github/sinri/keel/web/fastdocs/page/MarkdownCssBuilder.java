@@ -17,18 +17,22 @@ public class MarkdownCssBuilder implements FastDocsContentResponder {
         this.options = options;
     }
 
-
+    private static String cssFileContent = null;
     protected String buildPage() {
-        InputStream resourceAsStream = MarkdownCssBuilder.class.getClassLoader()
-                .getResourceAsStream("web-fastdocs-css/github-markdown.4.0.0.min.css");
-        if (resourceAsStream != null) {
-            try {
-                return new String(resourceAsStream.readAllBytes());
-            } catch (IOException e) {
+        if (cssFileContent == null) {
+            InputStream resourceAsStream = MarkdownCssBuilder.class.getClassLoader()
+                    .getResourceAsStream("web-fastdocs-css/github-markdown.4.0.0.min.css");
+            if (resourceAsStream != null) {
+                try {
+                    cssFileContent = new String(resourceAsStream.readAllBytes());
+                } catch (IOException e) {
+                    return "";
+                }
+            } else {
                 return "";
             }
         }
-        return "";
+        return cssFileContent;
     }
 
     @Override
