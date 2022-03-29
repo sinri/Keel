@@ -97,7 +97,11 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         List<String> dataRow = new ArrayList<>();
         row.forEach(entry -> {
             columns.add(entry.getKey());
-            dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+            if (entry.getValue() == null) {
+                dataRow.add("NULL");
+            } else {
+                dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+            }
         });
         this.batchValues.add(dataRow);
         return this;
@@ -135,7 +139,11 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             if (map instanceof JsonObject) {
                 ((JsonObject) map).forEach(entry -> {
                     if (isFirstRow.get()) columns.add(entry.getKey());
-                    dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+                    if (entry.getValue() == null) {
+                        dataRow.add("NULL");
+                    } else {
+                        dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+                    }
                 });
                 isFirstRow.set(false);
             }
