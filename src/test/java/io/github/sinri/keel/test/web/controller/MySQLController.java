@@ -6,7 +6,6 @@ import io.github.sinri.keel.mysql.condition.CompareCondition;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.github.sinri.keel.mysql.statement.WriteIntoStatement;
-import io.github.sinri.keel.test.verticles.worker.WorkerVerticleD;
 import io.github.sinri.keel.web.KeelWebRequestController;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -85,10 +84,5 @@ public class MySQLController extends KeelWebRequestController {
                 );
         System.out.println("testD3 sql " + writeIntoStatement.toString());
         return writeIntoStatement.executeForLastInsertedID(sqlConnection);
-    }
-
-    public Future<Integer> testSync() {
-        return new WorkerVerticleD(ctx)
-                .deployAndRun();
     }
 }
