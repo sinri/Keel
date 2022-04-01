@@ -35,7 +35,7 @@ abstract public class KeelRouterKit {
         return Future.succeededFuture();
     }
 
-    protected Future<Void> respond(KeelApiAnnotation annotation, RoutingContext ctx, Object result) {
+    public static Future<Void> respond(KeelLogger logger, KeelApiAnnotation annotation, RoutingContext ctx, Object result) {
         if (
                 annotation.responseContentType().equalsIgnoreCase("application/json")
                         || annotation.responseContentType().startsWith("application/json;")
@@ -95,6 +95,10 @@ abstract public class KeelRouterKit {
             );
             return ctx.response().setStatusCode(code).end(data);
         }
+    }
+
+    protected Future<Void> respond(KeelApiAnnotation annotation, RoutingContext ctx, Object result) {
+        return respond(logger, annotation, ctx, result);
     }
 
     protected boolean isMethodPublicNonStaticNotInheritedAndReturnFuture(Method method) {

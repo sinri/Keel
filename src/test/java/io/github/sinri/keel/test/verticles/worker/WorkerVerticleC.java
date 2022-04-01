@@ -4,11 +4,11 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.github.sinri.keel.mysql.statement.UpdateStatement;
 import io.github.sinri.keel.test.SharedTestBootstrap;
-import io.github.sinri.keel.verticles.KeelWorkerVerticleWithJDBC;
+import io.github.sinri.keel.verticles.sync.KeelSyncWorkerVerticleWithJDBC;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
-public class WorkerVerticleC extends KeelWorkerVerticleWithJDBC<Integer> {
+public class WorkerVerticleC extends KeelSyncWorkerVerticleWithJDBC<Integer> {
     public static void main(String[] args) {
         SharedTestBootstrap.initialize();
 

@@ -28,6 +28,10 @@ public class Keel {
         return propertiesReader;
     }
 
+    /**
+     * @param vertxOptions VertxOptions
+     * @see <a href="https://vertx.io/docs/apidocs/io/vertx/core/VertxOptions.html">Class VertxOptions</a>
+     */
     public static void initializeVertx(VertxOptions vertxOptions) {
         vertx = Vertx.vertx(vertxOptions);
     }

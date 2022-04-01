@@ -1,7 +1,8 @@
-package io.github.sinri.keel.verticles;
+package io.github.sinri.keel.verticles.sync;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.verticles.VerticleAbleToUndeployItself;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -12,7 +13,8 @@ import io.vertx.core.json.JsonObject;
  * 利用 vertx.deployVerticle(KeelWorkerVerticle.class, new DeploymentOptions().setWorker(true)) 这一特性，
  * 让 vertx 使用特定的线程 KeelWorkerVerticle 中的同步代码
  */
-abstract public class KeelSyncWorkerVerticle<R> extends AbstractVerticle {
+@Deprecated
+abstract public class KeelSyncWorkerVerticle<R> extends AbstractVerticle implements VerticleAbleToUndeployItself {
     private final Report<R> report = new Report<>();
     private KeelLogger logger = KeelLogger.buildSilentLogger();
 
@@ -93,6 +95,11 @@ abstract public class KeelSyncWorkerVerticle<R> extends AbstractVerticle {
                                 return Future.succeededFuture(report.getResult());
                             });
                 });
+    }
+
+    @Override
+    public Future<Void> undeployMe() {
+        return VerticleAbleToUndeployItself.undeploy(this.deploymentID());
     }
 
     protected static class Report<T> {

@@ -2,10 +2,10 @@ package io.github.sinri.keel.test.verticles.worker;
 
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.github.sinri.keel.mysql.statement.UpdateStatement;
-import io.github.sinri.keel.verticles.KeelWorkerVerticleWithJDBCForWeb;
+import io.github.sinri.keel.verticles.sync.KeelSyncWorkerVerticleWithJDBCForWeb;
 import io.vertx.ext.web.RoutingContext;
 
-public class WorkerVerticleD extends KeelWorkerVerticleWithJDBCForWeb<Integer> {
+public class WorkerVerticleD extends KeelSyncWorkerVerticleWithJDBCForWeb<Integer> {
     public WorkerVerticleD(RoutingContext routingContext) {
         super(routingContext);
     }

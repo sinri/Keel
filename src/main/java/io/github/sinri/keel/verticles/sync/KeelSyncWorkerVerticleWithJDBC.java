@@ -1,4 +1,4 @@
-package io.github.sinri.keel.verticles;
+package io.github.sinri.keel.verticles.sync;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.jdbc.ThreadLocalStatementWrapper;
@@ -10,7 +10,8 @@ import java.sql.SQLException;
  * @param <R>
  * @since 1.14
  */
-abstract public class KeelWorkerVerticleWithJDBC<R> extends KeelSyncWorkerVerticle<R> {
+@Deprecated
+abstract public class KeelSyncWorkerVerticleWithJDBC<R> extends KeelSyncWorkerVerticle<R> {
     @Override
     protected R syncExecute() throws SQLException {
         return ThreadLocalStatementWrapper.runWithTransactionExecutor(

@@ -6,7 +6,7 @@ import io.github.sinri.keel.mysql.jdbc.TransactionExecutor;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.github.sinri.keel.mysql.statement.UpdateStatement;
 import io.github.sinri.keel.test.SharedTestBootstrap;
-import io.github.sinri.keel.verticles.KeelSyncWorkerVerticle;
+import io.github.sinri.keel.verticles.sync.KeelSyncWorkerVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
