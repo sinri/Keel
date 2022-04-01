@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web.routing;
 
+import io.github.sinri.keel.core.JsonifiableEntity;
 import io.github.sinri.keel.core.controlflow.FutureForEach;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.web.KeelApiAnnotation;
@@ -44,8 +45,20 @@ abstract public class KeelRouterKit {
             if (result == null) {
                 jsonObject.put("code", "OK").putNull("data");
             } else if (result instanceof Throwable) {
+                StringBuilder sb = new StringBuilder();
+                var t = (Throwable) result;
+                while (t != null) {
+                    if (sb.length() > 0) {
+                        sb.append(" ← ");
+                    }
+                    sb.append(t.getClass().getName()).append(" : ").append(t.getMessage());
+                    t = t.getCause();
+                }
+
                 jsonObject.put("code", "FAILED")
-                        .put("data", ((Throwable) result).getMessage());
+                        .put("data", sb.toString());
+            } else if (result instanceof JsonifiableEntity) {
+                jsonObject.put("code", "OK").put("data", ((JsonifiableEntity<?>) result).toJsonObject());
             } else {
                 jsonObject.put("code", "OK").put("data", result);
             }
@@ -59,8 +72,18 @@ abstract public class KeelRouterKit {
             if (result == null) {
                 data = "";
             } else if (result instanceof Throwable) {
+                StringBuilder sb = new StringBuilder();
+                var t = (Throwable) result;
+                while (t != null) {
+                    if (sb.length() > 0) {
+                        sb.append(" ← ");
+                    }
+                    sb.append(t.getClass().getName()).append(" : ").append(t.getMessage());
+                    t = t.getCause();
+                }
+
                 code = 500;
-                data = "ERROR: " + result;
+                data = "ERROR: " + sb;
             } else {
                 data = result.toString();
             }

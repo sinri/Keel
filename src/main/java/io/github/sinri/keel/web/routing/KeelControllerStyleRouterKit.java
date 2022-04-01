@@ -128,7 +128,7 @@ public class KeelControllerStyleRouterKit extends KeelRouterKit {
     private PathParsedHandlerClassMethod parsePathToHandler(String requestMethod, String requestPath) throws NoSuchMethodException {
 //        getLogger().info("requestPath: " + requestPath);
         // here, the `requestPath` should not be empty or '/'
-        System.out.println("! requestPath=" + requestPath + " this.pathPrefix=" + this.pathPrefix);
+//        System.out.println("! requestPath=" + requestPath + " this.pathPrefix=" + this.pathPrefix);
         String requestPathWithoutPrefix = requestPath.substring(this.pathPrefix.length());
         //System.out.println("parsePathToHandler from "+requestPath+" to "+requestPathWithoutPrefix);
         String[] pathComponents = requestPathWithoutPrefix.split("/");
@@ -213,7 +213,10 @@ public class KeelControllerStyleRouterKit extends KeelRouterKit {
                     }
                     return respond(annotation, ctx, result);
                 })
-                .onFailure(throwable -> respond(annotation, ctx, throwable));
+                .onFailure(throwable -> {
+                    getLogger().exception("CONTROLLER EXECUTE THROW", throwable);
+                    respond(annotation, ctx, throwable);
+                });
     }
 
     private static class PathParsedHandlerClassMethod {

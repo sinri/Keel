@@ -70,7 +70,11 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         for (List<Object> row : batch) {
             List<String> t = new ArrayList<>();
             for (Object item : row) {
-                t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
+                if (item == null) {
+                    t.add("NULL");
+                } else {
+                    t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
+                }
             }
             this.batchValues.add(t);
         }
@@ -80,7 +84,11 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     public WriteIntoStatement addDataRow(List<Object> row) {
         List<String> t = new ArrayList<>();
         for (Object item : row) {
-            t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
+            if (item == null) {
+                t.add("NULL");
+            } else {
+                t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
+            }
         }
         this.batchValues.add(t);
         return this;
@@ -118,7 +126,11 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         List<String> dataRow = new ArrayList<>();
         mapForOneRow.forEach((key, value) -> {
             columns.add(key);
-            dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+            if (value == null) {
+                dataRow.add("NULL");
+            } else {
+                dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+            }
         });
         this.batchValues.add(dataRow);
         return this;
@@ -167,7 +179,11 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             List<String> dataRow = new ArrayList<>();
             map.forEach((key, value) -> {
                 if (isFirstRow.get()) columns.add(key);
-                dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+                if (value == null) {
+                    dataRow.add("NULL");
+                } else {
+                    dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+                }
             });
             this.batchValues.add(dataRow);
             isFirstRow.set(false);

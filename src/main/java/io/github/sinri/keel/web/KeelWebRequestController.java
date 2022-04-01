@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.ext.web.RoutingContext;
 
@@ -8,11 +7,11 @@ import java.util.List;
 
 public class KeelWebRequestController {
     protected final RoutingContext ctx;
-    protected final KeelLogger logger;
+    protected KeelLogger logger;
 
     public KeelWebRequestController(RoutingContext ctx) {
         this.ctx = ctx;
-        this.logger = Keel.logger("web/controller/" + KeelLogger.class.getName());
+        this.logger = KeelLogger.buildSilentLogger();
 
         // Keel.logger().debug("do something before call method!");
     }

@@ -34,7 +34,7 @@ public class ThreadLocalStatementWrapper {
             return result;
         } else {
             threadLocalStatementWrapper.rollbackInThreadLocalStatement();
-            throw new SQLException(errorInTransaction);
+            throw new SQLException("Rollback Done, due to " + errorInTransaction.getMessage(), errorInTransaction);
         }
     }
 

@@ -16,6 +16,7 @@ public class KeelMySQLOptions extends KeelOptions {
     public int poolMaxSize;
     public boolean poolShared;
     protected String dataSourceName;
+    public boolean allowPublicKeyRetrieval;
 
     public KeelMySQLOptions() {
         this.host = "127.0.0.1";
@@ -25,6 +26,7 @@ public class KeelMySQLOptions extends KeelOptions {
         this.schema = "test";
         this.charset = "utf8";
         this.useAffectedRows = true;
+        this.allowPublicKeyRetrieval = false;
         this.poolMaxSize = 8;
         this.poolShared = false;
     }
@@ -62,7 +64,10 @@ public class KeelMySQLOptions extends KeelOptions {
     }
 
     public String buildJDBCConnectionString() {
-        return "jdbc:mysql://" + host + ":" + port + "/" + schema + "?useSSL=false&useUnicode=true&characterEncoding=" + charset;
+        return "jdbc:mysql://" + host + ":" + port + "/" + schema
+                + "?useSSL=false&useUnicode=true" +
+                "&characterEncoding=" + charset
+                + "&allowPublicKeyRetrieval=" + (allowPublicKeyRetrieval ? "true" : "false");
     }
 
     public String getUsername() {

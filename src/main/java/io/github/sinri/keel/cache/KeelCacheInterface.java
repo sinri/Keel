@@ -2,6 +2,7 @@ package io.github.sinri.keel.cache;
 
 import io.github.sinri.keel.cache.caffeine.CaffeineCacheKit;
 
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
 /**
@@ -74,4 +75,10 @@ public interface KeelCacheInterface<K, V> {
      * clean up the entries that is not alive (expired, etc.)
      */
     void cleanUp();
+
+    /**
+     * @return ConcurrentMap<K, V> alive value only
+     * @since 1.14
+     */
+    ConcurrentMap<K, V> getSnapshotMap();
 }

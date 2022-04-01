@@ -90,14 +90,24 @@ public class KeelLogger {
      * @since 1.10
      */
     public void exception(String msg, Throwable throwable) {
-        String prefix;
-        if (msg == null || msg.isEmpty()) {
-            prefix = "";
-        } else {
-            prefix = msg + " × ";
+        if (throwable == null) {
+            error(msg);
+            return;
         }
-        error(prefix + throwable.getMessage(), new JsonObject().put("error_class", throwable.getClass().getName()));
-        for (var s : throwable.getStackTrace()) {
+        String prefix = throwable.getClass().getName() + " : " + throwable.getMessage();
+        if (msg != null && !msg.isEmpty()) {
+            prefix = msg + " × " + throwable.getClass().getName() + " : " + throwable.getMessage();
+        }
+        error(prefix);
+
+        var lastThrowable = throwable;
+        while (lastThrowable.getCause() != null) {
+            var cause = lastThrowable.getCause();
+            this.delegate.print(KeelLogLevel.ERROR, "Caused by " + cause.getClass().getName() + " : " + cause.getMessage(), null);
+            lastThrowable = cause;
+        }
+
+        for (var s : lastThrowable.getStackTrace()) {
             this.delegate.print(KeelLogLevel.ERROR, "\t" + s.toString(), null);
         }
     }

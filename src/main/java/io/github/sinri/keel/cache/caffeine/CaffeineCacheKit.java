@@ -7,6 +7,8 @@ import io.github.sinri.keel.cache.KeelCacheInterface;
 import org.checkerframework.checker.index.qual.NonNegative;
 
 import java.util.Date;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -77,6 +79,21 @@ public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
         this.cache.cleanUp();
     }
 
+    /**
+     * @return ConcurrentMap<K, V>
+     * Note: Modify the returned map would not affect the raw cache
+     * @since 1.14
+     */
+    public ConcurrentMap<K, V> getSnapshotMap() {
+        ConcurrentMap<K, V> map = new ConcurrentHashMap<>();
+        this.cache.asMap().forEach((k, v) -> {
+            if (v.isAliveNow()) {
+                map.put(k, v.getValue());
+            }
+        });
+        return map;
+    }
+
     protected static class ValueWrapper<P> {
         private final P value;
         private final long death;
@@ -98,6 +115,10 @@ public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
 
         public P getValue() {
             return value;
+        }
+
+        public boolean isAliveNow() {
+            return (new Date().getTime()) < this.death;
         }
     }
 }
