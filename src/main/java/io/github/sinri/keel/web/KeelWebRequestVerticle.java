@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @since 1.14
+ * @deprecated since 2.0 use KeelWebRequestReceptionist instead
  */
 abstract public class KeelWebRequestVerticle extends AbstractVerticle implements VerticleAbleToUndeployItself {
     private final RoutingContext routingContext;

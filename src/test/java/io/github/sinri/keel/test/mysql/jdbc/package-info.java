@@ -1,1 +1,0 @@
-package io.github.sinri.keel.test.mysql.jdbc;
