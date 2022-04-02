@@ -60,6 +60,20 @@ public interface KeelCacheInterface<K, V> {
     V read(K key, Function<? super K, ? extends V> fallbackValueGenerator, V fallbackValue);
 
     /**
+     * Read an available cached item with key;
+     * if not found, try to generate one with key using `fallbackValueGenerator` to return;
+     * if still gets `null`, return `fallbackValue`.
+     *
+     * @param key                    key
+     * @param fallbackValueGenerator fallback value generator, a function receive key and return value
+     * @param fallbackValue          the certain value returned when not found and generator returned `null`
+     * @param lifeInSeconds          life in seconds of the newly created
+     * @return value of found available cached item, or generated one, or `fallbackValue`
+     * @since 1.14
+     */
+    V read(K key, Function<? super K, ? extends V> fallbackValueGenerator, V fallbackValue, long lifeInSeconds);
+
+    /**
      * Remove the cached item with key.
      *
      * @param key key

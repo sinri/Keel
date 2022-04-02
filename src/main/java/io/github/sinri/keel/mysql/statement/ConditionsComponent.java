@@ -2,6 +2,9 @@ package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.condition.*;
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,5 +84,37 @@ public class ConditionsComponent {
     public String toString() {
         if (conditions.isEmpty()) return "";
         return KeelHelper.joinStringArray(conditions, " and ");
+    }
+
+    /**
+     * @param mapping
+     * @return
+     * @since 1.14
+     */
+    public final Future<ConditionsComponent> quickMapping(JsonObject mapping) {
+        mapping.forEach(entry -> {
+            if (entry.getKey() == null || entry.getKey().isEmpty()) {
+                return;
+            }
+            if (entry.getValue() == null) {
+                this.comparison(compareCondition -> compareCondition
+                        .compare(entry.getKey())
+                        .operator(CompareCondition.OP_IS)
+                        .againstExpression("NULL")
+                );
+            } else if (entry.getValue() instanceof JsonArray) {
+                if (((JsonArray) entry.getValue()).size() > 0) {
+                    this.among(amongstCondition -> amongstCondition
+                            .elementAsExpression(entry.getKey())
+                            .amongstValueList(((JsonArray) entry.getValue()).getList())
+                    );
+                }
+            } else {
+                this.comparison(compareCondition -> compareCondition
+                        .filedEqualsValue(entry.getKey(), entry.getValue().toString())
+                );
+            }
+        });
+        return Future.succeededFuture(this);
     }
 }
