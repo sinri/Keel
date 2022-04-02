@@ -7,6 +7,7 @@ import java.sql.Statement;
 
 /**
  * @since 1.9
+ * @since 2.0 由于 VERTICLE 的发现，应用场景减少。
  */
 public class ThreadLocalStatementWrapper {
 

@@ -13,7 +13,6 @@ import io.vertx.sqlclient.Tuple;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -270,26 +269,5 @@ public class KeelMySQLKit {
                         false
                 )
         );
-    }
-
-    private static final String KEY_MYSQL_CONNECTION_UUID = "MySQLConnectionUUID";
-    private static final String KEY_MYSQL_CONNECTION = "MySQLConnection";
-
-    /**
-     * It should only be used in Worker Verticle and target prepared.
-     *
-     * @return SqlConnection prepared in context with KEY_MYSQL_CONNECTION
-     */
-    public static SqlConnection getSqlConnectionFromVerticleContext() {
-        return Keel.getVertx().getOrCreateContext().get(KEY_MYSQL_CONNECTION);
-    }
-
-    public static String getSqlConnectionUUIDFromVerticleContext() {
-        return Keel.getVertx().getOrCreateContext().get(KEY_MYSQL_CONNECTION_UUID);
-    }
-
-    public static void setSqlConnectionToVerticleContext(SqlConnection sqlConnection) {
-        Keel.getVertx().getOrCreateContext().put(KEY_MYSQL_CONNECTION, sqlConnection);
-        Keel.getVertx().getOrCreateContext().put(KEY_MYSQL_CONNECTION_UUID, UUID.randomUUID().toString());
     }
 }

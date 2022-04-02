@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * @since 1.5
+ * I am thinking about to deprecate it and use VERTICLE to replace it.
  */
 abstract public class KeelProgram {
     private final KeelLogger logger;
