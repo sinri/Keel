@@ -27,23 +27,23 @@ public abstract class AbstractTableRow extends AbstractRow {
      */
     abstract public String getTableName();
 
-    abstract public String getPKFiledName();
+    abstract protected String getPKFiledName();
 
-    public Future<Long> insertThisRowForPK(SqlConnection sqlConnection) {
+    protected Future<Long> insertThisRowForPK(SqlConnection sqlConnection) {
         return new WriteIntoStatement()
                 .intoTable(getSchemaName(), getTableName())
                 .macroWriteOneRowWithJsonObject(getRow())
                 .executeForLastInsertedID(sqlConnection);
     }
 
-    public Future<Long> replaceThisRowForPK(SqlConnection sqlConnection) {
+    protected Future<Long> replaceThisRowForPK(SqlConnection sqlConnection) {
         return new WriteIntoStatement(WriteIntoStatement.REPLACE)
                 .intoTable(getSchemaName(), getTableName())
                 .macroWriteOneRowWithJsonObject(getRow())
                 .executeForLastInsertedID(sqlConnection);
     }
 
-    public Future<Integer> updateThisRow(SqlConnection sqlConnection) {
+    protected Future<Integer> updateThisRow(SqlConnection sqlConnection) {
         UpdateStatement updateStatement = new UpdateStatement()
                 .table(getSchemaName(), getTableName())
                 .where(conditionsComponent -> conditionsComponent
@@ -60,7 +60,7 @@ public abstract class AbstractTableRow extends AbstractRow {
         return updateStatement.limit(1).executeForAffectedRows(sqlConnection);
     }
 
-    public Future<Integer> deleteThisRow(SqlConnection sqlConnection) {
+    protected Future<Integer> deleteThisRow(SqlConnection sqlConnection) {
         return new DeleteStatement()
                 .from(getSchemaName(), getTableName())
                 .where(conditionsComponent -> conditionsComponent
