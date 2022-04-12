@@ -3,7 +3,7 @@ package io.github.sinri.keel.mysql.statement;
 import io.github.sinri.keel.mysql.MySQLExecutor;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
-import io.github.sinri.keel.mysql.matrix.AbstractTableRow;
+import io.github.sinri.keel.mysql.matrix.AbstractRow;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.data.Numeric;
@@ -22,12 +22,12 @@ public abstract class AbstractReadStatement extends AbstractStatement {
         return KeelJDBCForMySQL.queryForSelection(this.toString(), statement);
     }
 
-    public <T extends AbstractTableRow> MySQLExecutor<T> getOneTableRowFetcher(Class<T> classOfTableRow) {
-        return AbstractTableRow.buildTableRowFetcher(this, classOfTableRow);
+    public <T extends AbstractRow> MySQLExecutor<T> getOneTableRowFetcher(Class<T> classOfTableRow) {
+        return AbstractRow.buildTableRowFetcher(this, classOfTableRow);
     }
 
-    public <T extends AbstractTableRow> MySQLExecutor<List<T>> getTableRowListFetcher(Class<T> classOfTableRow) {
-        return AbstractTableRow.buildTableRowListFetcher(this, classOfTableRow);
+    public <T extends AbstractRow> MySQLExecutor<List<T>> getTableRowListFetcher(Class<T> classOfTableRow) {
+        return AbstractRow.buildTableRowListFetcher(this, classOfTableRow);
     }
 
     /**

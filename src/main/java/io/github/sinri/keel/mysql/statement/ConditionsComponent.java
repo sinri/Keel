@@ -2,7 +2,6 @@ package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.condition.*;
-import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -89,32 +88,40 @@ public class ConditionsComponent {
     /**
      * @param mapping
      * @return
-     * @since 1.14
+     * @since 2.0
      */
-    public final Future<ConditionsComponent> quickMapping(JsonObject mapping) {
-        mapping.forEach(entry -> {
-            if (entry.getKey() == null || entry.getKey().isEmpty()) {
-                return;
-            }
-            if (entry.getValue() == null) {
+    public final ConditionsComponent quickMapping(JsonObject mapping) {
+        mapping.forEach(entry -> quickMapping(entry.getKey(), entry.getValue()));
+        return this;
+    }
+
+    /**
+     * @param key
+     * @param value
+     * @return
+     * @since 2.0
+     */
+    public final ConditionsComponent quickMapping(String key, Object value) {
+        if (key != null && !key.isEmpty()) {
+            if (value == null) {
                 this.comparison(compareCondition -> compareCondition
-                        .compare(entry.getKey())
+                        .compare(key)
                         .operator(CompareCondition.OP_IS)
                         .againstExpression("NULL")
                 );
-            } else if (entry.getValue() instanceof JsonArray) {
-                if (((JsonArray) entry.getValue()).size() > 0) {
+            } else if (value instanceof JsonArray) {
+                if (((JsonArray) value).size() > 0) {
                     this.among(amongstCondition -> amongstCondition
-                            .elementAsExpression(entry.getKey())
-                            .amongstValueList(((JsonArray) entry.getValue()).getList())
+                            .elementAsExpression(key)
+                            .amongstValueList(((JsonArray) value).getList())
                     );
                 }
             } else {
                 this.comparison(compareCondition -> compareCondition
-                        .filedEqualsValue(entry.getKey(), entry.getValue().toString())
+                        .filedEqualsValue(key, value.toString())
                 );
             }
-        });
-        return Future.succeededFuture(this);
+        }
+        return this;
     }
 }

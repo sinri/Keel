@@ -1,5 +1,7 @@
 package io.github.sinri.keel.test.web.receptionist;
 
+import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.web.KeelWebRequestFilter;
 import io.github.sinri.keel.web.KeelWebRequestReceptionist;
 import io.vertx.core.Future;
@@ -12,6 +14,11 @@ public class RootPathReceptionist extends KeelWebRequestReceptionist<String> {
 
     public RootPathReceptionist(RoutingContext routingContext) {
         super(routingContext);
+    }
+
+    @Override
+    protected KeelLogger prepareLogger() {
+        return Keel.outputLogger("RootPathReceptionist");
     }
 
     @Override

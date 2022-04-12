@@ -1,14 +1,15 @@
 package io.github.sinri.keel.web;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.JsonifiableEntity;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -26,16 +27,29 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
 
     public KeelWebRequestReceptionist(RoutingContext routingContext) {
         this.routingContext = routingContext;
-        this.logger = KeelLogger.buildSilentLogger();
+        this.logger = Keel.outputLogger("KeelWebRequestReceptionist");
     }
 
-    public static <T> Route registerRoute(Route route, Class<? extends KeelWebRequestReceptionist<T>> receptionistClass) {
+    public static <T> Route registerRoute(
+            Route route,
+            Class<? extends KeelWebRequestReceptionist<T>> receptionistClass,
+            boolean withBodyHandler
+    ) {
+        if (withBodyHandler) {
+            route = route.handler(BodyHandler.create());
+        }
+        KeelLogger outputLogger = Keel.outputLogger("KeelWebRequestReceptionist::registerRoute");
         return route.handler(ctx -> {
             try {
                 receptionistClass.getConstructor(RoutingContext.class)
                         .newInstance(ctx)
-                        .deployMe();
+                        .deployMe()
+                        .compose(deploymentID -> {
+                            outputLogger.debug("receptionistClass " + receptionistClass.getName() + " deployed as " + deploymentID);
+                            return Future.succeededFuture();
+                        });
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                outputLogger.exception(e);
                 ctx.fail(404);
             }
         });
@@ -45,10 +59,12 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
         return logger;
     }
 
-    protected KeelWebRequestReceptionist<R> setLogger(KeelLogger logger) {
-        this.logger = logger;
-        return this;
-    }
+//    protected KeelWebRequestReceptionist<R> setLogger(KeelLogger logger) {
+//        this.logger = logger;
+//        return this;
+//    }
+
+    abstract protected KeelLogger prepareLogger();
 
     public RoutingContext getRoutingContext() {
         return routingContext;
@@ -62,22 +78,28 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
         return "application/json";
     }
 
-    protected Set<HttpMethod> getAcceptableMethod() {
-        var set = new HashSet<HttpMethod>();
-        set.add(HttpMethod.GET);
-        set.add(HttpMethod.POST);
-        set.add(HttpMethod.HEAD);
-        set.add(HttpMethod.OPTIONS);
+    protected Set<String> getAcceptableMethod() {
+        var set = new HashSet<String>();
+//        set.add(HttpMethod.GET.name());
+//        set.add(HttpMethod.POST.name());
+//        set.add(HttpMethod.HEAD.name());
+//        set.add(HttpMethod.OPTIONS.name());
         return set;
     }
 
     @Override
     public void start() throws Exception {
         super.start();
+
+        this.logger = prepareLogger();
+
         // check method
-        if (!getAcceptableMethod().contains(this.getRoutingContext().request().method())) {
-            getRoutingContext().fail(405);
-            return;
+        if (getAcceptableMethod() != null && !getAcceptableMethod().isEmpty()) {
+            if (!getAcceptableMethod().contains(this.getRoutingContext().request().method().name())) {
+                getLogger().warning("method: " + this.getRoutingContext().request().method().name() + " -> 405");
+                getRoutingContext().fail(405);
+                return;
+            }
         }
         // filters
         List<Class<? extends KeelWebRequestFilter>> filterClassList = this.getFilterClassList();
@@ -100,27 +122,25 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
                 }
         )
                 .run(0)
-                .onComplete(filteredResult -> {
-                    if (filteredResult.failed()) {
-                        this.getRoutingContext().fail(400);
-                        return;
-                    }
+                .compose(x -> {
+                    return Future.succeededFuture();
+                })
+                .compose(filtersPassed -> {
+                    return this.dealWithRequest();
+                })
+                .compose(responseObject -> {
+                    getLogger().notice("RECEPTIONIST DONE FOR " + deploymentID());
 
-                    // make response
-                    this.dealWithRequest()
-                            .onComplete(asyncResult -> {
-                                Object result;
-                                if (asyncResult.succeeded()) {
-                                    result = asyncResult.result();
-                                } else {
-                                    result = asyncResult.cause();
-                                }
-                                respond(result)
-                                        .compose(over -> {
-                                            // stop and undeploy!
-                                            return this.undeployMe();
-                                        });
-                            });
+                    return respond(responseObject);
+                })
+                .recover(throwable -> {
+                    getLogger().exception("RECEPTIONIST FAILED FOR " + deploymentID(), throwable);
+
+                    return respond(throwable);
+                })
+                .eventually(v -> {
+                    getLogger().notice("eventually");
+                    return Future.succeededFuture();
                 });
     }
 
