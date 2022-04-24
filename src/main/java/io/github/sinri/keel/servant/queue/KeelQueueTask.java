@@ -20,7 +20,7 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     // as verticle
     public final void start() {
-        setKeelLogger(prepareLogger());
+        setLogger(prepareLogger());
 
         run()
                 .recover(throwable -> {

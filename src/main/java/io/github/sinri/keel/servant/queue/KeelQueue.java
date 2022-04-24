@@ -12,7 +12,7 @@ public abstract class KeelQueue extends KeelVerticle {
 
     public KeelQueue() {
         super();
-        setKeelLogger(prepareLogger());
+        setLogger(prepareLogger());
     }
 
     public KeelQueue setWaitingSeconds(long waitingSeconds) {

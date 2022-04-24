@@ -82,7 +82,7 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
     public void start() throws Exception {
         super.start();
         this.requestID = prepareRequestID();
-        setKeelLogger(prepareLogger());
+        setLogger(prepareLogger());
 
         // check method
         if (getAcceptableMethod() != null && !getAcceptableMethod().isEmpty()) {
