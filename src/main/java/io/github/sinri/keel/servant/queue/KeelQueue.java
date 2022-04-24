@@ -31,7 +31,7 @@ public abstract class KeelQueue extends KeelVerticle {
     }
 
     protected final void routine() {
-        getLoggerInContext().debug("KeelQueue::routine start");
+        getLogger().debug("KeelQueue::routine start");
 
         KeelQueueNextTaskSeeker nextTaskSeeker = getNextTaskSeeker();
         // 1. seek next task to do
@@ -57,7 +57,7 @@ public abstract class KeelQueue extends KeelVerticle {
                                                         .setWorker(true)
                                         )
                                         .compose(deploymentID -> {
-                                            getLoggerInContext().warning("TASK VERTICLE DEPLOYED: " + deploymentID);
+                                            getLogger().warning("TASK VERTICLE DEPLOYED: " + deploymentID);
                                             return Future.succeededFuture(true);
                                         });
 
@@ -68,7 +68,7 @@ public abstract class KeelQueue extends KeelVerticle {
         )
                 .run(true)
                 .recover(throwable -> {
-                    getLoggerInContext().exception("KeelQueue 递归找活干里出现了奇怪的故障", throwable);
+                    getLogger().exception("KeelQueue 递归找活干里出现了奇怪的故障", throwable);
                     return Future.succeededFuture(false);
                 })
                 .eventually(v -> {

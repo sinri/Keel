@@ -24,11 +24,11 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
         run()
                 .recover(throwable -> {
-                    getLoggerInContext().exception("KeelQueueTask Caught throwable from Method run", throwable);
+                    getLogger().exception("KeelQueueTask Caught throwable from Method run", throwable);
                     return Future.succeededFuture();
                 })
                 .eventually(v -> {
-                    getLoggerInContext().info("KeelQueueTask to undeploy");
+                    getLogger().info("KeelQueueTask to undeploy");
                     return undeployMe();
                 });
     }

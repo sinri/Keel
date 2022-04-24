@@ -17,8 +17,6 @@ import java.util.List;
  */
 public abstract class KeelProgramAsVerticle extends KeelVerticle {
 
-    private KeelLogger logger;
-
     public static void runProgramAndExit(KeelProgramAsVerticle programVerticle, List<String> args) {
         List<Option> options = programVerticle.defineCLIOptions();
         CLI cli = CLI.create(programVerticle.getClass().getName());
@@ -39,16 +37,12 @@ public abstract class KeelProgramAsVerticle extends KeelVerticle {
 
     abstract protected KeelLogger prepareLogger();
 
-    public KeelLogger getLogger() {
-        return logger;
-    }
-
     abstract protected List<Option> defineCLIOptions();
 
     @Override
     public final void start() throws Exception {
         super.start();
-        logger = prepareLogger();
+        setLogger(prepareLogger());
         execute()
                 .compose(v -> {
                     getLogger().notice("DONE");

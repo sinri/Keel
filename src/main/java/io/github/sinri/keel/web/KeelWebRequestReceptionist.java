@@ -87,7 +87,7 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
         // check method
         if (getAcceptableMethod() != null && !getAcceptableMethod().isEmpty()) {
             if (!getAcceptableMethod().contains(this.getRoutingContext().request().method().name())) {
-                getLoggerInContext().warning("method: " + this.getRoutingContext().request().method().name() + " -> 405");
+                getLogger().warning("method: " + this.getRoutingContext().request().method().name() + " -> 405");
                 getRoutingContext().fail(405);
                 return;
             }
@@ -112,17 +112,17 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
                 .compose(x -> Future.succeededFuture())
                 .compose(filtersPassed -> this.dealWithRequest())
                 .compose(responseObject -> {
-                    getLoggerInContext().notice("RECEPTIONIST DONE FOR " + deploymentID());
+                    getLogger().notice("RECEPTIONIST DONE FOR " + deploymentID());
 
                     return respond(responseObject);
                 })
                 .recover(throwable -> {
-                    getLoggerInContext().exception("RECEPTIONIST FAILED FOR " + deploymentID(), throwable);
+                    getLogger().exception("RECEPTIONIST FAILED FOR " + deploymentID(), throwable);
 
                     return respond(throwable);
                 })
                 .eventually(v -> {
-                    getLoggerInContext().notice("eventually");
+                    getLogger().notice("eventually");
                     return Future.succeededFuture();
                 });
     }
@@ -161,7 +161,7 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
             } else {
                 jsonObject.put("code", "OK").put("data", result);
             }
-            getLoggerInContext().debug("Response for request [" + getRequestID() + "] as json", jsonObject);
+            getLogger().debug("Response for request [" + getRequestID() + "] as json", jsonObject);
             return this.getRoutingContext().json(jsonObject);
         } else {
             // NON JSON, AS certain MIME string to output, 500 for ERROR
@@ -186,7 +186,7 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
             } else {
                 data = result.toString();
             }
-            getLoggerInContext().debug(
+            getLogger().debug(
                     "Response for request [" + getRequestID() + "] as " + this.getResponseHeaderContentType(),
                     new JsonObject()
                             .put("code", code)
