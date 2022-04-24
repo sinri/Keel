@@ -24,11 +24,11 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
         Keel.setKeelLoggerInContext(logger);
     }
 
-    protected final SqlConnection getMySqlConnect() {
+    protected final SqlConnection getMySqlConnection() {
         return Keel.getMySqlConnectionInContext();
     }
 
-    protected final void setMySqlConnect(SqlConnection sqlConnect) {
+    protected final void setMySqlConnection(SqlConnection sqlConnect) {
         Keel.setMySqlConnectionInContext(sqlConnect);
     }
 
