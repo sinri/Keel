@@ -1,6 +1,5 @@
 package io.github.sinri.keel.test.v1.servant;
 
-import io.github.sinri.keel.servant.KeelServantQueueTask;
 import io.vertx.core.Future;
 
 public class SampleQueueTask extends KeelServantQueueTask {

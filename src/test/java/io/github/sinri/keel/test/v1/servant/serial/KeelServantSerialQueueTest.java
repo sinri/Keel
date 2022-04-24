@@ -2,8 +2,6 @@ package io.github.sinri.keel.test.v1.servant.serial;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.servant.KeelServantQueueTask;
-import io.github.sinri.keel.servant.KeelServantSerialQueue;
 import io.github.sinri.keel.test.v1.servant.SampleQueueTask;
 import io.vertx.core.Future;
 import io.vertx.core.VertxOptions;
