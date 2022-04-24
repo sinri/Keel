@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.v1.helper.json;
 
-import io.github.sinri.keel.core.JsonifiableEntity;
+import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
 public class JsonEntity implements JsonifiableEntity<JsonEntity> {

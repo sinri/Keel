@@ -1,4 +1,4 @@
-package io.github.sinri.keel.core;
+package io.github.sinri.keel.core.json;
 
 import io.vertx.core.json.JsonObject;
 
