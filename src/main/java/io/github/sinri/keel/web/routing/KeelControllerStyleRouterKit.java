@@ -25,6 +25,7 @@ import java.util.List;
  *
  * @since 1.1
  */
+@Deprecated
 public class KeelControllerStyleRouterKit extends KeelRouterKit {
     private final String pathPrefix;
     private final String controllerPackage;

@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
+@Deprecated
 abstract public class KeelRouterKit {
     protected KeelLogger logger = KeelLogger.buildSilentLogger();
 

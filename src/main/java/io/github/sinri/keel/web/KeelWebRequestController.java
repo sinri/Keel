@@ -5,6 +5,7 @@ import io.vertx.ext.web.RoutingContext;
 
 import java.util.List;
 
+@Deprecated
 public class KeelWebRequestController {
     protected final RoutingContext ctx;
     protected KeelLogger logger;

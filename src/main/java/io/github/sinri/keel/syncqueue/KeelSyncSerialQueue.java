@@ -1,9 +1,10 @@
-package io.github.sinri.keel.queue;
+package io.github.sinri.keel.syncqueue;
 
 import io.github.sinri.keel.core.logger.KeelLogger;
 
 import java.util.concurrent.*;
 
+@Deprecated
 public abstract class KeelSyncSerialQueue {
 
     private final ThreadPoolExecutor serialPool;

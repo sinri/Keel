@@ -10,7 +10,9 @@ import java.sql.Statement;
 /**
  * @param <T> the result value class
  * @since 1.10
+ * @deprecated
  */
+@Deprecated
 public class MySQLExecutor<T> {
     protected AsyncMySQLExecutor<T> asyncMySQLExecutor;
     protected SyncMySQLExecutor<T> syncMySQLExecutor;

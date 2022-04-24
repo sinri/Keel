@@ -18,6 +18,7 @@ import java.util.List;
  *
  * @since 1.13
  */
+@Deprecated
 public class KeelUrlRuleRouterKit extends KeelRouterKit {
     private final Router router;
 

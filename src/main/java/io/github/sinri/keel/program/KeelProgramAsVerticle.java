@@ -50,16 +50,16 @@ public abstract class KeelProgramAsVerticle extends KeelVerticle {
         super.start();
         logger = prepareLogger();
         execute()
-                .onComplete(asyncResult -> {
-                    if (asyncResult.succeeded()) {
-                        // done
-                        getLogger().notice("DONE");
-                    } else {
-                        // failed
-                        getLogger().exception("FAILED", asyncResult.cause());
-                    }
-                    undeployMe().eventually(v -> Keel.getVertx().close());
-                });
+                .compose(v -> {
+                    getLogger().notice("DONE");
+                    return Future.succeededFuture();
+                })
+                .recover(throwable -> {
+                    getLogger().exception("FAILED", throwable);
+                    return Future.succeededFuture();
+                })
+                .eventually(v -> undeployMe()
+                        .eventually(vv -> Keel.getVertx().close()));
     }
 
     /**

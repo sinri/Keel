@@ -2,6 +2,9 @@ package io.github.sinri.keel.core.logger;
 
 import io.vertx.core.json.JsonObject;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * The Logger For Keel Project
  *
@@ -126,5 +129,43 @@ public class KeelLogger {
 
     public void print(String content) {
         this.delegate.print(KeelLogLevel.INFO, content, System.lineSeparator());
+    }
+
+    protected static Set<String> stackTraceClassIgnorePrefixSet = new HashSet<>();
+
+    public static void registerStackTraceClassIgnorePrefix(String prefix) {
+        stackTraceClassIgnorePrefixSet.add(prefix);
+    }
+
+    /**
+     * 打印运行时调用栈
+     *
+     * @param remark Dying Message
+     * @since 2.0
+     */
+    public void reportCurrentRuntimeCodeLocation(String remark) {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        StringBuilder sb = new StringBuilder("✟ " + remark);
+        for (var ste : stackTrace) {
+            boolean ignore = false;
+            for (var prefix : stackTraceClassIgnorePrefixSet) {
+                if (ste.getClassName().startsWith(prefix)) {
+                    ignore = true;
+                    break;
+                }
+            }
+            if (ignore) continue;
+            sb.append("↑ \t")
+                    .append(ste.getClassName())
+                    .append("::")
+                    .append(ste.getMethodName())
+                    .append(" (")
+                    .append(ste.getFileName())
+                    .append(":")
+                    .append(ste.getLineNumber())
+                    .append(")")
+                    .append("\n");
+        }
+        print(sb.toString());
     }
 }

@@ -2,8 +2,8 @@ package io.github.sinri.keel.test.v1.queue.serial;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.queue.KeelSyncQueueTask;
-import io.github.sinri.keel.queue.KeelSyncSerialQueue;
+import io.github.sinri.keel.syncqueue.KeelSyncQueueTask;
+import io.github.sinri.keel.syncqueue.KeelSyncSerialQueue;
 import io.github.sinri.keel.test.v1.queue.QueueTask;
 
 public class SerialQueue extends KeelSyncSerialQueue {

@@ -1,8 +1,8 @@
 package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.mysql.DuplexExecutorForMySQL;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
-import io.github.sinri.keel.mysql.MySQLExecutor;
 import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
@@ -281,12 +281,17 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             onDuplicateKeyUpdateAssignmentMap.forEach((key, value) -> items.add(key + " = " + value));
             sql += KeelHelper.joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
+        if (!getRemarkAsComment().isEmpty()) {
+            sql += "\n-- " + getRemarkAsComment() + "\n";
+        }
         return sql;
     }
 
 
     @Override
     public ResultMatrix blockedExecute(Statement statement) throws SQLException {
+        String sql = this.toString();
+        getSqlAuditLogger().info(sql);
         return KeelJDBCForMySQL.executeForInsertion(this.toString(), statement);
     }
 
@@ -294,8 +299,8 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @return the MySQLExecutor for last inserted ID
      * @since 1.10
      */
-    public MySQLExecutor<Long> getExecutorForLastInsertedID() {
-        return MySQLExecutor.build(
+    public DuplexExecutorForMySQL<Long> getExecutorForLastInsertedID() {
+        return new DuplexExecutorForMySQL<>(
                 this::executeForLastInsertedID,
                 this::blockedExecuteForLastInsertedID
         );
@@ -308,8 +313,8 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @return
      * @since 1.10
      */
-    public <R> MySQLExecutor<R> getExecutorForLastInsertedID(Function<Long, R> idChecker, R recoveredValue) {
-        return MySQLExecutor.build(
+    public <R> DuplexExecutorForMySQL<R> getExecutorForLastInsertedID(Function<Long, R> idChecker, R recoveredValue) {
+        return new DuplexExecutorForMySQL<>(
                 sqlConnection -> executeForLastInsertedID(sqlConnection)
                         .compose(id -> Future.succeededFuture(idChecker.apply(id)))
                         .recover(throwable -> Future.succeededFuture(recoveredValue)),

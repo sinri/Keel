@@ -2,7 +2,7 @@ package io.github.sinri.keel.test.v1.queue;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.queue.KeelSyncQueueTask;
+import io.github.sinri.keel.syncqueue.KeelSyncQueueTask;
 import io.vertx.core.json.JsonObject;
 
 public class QueueTask extends KeelSyncQueueTask {

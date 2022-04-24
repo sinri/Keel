@@ -12,22 +12,29 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @param <R>
  * @since 2.0
  */
 abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
+    private String requestID;
     private final RoutingContext routingContext;
     private KeelLogger logger;
 
     public KeelWebRequestReceptionist(RoutingContext routingContext) {
         this.routingContext = routingContext;
+        this.requestID = new Date().getTime() + "#UNDEPLOYED";
         this.logger = Keel.outputLogger("KeelWebRequestReceptionist");
+    }
+
+    protected String prepareRequestID() {
+        return new Date().getTime() + "#" + deploymentID();
+    }
+
+    protected final String getRequestID() {
+        return requestID;
     }
 
     public static <T> Route registerRoute(
@@ -55,18 +62,13 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
         });
     }
 
-    public KeelLogger getLogger() {
+    public final KeelLogger getLogger() {
         return logger;
     }
 
-//    protected KeelWebRequestReceptionist<R> setLogger(KeelLogger logger) {
-//        this.logger = logger;
-//        return this;
-//    }
-
     abstract protected KeelLogger prepareLogger();
 
-    public RoutingContext getRoutingContext() {
+    public final RoutingContext getRoutingContext() {
         return routingContext;
     }
 
@@ -79,19 +81,16 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
     }
 
     protected Set<String> getAcceptableMethod() {
-        var set = new HashSet<String>();
-//        set.add(HttpMethod.GET.name());
-//        set.add(HttpMethod.POST.name());
-//        set.add(HttpMethod.HEAD.name());
-//        set.add(HttpMethod.OPTIONS.name());
-        return set;
+        return new HashSet<>();
     }
 
     @Override
     public void start() throws Exception {
         super.start();
-
+        this.requestID = prepareRequestID();
         this.logger = prepareLogger();
+
+        setKeelLogger(this.logger);
 
         // check method
         if (getAcceptableMethod() != null && !getAcceptableMethod().isEmpty()) {
@@ -104,30 +103,22 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
         // filters
         List<Class<? extends KeelWebRequestFilter>> filterClassList = this.getFilterClassList();
         new FutureRecursion<Integer>(
-                filterIndex -> {
-                    return Future.succeededFuture(filterIndex < filterClassList.size());
-                },
+                filterIndex -> Future.succeededFuture(filterIndex < filterClassList.size()),
                 filterIndex -> {
                     Class<? extends KeelWebRequestFilter> filterClass = filterClassList.get(filterIndex);
-                    KeelWebRequestFilter filter = null;
+                    KeelWebRequestFilter filter;
                     try {
                         filter = filterClass.getConstructor().newInstance();
                     } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                         return Future.failedFuture(e);
                     }
                     return filter.shouldHandleThisRequest(getRoutingContext())
-                            .compose(ok -> {
-                                return Future.succeededFuture(filterIndex + 1);
-                            });
+                            .compose(ok -> Future.succeededFuture(filterIndex + 1));
                 }
         )
                 .run(0)
-                .compose(x -> {
-                    return Future.succeededFuture();
-                })
-                .compose(filtersPassed -> {
-                    return this.dealWithRequest();
-                })
+                .compose(x -> Future.succeededFuture())
+                .compose(filtersPassed -> this.dealWithRequest())
                 .compose(responseObject -> {
                     getLogger().notice("RECEPTIONIST DONE FOR " + deploymentID());
 
@@ -155,7 +146,10 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
                         || responseHeaderContentType.startsWith("application/json;")
         ) {
             // output as JSON: all 200, while JSON field `code` shows OK or FAILED
-            JsonObject jsonObject = new JsonObject();
+            JsonObject jsonObject = new JsonObject()
+                    .put("__debug__", new JsonObject()
+                            .put("request_id", getRequestID())
+                    );
             if (result == null) {
                 jsonObject.put("code", "OK").putNull("data");
             } else if (result instanceof Throwable) {
@@ -169,14 +163,13 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
                     t = t.getCause();
                 }
 
-                jsonObject.put("code", "FAILED")
-                        .put("data", sb.toString());
+                jsonObject.put("code", "FAILED").put("data", sb.toString());
             } else if (result instanceof JsonifiableEntity) {
                 jsonObject.put("code", "OK").put("data", ((JsonifiableEntity<?>) result).toJsonObject());
             } else {
                 jsonObject.put("code", "OK").put("data", result);
             }
-            logger.debug("Response for request [" + this.getRoutingContext().request().streamId() + "] as json", jsonObject);
+            logger.debug("Response for request [" + getRequestID() + "] as json", jsonObject);
             return this.getRoutingContext().json(jsonObject);
         } else {
             // NON JSON, AS certain MIME string to output, 500 for ERROR
@@ -197,12 +190,12 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
                 }
 
                 code = 500;
-                data = "ERROR: " + sb;
+                data = "RequestID [" + getRequestID() + "] ERROR: " + sb;
             } else {
                 data = result.toString();
             }
             logger.debug(
-                    "Response for request [" + this.getRoutingContext().request().streamId() + "] as " + this.getResponseHeaderContentType(),
+                    "Response for request [" + getRequestID() + "] as " + this.getResponseHeaderContentType(),
                     new JsonObject()
                             .put("code", code)
                             .put("data", data)

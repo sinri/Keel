@@ -43,8 +43,6 @@ public class KeelHttpServer {
         server.requestHandler(router)
                 .exceptionHandler(throwable -> {
                     getLogger().exception("KeelHttpServer Exception", throwable);
-//                    System.err.println("KeelHttpServer Exception: "+throwable.getMessage());
-//                    throwable.printStackTrace();
                 })
                 .listen(httpServerAsyncResult -> {
                     if (httpServerAsyncResult.succeeded()) {

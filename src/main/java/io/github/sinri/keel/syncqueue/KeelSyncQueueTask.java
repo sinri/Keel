@@ -1,5 +1,6 @@
-package io.github.sinri.keel.queue;
+package io.github.sinri.keel.syncqueue;
 
+@Deprecated
 abstract public class KeelSyncQueueTask implements Runnable {
 
     abstract public String getTaskReference();

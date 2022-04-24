@@ -53,10 +53,6 @@ public class KeelHelper {
      */
     public static String joinStringArray(Collection<?> x, String separator) {
         StringBuilder result = new StringBuilder();
-//        for (int i = 0; i < x.size(); i++) {
-//            if (i > 0) result.append(separator);
-//            result.append(x.get(i).toString());
-//        }
 
         final int[] i = {0};
         x.forEach(item -> {

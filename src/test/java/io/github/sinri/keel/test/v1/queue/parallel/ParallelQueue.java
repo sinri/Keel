@@ -2,8 +2,8 @@ package io.github.sinri.keel.test.v1.queue.parallel;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.queue.KeelSyncParallelQueue;
-import io.github.sinri.keel.queue.KeelSyncQueueTask;
+import io.github.sinri.keel.syncqueue.KeelSyncParallelQueue;
+import io.github.sinri.keel.syncqueue.KeelSyncQueueTask;
 import io.github.sinri.keel.test.v1.queue.QueueTask;
 
 import java.util.ArrayList;

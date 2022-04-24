@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.mysql.MySQLExecutor;
+import io.github.sinri.keel.mysql.DuplexExecutorForMySQL;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
 
@@ -37,20 +37,15 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
      */
     public Future<Integer> executeForAffectedRows(SqlConnection sqlConnection) {
         return execute(sqlConnection)
-                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getTotalAffectedRows()))
-//                .recover(throwable -> {
-//                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForAffectedRows failed [" + throwable.getMessage() + "] when executing SQL: " + this);
-//                    return Future.succeededFuture(-1);
-//                })
-                ;
+                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getTotalAffectedRows()));
     }
 
     /**
-     * @return the MySQLExecutor for last inserted ID
-     * @since 1.10
+     * @return
+     * @since 2.0
      */
-    public MySQLExecutor<Integer> getExecutorForAffectedRows() {
-        return MySQLExecutor.build(
+    public DuplexExecutorForMySQL<Integer> getExecutorForAffectedRows() {
+        return new DuplexExecutorForMySQL<>(
                 this::executeForAffectedRows,
                 this::blockedExecuteForAffectedRows
         );
@@ -61,10 +56,10 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
      * @param recoveredValue
      * @param <R>
      * @return
-     * @since 1.10
+     * @since 2.0
      */
-    public <R> MySQLExecutor<R> getExecutorForAffectedRows(Function<Integer, R> afxChecker, R recoveredValue) {
-        return MySQLExecutor.build(
+    public <R> DuplexExecutorForMySQL<R> getExecutorForAffectedRows(Function<Integer, R> afxChecker, R recoveredValue) {
+        return new DuplexExecutorForMySQL<>(
                 sqlConnection -> executeForAffectedRows(sqlConnection)
                         .compose(afx -> Future.succeededFuture(afxChecker.apply(afx)))
                         .recover(throwable -> Future.succeededFuture(recoveredValue)),

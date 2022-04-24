@@ -160,7 +160,9 @@ public class SelectStatement extends AbstractReadStatement {
         if (!"".equals(lockMode)) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append(lockMode);
         }
-
+        if (!getRemarkAsComment().isEmpty()) {
+            sql.append("\n-- ").append(getRemarkAsComment()).append("\n");
+        }
         return String.valueOf(sql);
     }
 
