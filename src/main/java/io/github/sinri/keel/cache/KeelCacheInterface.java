@@ -91,7 +91,7 @@ public interface KeelCacheInterface<K, V> {
     void cleanUp();
 
     /**
-     * @return ConcurrentMap<K, V> alive value only
+     * @return ConcurrentMap K → V alive value only
      * @since 1.14
      */
     ConcurrentMap<K, V> getSnapshotMap();

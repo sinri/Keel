@@ -92,7 +92,7 @@ public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
     }
 
     /**
-     * @return ConcurrentMap<K, V>
+     * @return ConcurrentMap, K → V
      * Note: Modify the returned map would not affect the raw cache
      * @since 1.14
      */

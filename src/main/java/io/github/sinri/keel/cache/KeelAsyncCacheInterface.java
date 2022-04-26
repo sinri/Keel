@@ -69,7 +69,7 @@ public interface KeelAsyncCacheInterface<K, V> {
     Future<Void> cleanUp();
 
     /**
-     * @return ConcurrentMap<K, V> alive value only
+     * @return ConcurrentMap K → V alive value only
      * @since 1.14
      */
     Future<ConcurrentMap<K, V>> getSnapshotMap();
