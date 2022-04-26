@@ -5,6 +5,10 @@ import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @since 2.0
+ * Experimental
+ */
 public class JsonObjectValidator {
     protected final List<JsonObjectItemValidator> itemValidators;
 

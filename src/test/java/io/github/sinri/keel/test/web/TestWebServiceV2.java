@@ -17,13 +17,15 @@ public class TestWebServiceV2 {
         KeelWebRequestReceptionist.registerRoute(
                 khs.getRouter().get("/"),
                 RootPathReceptionist.class,
-                true
+                true,
+                Keel.logger("router")
         );
 
         KeelWebRequestReceptionist.registerRoute(
                 khs.getRouter().get("/a"),
                 ReceptionistA.class,
-                true
+                true,
+                Keel.logger("router")
         );
 
         khs.listen();

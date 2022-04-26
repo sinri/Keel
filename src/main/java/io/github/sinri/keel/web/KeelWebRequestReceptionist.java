@@ -1,30 +1,85 @@
 package io.github.sinri.keel.web;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Route;
+import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
+import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
- * @param <R>
  * @since 2.0
  */
-abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
-    private String requestID;
+abstract public class KeelWebRequestReceptionist extends KeelVerticle {
     private final RoutingContext routingContext;
+    private String requestID;
 
     public KeelWebRequestReceptionist(RoutingContext routingContext) {
         this.routingContext = routingContext;
         this.requestID = new Date().getTime() + "#UNDEPLOYED";
+    }
+
+    public static void registerRoute(
+            Route route,
+            Class<? extends KeelWebRequestReceptionist> receptionistClass,
+            boolean withBodyHandler,
+            KeelLogger logger
+    ) {
+        if (withBodyHandler) {
+            route = route.handler(BodyHandler.create());
+        }
+        route.handler(ctx -> {
+            try {
+                receptionistClass.getConstructor(RoutingContext.class)
+                        .newInstance(ctx)
+                        .deployMe()
+                        .compose(deploymentID -> {
+                            logger.debug("receptionistClass " + receptionistClass.getName() + " deployed as " + deploymentID);
+                            return Future.succeededFuture();
+                        });
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                logger.exception("receptionistClass " + receptionistClass.getName() + " cannot be deployed", e);
+                ctx.fail(404);
+            }
+        });
+    }
+
+    public static void registerApiServiceClass(Router router, Class<? extends KeelWebRequestReceptionist> c, KeelLogger logger) {
+        ApiMeta annotation = c.getAnnotation(ApiMeta.class);
+        if (annotation == null) {
+            logger.warning("class " + c.getName() + " without ApiMeta, passover");
+            return;
+        }
+
+        Route route = router.route(annotation.routePath());
+        String[] methods = annotation.allowMethods();
+        if (methods != null) {
+            for (var methodName : methods) {
+                HttpMethod hm = HttpMethod.valueOf(methodName);
+                route.method(hm);
+            }
+        }
+        if (!annotation.virtualHost().equals("")) {
+            route.virtualHost(annotation.virtualHost());
+        }
+
+        registerRoute(route, c, annotation.requestBodyNeeded(), logger);
+    }
+
+    public static void registerApiServicesInPackage(Router router, String packageName, KeelLogger logger) {
+        Reflections reflections = new Reflections(packageName);
+
+        Set<Class<? extends KeelWebRequestReceptionist>> allClasses = reflections.getSubTypesOf(KeelWebRequestReceptionist.class);
+        allClasses.forEach(c -> registerApiServiceClass(router, c, logger));
     }
 
     protected String prepareRequestID() {
@@ -33,31 +88,6 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
 
     protected final String getRequestID() {
         return requestID;
-    }
-
-    public static <T> void registerRoute(
-            Route route,
-            Class<? extends KeelWebRequestReceptionist<T>> receptionistClass,
-            boolean withBodyHandler
-    ) {
-        if (withBodyHandler) {
-            route = route.handler(BodyHandler.create());
-        }
-        KeelLogger outputLogger = Keel.outputLogger("KeelWebRequestReceptionist::registerRoute");
-        route.handler(ctx -> {
-            try {
-                receptionistClass.getConstructor(RoutingContext.class)
-                        .newInstance(ctx)
-                        .deployMe()
-                        .compose(deploymentID -> {
-                            outputLogger.debug("receptionistClass " + receptionistClass.getName() + " deployed as " + deploymentID);
-                            return Future.succeededFuture();
-                        });
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                outputLogger.exception(e);
-                ctx.fail(404);
-            }
-        });
     }
 
     abstract protected KeelLogger prepareLogger();
@@ -127,9 +157,7 @@ abstract public class KeelWebRequestReceptionist<R> extends KeelVerticle {
                 });
     }
 
-    abstract protected Future<R> dealWithRequest();
-
-    // abstract public Route registerRoute(Router router);
+    abstract protected Future<Object> dealWithRequest();
 
     protected Future<Void> respond(Object result) {
         String responseHeaderContentType = this.getResponseHeaderContentType();

@@ -18,6 +18,11 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     abstract protected KeelLogger prepareLogger();
 
+    protected Future<Void> lockTaskBeforeDeployment() {
+        // 如果需要就重载此方法
+        return Future.succeededFuture();
+    }
+
     // as verticle
     public final void start() {
         setLogger(prepareLogger());

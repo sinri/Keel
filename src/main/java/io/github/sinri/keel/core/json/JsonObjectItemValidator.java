@@ -2,6 +2,10 @@ package io.github.sinri.keel.core.json;
 
 import java.util.function.Function;
 
+/**
+ * @since 2.0
+ * Experimental
+ */
 public class JsonObjectItemValidator {
     protected String key;
     protected ExistenceType existenceType;

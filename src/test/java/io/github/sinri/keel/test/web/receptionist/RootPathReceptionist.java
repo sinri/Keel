@@ -10,7 +10,7 @@ import io.vertx.ext.web.RoutingContext;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RootPathReceptionist extends KeelWebRequestReceptionist<String> {
+public class RootPathReceptionist extends KeelWebRequestReceptionist {
 
     public RootPathReceptionist(RoutingContext routingContext) {
         super(routingContext);
@@ -27,7 +27,7 @@ public class RootPathReceptionist extends KeelWebRequestReceptionist<String> {
     }
 
     @Override
-    protected Future<String> dealWithRequest() {
+    protected Future<Object> dealWithRequest() {
         return Future.succeededFuture("done");
     }
 
