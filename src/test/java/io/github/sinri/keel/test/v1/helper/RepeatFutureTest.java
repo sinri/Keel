@@ -19,7 +19,8 @@ public class RepeatFutureTest {
     protected static void testFutureFor(int limit) {
         SharedTestBootstrap.getMySQLKit().getPool()
                 .withConnection(sqlConnection -> {
-                    return new FutureFor<Integer>(
+                    return FutureFor.call(
+                            0, i -> i < limit, i -> i + 1,
                             k -> {
                                 System.out.println("handle object " + k + " ...");
                                 return sqlConnection.query("select (" + k + "*2) as y")
@@ -36,8 +37,7 @@ public class RepeatFutureTest {
                                             return Future.succeededFuture();
                                         });
                             }
-                    )
-                            .run(0, i -> i < limit, i -> i + 1);
+                    );
                 })
                 .onFailure(throwable -> System.out.println("failed: " + throwable.getMessage()))
                 .onSuccess(fin -> System.out.println("done: " + fin))
@@ -49,8 +49,9 @@ public class RepeatFutureTest {
     protected static void testFutureForRange(int limit) {
         SharedTestBootstrap.getMySQLKit().getPool()
                 .withConnection(sqlConnection -> {
-                    return new FutureForRange(limit)
-                            .run(i -> {
+                    return FutureForRange.call(
+                            limit,
+                            i -> {
                                 System.out.println("handle object " + i + " ...");
                                 return sqlConnection.query("select (" + i + "*2) as y")
                                         .execute()
@@ -65,7 +66,8 @@ public class RepeatFutureTest {
                                             System.out.println("y=" + y);
                                             return Future.succeededFuture();
                                         });
-                            });
+                            }
+                    );
                 })
                 .onFailure(throwable -> System.out.println("failed: " + throwable.getMessage()))
                 .onSuccess(fin -> System.out.println("done"))
@@ -81,7 +83,8 @@ public class RepeatFutureTest {
         }
         SharedTestBootstrap.getMySQLKit().getPool()
                 .withConnection(sqlConnection -> {
-                    return new FutureForEach<Integer>(
+                    return FutureForEach.call(
+                            list,
                             item -> {
                                 return sqlConnection.query("select (" + item + "*2) as x")
                                         .execute()
@@ -96,7 +99,7 @@ public class RepeatFutureTest {
                                             }
                                         });
                             }
-                    ).process(list);
+                    );
                 })
                 .onFailure(throwable -> System.out.println("failed: " + throwable.getMessage()))
                 .onSuccess(fin -> System.out.println("done: " + fin))
@@ -124,13 +127,14 @@ public class RepeatFutureTest {
 
         //testFutureForeach(limit);
 
-        new FutureRecursion<Integer>(
-                x -> Future.succeededFuture(x > 0),
-                x -> {
-                    System.out.println("now x=" + x);
-                    return Future.succeededFuture(x - 1);
-                }
-        ).run(10)
+        FutureRecursion.call(
+                        10,
+                        x -> Future.succeededFuture(x > 0),
+                        x -> {
+                            System.out.println("now x=" + x);
+                            return Future.succeededFuture(x - 1);
+                        }
+                )
                 .compose(fin -> {
                     System.out.println("fin: " + fin);
                     return Future.succeededFuture();

@@ -18,18 +18,22 @@ import java.util.List;
  */
 public abstract class AbstractReadStatement extends AbstractStatement {
     @Override
+    @Deprecated
     public ResultMatrix blockedExecute(Statement statement) throws SQLException {
         return KeelJDBCForMySQL.queryForSelection(this.toString(), statement);
     }
 
+    @Deprecated
     public <T extends AbstractRow> DuplexExecutorForMySQL<T> getOneTableRowFetcher(Class<T> classOfTableRow) {
         return AbstractRow.buildTableRowFetcher(this, classOfTableRow);
     }
 
+    @Deprecated
     public <T extends AbstractRow> DuplexExecutorForMySQL<List<T>> getTableRowListFetcher(Class<T> classOfTableRow) {
         return AbstractRow.buildTableRowListFetcher(this, classOfTableRow);
     }
 
+    @Deprecated
     public DuplexExecutorForMySQL<List<Long>> getLongColumnFetcher(String fieldName) {
         return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
@@ -38,7 +42,7 @@ public abstract class AbstractReadStatement extends AbstractStatement {
         );
     }
 
-
+    @Deprecated
     public DuplexExecutorForMySQL<List<Integer>> getIntegerColumnFetcher(String fieldName) {
         return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
@@ -47,6 +51,7 @@ public abstract class AbstractReadStatement extends AbstractStatement {
         );
     }
 
+    @Deprecated
     public DuplexExecutorForMySQL<List<Numeric>> getNumberColumnFetcher(String fieldName) {
         return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
@@ -60,6 +65,7 @@ public abstract class AbstractReadStatement extends AbstractStatement {
      * @return
      * @since 1.13
      */
+    @Deprecated
     public DuplexExecutorForMySQL<List<String>> getStringColumnFetcher(String fieldName) {
         return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
@@ -73,6 +79,7 @@ public abstract class AbstractReadStatement extends AbstractStatement {
      * @return
      * @since 1.13
      */
+    @Deprecated
     public DuplexExecutorForMySQL<String> getStringCellFetcher(String fieldName) {
         return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
@@ -98,6 +105,7 @@ public abstract class AbstractReadStatement extends AbstractStatement {
      * @return
      * @since 1.13
      */
+    @Deprecated
     public DuplexExecutorForMySQL<Numeric> getNumericCellFetcher(String fieldName) {
         return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)

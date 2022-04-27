@@ -13,11 +13,20 @@ import java.util.function.Function;
 public class FutureForEach<T> {
     private final Function<T, Future<Void>> asyncItemProcessFunction;
 
-    public FutureForEach(Function<T, Future<Void>> itemProcessor) {
+    private FutureForEach(Function<T, Future<Void>> itemProcessor) {
         this.asyncItemProcessFunction = itemProcessor;
     }
 
-    public Future<Void> process(Collection<T> collection) {
+    @Deprecated
+    public static <T> Future<Void> quick(Collection<T> collection, Function<T, Future<Void>> itemProcessor) {
+        return call(collection, itemProcessor);
+    }
+
+    public static <T> Future<Void> call(Collection<T> collection, Function<T, Future<Void>> itemProcessor) {
+        return new FutureForEach<T>(itemProcessor).process(collection);
+    }
+
+    private Future<Void> process(Collection<T> collection) {
         AtomicReference<Future<Void>> futureAtomicReference = new AtomicReference<>();
         futureAtomicReference.set(Future.succeededFuture());
         collection.forEach(t -> {
@@ -25,9 +34,5 @@ public class FutureForEach<T> {
             futureAtomicReference.set(future);
         });
         return futureAtomicReference.get();
-    }
-
-    public static <T> Future<Void> quick(Collection<T> collection, Function<T, Future<Void>> itemProcessor) {
-        return new FutureForEach<T>(itemProcessor).process(collection);
     }
 }

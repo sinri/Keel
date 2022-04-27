@@ -93,6 +93,19 @@ public class KeelLogger {
      * @since 1.10
      */
     public void exception(String msg, Throwable throwable) {
+        exception(KeelLogLevel.ERROR, msg, throwable);
+    }
+
+    /**
+     * @param level
+     * @param msg
+     * @param throwable
+     * @since 2.1
+     */
+    public void exception(KeelLogLevel level, String msg, Throwable throwable) {
+        if (level.isSilent() || level.isNegligibleThan(this.delegate.options.getLowestLevel())) {
+            return;
+        }
         if (throwable == null) {
             error(msg);
             return;
@@ -106,12 +119,12 @@ public class KeelLogger {
         var lastThrowable = throwable;
         while (lastThrowable.getCause() != null) {
             var cause = lastThrowable.getCause();
-            this.delegate.print(KeelLogLevel.ERROR, "Caused by " + cause.getClass().getName() + " : " + cause.getMessage(), null);
+            this.delegate.print(level, "Caused by " + cause.getClass().getName() + " : " + cause.getMessage(), null);
             lastThrowable = cause;
         }
 
         for (var s : lastThrowable.getStackTrace()) {
-            this.delegate.print(KeelLogLevel.ERROR, "\t" + s.toString(), null);
+            this.delegate.print(level, "\t" + s.toString(), null);
         }
     }
 

@@ -22,6 +22,7 @@ public abstract class AbstractRow {
         this.row = tableRow;
     }
 
+    @Deprecated
     public static <T extends AbstractRow> DuplexExecutorForMySQL<List<T>> buildTableRowListFetcher(
             AbstractReadStatement readStatement,
             Class<T> classOfTableRow
@@ -33,6 +34,7 @@ public abstract class AbstractRow {
         );
     }
 
+    @Deprecated
     public static <T extends AbstractRow> DuplexExecutorForMySQL<T> buildTableRowFetcher(
             AbstractReadStatement readStatement,
             Class<T> classOfTableRow

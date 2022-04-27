@@ -124,21 +124,21 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
         }
         // filters
         List<Class<? extends KeelWebRequestFilter>> filterClassList = this.getFilterClassList();
-        new FutureRecursion<Integer>(
-                filterIndex -> Future.succeededFuture(filterIndex < filterClassList.size()),
-                filterIndex -> {
-                    Class<? extends KeelWebRequestFilter> filterClass = filterClassList.get(filterIndex);
-                    KeelWebRequestFilter filter;
-                    try {
-                        filter = filterClass.getConstructor().newInstance();
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                        return Future.failedFuture(e);
-                    }
-                    return filter.shouldHandleThisRequest(getRoutingContext())
+        FutureRecursion.call(
+                        0,
+                        filterIndex -> Future.succeededFuture(filterIndex < filterClassList.size()),
+                        filterIndex -> {
+                            Class<? extends KeelWebRequestFilter> filterClass = filterClassList.get(filterIndex);
+                            KeelWebRequestFilter filter;
+                            try {
+                                filter = filterClass.getConstructor().newInstance();
+                            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                                return Future.failedFuture(e);
+                            }
+                            return filter.shouldHandleThisRequest(getRoutingContext())
                             .compose(ok -> Future.succeededFuture(filterIndex + 1));
                 }
         )
-                .run(0)
                 .compose(x -> Future.succeededFuture())
                 .compose(filtersPassed -> this.dealWithRequest())
                 .compose(responseObject -> {

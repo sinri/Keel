@@ -14,7 +14,7 @@ public class FutureRecursion<T> {
     private final Function<T, Future<Boolean>> shouldNextFunction;
     private final Function<T, Future<T>> singleRecursionFunction;
 
-    public FutureRecursion(Function<T, Future<Boolean>> shouldNextFunction, Function<T, Future<T>> singleRecursionFunction) {
+    private FutureRecursion(Function<T, Future<Boolean>> shouldNextFunction, Function<T, Future<T>> singleRecursionFunction) {
         this.shouldNextFunction = shouldNextFunction;
         this.singleRecursionFunction = singleRecursionFunction;
     }
@@ -31,7 +31,18 @@ public class FutureRecursion<T> {
                         }));
     }
 
-    public Future<T> run(T initValue) {
+    public static <T> Future<T> call(
+            T initValue,
+            Function<T, Future<Boolean>> shouldNextFunction,
+            Function<T, Future<T>> singleRecursionFunction
+    ) {
+        return new FutureRecursion<T>(
+                shouldNextFunction, singleRecursionFunction
+        )
+                .run(initValue);
+    }
+
+    private Future<T> run(T initValue) {
         return recur(Future.succeededFuture(initValue));
     }
 }

@@ -8,7 +8,9 @@ import java.sql.Statement;
 /**
  * @since 1.9
  * @since 2.0 由于 VERTICLE 的发现，应用场景减少。
+ * @deprecated since 2.1
  */
+@Deprecated
 public class ThreadLocalStatementWrapper {
 
     private final ThreadLocal<Statement> threadLocalStatement;

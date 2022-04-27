@@ -289,6 +289,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
 
 
     @Override
+    @Deprecated
     public ResultMatrix blockedExecute(Statement statement) throws SQLException {
         String sql = this.toString();
         getSqlAuditLogger().info(sql);
@@ -298,7 +299,9 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     /**
      * @return the MySQLExecutor for last inserted ID
      * @since 1.10
+     * @deprecated since 2.1
      */
+    @Deprecated
     public DuplexExecutorForMySQL<Long> getExecutorForLastInsertedID() {
         return new DuplexExecutorForMySQL<>(
                 this::executeForLastInsertedID,
@@ -312,7 +315,9 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @param <R>
      * @return
      * @since 1.10
+     * @deprecated since 2.1
      */
+    @Deprecated
     public <R> DuplexExecutorForMySQL<R> getExecutorForLastInsertedID(Function<Long, R> idChecker, R recoveredValue) {
         return new DuplexExecutorForMySQL<>(
                 sqlConnection -> executeForLastInsertedID(sqlConnection)
@@ -345,18 +350,22 @@ public class WriteIntoStatement extends AbstractModifyStatement {
                 ;
     }
 
+    @Deprecated
     public long blockedExecuteForLastInsertedID(Statement statement) throws SQLException {
         return blockedExecute(statement).getLastInsertedID();
     }
 
+    @Deprecated
     public long blockedExecuteForLastInsertedID() throws SQLException {
         return blockedExecute().getLastInsertedID();
     }
 
+    @Deprecated
     public final long executeForLastInsertedID() throws SQLException {
         return blockedExecuteForLastInsertedID();
     }
 
+    @Deprecated
     public final long executeForLastInsertedID(Statement statement) throws SQLException {
         return blockedExecuteForLastInsertedID(statement);
     }

@@ -13,18 +13,22 @@ import java.util.function.Function;
  */
 public abstract class AbstractModifyStatement extends AbstractStatement {
 
+    @Deprecated
     public int blockedExecuteForAffectedRows(Statement statement) throws SQLException {
         return blockedExecute(statement).getTotalAffectedRows();
     }
 
+    @Deprecated
     public int blockedExecuteForAffectedRows() throws SQLException {
         return blockedExecute().getTotalAffectedRows();
     }
 
+    @Deprecated
     public final int executeForAffectedRows() throws SQLException {
         return blockedExecuteForAffectedRows();
     }
 
+    @Deprecated
     public final int executeForAffectedRows(Statement statement) throws SQLException {
         return blockedExecuteForAffectedRows(statement);
     }
@@ -43,7 +47,9 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
     /**
      * @return
      * @since 2.0
+     * @deprecated since 2.1
      */
+    @Deprecated
     public DuplexExecutorForMySQL<Integer> getExecutorForAffectedRows() {
         return new DuplexExecutorForMySQL<>(
                 this::executeForAffectedRows,
@@ -57,7 +63,9 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
      * @param <R>
      * @return
      * @since 2.0
+     * @deprecated since 2.1
      */
+    @Deprecated
     public <R> DuplexExecutorForMySQL<R> getExecutorForAffectedRows(Function<Integer, R> afxChecker, R recoveredValue) {
         return new DuplexExecutorForMySQL<>(
                 sqlConnection -> executeForAffectedRows(sqlConnection)

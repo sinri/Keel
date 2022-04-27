@@ -116,6 +116,7 @@ public class UpdateStatement extends AbstractModifyStatement {
 
 
     @Override
+    @Deprecated
     public ResultMatrix blockedExecute(Statement statement) throws SQLException {
         String sql = this.toString();
         getSqlAuditLogger().info(sql);

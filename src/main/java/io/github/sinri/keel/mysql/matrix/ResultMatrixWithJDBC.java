@@ -14,6 +14,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class ResultMatrixWithJDBC implements ResultMatrix {
     private final List<JsonObject> rowList;
     private Long lastInsertedID;
