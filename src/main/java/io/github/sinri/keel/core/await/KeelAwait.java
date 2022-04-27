@@ -14,7 +14,9 @@ import java.util.function.Function;
  *
  * @param <T> the class of the object to wait for
  * @since 1.9
+ * @deprecated since 2.1
  */
+@Deprecated
 public class KeelAwait<T> {
     private static final DeliveryOptions deliveryOptions;
 

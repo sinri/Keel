@@ -49,6 +49,15 @@ public class Keel {
         return vertx;
     }
 
+    /**
+     * @since 2.1
+     */
+    public static void closeVertx() {
+        if (vertx != null) {
+            vertx.close();
+        }
+    }
+
     public static EventBus getEventBus() {
         return vertx.eventBus();
     }

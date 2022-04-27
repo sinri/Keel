@@ -1,6 +1,7 @@
 package io.github.sinri.keel.cache;
 
 import io.github.sinri.keel.cache.caffeine.CaffeineCacheKit;
+import io.vertx.core.Future;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -95,4 +96,26 @@ public interface KeelCacheInterface<K, V> {
      * @since 1.14
      */
     ConcurrentMap<K, V> getSnapshotMap();
+
+    /**
+     * @param cache         KeelCacheInterface
+     * @param key           cache key
+     * @param generator     if not cached for key, use this function to generate one asynchronously
+     * @param lifeInSeconds life in seconds
+     * @param <K>           key type
+     * @param <V>           value type
+     * @return future of value
+     * @since 2.1
+     */
+    static <K, V> Future<V> ensureAndRead(KeelCacheInterface<K, V> cache, K key, Function<K, Future<V>> generator, long lifeInSeconds) {
+        V existed = cache.read(key);
+        if (existed != null) {
+            return Future.succeededFuture(existed);
+        }
+        return generator.apply(key)
+                .compose(v -> {
+                    cache.save(key, v, lifeInSeconds);
+                    return Future.succeededFuture(v);
+                });
+    }
 }
