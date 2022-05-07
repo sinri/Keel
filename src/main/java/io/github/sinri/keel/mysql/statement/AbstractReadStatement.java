@@ -6,6 +6,7 @@ import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
 import io.github.sinri.keel.mysql.matrix.AbstractRow;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
+import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.data.Numeric;
 
 import java.sql.SQLException;
@@ -17,6 +18,29 @@ import java.util.List;
  * @since 1.10
  */
 public abstract class AbstractReadStatement extends AbstractStatement {
+
+    /**
+     * @param sqlConnection
+     * @param classT
+     * @param <T>
+     * @return
+     * @since 2.1
+     */
+    public <T extends AbstractRow> Future<T> queryForOneRow(SqlConnection sqlConnection, Class<T> classT) {
+        return AbstractRow.fetchTableRow(sqlConnection, this, classT);
+    }
+
+    /**
+     * @param sqlConnection
+     * @param classT
+     * @param <T>
+     * @return
+     * @since 2.1
+     */
+    public <T extends AbstractRow> Future<List<T>> queryForRowList(SqlConnection sqlConnection, Class<T> classT) {
+        return AbstractRow.fetchTableRowList(sqlConnection, this, classT);
+    }
+
     @Override
     @Deprecated
     public ResultMatrix blockedExecute(Statement statement) throws SQLException {

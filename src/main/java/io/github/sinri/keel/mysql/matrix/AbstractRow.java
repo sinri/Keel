@@ -6,6 +6,7 @@ import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.sqlclient.SqlConnection;
 
 import java.util.Collection;
 import java.util.List;
@@ -20,6 +21,51 @@ public abstract class AbstractRow {
 
     public AbstractRow(JsonObject tableRow) {
         this.row = tableRow;
+    }
+
+    /**
+     * @param sqlConnection
+     * @param readStatement
+     * @param classOfTableRow
+     * @param <T>
+     * @return
+     * @since 2.1
+     */
+    public static <T extends AbstractRow> Future<List<T>> fetchTableRowList(
+            SqlConnection sqlConnection,
+            AbstractReadStatement readStatement,
+            Class<T> classOfTableRow
+    ) {
+        return readStatement.execute(sqlConnection)
+                .compose(resultMatrix -> {
+                    List<T> ts = resultMatrix.buildTableRowList(classOfTableRow);
+                    return Future.succeededFuture(ts);
+                });
+    }
+
+    /**
+     * @param sqlConnection
+     * @param readStatement
+     * @param classOfTableRow
+     * @param <T>
+     * @return
+     * @since 2.1
+     */
+    public static <T extends AbstractRow> Future<T> fetchTableRow(
+            SqlConnection sqlConnection,
+            AbstractReadStatement readStatement,
+            Class<T> classOfTableRow
+    ) {
+        return readStatement.execute(sqlConnection)
+                .compose(resultMatrix -> {
+                    T t;
+                    try {
+                        t = resultMatrix.buildTableRowByIndex(0, classOfTableRow);
+                    } catch (KeelSQLResultRowIndexError e) {
+                        return Future.succeededFuture(null);
+                    }
+                    return Future.succeededFuture(t);
+                });
     }
 
     @Deprecated

@@ -7,8 +7,11 @@ import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 
+/**
+ * @since 2.1
+ */
 public abstract class KeelQueue extends KeelVerticle {
-    private long waitingMS = 1000L; // 1000ms as 1s
+
     /**
      * 部署之前可以与部署之后的日志器不同实例，也可以相同
      */
@@ -18,11 +21,6 @@ public abstract class KeelQueue extends KeelVerticle {
         super();
 
         this.logger = prepareLogger();
-    }
-
-    public KeelQueue setWaitingMS(long waitingMS) {
-        this.waitingMS = waitingMS;
-        return this;
     }
 
     abstract protected KeelLogger prepareLogger();
@@ -79,33 +77,33 @@ public abstract class KeelQueue extends KeelVerticle {
                                                         }
                                                         // 队列里找出来一个task, deploy it (至于能不能跑起来有没有锁就不管了)
                                                         getLogger().info("To run task: " + task.getTaskReference());
-                                                        return task.lockTaskBeforeDeployment()
-                                                                .compose(locked -> {
-                                                                    getLogger().info("Locked task: " + task.getTaskReference());
-                                                                    return Keel.getVertx().deployVerticle(
-                                                                                    task,
-                                                                                    new DeploymentOptions()
-                                                                                            .setWorker(true)
-                                                                            )
-                                                                            .compose(deploymentID -> {
-                                                                                getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);
-                                                                                return Future.succeededFuture(true);
-                                                                            })
-                                                                            .recover(throwable -> {
-                                                                                getLogger().exception("CANNOT DEPLOY TASK [" + task.getTaskReference() + "] VERTICLE", throwable);
-                                                                                return Future.succeededFuture();
-                                                                            });
+//                                                        return task.lockTaskBeforeDeployment()
+//                                                                .compose(locked -> {
+                                                        getLogger().info("Trusted that task is already locked by seeker: " + task.getTaskReference());
+                                                        return Keel.getVertx().deployVerticle(
+                                                                        task,
+                                                                        new DeploymentOptions()
+                                                                                .setWorker(true)
+                                                                )
+                                                                .compose(deploymentID -> {
+                                                                    getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);
+                                                                    return Future.succeededFuture(true);
                                                                 })
                                                                 .recover(throwable -> {
-                                                                    getLogger().exception("CANNOT LOCK TASK [" + task.getTaskReference() + "]", throwable);
-                                                                    return Future.succeededFuture();
-                                                                })
-                                                                .compose(v -> {
-                                                                    // 继续找
+                                                                    getLogger().exception("CANNOT DEPLOY TASK [" + task.getTaskReference() + "] VERTICLE", throwable);
                                                                     return Future.succeededFuture(true);
                                                                 });
-
                                                     });
+//                                                    .recover(throwable -> {
+//                                                        getLogger().exception("CANNOT LOCK TASK [" + task.getTaskReference() + "]", throwable);
+//                                                        return Future.succeededFuture();
+//                                                    })
+//                                                    .compose(v -> {
+//                                                        // 继续找
+//                                                        return Future.succeededFuture(true);
+//                                                    });
+
+//                                                    });
                                         }
                                 )
                                 .recover(throwable -> {
@@ -113,7 +111,7 @@ public abstract class KeelQueue extends KeelVerticle {
                                     return Future.succeededFuture(false);
                                 })
                                 .eventually(v -> {
-                                    Keel.getVertx().setTimer(waitingMS, timerID -> {
+                                    Keel.getVertx().setTimer(nextTaskSeeker.waitingMs(), timerID -> {
                                         routine();
                                     });
                                     return Future.succeededFuture();
@@ -124,8 +122,28 @@ public abstract class KeelQueue extends KeelVerticle {
     }
 
     public interface KeelQueueNextTaskSeeker {
+//        private long waitingMsAfterStartTask = 1000L; // 1000ms as 1s
+//        private long waitingMsWhenNoTask=5000L;
+//
+//        public KeelQueue setWaitingMsAfterStartTask(long waitingMsAfterStartTask) {
+//            this.waitingMsAfterStartTask = waitingMsAfterStartTask;
+//            return this;
+//        }
+//
+//        public KeelQueue setWaitingMsWhenNoTask(long waitingMsWhenNoTask) {
+//            this.waitingMsWhenNoTask = waitingMsWhenNoTask;
+//            return this;
+//        }
+
         Future<Boolean> hasMore();
 
+        /**
+         * 找出一个task且其已完成lockTaskBeforeDeployment方法的调用
+         *
+         * @return
+         */
         Future<KeelQueueTask> seek();
+
+        long waitingMs();
     }
 }
