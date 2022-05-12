@@ -4,7 +4,6 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 
 /**
@@ -16,11 +15,21 @@ public abstract class KeelQueue extends KeelVerticle {
      * 部署之前可以与部署之后的日志器不同实例，也可以相同
      */
     private KeelLogger logger;
+    private QueueStatus queueStatus = QueueStatus.INIT;
 
     public KeelQueue() {
         super();
 
         this.logger = prepareLogger();
+    }
+
+    public QueueStatus getQueueStatus() {
+        return queueStatus;
+    }
+
+    protected KeelQueue setQueueStatus(QueueStatus queueStatus) {
+        this.queueStatus = queueStatus;
+        return this;
     }
 
     abstract protected KeelLogger prepareLogger();
@@ -37,28 +46,37 @@ public abstract class KeelQueue extends KeelVerticle {
         this.logger = prepareLogger();
         setLogger(this.logger);
 
-        //Keel.getVertx().setTimer(waitingSeconds, timerID -> {
+        this.queueStatus = QueueStatus.RUNNING;
+
         routine();
-        //});
     }
 
-    abstract protected Future<Boolean> shouldStop();
+    abstract protected Future<QueueSignal> readSignal();
 
     protected final void routine() {
         getLogger().debug("KeelQueue::routine start");
+        KeelQueueNextTaskSeeker nextTaskSeeker = getNextTaskSeeker();
 
-        shouldStop()
+        readSignal()
                 .recover(throwable -> {
-                    getLogger().warning("shouldStop throws: " + throwable.getMessage());
-                    return Future.succeededFuture(false);
-                })
-                .compose(shouldStop -> {
-                    if (shouldStop) {
-                        getLogger().notice("SHOULD STOP HERE");
+                    getLogger().debug("AS IS. Failed to read signal: " + throwable.getMessage());
+                    if (getQueueStatus() == QueueStatus.STOPPED) {
+                        return Future.succeededFuture(QueueSignal.STOP);
                     } else {
-                        KeelQueueNextTaskSeeker nextTaskSeeker = getNextTaskSeeker();
+                        return Future.succeededFuture(QueueSignal.RUN);
+                    }
+                })
+                .compose(signal -> {
+                    if (signal == QueueSignal.STOP) {
+                        if (getQueueStatus() == QueueStatus.RUNNING) {
+                            this.queueStatus = QueueStatus.STOPPED;
+                            getLogger().notice("Signal Stop Received");
+                        }
+                        return Future.succeededFuture();
+                    } else if (signal == QueueSignal.RUN) {
+                        this.queueStatus = QueueStatus.RUNNING;
                         // 1. seek next task to do
-                        FutureRecursion.call(
+                        return FutureRecursion.call(
                                         true,
                                         shouldNext -> {
                                             if (!shouldNext) {
@@ -77,14 +95,8 @@ public abstract class KeelQueue extends KeelVerticle {
                                                         }
                                                         // 队列里找出来一个task, deploy it (至于能不能跑起来有没有锁就不管了)
                                                         getLogger().info("To run task: " + task.getTaskReference());
-//                                                        return task.lockTaskBeforeDeployment()
-//                                                                .compose(locked -> {
                                                         getLogger().info("Trusted that task is already locked by seeker: " + task.getTaskReference());
-                                                        return Keel.getVertx().deployVerticle(
-                                                                        task,
-                                                                        new DeploymentOptions()
-                                                                                .setWorker(true)
-                                                                )
+                                                        return task.deployMeAsWorker()
                                                                 .compose(deploymentID -> {
                                                                     getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);
                                                                     return Future.succeededFuture(true);
@@ -94,47 +106,31 @@ public abstract class KeelQueue extends KeelVerticle {
                                                                     return Future.succeededFuture(true);
                                                                 });
                                                     });
-//                                                    .recover(throwable -> {
-//                                                        getLogger().exception("CANNOT LOCK TASK [" + task.getTaskReference() + "]", throwable);
-//                                                        return Future.succeededFuture();
-//                                                    })
-//                                                    .compose(v -> {
-//                                                        // 继续找
-//                                                        return Future.succeededFuture(true);
-//                                                    });
-
-//                                                    });
                                         }
                                 )
                                 .recover(throwable -> {
                                     getLogger().exception("KeelQueue 递归找活干里出现了奇怪的故障", throwable);
                                     return Future.succeededFuture(false);
-                                })
-                                .eventually(v -> {
-                                    Keel.getVertx().setTimer(nextTaskSeeker.waitingMs(), timerID -> {
-                                        routine();
-                                    });
-                                    return Future.succeededFuture();
                                 });
+                    } else {
+                        return Future.failedFuture("Unknown Signal");
                     }
+                })
+                .eventually(v -> {
+                    long waitingMs = nextTaskSeeker.waitingMs();
+                    getLogger().debug("set timer for next routine after " + waitingMs + " ms");
+                    Keel.getVertx().setTimer(waitingMs, timerID -> routine());
                     return Future.succeededFuture();
-                });
+                })
+        ;
+    }
+
+    @Override
+    public void stop() throws Exception {
+        this.queueStatus = QueueStatus.STOPPED;
     }
 
     public interface KeelQueueNextTaskSeeker {
-//        private long waitingMsAfterStartTask = 1000L; // 1000ms as 1s
-//        private long waitingMsWhenNoTask=5000L;
-//
-//        public KeelQueue setWaitingMsAfterStartTask(long waitingMsAfterStartTask) {
-//            this.waitingMsAfterStartTask = waitingMsAfterStartTask;
-//            return this;
-//        }
-//
-//        public KeelQueue setWaitingMsWhenNoTask(long waitingMsWhenNoTask) {
-//            this.waitingMsWhenNoTask = waitingMsWhenNoTask;
-//            return this;
-//        }
-
         Future<Boolean> hasMore();
 
         /**
@@ -145,5 +141,16 @@ public abstract class KeelQueue extends KeelVerticle {
         Future<KeelQueueTask> seek();
 
         long waitingMs();
+    }
+
+    public enum QueueSignal {
+        RUN,
+        STOP
+    }
+
+    public enum QueueStatus {
+        INIT,
+        RUNNING,
+        STOPPED
     }
 }
