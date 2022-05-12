@@ -6,6 +6,8 @@ import io.vertx.core.json.JsonObject;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 这是一个遵循 KeelOptions 定义的 POJO 类，用于 KeelLogger 的初始化。
@@ -21,6 +23,7 @@ public class KeelLoggerOptions extends KeelOptions {
     public boolean showThreadID;
     public String fileOutputCharset;
     protected String aspect;
+    protected String logFileSpiltStyles;
 
     public KeelLoggerOptions() {
         this.aspect = "default";
@@ -30,6 +33,7 @@ public class KeelLoggerOptions extends KeelOptions {
         this.keepWriterReady = true;
         this.showThreadID = true;
         this.fileOutputCharset = null;
+        this.logFileSpiltStyles = "NAMED_WITH_PERIOD,ARCHIVED_BY_PERIOD";
     }
 
     /**
@@ -124,5 +128,22 @@ public class KeelLoggerOptions extends KeelOptions {
     public KeelLoggerOptions setFileOutputCharset(Charset fileOutputCharset) {
         this.fileOutputCharset = fileOutputCharset.name();
         return this;
+    }
+
+    public Set<LogFileSpiltStyle> getLogFileSpiltStyleSet() {
+        Set<LogFileSpiltStyle> x = new HashSet<>();
+        String[] split = logFileSpiltStyles.split("[, ;]+");
+        for (var t : split) {
+            x.add(LogFileSpiltStyle.valueOf(t));
+        }
+        return x;
+    }
+
+    /**
+     * @since 2.0
+     */
+    public enum LogFileSpiltStyle {
+        NAMED_WITH_PERIOD, // 仅在文件名上加上时间范围标记
+        ARCHIVED_BY_PERIOD, // 按照时间范围分文件夹
     }
 }

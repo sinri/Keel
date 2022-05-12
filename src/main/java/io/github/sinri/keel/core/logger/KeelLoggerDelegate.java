@@ -100,7 +100,7 @@ public class KeelLoggerDelegate {
             prefix = aspectComponentList.get(aspectComponentList.size() - 1);
         }
         String currentDateExpression = getCurrentDateExpression(rotateDateTimeFormat);
-        if (currentDateExpression != null) {
+        if (currentDateExpression != null && options.getLogFileSpiltStyleSet().contains(KeelLoggerOptions.LogFileSpiltStyle.NAMED_WITH_PERIOD)) {
             return prefix + "-" + currentDateExpression + ".log";
         } else {
             return prefix + ".log";
@@ -122,16 +122,23 @@ public class KeelLoggerDelegate {
                 return logRootDirectory;
             }
         }
-
         File dir = new File(logRootDirectory.getAbsolutePath() + File.separator + computeRelativeDirPath());
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                new KeelLogger().warning("Cannot MKDIRS: " + dir.getAbsolutePath());
-                //throw new IOException("Cannot MKDIRS: " + dir.getAbsolutePath());
+
+        String realPath = dir.getAbsolutePath();
+        if (options.getLogFileSpiltStyleSet().contains(KeelLoggerOptions.LogFileSpiltStyle.ARCHIVED_BY_PERIOD)) {
+            String rotateDateTimeFormat = this.options.rotate;
+            String currentDateExpression = getCurrentDateExpression(rotateDateTimeFormat);
+            if (currentDateExpression != null) {
+                realPath += File.separator + currentDateExpression;
+                dir = new File(realPath);
+                if (!dir.exists()) {
+                    if (!dir.mkdirs()) {
+                        new KeelLogger().warning("Cannot MKDIRS: " + dir.getAbsolutePath());
+                    }
+                }
             }
         }
-
-        String realPath = dir.getAbsolutePath() + File.separator + computeFileName();
+        realPath += File.separator + computeFileName();
 
         return new File(realPath);
     }
@@ -157,18 +164,22 @@ public class KeelLoggerDelegate {
         if (level.isSilent() || level.isNegligibleThan(this.options.getLowestLevel())) {
             return;
         }
+
         String subject = aspectComponentList.get(aspectComponentList.size() - 1);
         if (categoryPrefix != null && !categoryPrefix.isEmpty()) {
             subject += ":" + categoryPrefix;
         }
         String content = getCurrentDateExpression("yyyy-MM-dd HH:mm:ss") + " "
                 + "[" + level.name() + "] "
+//                + reportPoint
                 + "<" + subject + "> "
                 + (this.options.isShowThreadID() ? ("[" + Thread.currentThread().getId() + "] ") : "")
                 + msg;
         if (context != null) {
             content += " | " + context;
         }
+
+
         print(content, null);
     }
 

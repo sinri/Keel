@@ -27,7 +27,7 @@ public class KeelMySQLOptions extends KeelOptions {
         this.charset = "utf8";
         this.useAffectedRows = true;
         this.allowPublicKeyRetrieval = false;
-        this.poolMaxSize = 8;
+        this.poolMaxSize = 128;
         this.poolShared = false;
     }
 

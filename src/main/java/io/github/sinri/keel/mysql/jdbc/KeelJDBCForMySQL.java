@@ -6,6 +6,11 @@ import io.github.sinri.keel.mysql.matrix.ResultMatrixWithJDBC;
 
 import java.sql.*;
 
+/**
+ * @since 2.0 由于 VERTICLE 的发现，应用场景减少。
+ * @deprecated since 2.1
+ */
+@Deprecated
 public class KeelJDBCForMySQL {
 
     private final String jdbcConnectionString;

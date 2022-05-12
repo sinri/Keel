@@ -1,6 +1,7 @@
 package io.github.sinri.keel.cache;
 
 import io.github.sinri.keel.cache.caffeine.CaffeineCacheKit;
+import io.vertx.core.Future;
 
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -60,6 +61,20 @@ public interface KeelCacheInterface<K, V> {
     V read(K key, Function<? super K, ? extends V> fallbackValueGenerator, V fallbackValue);
 
     /**
+     * Read an available cached item with key;
+     * if not found, try to generate one with key using `fallbackValueGenerator` to return;
+     * if still gets `null`, return `fallbackValue`.
+     *
+     * @param key                    key
+     * @param fallbackValueGenerator fallback value generator, a function receive key and return value
+     * @param fallbackValue          the certain value returned when not found and generator returned `null`
+     * @param lifeInSeconds          life in seconds of the newly created
+     * @return value of found available cached item, or generated one, or `fallbackValue`
+     * @since 1.14
+     */
+    V read(K key, Function<? super K, ? extends V> fallbackValueGenerator, V fallbackValue, long lifeInSeconds);
+
+    /**
      * Remove the cached item with key.
      *
      * @param key key
@@ -77,8 +92,30 @@ public interface KeelCacheInterface<K, V> {
     void cleanUp();
 
     /**
-     * @return ConcurrentMap<K, V> alive value only
+     * @return ConcurrentMap K → V alive value only
      * @since 1.14
      */
     ConcurrentMap<K, V> getSnapshotMap();
+
+    /**
+     * @param cache         KeelCacheInterface
+     * @param key           cache key
+     * @param generator     if not cached for key, use this function to generate one asynchronously
+     * @param lifeInSeconds life in seconds
+     * @param <K>           key type
+     * @param <V>           value type
+     * @return future of value
+     * @since 2.1
+     */
+    static <K, V> Future<V> ensureAndRead(KeelCacheInterface<K, V> cache, K key, Function<K, Future<V>> generator, long lifeInSeconds) {
+        V existed = cache.read(key);
+        if (existed != null) {
+            return Future.succeededFuture(existed);
+        }
+        return generator.apply(key)
+                .compose(v -> {
+                    cache.save(key, v, lifeInSeconds);
+                    return Future.succeededFuture(v);
+                });
+    }
 }

@@ -9,15 +9,25 @@ import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.sqlclient.SqlConnection;
 
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Keel {
+    private static final String KEY_MYSQL_CONNECTION = "MySQLConnection";
+    @Deprecated
+    private static final String KEY_JDBC_STATEMENT = "JDBCStatement";
+    private static final String KEY_KEEL_LOGGER = "KeelLogger";
+
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
     private static final Map<String, KeelLogger> loggerMap = new HashMap<>();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
+
+    @Deprecated
     private static final Map<String, KeelJDBCForMySQL> mysqlKitWithJDBCMap = new HashMap<>();
+
     private static Vertx vertx;
 
     public static void loadPropertiesFromFile(String propertiesFileName) {
@@ -28,6 +38,10 @@ public class Keel {
         return propertiesReader;
     }
 
+    /**
+     * @param vertxOptions VertxOptions
+     * @see <a href="https://vertx.io/docs/apidocs/io/vertx/core/VertxOptions.html">Class VertxOptions</a>
+     */
     public static void initializeVertx(VertxOptions vertxOptions) {
         vertx = Vertx.vertx(vertxOptions);
     }
@@ -37,6 +51,15 @@ public class Keel {
             throw new RuntimeException("The shared vertx instance was not initialized. Run `Keel.initializeVertx()` first!");
         }
         return vertx;
+    }
+
+    /**
+     * @since 2.1
+     */
+    public static void closeVertx() {
+        if (vertx != null) {
+            vertx.close();
+        }
     }
 
     public static EventBus getEventBus() {
@@ -93,7 +116,9 @@ public class Keel {
      * @param dataSourceName the data source name
      * @return KeelJDBCForMySQL
      * @since 1.10
+     * @deprecated since 2.1
      */
+    @Deprecated
     public static KeelJDBCForMySQL getMySQLKitWithJDBC(String dataSourceName) {
         if (!mysqlKitWithJDBCMap.containsKey(dataSourceName)) {
             KeelMySQLOptions keelMySQLOptions = KeelMySQLOptions.generateOptionsForDataSourceWithPropertiesReader(dataSourceName);
@@ -106,10 +131,67 @@ public class Keel {
     /**
      * @return getMySQLKitWithJDBC(mysql.default_data_source_name);
      * @since 1.10
+     * @deprecated since 2.1
      */
+    @Deprecated
     public static KeelJDBCForMySQL getMySQLKitWithJDBC() {
         String defaultName = propertiesReader.getProperty("mysql.default_data_source_name");
         return getMySQLKitWithJDBC(defaultName);
     }
 
+    /**
+     * @return
+     * @since 2.0
+     */
+    public static SqlConnection getMySqlConnectionInContext() {
+        return Keel.getVertx().getOrCreateContext().get(KEY_MYSQL_CONNECTION);
+    }
+
+    /**
+     * @param sqlConnection
+     * @since 2.0
+     */
+    public static void setMySqlConnectionInContext(SqlConnection sqlConnection) {
+        Keel.getVertx().getOrCreateContext().put(KEY_MYSQL_CONNECTION, sqlConnection);
+    }
+
+    /**
+     * @return
+     * @since 2.0
+     * @deprecated since 2.1
+     */
+    @Deprecated
+    public static Statement getJDBCStatementInContext() {
+        return Keel.getVertx().getOrCreateContext().get(KEY_JDBC_STATEMENT);
+    }
+
+    /**
+     * @param statement
+     * @since 2.0
+     * @deprecated since 2.1
+     */
+    @Deprecated
+    public static void setJDBCStatementInContext(Statement statement) {
+        Keel.getVertx().getOrCreateContext().put(KEY_JDBC_STATEMENT, statement);
+    }
+
+    /**
+     * @return
+     * @since 2.0
+     */
+    public static KeelLogger getKeelLoggerInContext() {
+        KeelLogger logger = Keel.getVertx().getOrCreateContext().get(KEY_KEEL_LOGGER);
+        if (logger == null) {
+            logger = KeelLogger.buildSilentLogger();
+        }
+        return logger;
+    }
+
+    /**
+     * @param logger
+     * @since 2.0
+     */
+    public static void setKeelLoggerInContext(KeelLogger logger) {
+        Keel.getVertx().getOrCreateContext().put(KEY_KEEL_LOGGER, logger);
+    }
 }

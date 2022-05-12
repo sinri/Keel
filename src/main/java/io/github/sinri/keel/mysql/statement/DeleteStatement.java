@@ -84,13 +84,19 @@ public class DeleteStatement extends AbstractModifyStatement {
         if (limit > 0) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "limit " + limit;
         }
+        if (!getRemarkAsComment().isEmpty()) {
+            sql += "\n-- " + getRemarkAsComment() + "\n";
+        }
         return sql;
     }
 
 
 
     @Override
+    @Deprecated
     public ResultMatrix blockedExecute(Statement statement) throws SQLException {
+        String sql = this.toString();
+        getSqlAuditLogger().info(sql);
         return KeelJDBCForMySQL.executeForModification(this.toString(), statement);
     }
 

@@ -42,7 +42,7 @@ public interface ResultMatrix {
      * @throws IllegalAccessException
      * @since 1.10
      */
-    static <T extends AbstractTableRow> T buildTableRow(JsonObject row, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    static <T extends AbstractRow> T buildTableRow(JsonObject row, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return classOfTableRow.getConstructor(JsonObject.class).newInstance(row);
     }
 
@@ -57,7 +57,7 @@ public interface ResultMatrix {
      * @throws IllegalAccessException
      * @since 1.10
      */
-    static <T extends AbstractTableRow> List<T> buildTableRowList(List<JsonObject> rowList, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    static <T extends AbstractRow> List<T> buildTableRowList(List<JsonObject> rowList, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         ArrayList<T> list = new ArrayList<>();
         for (var x : rowList) {
             list.add(ResultMatrix.buildTableRow(x, classOfTableRow));
@@ -72,7 +72,7 @@ public interface ResultMatrix {
      * @return
      * @since 1.10
      */
-    <T extends AbstractTableRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
+    <T extends AbstractRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
 
     /**
      * @param classOfTableRow
@@ -80,7 +80,7 @@ public interface ResultMatrix {
      * @return
      * @since 1.10
      */
-    <T extends AbstractTableRow> List<T> buildTableRowList(Class<T> classOfTableRow);
+    <T extends AbstractRow> List<T> buildTableRowList(Class<T> classOfTableRow);
 
     String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError;
 

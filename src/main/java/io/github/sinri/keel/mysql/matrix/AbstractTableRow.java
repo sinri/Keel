@@ -1,95 +1,71 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.mysql.MySQLExecutor;
-import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
-import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
+import io.github.sinri.keel.mysql.statement.DeleteStatement;
+import io.github.sinri.keel.mysql.statement.UpdateStatement;
+import io.github.sinri.keel.mysql.statement.WriteIntoStatement;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
+import io.vertx.sqlclient.SqlConnection;
 
 /**
- * @since 1.10 Designed for a wrapper of each row in ResultMatrix
+ * @since 2.0
  */
-public abstract class AbstractTableRow {
-    private final JsonObject tableRow;
-
-
+public abstract class AbstractTableRow extends AbstractRow {
     public AbstractTableRow(JsonObject tableRow) {
-        this.tableRow = tableRow;
+        super(tableRow);
     }
 
-    public static <T extends AbstractTableRow> MySQLExecutor<List<T>> buildTableRowListFetcher(
-            AbstractReadStatement readStatement,
-            Class<T> classOfTableRow
-    ) {
-        return MySQLExecutor.build(
-                sqlConnection -> readStatement.execute(sqlConnection)
-                        .compose(resultMatrix -> Future.succeededFuture(resultMatrix.buildTableRowList(classOfTableRow))),
-                statement -> readStatement.blockedExecute(statement).buildTableRowList(classOfTableRow)
-        );
+    /**
+     * @return default null
+     */
+    public String getSchemaName() {
+        return null;
     }
 
-    public static <T extends AbstractTableRow> MySQLExecutor<T> buildTableRowFetcher(
-            AbstractReadStatement readStatement,
-            Class<T> classOfTableRow
-    ) {
-        return MySQLExecutor.build(
-                sqlConnection -> readStatement.execute(sqlConnection)
-                        .compose(resultMatrix -> {
-                            T t;
-                            try {
-                                t = resultMatrix.buildTableRowByIndex(0, classOfTableRow);
-                            } catch (KeelSQLResultRowIndexError e) {
-                                return Future.succeededFuture(null);
-                            }
-                            return Future.succeededFuture(t);
-                        }),
-                statement -> {
-                    try {
-                        return readStatement.blockedExecute(statement).buildTableRowByIndex(0, classOfTableRow);
-                    } catch (KeelSQLResultRowIndexError e) {
-                        return null;
-                    }
+    /**
+     * @return table name
+     */
+    abstract public String getTableName();
+
+    abstract protected String getPKFiledName();
+
+    protected Future<Long> insertThisRowForPK(SqlConnection sqlConnection) {
+        return new WriteIntoStatement()
+                .intoTable(getSchemaName(), getTableName())
+                .macroWriteOneRowWithJsonObject(getRow())
+                .executeForLastInsertedID(sqlConnection);
+    }
+
+    protected Future<Long> replaceThisRowForPK(SqlConnection sqlConnection) {
+        return new WriteIntoStatement(WriteIntoStatement.REPLACE)
+                .intoTable(getSchemaName(), getTableName())
+                .macroWriteOneRowWithJsonObject(getRow())
+                .executeForLastInsertedID(sqlConnection);
+    }
+
+    protected Future<Integer> updateThisRow(SqlConnection sqlConnection) {
+        UpdateStatement updateStatement = new UpdateStatement()
+                .table(getSchemaName(), getTableName())
+                .where(conditionsComponent -> conditionsComponent
+                        .quickMapping(getPKFiledName(), getFieldAsNumber(getPKFiledName()).longValue()));
+        this.getRow().forEach(entry -> {
+            if (!entry.getKey().equals(getPKFiledName())) {
+                if (entry.getValue() == null) {
+                    updateStatement.setWithExpression(entry.getKey(), "NULL");
+                } else {
+                    updateStatement.setWithValue(entry.getKey(), String.valueOf(entry.getValue()));
                 }
-        );
+            }
+        });
+        return updateStatement.limit(1).executeForAffectedRows(sqlConnection);
     }
 
-    public JsonObject getTableRow() {
-        return tableRow;
-    }
-
-    public String getFieldAsString(String field) {
-        return tableRow.getString(field);
-    }
-
-    public Number getFieldAsNumber(String field) {
-        return tableRow.getNumber(field);
-    }
-
-    /**
-     * @param rows collection of AbstractTableRow
-     * @return a json array
-     * @since 1.13
-     */
-    public static JsonArray rowsToJsonArray(Collection<? extends AbstractTableRow> rows) {
-        JsonArray array = new JsonArray();
-        rows.forEach(row -> array.add(row.getTableRow()));
-        return array;
-    }
-
-    /**
-     * @param rows        collection of AbstractTableRow
-     * @param transformer a function, AbstractTableRow->JsonObject
-     * @return a json array
-     * @since 1.13
-     */
-    public static JsonArray rowsToJsonArray(Collection<? extends AbstractTableRow> rows, Function<AbstractTableRow, JsonObject> transformer) {
-        JsonArray array = new JsonArray();
-        rows.forEach(row -> array.add(transformer.apply(row)));
-        return array;
+    protected Future<Integer> deleteThisRow(SqlConnection sqlConnection) {
+        return new DeleteStatement()
+                .from(getSchemaName(), getTableName())
+                .where(conditionsComponent -> conditionsComponent
+                        .quickMapping(getPKFiledName(), getFieldAsNumber(getPKFiledName()).longValue()))
+                .limit(1)
+                .executeForAffectedRows(sqlConnection);
     }
 }

@@ -1,11 +1,12 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.mysql.MySQLExecutor;
+import io.github.sinri.keel.mysql.DuplexExecutorForMySQL;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
-import io.github.sinri.keel.mysql.matrix.AbstractTableRow;
+import io.github.sinri.keel.mysql.matrix.AbstractRow;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
+import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.data.Numeric;
 
 import java.sql.SQLException;
@@ -17,52 +18,66 @@ import java.util.List;
  * @since 1.10
  */
 public abstract class AbstractReadStatement extends AbstractStatement {
+
+    /**
+     * @param sqlConnection
+     * @param classT
+     * @param <T>
+     * @return
+     * @since 2.1
+     */
+    public <T extends AbstractRow> Future<T> queryForOneRow(SqlConnection sqlConnection, Class<T> classT) {
+        return AbstractRow.fetchTableRow(sqlConnection, this, classT);
+    }
+
+    /**
+     * @param sqlConnection
+     * @param classT
+     * @param <T>
+     * @return
+     * @since 2.1
+     */
+    public <T extends AbstractRow> Future<List<T>> queryForRowList(SqlConnection sqlConnection, Class<T> classT) {
+        return AbstractRow.fetchTableRowList(sqlConnection, this, classT);
+    }
+
     @Override
+    @Deprecated
     public ResultMatrix blockedExecute(Statement statement) throws SQLException {
         return KeelJDBCForMySQL.queryForSelection(this.toString(), statement);
     }
 
-    public <T extends AbstractTableRow> MySQLExecutor<T> getOneTableRowFetcher(Class<T> classOfTableRow) {
-        return AbstractTableRow.buildTableRowFetcher(this, classOfTableRow);
+    @Deprecated
+    public <T extends AbstractRow> DuplexExecutorForMySQL<T> getOneTableRowFetcher(Class<T> classOfTableRow) {
+        return AbstractRow.buildTableRowFetcher(this, classOfTableRow);
     }
 
-    public <T extends AbstractTableRow> MySQLExecutor<List<T>> getTableRowListFetcher(Class<T> classOfTableRow) {
-        return AbstractTableRow.buildTableRowListFetcher(this, classOfTableRow);
+    @Deprecated
+    public <T extends AbstractRow> DuplexExecutorForMySQL<List<T>> getTableRowListFetcher(Class<T> classOfTableRow) {
+        return AbstractRow.buildTableRowListFetcher(this, classOfTableRow);
     }
 
-    /**
-     * @param fieldName
-     * @return
-     * @since 1.13
-     */
-    public MySQLExecutor<List<Long>> getLongColumnFetcher(String fieldName) {
-        return MySQLExecutor.build(
+    @Deprecated
+    public DuplexExecutorForMySQL<List<Long>> getLongColumnFetcher(String fieldName) {
+        return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
                         .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getOneColumnAsLong(fieldName))),
                 statement -> this.blockedExecute(statement).getOneColumnAsLong(fieldName)
         );
     }
 
-    /**
-     * @param fieldName
-     * @return
-     * @since 1.13
-     */
-    public MySQLExecutor<List<Integer>> getIntegerColumnFetcher(String fieldName) {
-        return MySQLExecutor.build(
+    @Deprecated
+    public DuplexExecutorForMySQL<List<Integer>> getIntegerColumnFetcher(String fieldName) {
+        return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
                         .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getOneColumnAsInteger(fieldName))),
                 statement -> this.blockedExecute(statement).getOneColumnAsInteger(fieldName)
         );
     }
 
-    /**
-     * @param fieldName
-     * @return
-     * @since 1.13
-     */
-    public MySQLExecutor<List<Numeric>> getNumberColumnFetcher(String fieldName) {
-        return MySQLExecutor.build(
+    @Deprecated
+    public DuplexExecutorForMySQL<List<Numeric>> getNumberColumnFetcher(String fieldName) {
+        return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
                         .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getOneColumnAsNumeric(fieldName))),
                 statement -> this.blockedExecute(statement).getOneColumnAsNumeric(fieldName)
@@ -74,8 +89,9 @@ public abstract class AbstractReadStatement extends AbstractStatement {
      * @return
      * @since 1.13
      */
-    public MySQLExecutor<List<String>> getStringColumnFetcher(String fieldName) {
-        return MySQLExecutor.build(
+    @Deprecated
+    public DuplexExecutorForMySQL<List<String>> getStringColumnFetcher(String fieldName) {
+        return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
                         .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getOneColumnAsString(fieldName))),
                 statement -> this.blockedExecute(statement).getOneColumnAsString(fieldName)
@@ -87,8 +103,9 @@ public abstract class AbstractReadStatement extends AbstractStatement {
      * @return
      * @since 1.13
      */
-    public MySQLExecutor<String> getStringCellFetcher(String fieldName) {
-        return MySQLExecutor.build(
+    @Deprecated
+    public DuplexExecutorForMySQL<String> getStringCellFetcher(String fieldName) {
+        return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
                         .compose(resultMatrix -> {
                             try {
@@ -112,8 +129,9 @@ public abstract class AbstractReadStatement extends AbstractStatement {
      * @return
      * @since 1.13
      */
-    public MySQLExecutor<Numeric> getNumericCellFetcher(String fieldName) {
-        return MySQLExecutor.build(
+    @Deprecated
+    public DuplexExecutorForMySQL<Numeric> getNumericCellFetcher(String fieldName) {
+        return new DuplexExecutorForMySQL<>(
                 sqlConnection -> this.execute(sqlConnection)
                         .compose(resultMatrix -> {
                             try {

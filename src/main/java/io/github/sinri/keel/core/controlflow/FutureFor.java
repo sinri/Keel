@@ -9,13 +9,28 @@ import java.util.function.Function;
  * @since 1.13
  */
 public class FutureFor<T> {
-    public Function<T, Future<Void>> handleFunction;
+    private final Function<T, Future<Void>> handleFunction;
 
-    public FutureFor(Function<T, Future<Void>> handleFunction) {
+    private FutureFor(Function<T, Future<Void>> handleFunction) {
         this.handleFunction = handleFunction;
     }
 
-    public Future<Void> run(
+    public static <T> Future<Void> call(
+            T initValue,
+            Function<T, Boolean> shouldContinueFunction,
+            Function<T, T> pointerModifyFunction,
+            Function<T, Future<Void>> handleFunction
+    ) {
+        return new FutureFor<T>(
+                handleFunction
+        ).run(
+                initValue,
+                shouldContinueFunction,
+                pointerModifyFunction
+        );
+    }
+
+    private Future<Void> run(
             T initValue,
             Function<T, Boolean> shouldContinueFunction,
             Function<T, T> pointerModifyFunction

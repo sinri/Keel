@@ -41,6 +41,9 @@ public class KeelHttpServer {
 
     public void listen() {
         server.requestHandler(router)
+                .exceptionHandler(throwable -> {
+                    getLogger().exception("KeelHttpServer Exception", throwable);
+                })
                 .listen(httpServerAsyncResult -> {
                     if (httpServerAsyncResult.succeeded()) {
                         HttpServer httpServer = httpServerAsyncResult.result();
@@ -55,7 +58,8 @@ public class KeelHttpServer {
                                     .onFailure(vertxCloseFailed -> logger.error("VertX Instance Closing Failure: " + vertxCloseFailed.getMessage()));
                         }
                     }
-                });
+                })
+        ;
     }
 
     public void terminate() {

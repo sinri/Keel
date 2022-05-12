@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
@@ -48,13 +49,18 @@ public class KeelHelper {
      * @param x         a list
      * @param separator separator
      * @return the joined string
+     * @since 2.0 list -> collection
      */
-    public static String joinStringArray(List<?> x, String separator) {
+    public static String joinStringArray(Collection<?> x, String separator) {
         StringBuilder result = new StringBuilder();
-        for (int i = 0; i < x.size(); i++) {
-            if (i > 0) result.append(separator);
-            result.append(x.get(i).toString());
-        }
+
+        final int[] i = {0};
+        x.forEach(item -> {
+            if (i[0] > 0) result.append(separator);
+            result.append(item.toString());
+            i[0] += 1;
+        });
+
         return result.toString();
     }
 

@@ -9,7 +9,9 @@ import java.sql.Statement;
 /**
  * @param <T>
  * @since 1.13
+ * @deprecated since 2.1
  */
+@Deprecated
 public class DuplexExecutorForMySQL<T> extends DuplexExecutor<T, SqlConnection, Statement, SQLException> {
     public DuplexExecutorForMySQL(
             AsyncExecutor<T, SqlConnection> asyncExecutor,

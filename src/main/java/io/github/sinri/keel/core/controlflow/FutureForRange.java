@@ -13,25 +13,42 @@ public class FutureForRange {
     private final Integer end;
     private final Integer step;
 
-    public FutureForRange(Integer start, Integer end, Integer step) {
+    private FutureForRange(Integer start, Integer end, Integer step) {
         this.start = start;
         this.end = end;
         this.step = step;
     }
 
-    public FutureForRange(Integer start, Integer end) {
+    private FutureForRange(Integer start, Integer end) {
         this.start = start;
         this.end = end;
         this.step = 1;
     }
 
-    public FutureForRange(Integer end) {
+    private FutureForRange(Integer end) {
         this.start = 0;
         this.end = end;
         this.step = 1;
     }
 
-    public Future<Void> run(Function<Integer, Future<Void>> handleFunction) {
+    @Deprecated
+    public static <T> Future<Void> quick(Integer times, Function<Integer, Future<Void>> handleFunction) {
+        return call(times, handleFunction);
+    }
+
+    public static <T> Future<Void> call(Integer start, Integer end, Integer step, Function<Integer, Future<Void>> handleFunction) {
+        return new FutureForRange(start, end, step).run(handleFunction);
+    }
+
+    public static <T> Future<Void> call(Integer start, Integer end, Function<Integer, Future<Void>> handleFunction) {
+        return new FutureForRange(start, end).run(handleFunction);
+    }
+
+    public static <T> Future<Void> call(Integer times, Function<Integer, Future<Void>> handleFunction) {
+        return new FutureForRange(times).run(handleFunction);
+    }
+
+    private Future<Void> run(Function<Integer, Future<Void>> handleFunction) {
         AtomicReference<Future<Void>> futureAtomicReference = new AtomicReference<>();
         futureAtomicReference.set(Future.succeededFuture(null));
         for (Integer t = start; t < end; t += step) {
@@ -41,9 +58,5 @@ public class FutureForRange {
             futureAtomicReference.set(f);
         }
         return futureAtomicReference.get();
-    }
-
-    public static <T> Future<Void> quick(Integer times, Function<Integer, Future<Void>> handleFunction) {
-        return new FutureForRange(times).run(handleFunction);
     }
 }

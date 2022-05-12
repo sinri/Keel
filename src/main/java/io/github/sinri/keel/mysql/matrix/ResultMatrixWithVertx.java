@@ -70,7 +70,7 @@ public class ResultMatrixWithVertx implements ResultMatrix {
         }
     }
 
-    public <T extends AbstractTableRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
+    public <T extends AbstractRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
         try {
             return ResultMatrix.buildTableRow(getRowByIndex(index), classOfTableRow);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -78,7 +78,7 @@ public class ResultMatrixWithVertx implements ResultMatrix {
         }
     }
 
-    public <T extends AbstractTableRow> List<T> buildTableRowList(Class<T> classOfTableRow) {
+    public <T extends AbstractRow> List<T> buildTableRowList(Class<T> classOfTableRow) {
         try {
             return ResultMatrix.buildTableRowList(getRowList(), classOfTableRow);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
