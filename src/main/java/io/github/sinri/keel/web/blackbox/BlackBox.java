@@ -155,6 +155,7 @@ public class BlackBox {
     private void handleFile(RoutingContext routingContext, File file) {
         routingContext.response()
                 .setChunked(true)
+                .putHeader("Content-Type", "text/plain;charset=UTF-8")
                 .sendFile(file.getAbsolutePath())
                 .compose(v -> {
                     return routingContext.response().end();

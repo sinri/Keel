@@ -23,7 +23,7 @@ public class KeelLoggerOptions extends KeelOptions {
     public boolean showThreadID;
     public String fileOutputCharset;
     protected String aspect;
-    protected String logFileSpiltStyles;
+    public String logFileSpiltStyles;
 
     public KeelLoggerOptions() {
         this.aspect = "default";

@@ -22,6 +22,7 @@ public class Keel {
     private static final String KEY_KEEL_LOGGER = "KeelLogger";
 
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
+    @Deprecated
     private static final Map<String, KeelLogger> loggerMap = new HashMap<>();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
 
@@ -80,7 +81,9 @@ public class Keel {
      *
      * @param aspect aspect
      * @return KeelLogger, if already shared, use existed.
+     * @deprecated if the logger would be used in a wide scope, use verticle resolution
      */
+    @Deprecated
     public static KeelLogger logger(String aspect) {
         if (loggerMap.containsKey(aspect)) {
             return loggerMap.get(aspect);

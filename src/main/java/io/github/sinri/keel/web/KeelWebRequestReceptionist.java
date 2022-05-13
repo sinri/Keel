@@ -152,8 +152,9 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                     return respond(throwable);
                 })
                 .eventually(v -> {
-                    getLogger().notice("eventually");
-                    return Future.succeededFuture();
+                    // @since 2.2 undeploy me
+                    getLogger().notice("RECEPTIONIST eventually undeploy me!");
+                    return undeployMe();
                 });
     }
 
