@@ -92,19 +92,20 @@ public class KeelLoggerDelegate {
     }
 
     protected String computeFileName() {
-        String rotateDateTimeFormat = this.options.rotate;
         String prefix;
         if (this.categoryPrefix != null && !this.categoryPrefix.isEmpty()) {
             prefix = this.categoryPrefix;
         } else {
             prefix = aspectComponentList.get(aspectComponentList.size() - 1);
         }
-        String currentDateExpression = getCurrentDateExpression(rotateDateTimeFormat);
-        if (currentDateExpression != null && options.getLogFileSpiltStyleSet().contains(KeelLoggerOptions.LogFileSpiltStyle.NAMED_WITH_PERIOD)) {
+
+        String currentDateExpression = getCurrentDateExpression(this.options.rotate);
+        if (currentDateExpression != null) {
             return prefix + "-" + currentDateExpression + ".log";
         } else {
             return prefix + ".log";
         }
+
     }
 
     protected File getOutputTargetFile() {
@@ -125,19 +126,13 @@ public class KeelLoggerDelegate {
         File dir = new File(logRootDirectory.getAbsolutePath() + File.separator + computeRelativeDirPath());
 
         String realPath = dir.getAbsolutePath();
-        if (options.getLogFileSpiltStyleSet().contains(KeelLoggerOptions.LogFileSpiltStyle.ARCHIVED_BY_PERIOD)) {
-            String rotateDateTimeFormat = this.options.rotate;
-            String currentDateExpression = getCurrentDateExpression(rotateDateTimeFormat);
-            if (currentDateExpression != null) {
-                realPath += File.separator + currentDateExpression;
-                dir = new File(realPath);
-//                if (!dir.exists()) {
-//                    if (!dir.mkdirs()) {
-//                        new KeelLogger().warning("Cannot MKDIRS: " + dir.getAbsolutePath());
-//                    }
-//                }
-            }
+
+        String currentDateExpression = getCurrentDateExpression(this.options.archive);
+        if (currentDateExpression != null) {
+            realPath += File.separator + currentDateExpression;
+            dir = new File(realPath);
         }
+
         realPath += File.separator + computeFileName();
 
         File file = new File(realPath);
