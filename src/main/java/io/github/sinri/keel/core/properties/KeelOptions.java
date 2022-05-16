@@ -56,7 +56,11 @@ abstract public class KeelOptions {
 
                 Class<?> type = field.getType();
                 if (type == boolean.class || type == Boolean.class) {
-                    field.setBoolean(this, value.toString().equals(BOOL_YES));
+                    if (value instanceof Boolean) {
+                        field.setBoolean(this, (Boolean) value);
+                    } else {
+                        field.setBoolean(this, value.toString().equals(BOOL_YES));
+                    }
                 } else if (type == Byte.class || type == byte.class) {
                     field.setByte(this, Byte.parseByte(value.toString()));
                 } else if (type == short.class || type == Short.class) {
