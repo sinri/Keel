@@ -4,6 +4,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * The Logger For Keel Project
@@ -13,13 +14,24 @@ import java.util.Set;
 public class KeelLogger {
 
     protected KeelLoggerDelegate delegate;
+    private final String uniqueLoggerID;
 
     public KeelLogger(KeelLoggerOptions options) {
         this.delegate = new KeelLoggerDelegate(options);
+        this.uniqueLoggerID = UUID.randomUUID().toString();
     }
 
     public KeelLogger() {
         this.delegate = new KeelLoggerDelegate();
+        this.uniqueLoggerID = UUID.randomUUID().toString();
+    }
+
+    /**
+     * @return Unique Logger ID
+     * @since 2.2
+     */
+    public String getUniqueLoggerID() {
+        return uniqueLoggerID;
     }
 
     /**

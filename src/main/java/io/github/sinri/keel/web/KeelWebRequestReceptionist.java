@@ -228,4 +228,10 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
             return this.getRoutingContext().response().setStatusCode(code).end(data);
         }
     }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
+    }
 }

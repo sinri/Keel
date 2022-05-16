@@ -4,10 +4,12 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.github.sinri.keel.test.web.receptionist.ReceptionistA;
 import io.github.sinri.keel.test.web.receptionist.RootPathReceptionist;
+import io.github.sinri.keel.test.web.ws.WebSocketTest;
 import io.github.sinri.keel.web.KeelHttpServer;
 import io.github.sinri.keel.web.KeelWebRequestReceptionist;
 import io.github.sinri.keel.web.blackbox.BlackBox;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.ext.web.handler.StaticHandler;
 
 public class TestWebServiceV2 {
     public static void main(String[] args) {
@@ -31,6 +33,15 @@ public class TestWebServiceV2 {
                 true,
                 Keel.logger("router")
         );
+
+        khs.getRouter().get("/ws/page")
+                .handler(StaticHandler.create("web_root/websocket"));
+
+        WebSocketTest.upgradeFromHttp(khs.getRouter().get("/ws/api"), WebSocketTest.class);
+
+//        khs.websocket(webSocket -> {
+//            WebSocketTest.handle(webSocket, WebSocketTest.class);
+//        });
 
         khs.listen();
     }

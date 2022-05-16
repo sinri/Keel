@@ -187,9 +187,11 @@ public class Keel {
      * @since 2.0
      */
     public static KeelLogger getKeelLoggerInContext() {
+//        System.out.println("Keel::getKeelLoggerInContext as "+Keel.getVertx().getOrCreateContext().deploymentID());
         KeelLogger logger = Keel.getVertx().getOrCreateContext().get(KEY_KEEL_LOGGER);
         if (logger == null) {
-            logger = KeelLogger.buildSilentLogger();
+            //logger = KeelLogger.buildSilentLogger();
+            logger = new KeelLogger();
         }
         return logger;
     }

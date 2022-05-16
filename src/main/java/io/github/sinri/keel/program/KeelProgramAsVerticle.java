@@ -65,4 +65,10 @@ public abstract class KeelProgramAsVerticle extends KeelVerticle {
      * @return future
      */
     abstract protected Future<Void> execute();
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
+    }
 }

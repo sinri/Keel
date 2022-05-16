@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Keel Websocket</title>
+</head>
+<body>
+<h1>SEE CONSOLE</h1>
+<script>
+    const socket = new WebSocket("ws://localhost:14000/ws/api");
+    socket.addEventListener('open', function (event) {
+        //socket.send("Hello!");
+        console.log("? OPEN");
+    })
+    socket.addEventListener('message', function (event) {
+        console.log("< " + event.data, event);
+    })
+    socket.addEventListener('error', function (event) {
+        console.log("! ERROR OCCURRED", event);
+    })
+    socket.addEventListener('close', function (event) {
+        console.log(". REMOTE CLOSE MESSAGE RECEIVED", event);
+    })
+
+    setTimeout(function (timerID) {
+        const v = "Now is " + (new Date());
+        socket.send(v);
+        console.log("> " + v)
+    }, 3000)
+    setTimeout(function (timerID) {
+        socket.close()
+        console.log("; CLOSE")
+    }, 5000)
+</script>
+</body>
+</html>

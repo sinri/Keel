@@ -130,6 +130,8 @@ public abstract class KeelQueue extends KeelVerticle {
     @Override
     public void stop() throws Exception {
         this.queueStatus = QueueStatus.STOPPED;
+
+        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
     }
 
     public interface KeelQueueNextTaskSeeker {

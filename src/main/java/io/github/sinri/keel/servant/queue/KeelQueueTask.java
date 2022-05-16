@@ -58,4 +58,10 @@ public abstract class KeelQueueTask extends KeelVerticle {
     protected void notifyBeforeUndeploy() {
         // do nothing by default
     }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
+    }
 }

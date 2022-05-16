@@ -1,5 +1,6 @@
 package io.github.sinri.keel.core.logger;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
 import io.vertx.core.json.JsonObject;
 
@@ -172,11 +173,22 @@ public class KeelLoggerDelegate {
         if (categoryPrefix != null && !categoryPrefix.isEmpty()) {
             subject += ":" + categoryPrefix;
         }
+
+        String threadInfo = "";
+        if (this.options.isShowThreadID()) {
+            threadInfo = "[" + Thread.currentThread().getId() + "] ";
+        }
+        String verticleDeploymentInfo = "";
+        if (this.options.isShowVerticleDeploymentID()) {
+            verticleDeploymentInfo = "{" + Keel.getVertx().getOrCreateContext().deploymentID() + "} ";
+        }
+
         String content = getCurrentDateExpression("yyyy-MM-dd HH:mm:ss") + " "
                 + "[" + level.name() + "] "
 //                + reportPoint
                 + "<" + subject + "> "
-                + (this.options.isShowThreadID() ? ("[" + Thread.currentThread().getId() + "] ") : "")
+                + threadInfo
+                + verticleDeploymentInfo
                 + msg;
         if (context != null) {
             content += " | " + context;

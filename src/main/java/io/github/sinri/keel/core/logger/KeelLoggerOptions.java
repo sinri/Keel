@@ -20,6 +20,7 @@ public class KeelLoggerOptions extends KeelOptions {
     public String archive;
     public boolean keepWriterReady;
     public boolean showThreadID;
+    public boolean showVerticleDeploymentID;
     public String fileOutputCharset;
     protected String aspect;
 
@@ -32,6 +33,7 @@ public class KeelLoggerOptions extends KeelOptions {
         this.showThreadID = true;
         this.fileOutputCharset = null;
         this.archive = null;
+        this.showVerticleDeploymentID = true;
     }
 
     /**
@@ -118,6 +120,14 @@ public class KeelLoggerOptions extends KeelOptions {
 
     public boolean isShowThreadID() {
         return this.showThreadID;
+    }
+
+    /**
+     * @return
+     * @since 2.2
+     */
+    public boolean isShowVerticleDeploymentID() {
+        return showVerticleDeploymentID;
     }
 
     public KeelLoggerOptions setShowThreadID(boolean showThreadID) {
