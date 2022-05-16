@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.core.logger.KeelLogger;
@@ -111,6 +112,9 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
     @Override
     public void start() throws Exception {
         super.start();
+
+        Keel.registerDeployedKeelVerticle(this);
+
         this.requestID = prepareRequestID();
         setLogger(prepareLogger());
 
@@ -136,9 +140,9 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                                 return Future.failedFuture(e);
                             }
                             return filter.shouldHandleThisRequest(getRoutingContext())
-                            .compose(ok -> Future.succeededFuture(filterIndex + 1));
-                }
-        )
+                                    .compose(ok -> Future.succeededFuture(filterIndex + 1));
+                        }
+                )
                 .compose(x -> Future.succeededFuture())
                 .compose(filtersPassed -> this.dealWithRequest())
                 .compose(responseObject -> {

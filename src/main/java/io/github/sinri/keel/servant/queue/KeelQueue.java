@@ -42,6 +42,8 @@ public abstract class KeelQueue extends KeelVerticle {
     abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
 
     public void start() {
+        Keel.registerDeployedKeelVerticle(this);
+
         // 部署之后重新加载一遍
         this.logger = prepareLogger();
         setLogger(this.logger);

@@ -97,35 +97,13 @@ public class KeelLogger {
     }
 
     /**
-     * @param level
-     * @param msg
-     * @param throwable
+     * @param level     KeelLogLevel
+     * @param msg       Message String
+     * @param throwable Throwable
      * @since 2.1
      */
     public void exception(KeelLogLevel level, String msg, Throwable throwable) {
-        if (level.isSilent() || level.isNegligibleThan(this.delegate.options.getLowestLevel())) {
-            return;
-        }
-        if (throwable == null) {
-            error(msg);
-            return;
-        }
-        String prefix = throwable.getClass().getName() + " : " + throwable.getMessage();
-        if (msg != null && !msg.isEmpty()) {
-            prefix = msg + " × " + throwable.getClass().getName() + " : " + throwable.getMessage();
-        }
-        error(prefix);
-
-        var lastThrowable = throwable;
-        while (lastThrowable.getCause() != null) {
-            var cause = lastThrowable.getCause();
-            this.delegate.print(level, "Caused by " + cause.getClass().getName() + " : " + cause.getMessage(), null);
-            lastThrowable = cause;
-        }
-
-        for (var s : lastThrowable.getStackTrace()) {
-            this.delegate.print(level, "\t" + s.toString(), null);
-        }
+        this.delegate.exception(level, msg, throwable);
     }
 
     public void print(KeelLogLevel level, String content, String ending) {

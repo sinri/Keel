@@ -42,6 +42,9 @@ public abstract class KeelProgramAsVerticle extends KeelVerticle {
     @Override
     public final void start() throws Exception {
         super.start();
+
+        Keel.registerDeployedKeelVerticle(this);
+
         setLogger(prepareLogger());
         execute()
                 .compose(v -> {

@@ -1,5 +1,6 @@
 package io.github.sinri.keel.servant.queue;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
@@ -32,6 +33,8 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     // as verticle
     public final void start() {
+        Keel.registerDeployedKeelVerticle(this);
+
         setLogger(prepareLogger());
         notifyAfterDeployed();
         run()

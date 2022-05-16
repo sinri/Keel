@@ -6,9 +6,11 @@ import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.KeelMySQLOptions;
 import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
+import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
 import java.sql.Statement;
@@ -28,6 +30,8 @@ public class Keel {
 
     @Deprecated
     private static final Map<String, KeelJDBCForMySQL> mysqlKitWithJDBCMap = new HashMap<>();
+
+    private static final Map<String, JsonObject> deployedKeelVerticleMap = new HashMap<>();
 
     private static Vertx vertx;
 
@@ -196,5 +200,32 @@ public class Keel {
      */
     public static void setKeelLoggerInContext(KeelLogger logger) {
         Keel.getVertx().getOrCreateContext().put(KEY_KEEL_LOGGER, logger);
+    }
+
+    /**
+     * @param keelVerticle KeelVerticle Instance (deployed)
+     * @since 2.2
+     */
+    public static void registerDeployedKeelVerticle(KeelVerticle keelVerticle) {
+        if (keelVerticle.deploymentID() != null) {
+            deployedKeelVerticleMap.put(keelVerticle.deploymentID(), keelVerticle.getVerticleInfo());
+        }
+    }
+
+    /**
+     * @param deploymentID DeploymentID of KeelVerticle Instance (deployed)
+     * @since 2.2
+     */
+    public static void unregisterDeployedKeelVerticle(String deploymentID) {
+        deployedKeelVerticleMap.remove(deploymentID);
+    }
+
+    /**
+     * @param deploymentID
+     * @return
+     * @since 2.2
+     */
+    public static JsonObject getDeployedKeelVerticleInfo(String deploymentID) {
+        return deployedKeelVerticleMap.get(deploymentID);
     }
 }

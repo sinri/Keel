@@ -46,6 +46,16 @@ public class KeelLoggerOptions extends KeelOptions {
         if (x.containsKey("*")) {
             keelLoggerOptions.overwritePropertiesWithJsonObject(x.getJsonObject("*"));
         }
+        String[] aspectComponents = aspect.split("/");
+        StringBuilder aspectPart = new StringBuilder();
+        if (aspectComponents.length > 1) {
+            for (var aspectComponent : aspectComponents) {
+                aspectPart.append((aspectPart.length() == 0) ? "" : "/").append(aspectComponent);
+                if (x.containsKey(aspectPart.toString())) {
+                    keelLoggerOptions.overwritePropertiesWithJsonObject(x.getJsonObject(aspectPart.toString()));
+                }
+            }
+        }
         if (x.containsKey(aspect)) {
             keelLoggerOptions.overwritePropertiesWithJsonObject(x.getJsonObject(aspect));
         }

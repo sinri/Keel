@@ -5,6 +5,7 @@ import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
 import java.sql.Statement;
@@ -22,6 +23,12 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
 
     protected final void setLogger(KeelLogger logger) {
         Keel.setKeelLoggerInContext(logger);
+    }
+
+    public JsonObject getVerticleInfo() {
+        return new JsonObject()
+                .put("class", this.getClass().getName())
+                .put("config", this.config());
     }
 
     protected final SqlConnection getMySqlConnection() {

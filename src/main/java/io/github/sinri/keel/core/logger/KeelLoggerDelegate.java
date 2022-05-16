@@ -131,16 +131,24 @@ public class KeelLoggerDelegate {
             if (currentDateExpression != null) {
                 realPath += File.separator + currentDateExpression;
                 dir = new File(realPath);
-                if (!dir.exists()) {
-                    if (!dir.mkdirs()) {
-                        new KeelLogger().warning("Cannot MKDIRS: " + dir.getAbsolutePath());
-                    }
-                }
+//                if (!dir.exists()) {
+//                    if (!dir.mkdirs()) {
+//                        new KeelLogger().warning("Cannot MKDIRS: " + dir.getAbsolutePath());
+//                    }
+//                }
             }
         }
         realPath += File.separator + computeFileName();
 
-        return new File(realPath);
+        File file = new File(realPath);
+        File parentFile = file.getParentFile();
+        if (parentFile != null && !parentFile.exists()) {
+            if (!parentFile.mkdirs()) {
+                new KeelLogger().warning("Cannot MKDIRS: " + dir.getAbsolutePath());
+            }
+        }
+
+        return file;
     }
 
     protected BufferedWriter getWriter(File outputTargetFile) throws IOException {
@@ -229,5 +237,37 @@ public class KeelLoggerDelegate {
             return;
         }
         print(content, ending);
+    }
+
+    /**
+     * @param level     KeelLogLevel
+     * @param msg       Message String
+     * @param throwable Throwable
+     * @since 2.2 capsulized here from KeelLogger
+     */
+    public void exception(KeelLogLevel level, String msg, Throwable throwable) {
+        if (level.isSilent() || level.isNegligibleThan(this.options.getLowestLevel())) {
+            return;
+        }
+        if (throwable == null) {
+            log(KeelLogLevel.ERROR, msg, null);
+            return;
+        }
+        String prefix = throwable.getClass().getName() + " : " + throwable.getMessage();
+        if (msg != null && !msg.isEmpty()) {
+            prefix = msg + " × " + throwable.getClass().getName() + " : " + throwable.getMessage();
+        }
+        log(KeelLogLevel.ERROR, prefix, null);
+
+        var lastThrowable = throwable;
+        while (lastThrowable.getCause() != null) {
+            var cause = lastThrowable.getCause();
+            this.print(level, "Caused by " + cause.getClass().getName() + " : " + cause.getMessage(), null);
+            lastThrowable = cause;
+        }
+
+        for (var s : lastThrowable.getStackTrace()) {
+            this.print(level, "\t" + s.toString(), null);
+        }
     }
 }
