@@ -7,6 +7,7 @@ import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.KeelMySQLOptions;
 import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
 import io.github.sinri.keel.verticles.KeelVerticle;
+import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
@@ -187,10 +188,17 @@ public class Keel {
      * @since 2.0
      */
     public static KeelLogger getKeelLoggerInContext() {
-//        System.out.println("Keel::getKeelLoggerInContext as "+Keel.getVertx().getOrCreateContext().deploymentID());
-        KeelLogger logger = Keel.getVertx().getOrCreateContext().get(KEY_KEEL_LOGGER);
+        return getKeelLoggerInContext(Keel.getVertx().getOrCreateContext());
+    }
+
+    /**
+     * @param context
+     * @return
+     * @since 2.2
+     */
+    public static KeelLogger getKeelLoggerInContext(Context context) {
+        KeelLogger logger = context.get(KEY_KEEL_LOGGER);
         if (logger == null) {
-            //logger = KeelLogger.buildSilentLogger();
             logger = new KeelLogger();
         }
         return logger;

@@ -4,7 +4,7 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.github.sinri.keel.test.web.receptionist.ReceptionistA;
 import io.github.sinri.keel.test.web.receptionist.RootPathReceptionist;
-import io.github.sinri.keel.test.web.ws.WebSocketTest;
+import io.github.sinri.keel.test.web.ws.WebSocketTest2;
 import io.github.sinri.keel.web.KeelHttpServer;
 import io.github.sinri.keel.web.KeelWebRequestReceptionist;
 import io.github.sinri.keel.web.blackbox.BlackBox;
@@ -37,7 +37,7 @@ public class TestWebServiceV2 {
         khs.getRouter().get("/ws/page")
                 .handler(StaticHandler.create("web_root/websocket"));
 
-        WebSocketTest.upgradeFromHttp(khs.getRouter().get("/ws/api"), WebSocketTest.class);
+        WebSocketTest2.upgradeFromHttp(khs.getRouter().get("/ws/api"), WebSocketTest2.class);
 
 //        khs.websocket(webSocket -> {
 //            WebSocketTest.handle(webSocket, WebSocketTest.class);

@@ -11,16 +11,17 @@ import io.vertx.ext.web.Route;
 import java.lang.reflect.InvocationTargetException;
 
 abstract public class KeelWebSocketHandler extends KeelVerticle {
+
     private final ServerWebSocket webSocket;
 
     public KeelWebSocketHandler(ServerWebSocket webSocket) {
+        super();
         this.webSocket = webSocket;
     }
 
-    public static void handle(ServerWebSocket webSocket, Class<? extends KeelWebSocketHandler> handlerClass) {
+    public static <T extends KeelWebSocketHandler> void handle(ServerWebSocket webSocket, Class<T> handlerClass) {
         KeelLogger logger = Keel.outputLogger("KeelWebSocketHandler::handle for " + handlerClass.getName());
-        Keel.getVertx().getOrCreateContext();
-        KeelWebSocketHandler keelWebSocketHandler;
+        T keelWebSocketHandler;
         try {
             keelWebSocketHandler = handlerClass.getConstructor(ServerWebSocket.class).newInstance(webSocket);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -37,7 +38,6 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
                     logger.exception(throwable);
                     return Future.succeededFuture();
                 });
-
     }
 
     public static void upgradeFromHttp(Route route, Class<? extends KeelWebSocketHandler> handlerClass) {
@@ -56,93 +56,50 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
         });
     }
 
-    protected ServerWebSocket getWebSocket() {
-        return webSocket;
-    }
-
     abstract protected KeelLogger prepareLogger();
 
     @Override
-    public final void start() throws Exception {
+    public void start() throws Exception {
         super.start();
-        Keel.registerDeployedKeelVerticle(this);
-        KeelLogger logger = prepareLogger();
-        setLogger(logger);
+        setLogger(prepareLogger());
 
-        logger.info("START");
-        if (getWebSocket() == null) {
-            logger.error("null");
-        }
+        webSocket
+                .handler(this::handleBuffer)
+                .exceptionHandler(this::handleException)
+                .endHandler(end -> this.handleEnd());
 
-        getLogger().info("incoming websocket " + getWebSocket().toString());
-
-        getWebSocket()
-                .handler(buffer -> {
-                    context.runOnContext(inContext -> {
-                        getLogger().info("HANDLE BUFFER " + buffer.toString());
-                        handleBuffer(buffer);
-                    });
-                })
-                .exceptionHandler(throwable -> {
-                    context.runOnContext(v -> {
-                        handleException(throwable);
-                    });
-                })
-                .endHandler(end -> {
-                    context.runOnContext(v -> {
-                        handleEnding().eventually(vv -> undeployMe());
-                    });
-                });
-        handleSocket();
-
-    }
-
-    protected final void handleSocket() {
-        shouldAccept()
-                .compose(shouldAccept -> {
-                    getLogger().info("deployment: " + deploymentID());
-                    if (!shouldAccept) {
-                        getLogger().warning("to reject it");
-                        getWebSocket().reject();
-                        return Future.succeededFuture();
+        shouldReject()
+                .compose(shouldReject -> {
+                    if (shouldReject) {
+                        webSocket.reject();
+                    } else {
+                        accept();
                     }
-                    // The ServerWebSocket instance enables you to retrieve the headers, path, query and URI of the HTTP request of the WebSocket handshake.
-
-                    getWebSocket().accept();
-
-                    return sendTextMessageAfterAccept()
-                            .compose(getWebSocket()::writeTextMessage);
+                    return Future.succeededFuture();
                 });
     }
 
-    /**
-     * Check if the websocket should be rejected
-     *
-     * @return void
-     */
-    protected Future<Boolean> shouldAccept() {
-//        System.out.println("KeelWebSocketHandler::shouldAccept logger is " + getLogger().getUniqueLoggerID());
-        getLogger().info("shouldAccept");
-        return Future.succeededFuture(true);
+    protected Future<Boolean> shouldReject() {
+        return Future.succeededFuture(false);
     }
 
-    abstract protected Future<String> sendTextMessageAfterAccept();
+//    protected boolean shouldReject() {
+//        return false;
+//    }
+
+    abstract protected void accept();
 
     abstract protected void handleBuffer(Buffer buffer);
 
-    protected void handleException(Throwable throwable) {
-        getLogger().exception("EXCEPTION", throwable);
-        getWebSocket().end();
+    abstract protected void handleException(Throwable throwable);
+
+    abstract protected void handleEnd();
+
+    protected final Future<Void> writeText(String text) {
+        return webSocket.writeTextMessage(text);
     }
 
-    protected Future<Void> handleEnding() {
-        getLogger().info("END");
-        return Future.succeededFuture();
-    }
-
-    @Override
-    public void stop() throws Exception {
-        super.stop();
-        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
+    protected final Future<Void> close() {
+        return webSocket.close();
     }
 }

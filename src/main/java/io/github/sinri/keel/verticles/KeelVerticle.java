@@ -18,7 +18,7 @@ import java.sql.Statement;
 abstract public class KeelVerticle extends AbstractVerticle implements VerticleAbleToUndeployItself {
 
     protected KeelLogger getLogger() {
-        return Keel.getKeelLoggerInContext();
+        return Keel.getKeelLoggerInContext(context);
     }
 
     protected final void setLogger(KeelLogger logger) {
