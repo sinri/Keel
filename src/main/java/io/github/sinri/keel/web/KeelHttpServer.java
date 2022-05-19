@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
@@ -23,7 +24,7 @@ public class KeelHttpServer {
         this.vertx = vertx;
         server = vertx.createHttpServer(options);
         router = Router.router(vertx);
-        logger = new KeelLogger();
+        logger = Keel.outputLogger(getClass().getName());
         this.closeVertXWhenTerminated = closeVertXWhenTerminated;
     }
 
@@ -52,7 +53,7 @@ public class KeelHttpServer {
                 .listen(httpServerAsyncResult -> {
                     if (httpServerAsyncResult.succeeded()) {
                         HttpServer httpServer = httpServerAsyncResult.result();
-                        logger.info("HTTP Server Established: " + httpServer.toString() + " Actual Port: " + httpServer.actualPort());
+                        logger.info("HTTP Server Established, Actual Port: " + httpServer.actualPort());
                     } else {
                         Throwable throwable = httpServerAsyncResult.cause();
                         logger.fatal(throwable.getMessage());

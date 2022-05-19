@@ -183,17 +183,31 @@ public class KeelLoggerDelegate {
             verticleDeploymentInfo = "{" + Keel.getVertx().getOrCreateContext().deploymentID() + "} ";
         }
 
-        String content = getCurrentDateExpression("yyyy-MM-dd HH:mm:ss") + " "
+        String meta = getCurrentDateExpression("yyyy-MM-dd HH:mm:ss") + " "
                 + "[" + level.name() + "] "
 //                + reportPoint
                 + "<" + subject + "> "
                 + threadInfo
-                + verticleDeploymentInfo
-                + msg;
-        if (context != null) {
-            content += " | " + context;
-        }
+                + verticleDeploymentInfo;
 
+        String content;
+        if (this.options.getCompositionStyle() == KeelLoggerOptions.CompositionStyle.TWO_LINES) {
+            content = meta + "\n" + msg;
+            if (context != null) {
+                content += " | " + context;
+            }
+        } else if (this.options.getCompositionStyle() == KeelLoggerOptions.CompositionStyle.THREE_LINES) {
+            content = meta + "\n" + msg;
+            if (context != null) {
+                content += "\ncontext: " + context;
+            }
+        } else {
+            // as ONE_LINE
+            content = meta + msg;
+            if (context != null) {
+                content += " | " + context;
+            }
+        }
 
         print(content, null);
     }

@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.websockets;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
@@ -19,8 +18,8 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
         this.webSocket = webSocket;
     }
 
-    public static <T extends KeelWebSocketHandler> void handle(ServerWebSocket webSocket, Class<T> handlerClass) {
-        KeelLogger logger = Keel.outputLogger("KeelWebSocketHandler::handle for " + handlerClass.getName());
+    public static <T extends KeelWebSocketHandler> void handle(ServerWebSocket webSocket, Class<T> handlerClass, KeelLogger logger) {
+//        KeelLogger logger = Keel.outputLogger("KeelWebSocketHandler::handle for " + handlerClass.getName());
         T keelWebSocketHandler;
         try {
             keelWebSocketHandler = handlerClass.getConstructor(ServerWebSocket.class).newInstance(webSocket);
@@ -40,8 +39,8 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
                 });
     }
 
-    public static void upgradeFromHttp(Route route, Class<? extends KeelWebSocketHandler> handlerClass) {
-        KeelLogger logger = Keel.outputLogger("KeelWebSocketHandler::upgradeFromHttp");
+    public static void upgradeFromHttp(Route route, Class<? extends KeelWebSocketHandler> handlerClass, KeelLogger logger) {
+//        KeelLogger logger = Keel.outputLogger("KeelWebSocketHandler::upgradeFromHttp");
         route.handler(routingContext -> {
             logger.debug(routingContext.request().toString());
             routingContext.request().toWebSocket(serverWebSocketAsyncResult -> {
@@ -50,7 +49,7 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
                 } else {
                     ServerWebSocket webSocketFromHttp = serverWebSocketAsyncResult.result();
                     logger.debug("Got webSocketFromHttp " + webSocketFromHttp.toString());
-                    handle(webSocketFromHttp, handlerClass);
+                    handle(webSocketFromHttp, handlerClass, logger);
                 }
             });
         });

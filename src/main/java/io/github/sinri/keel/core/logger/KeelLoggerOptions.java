@@ -22,6 +22,8 @@ public class KeelLoggerOptions extends KeelOptions {
     public boolean showThreadID;
     public boolean showVerticleDeploymentID;
     public String fileOutputCharset;
+    public String compositionStyle;
+
     protected String aspect;
 
     public KeelLoggerOptions() {
@@ -34,17 +36,42 @@ public class KeelLoggerOptions extends KeelOptions {
         this.fileOutputCharset = null;
         this.archive = null;
         this.showVerticleDeploymentID = true;
+        this.compositionStyle = CompositionStyle.ONE_LINE.name();
     }
 
     /**
-     * @param aspect the string of aspect
-     * @return KeelLoggerOptions, read and composed of the content read by reader
+     * @param aspect
+     * @return
+     * @since 1.11
+     * @deprecated since 2.2
      */
+    @Deprecated
     public static KeelLoggerOptions generateOptionsForAspectWithPropertiesReader(String aspect) {
-        JsonObject x = Keel.getPropertiesReader().filter("log").toJsonObject();
         KeelLoggerOptions keelLoggerOptions = new KeelLoggerOptions();
+        return generateOptionsForAspectWithPropertiesReader(aspect, keelLoggerOptions);
+    }
+
+    /**
+     * @param aspect            the string of aspect
+     * @param keelLoggerOptions existed options to overwrite
+     * @return KeelLoggerOptions, read and composed of the content read by reader
+     * @since 2.2
+     * @deprecated since 2.2
+     */
+    @Deprecated
+    public static KeelLoggerOptions generateOptionsForAspectWithPropertiesReader(String aspect, KeelLoggerOptions keelLoggerOptions) {
+        return keelLoggerOptions.loadForAspect(aspect);
+    }
+
+    /**
+     * @param aspect
+     * @return
+     * @since 2.2
+     */
+    public KeelLoggerOptions loadForAspect(String aspect) {
+        JsonObject x = Keel.getPropertiesReader().filter("log").toJsonObject();
         if (x.containsKey("*")) {
-            keelLoggerOptions.overwritePropertiesWithJsonObject(x.getJsonObject("*"));
+            this.overwritePropertiesWithJsonObject(x.getJsonObject("*"));
         }
         String[] aspectComponents = aspect.split("/");
         StringBuilder aspectPart = new StringBuilder();
@@ -52,15 +79,15 @@ public class KeelLoggerOptions extends KeelOptions {
             for (var aspectComponent : aspectComponents) {
                 aspectPart.append((aspectPart.length() == 0) ? "" : "/").append(aspectComponent);
                 if (x.containsKey(aspectPart.toString())) {
-                    keelLoggerOptions.overwritePropertiesWithJsonObject(x.getJsonObject(aspectPart.toString()));
+                    this.overwritePropertiesWithJsonObject(x.getJsonObject(aspectPart.toString()));
                 }
             }
         }
         if (x.containsKey(aspect)) {
-            keelLoggerOptions.overwritePropertiesWithJsonObject(x.getJsonObject(aspect));
+            this.overwritePropertiesWithJsonObject(x.getJsonObject(aspect));
         }
-        keelLoggerOptions.setAspect(aspect);
-        return keelLoggerOptions;
+        this.setAspect(aspect);
+        return this;
     }
 
     public String getAspect() {
@@ -146,5 +173,32 @@ public class KeelLoggerOptions extends KeelOptions {
     public KeelLoggerOptions setFileOutputCharset(Charset fileOutputCharset) {
         this.fileOutputCharset = fileOutputCharset.name();
         return this;
+    }
+
+    /**
+     * @return
+     * @since 2.2
+     */
+    public CompositionStyle getCompositionStyle() {
+        return CompositionStyle.valueOf(compositionStyle);
+    }
+
+    /**
+     * @param compositionStyle
+     * @return
+     * @since 2.2
+     */
+    public KeelLoggerOptions setCompositionStyle(CompositionStyle compositionStyle) {
+        this.compositionStyle = compositionStyle.name();
+        return this;
+    }
+
+    /**
+     * @since 2.2
+     */
+    public enum CompositionStyle {
+        ONE_LINE, // meta + message + context \n
+        TWO_LINES,// meta \n message + context \n
+        THREE_LINES,// meta \n message \n context \n
     }
 }

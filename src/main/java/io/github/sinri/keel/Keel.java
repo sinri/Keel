@@ -78,7 +78,9 @@ public class Keel {
      * @since 1.11
      */
     public static KeelLogger standaloneLogger(String aspect) {
-        return new KeelLogger(KeelLoggerOptions.generateOptionsForAspectWithPropertiesReader(aspect));
+        KeelLoggerOptions options = new KeelLoggerOptions()
+                .loadForAspect(aspect);
+        return new KeelLogger(options);
     }
 
     /**
@@ -99,7 +101,11 @@ public class Keel {
     }
 
     public static KeelLogger outputLogger(String aspect) {
-        return new KeelLogger(KeelLoggerOptions.generateOptionsForAspectWithPropertiesReader(aspect).setDir(""));
+        KeelLoggerOptions options = new KeelLoggerOptions()
+                .setCompositionStyle(KeelLoggerOptions.CompositionStyle.THREE_LINES)
+                .loadForAspect(aspect)
+                .setDir("");
+        return new KeelLogger(options);
     }
 
     public static KeelMySQLKit getMySQLKit(String dataSourceName) {
@@ -209,7 +215,16 @@ public class Keel {
      * @since 2.0
      */
     public static void setKeelLoggerInContext(KeelLogger logger) {
-        Keel.getVertx().getOrCreateContext().put(KEY_KEEL_LOGGER, logger);
+        setKeelLoggerInContext(Keel.getVertx().getOrCreateContext(), logger);
+    }
+
+    /**
+     * @param context
+     * @param logger
+     * @since 2.2
+     */
+    public static void setKeelLoggerInContext(Context context, KeelLogger logger) {
+        context.put(KEY_KEEL_LOGGER, logger);
     }
 
     /**

@@ -1,6 +1,7 @@
 package io.github.sinri.keel.test.web;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.github.sinri.keel.test.web.receptionist.ReceptionistA;
 import io.github.sinri.keel.test.web.receptionist.RootPathReceptionist;
@@ -14,6 +15,9 @@ import io.vertx.ext.web.handler.StaticHandler;
 public class TestWebServiceV2 {
     public static void main(String[] args) {
         SharedTestBootstrap.initialize();
+
+        KeelLogger routerLogger = Keel.standaloneLogger("router");
+
         KeelHttpServer khs = new KeelHttpServer(Keel.getVertx(), new HttpServerOptions().setPort(14000), true);
 
         new BlackBox("/blackbox", "/Users/leqee/code/Keel/log")
@@ -24,20 +28,20 @@ public class TestWebServiceV2 {
                 khs.getRouter().get("/"),
                 RootPathReceptionist.class,
                 true,
-                Keel.logger("router")
+                routerLogger
         );
 
         KeelWebRequestReceptionist.registerRoute(
                 khs.getRouter().get("/a"),
                 ReceptionistA.class,
                 true,
-                Keel.logger("router")
+                routerLogger
         );
 
         khs.getRouter().get("/ws/page")
                 .handler(StaticHandler.create("web_root/websocket"));
 
-        WebSocketTest2.upgradeFromHttp(khs.getRouter().get("/ws/api"), WebSocketTest2.class);
+        WebSocketTest2.upgradeFromHttp(khs.getRouter().get("/ws/api"), WebSocketTest2.class, routerLogger);
 
 //        khs.websocket(webSocket -> {
 //            WebSocketTest.handle(webSocket, WebSocketTest.class);
