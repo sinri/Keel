@@ -7,39 +7,39 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @since 2.2
  */
-public class HtmlElement {
+public class HTMLTagElement {
     private final String tag;
     private final boolean paired;
-    private final List<HtmlElement> subElementList = new ArrayList<>();
+    private final List<HTMLTagElement> subElementList = new ArrayList<>();
     private String attributes;
     private String content;
 
-    public HtmlElement(String tag) {
+    public HTMLTagElement(String tag) {
         this.tag = tag;
         this.paired = !tag.equalsIgnoreCase("br");
         this.attributes = null;
         this.content = null;
     }
 
-    public HtmlElement(String tag, boolean paired) {
+    public HTMLTagElement(String tag, boolean paired) {
         this.tag = tag;
         this.paired = paired;
         this.attributes = null;
         this.content = null;
     }
 
-    public HtmlElement setAttributes(String attributes) {
+    public HTMLTagElement setAttributes(String attributes) {
         this.attributes = attributes;
         return this;
     }
 
-    public HtmlElement setContent(String content) {
+    public HTMLTagElement setContent(String content) {
         this.content = content;
         return this;
     }
 
-    public HtmlElement addSubElement(HtmlElement subHtmlElement) {
-        this.subElementList.add(subHtmlElement);
+    public HTMLTagElement addSubElement(HTMLTagElement subHTMLTagElement) {
+        this.subElementList.add(subHTMLTagElement);
         return this;
     }
 

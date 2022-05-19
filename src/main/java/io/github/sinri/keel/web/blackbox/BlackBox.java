@@ -2,7 +2,8 @@ package io.github.sinri.keel.web.blackbox;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.web.blackbox.html.HtmlElement;
+import io.github.sinri.keel.web.blackbox.html.HTMLElement;
+import io.github.sinri.keel.web.blackbox.html.HTMLTagElement;
 import io.vertx.core.Future;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
@@ -40,7 +41,7 @@ public class BlackBox {
                     logger.error("failure handler");
                     routingContext.response().setStatusCode(501).end();
                 })
-                .handler(routingContext -> {
+                .blockingHandler(routingContext -> {
                     String path = routingContext.request().path();
                     logger.info("incoming request path " + path);
                     if (path.startsWith(this.routeRootPath + "/see/")) {
@@ -75,39 +76,39 @@ public class BlackBox {
 
                     String pageTitle = "BlackBox - " + relativeDirPath;
 
-                    HtmlElement bodyElement = new HtmlElement("body")
+                    HTMLTagElement bodyElement = new HTMLTagElement("body")
                             .setAttributes("style='text-align: center;'");
                     bodyElement.addSubElement(
-                            new HtmlElement("h1").setContent(pageTitle)
+                            new HTMLTagElement("h1").setContent(pageTitle)
                     );
                     if (!isRootDir) {
                         File parent = dir.getParentFile();
                         String relativeParentDirPath = parent.getAbsolutePath().substring(this.logDirPath.length());
 
                         bodyElement.addSubElement(
-                                new HtmlElement("div")
+                                new HTMLTagElement("div")
                                         .setAttributes("style='margin: 10px auto;'")
                                         .addSubElement(
-                                                new HtmlElement("a")
+                                                new HTMLTagElement("a")
                                                         .setAttributes("href='" + this.routeRootPath + "/see" + (relativeParentDirPath.isEmpty() ? "/" : relativeParentDirPath) + "'")
                                                         .setContent("Go to parent directory: " + parent.getName())
                                         )
                         );
                     }
                     bodyElement.addSubElement(
-                            new HtmlElement("div").setContent("Totally " + children.size() + " child(ren).")
+                            new HTMLTagElement("div").setContent("Totally " + children.size() + " child(ren).")
                     );
                     if (!children.isEmpty()) {
-                        HtmlElement table = new HtmlElement("table")
+                        HTMLTagElement table = new HTMLTagElement("table")
                                 .setAttributes("style='min-width:50%;margin: auto;'");
 
                         table.addSubElement(
-                                new HtmlElement("tr")
-                                        .addSubElement(new HtmlElement("th")
+                                new HTMLTagElement("tr")
+                                        .addSubElement(new HTMLTagElement("th")
                                                 .setAttributes("style='margin:5px 10px;border-bottom: gray 1px dashed;'")
                                                 .setContent("Name")
                                         )
-                                        .addSubElement(new HtmlElement("th")
+                                        .addSubElement(new HTMLTagElement("th")
                                                 .setAttributes("style='margin:5px 10px;border-bottom: gray 1px dashed;'")
                                                 .setContent("Last Modified")
                                         )
@@ -118,15 +119,15 @@ public class BlackBox {
                             String relativeChildPath = child.substring(this.logDirPath.length());
 
                             table.addSubElement(
-                                    new HtmlElement("tr")
-                                            .addSubElement(new HtmlElement("td")
+                                    new HTMLTagElement("tr")
+                                            .addSubElement(new HTMLTagElement("td")
                                                     .setAttributes("style='margin:5px 10px;border-bottom: gray 1px dashed;'")
-                                                    .addSubElement(new HtmlElement("a")
+                                                    .addSubElement(new HTMLTagElement("a")
                                                             .setContent(childFile.getName())
                                                             .setAttributes("href='" + this.routeRootPath + "/see" + relativeChildPath + "'" + (childFile.isFile() ? " target='_blank'" : ""))
                                                     )
                                             )
-                                            .addSubElement(new HtmlElement("td")
+                                            .addSubElement(new HTMLTagElement("td")
                                                     .setAttributes("style='margin:5px 10px;border-bottom: gray 1px dashed;'")
                                                     .setContent((new Date(childFile.lastModified()).toString()))
                                             )
@@ -136,19 +137,18 @@ public class BlackBox {
                         bodyElement.addSubElement(table);
                     }
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("<!doctype html>\n");
-
-                    var html = new HtmlElement("html")
-                            .addSubElement(new HtmlElement("head")
-                                    .addSubElement(new HtmlElement("title").setContent(pageTitle))
+                    return Future.succeededFuture(
+                            new HTMLElement(
+                                    new HTMLTagElement("html")
+                                            .addSubElement(new HTMLTagElement("head")
+                                                    .addSubElement(new HTMLTagElement("title").setContent(pageTitle))
+                                            )
+                                            .addSubElement(bodyElement)
                             )
-                            .addSubElement(bodyElement);
-                    sb.append(html.toString());
-                    return Future.succeededFuture(sb.toString());
+                    );
                 })
-                .compose(code -> {
-                    return routingContext.response().end(code);
+                .compose(html -> {
+                    return routingContext.response().end(html.toString());
                 });
     }
 
