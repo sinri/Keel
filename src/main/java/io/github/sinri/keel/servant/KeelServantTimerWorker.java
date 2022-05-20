@@ -1,8 +1,14 @@
 package io.github.sinri.keel.servant;
 
+import io.github.sinri.keel.core.logger.KeelLogger;
+import io.vertx.core.Future;
+
 import java.util.Calendar;
 import java.util.concurrent.Semaphore;
 
+/**
+ * @since 2.3 fix async wait bug
+ */
 public abstract class KeelServantTimerWorker {
     private final String cronExpression;
     private final KeelCronParser cronParser;
@@ -27,26 +33,32 @@ public abstract class KeelServantTimerWorker {
         return cronParser;
     }
 
+    abstract protected KeelLogger getLogger();
+
     public void trigger(Calendar calendar) {
         if (!cronParser.match(calendar)) {
+            getLogger().debug("CRON PARSER NOT MATCHES");
             return;
         }
         // lock it
         if (monopolizedSemaphore != null) {
-            try {
-                monopolizedSemaphore.acquire();
+            boolean acquired = monopolizedSemaphore.tryAcquire();
+            if (acquired) {
                 // working
-                work(calendar);
-                monopolizedSemaphore.release();
-            } catch (InterruptedException e) {
-                // worker is monopolized now, just passover and wait for the next turn.
-                e.printStackTrace();
+                work(calendar)
+                        .eventually(fin -> {
+                            monopolizedSemaphore.release();
+                            return Future.succeededFuture();
+                        });
+            } else {
+                getLogger().warning("Monopolized Semaphore failed to acquire!");
             }
         } else {
             // working
+            getLogger().debug("START");
             work(calendar);
         }
     }
 
-    abstract protected void work(Calendar calendar);
+    abstract protected Future<Void> work(Calendar calendar);
 }
