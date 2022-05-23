@@ -40,32 +40,8 @@ public class KeelLoggerOptions extends KeelOptions {
     }
 
     /**
-     * @param aspect
-     * @return
-     * @since 1.11
-     * @deprecated since 2.2
-     */
-    @Deprecated
-    public static KeelLoggerOptions generateOptionsForAspectWithPropertiesReader(String aspect) {
-        KeelLoggerOptions keelLoggerOptions = new KeelLoggerOptions();
-        return generateOptionsForAspectWithPropertiesReader(aspect, keelLoggerOptions);
-    }
-
-    /**
-     * @param aspect            the string of aspect
-     * @param keelLoggerOptions existed options to overwrite
-     * @return KeelLoggerOptions, read and composed of the content read by reader
-     * @since 2.2
-     * @deprecated since 2.2
-     */
-    @Deprecated
-    public static KeelLoggerOptions generateOptionsForAspectWithPropertiesReader(String aspect, KeelLoggerOptions keelLoggerOptions) {
-        return keelLoggerOptions.loadForAspect(aspect);
-    }
-
-    /**
-     * @param aspect
-     * @return
+     * @param aspect Aspect of logger
+     * @return KeelLoggerOptions
      * @since 2.2
      */
     public KeelLoggerOptions loadForAspect(String aspect) {
@@ -94,7 +70,7 @@ public class KeelLoggerOptions extends KeelOptions {
         return aspect;
     }
 
-    public KeelLoggerOptions setAspect(String aspect) {
+    protected KeelLoggerOptions setAspect(String aspect) {
         this.aspect = aspect;
         return this;
     }
@@ -150,7 +126,7 @@ public class KeelLoggerOptions extends KeelOptions {
     }
 
     /**
-     * @return
+     * @return is Show Verticle Deployment ID
      * @since 2.2
      */
     public boolean isShowVerticleDeploymentID() {
@@ -176,7 +152,7 @@ public class KeelLoggerOptions extends KeelOptions {
     }
 
     /**
-     * @return
+     * @return CompositionStyle
      * @since 2.2
      */
     public CompositionStyle getCompositionStyle() {
@@ -184,8 +160,8 @@ public class KeelLoggerOptions extends KeelOptions {
     }
 
     /**
-     * @param compositionStyle
-     * @return
+     * @param compositionStyle CompositionStyle
+     * @return KeelLoggerOptions
      * @since 2.2
      */
     public KeelLoggerOptions setCompositionStyle(CompositionStyle compositionStyle) {

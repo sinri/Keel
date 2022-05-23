@@ -1,23 +1,17 @@
 package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.KeelHelper;
-import io.github.sinri.keel.mysql.DuplexExecutorForMySQL;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
-import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
-import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 public class WriteIntoStatement extends AbstractModifyStatement {
     /**
@@ -287,53 +281,6 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         return sql;
     }
 
-
-    @Override
-    @Deprecated
-    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
-        String sql = this.toString();
-        getSqlAuditLogger().info(sql);
-        return KeelJDBCForMySQL.executeForInsertion(this.toString(), statement);
-    }
-
-    /**
-     * @return the MySQLExecutor for last inserted ID
-     * @since 1.10
-     * @deprecated since 2.1
-     */
-    @Deprecated
-    public DuplexExecutorForMySQL<Long> getExecutorForLastInsertedID() {
-        return new DuplexExecutorForMySQL<>(
-                this::executeForLastInsertedID,
-                this::blockedExecuteForLastInsertedID
-        );
-    }
-
-    /**
-     * @param idChecker
-     * @param recoveredValue
-     * @param <R>
-     * @return
-     * @since 1.10
-     * @deprecated since 2.1
-     */
-    @Deprecated
-    public <R> DuplexExecutorForMySQL<R> getExecutorForLastInsertedID(Function<Long, R> idChecker, R recoveredValue) {
-        return new DuplexExecutorForMySQL<>(
-                sqlConnection -> executeForLastInsertedID(sqlConnection)
-                        .compose(id -> Future.succeededFuture(idChecker.apply(id)))
-                        .recover(throwable -> Future.succeededFuture(recoveredValue)),
-                statement -> {
-                    try {
-                        long id = blockedExecuteForLastInsertedID(statement);
-                        return idChecker.apply(id);
-                    } catch (SQLException sqlException) {
-                        return recoveredValue;
-                    }
-                }
-        );
-    }
-
     /**
      * @param sqlConnection get from pool
      * @return future with last inserted id; if any error occurs, failed future returned instead.
@@ -342,31 +289,6 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      */
     public Future<Long> executeForLastInsertedID(SqlConnection sqlConnection) {
         return execute(sqlConnection)
-                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getLastInsertedID()))
-//                .recover(throwable -> {
-//                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForLastInsertedID failed [" + throwable.getMessage() + "] when executing SQL: " + this);
-//                    return Future.succeededFuture(-1L);
-//                })
-                ;
-    }
-
-    @Deprecated
-    public long blockedExecuteForLastInsertedID(Statement statement) throws SQLException {
-        return blockedExecute(statement).getLastInsertedID();
-    }
-
-    @Deprecated
-    public long blockedExecuteForLastInsertedID() throws SQLException {
-        return blockedExecute().getLastInsertedID();
-    }
-
-    @Deprecated
-    public final long executeForLastInsertedID() throws SQLException {
-        return blockedExecuteForLastInsertedID();
-    }
-
-    @Deprecated
-    public final long executeForLastInsertedID(Statement statement) throws SQLException {
-        return blockedExecuteForLastInsertedID(statement);
+                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getLastInsertedID()));
     }
 }

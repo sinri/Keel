@@ -1,11 +1,7 @@
 package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.KeelHelper;
-import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
-import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -45,8 +41,8 @@ public class DeleteStatement extends AbstractModifyStatement {
     }
 
     /**
-     * @param function
-     * @return
+     * @param function ConditionsComponent -> this
+     * @return this
      * @since 1.4
      */
     public DeleteStatement where(Function<ConditionsComponent, ConditionsComponent> function) {
@@ -89,16 +85,4 @@ public class DeleteStatement extends AbstractModifyStatement {
         }
         return sql;
     }
-
-
-
-    @Override
-    @Deprecated
-    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
-        String sql = this.toString();
-        getSqlAuditLogger().info(sql);
-        return KeelJDBCForMySQL.executeForModification(this.toString(), statement);
-    }
-
-
 }

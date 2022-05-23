@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.mysql.DuplexExecutorForMySQL;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
 import io.vertx.core.Future;
@@ -66,44 +65,6 @@ public abstract class AbstractRow {
                     }
                     return Future.succeededFuture(t);
                 });
-    }
-
-    @Deprecated
-    public static <T extends AbstractRow> DuplexExecutorForMySQL<List<T>> buildTableRowListFetcher(
-            AbstractReadStatement readStatement,
-            Class<T> classOfTableRow
-    ) {
-        return new DuplexExecutorForMySQL<>(
-                sqlConnection -> readStatement.execute(sqlConnection)
-                        .compose(resultMatrix -> Future.succeededFuture(resultMatrix.buildTableRowList(classOfTableRow))),
-                statement -> readStatement.blockedExecute(statement).buildTableRowList(classOfTableRow)
-        );
-    }
-
-    @Deprecated
-    public static <T extends AbstractRow> DuplexExecutorForMySQL<T> buildTableRowFetcher(
-            AbstractReadStatement readStatement,
-            Class<T> classOfTableRow
-    ) {
-        return new DuplexExecutorForMySQL<>(
-                sqlConnection -> readStatement.execute(sqlConnection)
-                        .compose(resultMatrix -> {
-                            T t;
-                            try {
-                                t = resultMatrix.buildTableRowByIndex(0, classOfTableRow);
-                            } catch (KeelSQLResultRowIndexError e) {
-                                return Future.succeededFuture(null);
-                            }
-                            return Future.succeededFuture(t);
-                        }),
-                statement -> {
-                    try {
-                        return readStatement.blockedExecute(statement).buildTableRowByIndex(0, classOfTableRow);
-                    } catch (KeelSQLResultRowIndexError e) {
-                        return null;
-                    }
-                }
-        );
     }
 
     /**

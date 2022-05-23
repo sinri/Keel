@@ -26,7 +26,9 @@ public class KeelLoggerTest {
                     logger.fatal("fatal");
                 })
                 .test("stdout-with-aspect", testContext -> {
-                    KeelLogger logger = new KeelLogger(new KeelLoggerOptions().setAspect("aspect"));
+                    KeelLoggerOptions options = new KeelLoggerOptions().loadForAspect("aspect");
+                    KeelLogger logger = new KeelLogger(options);
+
                     logger.debug("debug");
                     logger.info("info");
                     logger.notice("notice");

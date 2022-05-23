@@ -26,7 +26,8 @@ public class KeelLoggerOptionsTest {
         );
 
         for (var aspect : aspects) {
-            KeelLogLevel lowestLevel = KeelLoggerOptions.generateOptionsForAspectWithPropertiesReader(aspect).getLowestLevel();
+
+            KeelLogLevel lowestLevel = new KeelLoggerOptions().loadForAspect("aspect").getLowestLevel();
             System.out.println(aspect + " -> " + lowestLevel);
         }
 

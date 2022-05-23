@@ -2,11 +2,7 @@ package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
-import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
-import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -112,16 +108,4 @@ public class UpdateStatement extends AbstractModifyStatement {
         }
         return sql;
     }
-
-
-
-    @Override
-    @Deprecated
-    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
-        String sql = this.toString();
-        getSqlAuditLogger().info(sql);
-        return KeelJDBCForMySQL.executeForModification(this.toString(), statement);
-    }
-
-
 }

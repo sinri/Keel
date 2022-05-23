@@ -80,8 +80,8 @@ public class SelectStatement extends AbstractReadStatement {
     }
 
     /**
-     * @param function
-     * @return
+     * @param function ConditionsComponent -> ConditionsComponent it self
+     * @return this
      * @since 1.4
      */
     public SelectStatement where(Function<ConditionsComponent, ConditionsComponent> function) {
