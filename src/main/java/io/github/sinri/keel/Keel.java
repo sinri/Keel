@@ -5,7 +5,6 @@ import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.KeelMySQLOptions;
-import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
@@ -14,23 +13,17 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Keel {
     private static final String KEY_MYSQL_CONNECTION = "MySQLConnection";
-    @Deprecated
-    private static final String KEY_JDBC_STATEMENT = "JDBCStatement";
     private static final String KEY_KEEL_LOGGER = "KeelLogger";
 
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
-    @Deprecated
+    @Deprecated(forRemoval = true)
     private static final Map<String, KeelLogger> loggerMap = new HashMap<>();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
-
-    @Deprecated
-    private static final Map<String, KeelJDBCForMySQL> mysqlKitWithJDBCMap = new HashMap<>();
 
     private static final Map<String, JsonObject> deployedKeelVerticleMap = new HashMap<>();
 
@@ -127,33 +120,6 @@ public class Keel {
     }
 
     /**
-     * @param dataSourceName the data source name
-     * @return KeelJDBCForMySQL
-     * @since 1.10
-     * @deprecated since 2.1
-     */
-    @Deprecated
-    public static KeelJDBCForMySQL getMySQLKitWithJDBC(String dataSourceName) {
-        if (!mysqlKitWithJDBCMap.containsKey(dataSourceName)) {
-            KeelMySQLOptions keelMySQLOptions = KeelMySQLOptions.generateOptionsForDataSourceWithPropertiesReader(dataSourceName);
-            KeelJDBCForMySQL keelJDBCForMySQL = new KeelJDBCForMySQL(keelMySQLOptions);
-            mysqlKitWithJDBCMap.put(dataSourceName, keelJDBCForMySQL);
-        }
-        return mysqlKitWithJDBCMap.get(dataSourceName);
-    }
-
-    /**
-     * @return getMySQLKitWithJDBC(mysql.default_data_source_name);
-     * @since 1.10
-     * @deprecated since 2.1
-     */
-    @Deprecated
-    public static KeelJDBCForMySQL getMySQLKitWithJDBC() {
-        String defaultName = propertiesReader.getProperty("mysql.default_data_source_name");
-        return getMySQLKitWithJDBC(defaultName);
-    }
-
-    /**
      * @return
      * @since 2.0
      */
@@ -167,26 +133,6 @@ public class Keel {
      */
     public static void setMySqlConnectionInContext(SqlConnection sqlConnection) {
         Keel.getVertx().getOrCreateContext().put(KEY_MYSQL_CONNECTION, sqlConnection);
-    }
-
-    /**
-     * @return
-     * @since 2.0
-     * @deprecated since 2.1
-     */
-    @Deprecated
-    public static Statement getJDBCStatementInContext() {
-        return Keel.getVertx().getOrCreateContext().get(KEY_JDBC_STATEMENT);
-    }
-
-    /**
-     * @param statement
-     * @since 2.0
-     * @deprecated since 2.1
-     */
-    @Deprecated
-    public static void setJDBCStatementInContext(Statement statement) {
-        Keel.getVertx().getOrCreateContext().put(KEY_JDBC_STATEMENT, statement);
     }
 
     /**
@@ -246,8 +192,8 @@ public class Keel {
     }
 
     /**
-     * @param deploymentID
-     * @return
+     * @param deploymentID ID of deployment for one Verticle deployed
+     * @return the information json object
      * @since 2.2
      */
     public static JsonObject getDeployedKeelVerticleInfo(String deploymentID) {

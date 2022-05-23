@@ -8,8 +8,6 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
-import java.sql.Statement;
-
 /**
  * 在 Keel 2.0 中，有一个异象，是将所有逻辑扔进 Verticle 里运行来模拟同一线程。
  *
@@ -37,14 +35,6 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
 
     protected final void setMySqlConnection(SqlConnection sqlConnect) {
         Keel.setMySqlConnectionInContext(sqlConnect);
-    }
-
-    protected final Statement getJDBCStatement() {
-        return Keel.getJDBCStatementInContext();
-    }
-
-    protected final void setJDBCStatement(Statement statement) {
-        Keel.setJDBCStatementInContext(statement);
     }
 
     @Override
