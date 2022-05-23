@@ -291,4 +291,33 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         return execute(sqlConnection)
                 .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getLastInsertedID()));
     }
+
+    /**
+     * 按照最大块尺寸分裂！
+     *
+     * @param chunkSize an integer
+     * @return a list of WriteIntoStatement
+     * @since 2.3
+     */
+    public List<WriteIntoStatement> divide(int chunkSize) {
+        if (sourceTableName != null || sourceSelectSQL != null) {
+            return List.of(this);
+        }
+
+        List<WriteIntoStatement> list = new ArrayList<>();
+        int size = this.batchValues.size();
+        for (int chunkStartIndex = 0; chunkStartIndex < size; chunkStartIndex += chunkSize) {
+            WriteIntoStatement chunkWIS = new WriteIntoStatement(this.writeType);
+
+            chunkWIS.columns.addAll(this.columns);
+            chunkWIS.onDuplicateKeyUpdateAssignmentMap.putAll(this.onDuplicateKeyUpdateAssignmentMap);
+            chunkWIS.ignoreMark = this.ignoreMark;
+            chunkWIS.schema = this.schema;
+            chunkWIS.table = this.table;
+            chunkWIS.batchValues.addAll(this.batchValues.subList(chunkStartIndex, Math.min(size, chunkStartIndex + chunkSize)));
+
+            list.add(chunkWIS);
+        }
+        return list;
+    }
 }

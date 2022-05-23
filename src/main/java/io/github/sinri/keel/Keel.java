@@ -21,7 +21,7 @@ public class Keel {
     private static final String KEY_KEEL_LOGGER = "KeelLogger";
 
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
-    @Deprecated(forRemoval = true)
+    @Deprecated(since = "2.2", forRemoval = true)
     private static final Map<String, KeelLogger> loggerMap = new HashMap<>();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
 
@@ -54,7 +54,9 @@ public class Keel {
 
     /**
      * @since 2.1
+     * @deprecated since 2.3
      */
+    @Deprecated(since = "2.3", forRemoval = true)
     public static void closeVertx() {
         if (vertx != null) {
             vertx.close();
@@ -83,7 +85,7 @@ public class Keel {
      * @return KeelLogger, if already shared, use existed.
      * @deprecated if the logger would be used in a wide scope, use verticle resolution
      */
-    @Deprecated
+    @Deprecated(since = "2.2", forRemoval = true)
     public static KeelLogger logger(String aspect) {
         if (loggerMap.containsKey(aspect)) {
             return loggerMap.get(aspect);
@@ -120,32 +122,47 @@ public class Keel {
     }
 
     /**
-     * @return
      * @since 2.0
+     * @deprecated since 2.3
      */
+    @Deprecated(since = "2.3", forRemoval = true)
     public static SqlConnection getMySqlConnectionInContext() {
         return Keel.getVertx().getOrCreateContext().get(KEY_MYSQL_CONNECTION);
     }
 
     /**
-     * @param sqlConnection
      * @since 2.0
+     * @deprecated since 2.3
      */
+    @Deprecated(since = "2.3", forRemoval = true)
     public static void setMySqlConnectionInContext(SqlConnection sqlConnection) {
         Keel.getVertx().getOrCreateContext().put(KEY_MYSQL_CONNECTION, sqlConnection);
     }
 
     /**
-     * @return
-     * @since 2.0
+     * @since 2.3
      */
+    public static SqlConnection getMySqlConnectionInContext(Context context) {
+        return context.get(KEY_MYSQL_CONNECTION);
+    }
+
+    /**
+     * @since 2.3
+     */
+    public static void setMySqlConnectionInContext(Context context, SqlConnection sqlConnection) {
+        context.put(KEY_MYSQL_CONNECTION, sqlConnection);
+    }
+
+    /**
+     * @since 2.0
+     * @deprecated since 2.3
+     */
+    @Deprecated(since = "2.3", forRemoval = true)
     public static KeelLogger getKeelLoggerInContext() {
         return getKeelLoggerInContext(Keel.getVertx().getOrCreateContext());
     }
 
     /**
-     * @param context
-     * @return
      * @since 2.2
      */
     public static KeelLogger getKeelLoggerInContext(Context context) {
@@ -157,16 +174,15 @@ public class Keel {
     }
 
     /**
-     * @param logger
      * @since 2.0
+     * @deprecated since 2.3
      */
+    @Deprecated(since = "2.3", forRemoval = true)
     public static void setKeelLoggerInContext(KeelLogger logger) {
         setKeelLoggerInContext(Keel.getVertx().getOrCreateContext(), logger);
     }
 
     /**
-     * @param context
-     * @param logger
      * @since 2.2
      */
     public static void setKeelLoggerInContext(Context context, KeelLogger logger) {

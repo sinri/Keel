@@ -40,11 +40,6 @@ public class KeelHttpServer {
         return router;
     }
 
-//    public KeelHttpServer websocket(Handler<ServerWebSocket> webSocketHandler){
-//        server.webSocketHandler(webSocketHandler);
-//        return this;
-//    }
-
     public void listen() {
         server.requestHandler(router)
                 .exceptionHandler(throwable -> {

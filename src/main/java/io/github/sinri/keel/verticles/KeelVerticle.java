@@ -20,7 +20,7 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
     }
 
     protected final void setLogger(KeelLogger logger) {
-        Keel.setKeelLoggerInContext(logger);
+        Keel.setKeelLoggerInContext(this.context, logger);
     }
 
     public JsonObject getVerticleInfo() {
@@ -30,11 +30,11 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
     }
 
     protected final SqlConnection getMySqlConnection() {
-        return Keel.getMySqlConnectionInContext();
+        return Keel.getMySqlConnectionInContext(this.context);
     }
 
     protected final void setMySqlConnection(SqlConnection sqlConnect) {
-        Keel.setMySqlConnectionInContext(sqlConnect);
+        Keel.setMySqlConnectionInContext(this.context, sqlConnect);
     }
 
     @Override

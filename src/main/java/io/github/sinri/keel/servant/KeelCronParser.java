@@ -30,11 +30,6 @@ public class KeelCronParser {
         parseField(weekdayExpression, weekdayOptions, 0, 6);
     }
 
-    public static void main(String[] args) {
-        boolean match = new KeelCronParser("45 6,18 * * *").match(Calendar.getInstance());
-        System.out.println(match);
-    }
-
     public boolean match(Calendar currentCalendar) {
         // currentCalendar := Calendar.getInstance();
         int minute = currentCalendar.get(Calendar.MINUTE);
@@ -51,7 +46,7 @@ public class KeelCronParser {
     }
 
     private void parseField(String rawComponent, Set<Integer> optionSet, int min, int max) {
-        System.out.println("parseField: " + rawComponent);
+//        System.out.println("parseField: " + rawComponent);
 
         if (rawComponent.equals("*")) {
             for (int i = min; i <= max; i++) {
