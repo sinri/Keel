@@ -30,7 +30,29 @@ public class KeelCronParser {
         parseField(weekdayExpression, weekdayOptions, 0, 6);
     }
 
+    public static void main(String[] args) {
+        boolean match = new KeelCronParser("45 6,18 * * *").match(Calendar.getInstance());
+        System.out.println(match);
+    }
+
+    public boolean match(Calendar currentCalendar) {
+        // currentCalendar := Calendar.getInstance();
+        int minute = currentCalendar.get(Calendar.MINUTE);
+        int hour = currentCalendar.get(Calendar.HOUR_OF_DAY);
+        int day = currentCalendar.get(Calendar.DAY_OF_MONTH);
+        int month = 1 + currentCalendar.get(Calendar.MONTH);// make JAN 1, ...
+        int weekday = currentCalendar.get(Calendar.DAY_OF_WEEK) - 1; // make sunday 0, ...
+
+        return minuteOptions.contains(minute)
+                && hourOptions.contains(hour)
+                && dayOptions.contains(day)
+                && monthOptions.contains(month)
+                && weekdayOptions.contains(weekday);
+    }
+
     private void parseField(String rawComponent, Set<Integer> optionSet, int min, int max) {
+        System.out.println("parseField: " + rawComponent);
+
         if (rawComponent.equals("*")) {
             for (int i = min; i <= max; i++) {
                 optionSet.add(i);
@@ -48,6 +70,12 @@ public class KeelCronParser {
 
         for (String part : parts) {
             part = part.trim();
+
+            Matcher matcher0 = Pattern.compile("^\\d+$").matcher(part);
+            if (matcher0.matches()) {
+                optionSet.add(Integer.parseInt(part));
+                continue;
+            }
 
             Matcher matcher1 = Pattern.compile("^(\\d+)-(\\d+)$").matcher(part);
             if (matcher1.matches()) {
@@ -75,20 +103,5 @@ public class KeelCronParser {
 
             throw new IllegalArgumentException();
         }
-    }
-
-    public boolean match(Calendar currentCalendar) {
-        // currentCalendar := Calendar.getInstance();
-        int minute = currentCalendar.get(Calendar.MINUTE);
-        int hour = currentCalendar.get(Calendar.HOUR_OF_DAY);
-        int day = currentCalendar.get(Calendar.DAY_OF_MONTH);
-        int month = 1 + currentCalendar.get(Calendar.MONTH);// make JAN 1, ...
-        int weekday = currentCalendar.get(Calendar.DAY_OF_WEEK) - 1; // make sunday 0, ...
-
-        return minuteOptions.contains(minute)
-                && hourOptions.contains(hour)
-                && dayOptions.contains(day)
-                && monthOptions.contains(month)
-                && weekdayOptions.contains(weekday);
     }
 }
