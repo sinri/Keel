@@ -10,7 +10,7 @@ import io.vertx.sqlclient.SqlConnection;
  * @since 1.7
  */
 abstract public class AbstractStatement {
-    protected static KeelLogger sqlAuditLogger = KeelLogger.buildSilentLogger();
+    protected static KeelLogger sqlAuditLogger = KeelLogger.silentLogger();
     private String remarkAsComment = "";
 
     public static KeelLogger getSqlAuditLogger() {

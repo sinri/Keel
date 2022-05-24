@@ -8,6 +8,8 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
+import java.util.function.Function;
+
 /**
  * 在 Keel 2.0 中，有一个异象，是将所有逻辑扔进 Verticle 里运行来模拟同一线程。
  *
@@ -15,25 +17,27 @@ import io.vertx.sqlclient.SqlConnection;
  */
 abstract public class KeelVerticle extends AbstractVerticle implements VerticleAbleToUndeployItself {
 
-    @Deprecated(since = "2.4", forRemoval = true)
+    private KeelLogger logger = KeelLogger.silentLogger();
+
+    /**
+     * @since 2.4 do not rely on context anymore
+     */
     protected KeelLogger getLogger() {
-        if (context == null) {
-            return Keel.outputLogger(getClass().getName());
-        }
-        return Keel.getKeelLoggerInContext(context);
+        return logger;
     }
 
-    @Deprecated(since = "2.4", forRemoval = true)
+    /**
+     * @since 2.4 do not rely on context anymore
+     */
     protected final void setLogger(KeelLogger logger) {
-        if (this.context != null) {
-            Keel.setKeelLoggerInContext(this.context, logger);
-        }
+        this.logger = logger;
     }
 
     public JsonObject getVerticleInfo() {
         return new JsonObject()
                 .put("class", this.getClass().getName())
-                .put("config", this.config());
+                .put("config", this.config())
+                .put("deployment_id", this.deploymentID());
     }
 
     @Deprecated(since = "2.4", forRemoval = true)
@@ -44,6 +48,34 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
     @Deprecated(since = "2.4", forRemoval = true)
     protected final void setMySqlConnection(SqlConnection sqlConnect) {
         Keel.setMySqlConnectionInContext(this.context, sqlConnect);
+    }
+
+    /**
+     * @since 2.4
+     */
+    protected final <R> Future<R> executeWithMySQL(Function<SqlConnection, Future<R>> executor) {
+        return Keel.getMySQLKit().getPool().withConnection(executor);
+    }
+
+    /**
+     * @since 2.4
+     */
+    protected final <R> Future<R> executeWithMySQL(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
+        return Keel.getMySQLKit(dataSourceName).getPool().withConnection(executor);
+    }
+
+    /**
+     * @since 2.4
+     */
+    protected final <R> Future<R> executeWithinMySQLTransaction(Function<SqlConnection, Future<R>> executor) {
+        return Keel.getMySQLKit().getPool().withTransaction(executor);
+    }
+
+    /**
+     * @since 2.4
+     */
+    protected final <R> Future<R> executeWithinMySQLTransaction(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
+        return Keel.getMySQLKit(dataSourceName).getPool().withTransaction(executor);
     }
 
     @Override
