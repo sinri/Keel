@@ -15,12 +15,19 @@ import io.vertx.sqlclient.SqlConnection;
  */
 abstract public class KeelVerticle extends AbstractVerticle implements VerticleAbleToUndeployItself {
 
+    @Deprecated(since = "2.4", forRemoval = true)
     protected KeelLogger getLogger() {
+        if (context == null) {
+            return Keel.outputLogger(getClass().getName());
+        }
         return Keel.getKeelLoggerInContext(context);
     }
 
+    @Deprecated(since = "2.4", forRemoval = true)
     protected final void setLogger(KeelLogger logger) {
-        Keel.setKeelLoggerInContext(this.context, logger);
+        if (this.context != null) {
+            Keel.setKeelLoggerInContext(this.context, logger);
+        }
     }
 
     public JsonObject getVerticleInfo() {
@@ -29,10 +36,12 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
                 .put("config", this.config());
     }
 
+    @Deprecated(since = "2.4", forRemoval = true)
     protected final SqlConnection getMySqlConnection() {
         return Keel.getMySqlConnectionInContext(this.context);
     }
 
+    @Deprecated(since = "2.4", forRemoval = true)
     protected final void setMySqlConnection(SqlConnection sqlConnect) {
         Keel.setMySqlConnectionInContext(this.context, sqlConnect);
     }
