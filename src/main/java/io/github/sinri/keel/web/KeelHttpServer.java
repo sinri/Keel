@@ -2,6 +2,8 @@ package io.github.sinri.keel.web;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.web.websockets.KeelWebSocketHandler;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
@@ -38,6 +40,13 @@ public class KeelHttpServer {
 
     public Router getRouter() {
         return router;
+    }
+
+    /**
+     * @since 2.4
+     */
+    public void setWebSocketHandlerToServer(Class<? extends KeelWebSocketHandler> handlerClass, DeploymentOptions deploymentOptions) {
+        this.server.webSocketHandler(websocket -> KeelWebSocketHandler.handle(websocket, handlerClass, getLogger(), deploymentOptions));
     }
 
     public void listen() {

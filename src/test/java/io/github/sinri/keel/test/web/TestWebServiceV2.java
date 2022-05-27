@@ -41,7 +41,7 @@ public class TestWebServiceV2 {
         khs.getRouter().get("/ws/page")
                 .handler(StaticHandler.create("web_root/websocket"));
 
-        WebSocketTest2.upgradeFromHttp(khs.getRouter().get("/ws/api"), WebSocketTest2.class, routerLogger);
+        WebSocketTest2.upgradeFromHttp(khs.getRouter().get("/ws/api"), WebSocketTest2.class, routerLogger, null);
 
 //        khs.websocket(webSocket -> {
 //            WebSocketTest.handle(webSocket, WebSocketTest.class);
