@@ -2,6 +2,7 @@ package io.github.sinri.keel.core;
 
 import io.github.sinri.keel.core.properties.KeelOptions;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.io.IOException;
@@ -13,10 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -295,5 +293,49 @@ public class KeelHelper {
             e.printStackTrace();
         }
         return jarEntryList;
+    }
+
+    /**
+     * @since 2.4
+     */
+    private static JsonArray getSortedJsonArray(JsonArray array) {
+        List<Object> list = new ArrayList<>();
+        array.forEach(list::add);
+        list.sort(Comparator.comparing(Object::toString));
+        return new JsonArray(list);
+    }
+
+    /**
+     * @since 2.4
+     */
+    public static String getJsonForArrayWhoseItemsSorted(JsonArray array) {
+        return getSortedJsonArray(array).toString();
+    }
+
+    /**
+     * @since 2.4
+     */
+    private static JsonObject getSortedJsonObject(JsonObject object) {
+        JsonObject result = new JsonObject();
+        List<String> keyList = new ArrayList<>(object.getMap().keySet());
+        keyList.sort(Comparator.naturalOrder());
+        keyList.forEach(key -> {
+            Object value = object.getValue(key);
+            if (value instanceof JsonObject) {
+                result.put(key, getSortedJsonObject((JsonObject) value));
+            } else if (value instanceof JsonArray) {
+                result.put(key, getSortedJsonArray((JsonArray) value));
+            } else {
+                result.put(key, value);
+            }
+        });
+        return result;
+    }
+
+    /**
+     * @since 2.4
+     */
+    public static String getJsonForObjectWhoseItemKeysSorted(JsonObject object) {
+        return getSortedJsonObject(object).toString();
     }
 }

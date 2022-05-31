@@ -7,6 +7,7 @@ import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
@@ -21,6 +22,9 @@ import java.util.*;
  * @since 2.0
  */
 abstract public class KeelWebRequestReceptionist extends KeelVerticle {
+    public static final String RoutingContextDatumKeyOfClientIPChain = "client_ip_chain";
+    public static final String RoutingContextDatumKeyOfRequestID = "request_id";
+
     private final RoutingContext routingContext;
     private String requestID;
 
@@ -109,6 +113,24 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
         return new HashSet<>();
     }
 
+    /**
+     * @since 2.4
+     */
+    private void parseClientIPChain() {
+        // X-Forwarded-For
+        JsonArray clientIPChain = new JsonArray();
+        String xForwardedFor = getRoutingContext().request().getHeader("X-Forwarded-For");
+        if (xForwardedFor != null) {
+            String[] split = xForwardedFor.split("[ ,]+");
+            for (var item : split) {
+                clientIPChain.add(item);
+            }
+        }
+        clientIPChain.add(getRoutingContext().request().remoteAddress().hostAddress());
+
+        getRoutingContext().put(RoutingContextDatumKeyOfClientIPChain, clientIPChain);
+    }
+
     @Override
     public void start() throws Exception {
         super.start();
@@ -116,6 +138,8 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
         Keel.registerDeployedKeelVerticle(this);
 
         this.requestID = prepareRequestID();
+        this.getRoutingContext().put(RoutingContextDatumKeyOfRequestID, this.requestID);
+
         setLogger(prepareLogger());
 
         // check method
@@ -126,6 +150,10 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                 return;
             }
         }
+
+        // client ip chain
+        parseClientIPChain();
+
         // filters
         List<Class<? extends KeelWebRequestFilter>> filterClassList = this.getFilterClassList();
         FutureRecursion.call(
@@ -146,7 +174,7 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                 .compose(x -> Future.succeededFuture())
                 .compose(filtersPassed -> this.dealWithRequest())
                 .compose(responseObject -> {
-                    getLogger().notice("RECEPTIONIST DONE FOR " + deploymentID());
+                    getLogger().debug("RECEPTIONIST DONE FOR " + deploymentID());
 
                     return respond(responseObject);
                 })
@@ -157,7 +185,7 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                 })
                 .eventually(v -> {
                     // @since 2.2 undeploy me
-                    getLogger().notice("RECEPTIONIST eventually undeploy me!");
+                    getLogger().debug("RECEPTIONIST eventually undeploy me!");
                     return undeployMe();
                 });
     }

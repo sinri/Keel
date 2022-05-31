@@ -1,9 +1,12 @@
 package io.github.sinri.keel.web;
 
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.ext.web.RoutingContext;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @since 1.1
@@ -19,6 +22,20 @@ public abstract class KeelWebRequestFilter {
     public KeelWebRequestFilter setTargetMethod(Method method) {
         this.method = method;
         return this;
+    }
+
+    /**
+     * @since 2.4
+     */
+    protected static List<String> getClientIPChain(RoutingContext ctx) {
+        JsonArray array = ctx.get(KeelWebRequestReceptionist.RoutingContextDatumKeyOfClientIPChain);
+        List<String> list = new ArrayList<>();
+        if (array != null) {
+            array.forEach(item -> {
+                list.add(item.toString());
+            });
+        }
+        return list;
     }
 
     abstract public Future<Void> shouldHandleThisRequest(RoutingContext ctx);
