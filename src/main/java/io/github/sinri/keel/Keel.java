@@ -142,6 +142,7 @@ public class Keel {
     /**
      * @since 2.3
      */
+    @Deprecated(since = "2.4")
     public static SqlConnection getMySqlConnectionInContext(Context context) {
         return context.get(KEY_MYSQL_CONNECTION);
     }
@@ -149,6 +150,7 @@ public class Keel {
     /**
      * @since 2.3
      */
+    @Deprecated(since = "2.4")
     public static void setMySqlConnectionInContext(Context context, SqlConnection sqlConnection) {
         context.put(KEY_MYSQL_CONNECTION, sqlConnection);
     }
@@ -165,6 +167,7 @@ public class Keel {
     /**
      * @since 2.2
      */
+    @Deprecated(since = "2.4")
     public static KeelLogger getKeelLoggerInContext(Context context) {
         KeelLogger logger = context.get(KEY_KEEL_LOGGER);
         if (logger == null) {
@@ -185,6 +188,7 @@ public class Keel {
     /**
      * @since 2.2
      */
+    @Deprecated(since = "2.4")
     public static void setKeelLoggerInContext(Context context, KeelLogger logger) {
         context.put(KEY_KEEL_LOGGER, logger);
     }

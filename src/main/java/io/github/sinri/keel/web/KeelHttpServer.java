@@ -60,7 +60,7 @@ public class KeelHttpServer {
                         logger.info("HTTP Server Established, Actual Port: " + httpServer.actualPort());
                     } else {
                         Throwable throwable = httpServerAsyncResult.cause();
-                        logger.fatal(throwable.getMessage());
+                        logger.exception("Listen failed", throwable);
 
                         if (closeVertXWhenTerminated) {
                             vertx.close()

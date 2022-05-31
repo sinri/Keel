@@ -25,17 +25,17 @@ public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
                 .expireAfter(new Expiry<K, ValueWrapper<V>>() {
                     @Override
                     public long expireAfterCreate(K key, ValueWrapper<V> valueWrapper, long currentTime) {
-                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath());
+                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath()) - currentTime;
                     }
 
                     @Override
                     public long expireAfterUpdate(K key, ValueWrapper<V> valueWrapper, long currentTime, @NonNegative long currentDuration) {
-                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath());
+                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath()) - currentTime;
                     }
 
                     @Override
                     public long expireAfterRead(K key, ValueWrapper<V> valueWrapper, long currentTime, @NonNegative long currentDuration) {
-                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath());
+                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath()) - currentTime;
                     }
                 })
                 .build();
@@ -55,7 +55,11 @@ public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
     public V read(K key, V fallbackValue) {
         ValueWrapper<V> valueWrapper = this.cache.getIfPresent(key);
         if (valueWrapper == null) return fallbackValue;
-        return valueWrapper.getValue();
+        if (valueWrapper.isAliveNow()) {
+            return valueWrapper.getValue();
+        } else {
+            return fallbackValue;
+        }
     }
 
     @Override
@@ -73,7 +77,11 @@ public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
                 }
         );
         if (valueWrapper == null) return fallbackValue;
-        return valueWrapper.getValue();
+        if (valueWrapper.isAliveNow()) {
+            return valueWrapper.getValue();
+        } else {
+            return fallbackValue;
+        }
     }
 
     @Override
