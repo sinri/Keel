@@ -37,16 +37,6 @@ public class KeelLogger {
     private static final KeelLogger silentLoggerInstance = new KeelLogger(new KeelLoggerOptions().setLowestLevel(KeelLogLevel.SILENT));
 
     /**
-     * @return a silent logger
-     * @since 1.10
-     * @deprecated use `silentLogger` instead
-     */
-    @Deprecated(since = "2.4", forRemoval = true)
-    public static KeelLogger buildSilentLogger() {
-        return new KeelLogger(new KeelLoggerOptions().setLowestLevel(KeelLogLevel.SILENT));
-    }
-
-    /**
      * @since 2.4
      */
     public static KeelLogger silentLogger() {

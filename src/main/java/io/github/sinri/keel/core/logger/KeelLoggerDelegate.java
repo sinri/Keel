@@ -183,9 +183,8 @@ public class KeelLoggerDelegate {
             verticleDeploymentInfo = "{" + Keel.getVertx().getOrCreateContext().deploymentID() + "} ";
         }
 
-        String meta = getCurrentDateExpression("yyyy-MM-dd HH:mm:ss") + " "
+        String meta = getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " "
                 + "[" + level.name() + "] "
-//                + reportPoint
                 + "<" + subject + "> "
                 + threadInfo
                 + verticleDeploymentInfo;
@@ -287,8 +286,37 @@ public class KeelLoggerDelegate {
             lastThrowable = cause;
         }
 
+        String currentIgnorablePackage = null;
+        int currentIgnorablePackageLines = 0;
         for (var s : lastThrowable.getStackTrace()) {
-            this.print(level, "\t" + s.toString(), null);
+            String ignorablePackage = this.options.verifyIgnorableThrowableStackPackage(s.getClassName());
+            if (ignorablePackage != null) {
+                if (currentIgnorablePackage == null) {
+                    currentIgnorablePackage = ignorablePackage;
+                    currentIgnorablePackageLines = 1;
+//                    System.out.println("ignorablePackage: "+ignorablePackage+" A");
+                } else if (currentIgnorablePackage.equals(ignorablePackage)) {
+                    currentIgnorablePackageLines += 1;
+//                    System.out.println("ignorablePackage: "+ignorablePackage+" B");
+                } else {
+                    // print current
+                    this.print(level, "\t [*" + currentIgnorablePackageLines + "] " + currentIgnorablePackage, null);
+                    currentIgnorablePackage = ignorablePackage;
+                    currentIgnorablePackageLines = 1;
+//                    System.out.println("ignorablePackage: "+ignorablePackage+" C");
+                }
+            } else {
+                if (currentIgnorablePackage != null) {
+                    this.print(level, "\t [*" + currentIgnorablePackageLines + "] " + currentIgnorablePackage, null);
+                    currentIgnorablePackage = null;
+//                    System.out.println("break: "+currentIgnorablePackage+" D");
+                }
+                this.print(level, "\t" + s, null);
+            }
+        }
+        if (currentIgnorablePackage != null) {
+            this.print(level, "\t [*" + currentIgnorablePackageLines + "] " + currentIgnorablePackage, null);
+//            System.out.println("fin: "+currentIgnorablePackage);
         }
     }
 }

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.cache;
 
-import io.github.sinri.keel.cache.caffeine.CaffeineCacheKit;
+import io.github.sinri.keel.cache.impl.KeelCacheAlef;
 import io.vertx.core.Future;
 
 import java.util.concurrent.ConcurrentMap;
@@ -17,9 +17,10 @@ public interface KeelCacheInterface<K, V> {
      * @param <V> class for value
      * @return A new instance of KeelCacheInterface created.
      * @since 1.9 Use CaffeineCacheKit as implementation by default.
+     * @since 2.5 changed to use KeelCacheAlef
      */
     static <K, V> KeelCacheInterface<K, V> createDefaultInstance() {
-        return new CaffeineCacheKit<>();
+        return new KeelCacheAlef<>();
     }
 
     /**
@@ -47,32 +48,6 @@ public interface KeelCacheInterface<K, V> {
      * @return value of found available cached item, or `fallbackValue`
      */
     V read(K key, V fallbackValue);
-
-    /**
-     * Read an available cached item with key;
-     * if not found, try to generate one with key using `fallbackValueGenerator` to return;
-     * if still gets `null`, return `fallbackValue`.
-     *
-     * @param key                    key
-     * @param fallbackValueGenerator fallback value generator, a function receive key and return value
-     * @param fallbackValue          the certain value returned when not found and generator returned `null`
-     * @return value of found available cached item, or generated one, or `fallbackValue`
-     */
-    V read(K key, Function<? super K, ? extends V> fallbackValueGenerator, V fallbackValue);
-
-    /**
-     * Read an available cached item with key;
-     * if not found, try to generate one with key using `fallbackValueGenerator` to return;
-     * if still gets `null`, return `fallbackValue`.
-     *
-     * @param key                    key
-     * @param fallbackValueGenerator fallback value generator, a function receive key and return value
-     * @param fallbackValue          the certain value returned when not found and generator returned `null`
-     * @param lifeInSeconds          life in seconds of the newly created
-     * @return value of found available cached item, or generated one, or `fallbackValue`
-     * @since 1.14
-     */
-    V read(K key, Function<? super K, ? extends V> fallbackValueGenerator, V fallbackValue, long lifeInSeconds);
 
     /**
      * Remove the cached item with key.
@@ -118,4 +93,5 @@ public interface KeelCacheInterface<K, V> {
                     return Future.succeededFuture(v);
                 });
     }
+
 }

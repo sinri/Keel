@@ -1,5 +1,6 @@
 package io.github.sinri.keel.cache;
 
+import io.github.sinri.keel.cache.impl.KeelCacheBet;
 import io.vertx.core.Future;
 
 import java.util.concurrent.ConcurrentMap;
@@ -11,6 +12,12 @@ import java.util.function.Function;
  * @since 1.14
  */
 public interface KeelAsyncCacheInterface<K, V> {
+    /**
+     * @since 2.5
+     */
+    static <K, V> KeelAsyncCacheInterface<K, V> createDefaultInstance() {
+        return new KeelCacheBet<>();
+    }
 
     /**
      * Save an item (as key and value pair) into cache, keep it available for a certain time.
@@ -22,7 +29,8 @@ public interface KeelAsyncCacheInterface<K, V> {
     Future<Void> save(K key, V value, long lifeInSeconds);
 
     /**
-     * Read an available cached item with key, or return `null` when not found.
+     * Read an available cached item with key in returned future,
+     * or return a failed future of NotCached.
      *
      * @param key key
      * @return value of found available cached item, or `null`
@@ -30,7 +38,8 @@ public interface KeelAsyncCacheInterface<K, V> {
     Future<V> read(K key);
 
     /**
-     * Read an available cached item with key, or return `fallbackValue` when not found.
+     * Read an available cached item with key, or return `fallbackValue` when not found;
+     * no failed future.
      *
      * @param key           key
      * @param fallbackValue the certain value returned when not found
@@ -40,16 +49,16 @@ public interface KeelAsyncCacheInterface<K, V> {
 
     /**
      * Read an available cached item with key;
-     * if not found, try to generate one with key using `fallbackValueGenerator` to return;
-     * if still gets `null`, return `fallbackValue`.
+     * if not found, try to generate one with key using `fallbackValueGenerator` to save into cache, then return it in the future;
+     * if failed to generate, failed future instead.
      *
-     * @param key                    key
-     * @param fallbackValueGenerator fallback value generator, a function receive key and return value
-     * @param fallbackValue          the certain value returned when not found and generator returned `null`
-     * @param lifeInSeconds          life in seconds used in newly created cache item
-     * @return value of found available cached item, or generated one, or `fallbackValue`
+     * @param key           key
+     * @param generator     function to generate a value for given key, to be saved into cache and return when no cached item found
+     * @param lifeInSeconds cache available in this period, in seconds
+     * @return the valued read from cache
+     * @since 2.5
      */
-    Future<V> read(K key, Function<? super K, ? extends V> fallbackValueGenerator, V fallbackValue, long lifeInSeconds);
+    Future<V> read(K key, Function<K, Future<V>> generator, long lifeInSeconds);
 
     /**
      * Remove the cached item with key.
@@ -73,4 +82,10 @@ public interface KeelAsyncCacheInterface<K, V> {
      * @since 1.14
      */
     Future<ConcurrentMap<K, V>> getSnapshotMap();
+
+    class NotCached extends Exception {
+        public NotCached(String key) {
+            super("For key [" + key + "], no available cached record found.");
+        }
+    }
 }

@@ -1,11 +1,15 @@
 package io.github.sinri.keel.core.logger;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.KeelHelper;
 import io.github.sinri.keel.core.properties.KeelOptions;
 import io.vertx.core.json.JsonObject;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * 这是一个遵循 KeelOptions 定义的 POJO 类，用于 KeelLogger 的初始化。
@@ -23,6 +27,7 @@ public class KeelLoggerOptions extends KeelOptions {
     public boolean showVerticleDeploymentID;
     public String fileOutputCharset;
     public String compositionStyle;
+    public String throwableStackIgnorePackages;
 
     protected String aspect;
 
@@ -167,6 +172,51 @@ public class KeelLoggerOptions extends KeelOptions {
     public KeelLoggerOptions setCompositionStyle(CompositionStyle compositionStyle) {
         this.compositionStyle = compositionStyle.name();
         return this;
+    }
+
+    /**
+     * @since 2.5
+     */
+    public List<String> getThrowableStackIgnorePackages() {
+        List<String> list = new ArrayList<>();
+        if (this.throwableStackIgnorePackages != null) {
+            String[] split = this.throwableStackIgnorePackages.split("[\\s;,]+");
+            for (var x : split) {
+                var y = x.trim();
+                if (!y.isEmpty()) {
+                    list.add(y);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * @since 2.5
+     */
+    public KeelLoggerOptions setThrowableStackIgnorePackages(String throwableStackIgnorePackages) {
+        this.throwableStackIgnorePackages = throwableStackIgnorePackages;
+        return this;
+    }
+
+    /**
+     * @since 2.5
+     */
+    public KeelLoggerOptions setThrowableStackIgnorePackages(Collection<String> throwableStackIgnorePackages) {
+        this.throwableStackIgnorePackages = KeelHelper.joinStringArray(throwableStackIgnorePackages, ",");
+        return this;
+    }
+
+    /**
+     * @since 2.5
+     */
+    public String verifyIgnorableThrowableStackPackage(String stack) {
+        for (var x : this.getThrowableStackIgnorePackages()) {
+            if (stack.startsWith(x)) {
+                return x;
+            }
+        }
+        return null;
     }
 
     /**
