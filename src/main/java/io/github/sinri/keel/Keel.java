@@ -1,7 +1,7 @@
 package io.github.sinri.keel;
 
-import io.github.sinri.keel.core.logger2.KeelLogger;
-import io.github.sinri.keel.core.logger2.KeelLoggerOptions;
+import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.KeelMySQLOptions;

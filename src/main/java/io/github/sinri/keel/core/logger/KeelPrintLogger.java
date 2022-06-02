@@ -1,4 +1,4 @@
-package io.github.sinri.keel.core.logger2;
+package io.github.sinri.keel.core.logger;
 
 /**
  * Print contents to STDOUT.

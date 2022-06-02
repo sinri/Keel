@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.program;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger2.KeelLogger;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.program.KeelProgramAsVerticle;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.Future;

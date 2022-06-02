@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.web.receptionist;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger2.KeelLogger;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.web.KeelWebRequestFilter;
 import io.github.sinri.keel.web.KeelWebRequestReceptionist;
 import io.vertx.core.Future;

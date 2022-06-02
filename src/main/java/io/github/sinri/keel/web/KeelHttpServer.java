@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger2.KeelLogger;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.web.websockets.KeelWebSocketHandler;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;

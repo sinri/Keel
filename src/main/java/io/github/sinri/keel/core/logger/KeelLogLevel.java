@@ -1,4 +1,4 @@
-package io.github.sinri.keel.core.logger2;
+package io.github.sinri.keel.core.logger;
 
 public enum KeelLogLevel {
     DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL, SILENT;

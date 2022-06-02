@@ -1,4 +1,4 @@
-package io.github.sinri.keel.core.logger2;
+package io.github.sinri.keel.core.logger;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;

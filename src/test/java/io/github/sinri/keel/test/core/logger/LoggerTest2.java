@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.core.logger;
 
-import io.github.sinri.keel.core.logger2.KeelLogger;
-import io.github.sinri.keel.core.logger2.KeelLoggerOptions;
+import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 
 public class LoggerTest2 {

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.fastdocs.page;
 
-import io.github.sinri.keel.core.logger2.KeelLogger;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.ext.web.RoutingContext;
 
 /**

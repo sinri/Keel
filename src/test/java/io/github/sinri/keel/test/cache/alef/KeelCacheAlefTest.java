@@ -2,7 +2,7 @@ package io.github.sinri.keel.test.cache.alef;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.cache.impl.KeelCacheAlef;
-import io.github.sinri.keel.core.logger2.KeelLogger;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 
 public class KeelCacheAlefTest {

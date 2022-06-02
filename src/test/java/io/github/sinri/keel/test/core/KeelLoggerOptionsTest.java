@@ -1,8 +1,8 @@
 package io.github.sinri.keel.test.core;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger2.KeelLogLevel;
-import io.github.sinri.keel.core.logger2.KeelLoggerOptions;
+import io.github.sinri.keel.core.logger.KeelLogLevel;
+import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.json.JsonObject;
 
