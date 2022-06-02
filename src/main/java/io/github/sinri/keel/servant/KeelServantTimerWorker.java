@@ -1,6 +1,6 @@
 package io.github.sinri.keel.servant;
 
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.vertx.core.Future;
 
 import java.util.Calendar;

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.websockets;
 
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;

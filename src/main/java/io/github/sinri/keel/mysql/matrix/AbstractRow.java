@@ -23,11 +23,6 @@ public abstract class AbstractRow {
     }
 
     /**
-     * @param sqlConnection
-     * @param readStatement
-     * @param classOfTableRow
-     * @param <T>
-     * @return
      * @since 2.1
      */
     public static <T extends AbstractRow> Future<List<T>> fetchTableRowList(
@@ -43,11 +38,6 @@ public abstract class AbstractRow {
     }
 
     /**
-     * @param sqlConnection
-     * @param readStatement
-     * @param classOfTableRow
-     * @param <T>
-     * @return
      * @since 2.1
      */
     public static <T extends AbstractRow> Future<T> fetchTableRow(

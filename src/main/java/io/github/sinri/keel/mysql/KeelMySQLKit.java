@@ -76,11 +76,6 @@ public class KeelMySQLKit {
     }
 
     /**
-     * @param sqlConnection
-     * @param sqlTemplate
-     * @param batch
-     * @param useRecover
-     * @return
      * @since 1.1
      */
     public static Future<Long> executeSqlForLastInsertedID(
@@ -102,11 +97,6 @@ public class KeelMySQLKit {
     }
 
     /**
-     * @param sqlConnection
-     * @param sqlTemplate
-     * @param data
-     * @param useRecover
-     * @return
      * @since 1.1
      */
     public static Future<Long> executeSqlForLastInsertedID(
@@ -128,11 +118,6 @@ public class KeelMySQLKit {
     }
 
     /**
-     * @param sqlConnection
-     * @param sqlTemplate
-     * @param data
-     * @param useRecover
-     * @return
      * @since 1.1
      */
     public static Future<Integer> executeSqlForAffectedRowCount(
@@ -160,10 +145,6 @@ public class KeelMySQLKit {
     }
 
     /**
-     * @param sqlConnection
-     * @param sqlTemplate
-     * @param useRecover
-     * @return
      * @since 1.1
      */
     public static Future<Integer> executeSqlForAffectedRowCount(
@@ -190,11 +171,6 @@ public class KeelMySQLKit {
     }
 
     /**
-     * @param sqlConnection
-     * @param sqlTemplate
-     * @param data
-     * @param useRecover
-     * @return
      * @since 1.1
      */
     public static Future<ResultMatrix> executeSqlForResultMatrix(
@@ -214,10 +190,6 @@ public class KeelMySQLKit {
     }
 
     /**
-     * @param sqlConnection
-     * @param sqlTemplate
-     * @param useRecover
-     * @return
      * @since 1.1
      */
     public static Future<ResultMatrix> executeSqlForResultMatrix(

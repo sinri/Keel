@@ -24,8 +24,8 @@ public class KeelSilentLogger implements KeelLogger {
     }
 
     @Override
-    public void setCategoryPrefix(String categoryPrefix) {
-
+    public KeelLogger setCategoryPrefix(String categoryPrefix) {
+        return this;
     }
 
     @Override

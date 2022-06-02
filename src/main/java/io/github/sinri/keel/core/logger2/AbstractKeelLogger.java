@@ -30,8 +30,9 @@ abstract public class AbstractKeelLogger implements KeelLogger {
     }
 
     @Override
-    public void setCategoryPrefix(String categoryPrefix) {
+    public KeelLogger setCategoryPrefix(String categoryPrefix) {
         this.categoryPrefix = categoryPrefix;
+        return this;
     }
 
     protected String createTextFromLog(KeelLogLevel level, String msg, JsonObject context) {

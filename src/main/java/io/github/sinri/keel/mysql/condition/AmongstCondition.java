@@ -68,9 +68,6 @@ public class AmongstCondition extends KeelMySQLCondition {
     }
 
     /**
-     * @param targetSet
-     * @param needQuoting
-     * @return
      * @since 1.4
      */
     public AmongstCondition amongst(Collection<?> targetSet, boolean needQuoting) {
@@ -86,8 +83,6 @@ public class AmongstCondition extends KeelMySQLCondition {
     }
 
     /**
-     * @param targetSet
-     * @return
      * @since 1.4
      */
     public AmongstCondition amongst(Collection<?> targetSet) {

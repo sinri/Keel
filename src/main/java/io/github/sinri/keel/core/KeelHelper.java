@@ -238,9 +238,6 @@ public class KeelHelper {
     }
 
     /**
-     * @param method
-     * @param classOfAnnotation
-     * @param defaultAnnotation
      * @param <T>               class of target annotation
      * @return target annotation
      * @since 1.13

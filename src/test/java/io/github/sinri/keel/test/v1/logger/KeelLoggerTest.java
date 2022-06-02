@@ -1,8 +1,7 @@
 package io.github.sinri.keel.test.v1.logger;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.core.logger.KeelLoggerOptions;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestSuite;
@@ -17,7 +16,7 @@ public class KeelLoggerTest {
 
         TestSuite suite = TestSuite.create("KeelLoggerTestSuite");
         suite.test("stdout", context -> {
-                    KeelLogger logger = new KeelLogger();
+                    KeelLogger logger = Keel.outputLogger("aspect");
                     logger.debug("debug");
                     logger.info("info");
                     logger.notice("notice");
@@ -26,8 +25,7 @@ public class KeelLoggerTest {
                     logger.fatal("fatal");
                 })
                 .test("stdout-with-aspect", testContext -> {
-                    KeelLoggerOptions options = new KeelLoggerOptions().loadForAspect("aspect");
-                    KeelLogger logger = new KeelLogger(options);
+                    KeelLogger logger = Keel.outputLogger("aspect");
 
                     logger.debug("debug");
                     logger.info("info");

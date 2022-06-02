@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.cache.alef;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
 

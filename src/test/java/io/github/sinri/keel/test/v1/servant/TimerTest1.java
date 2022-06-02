@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.v1.servant;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.github.sinri.keel.servant.KeelServantTimer;
 import io.github.sinri.keel.servant.KeelServantTimerWorker;
 import io.vertx.core.Future;

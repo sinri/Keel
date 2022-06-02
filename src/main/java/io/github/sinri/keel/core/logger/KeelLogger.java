@@ -11,6 +11,7 @@ import java.util.UUID;
  *
  * @since 1.11 Greatly Changed
  */
+@Deprecated(since = "2.6", forRemoval = true)
 public class KeelLogger {
 
     protected KeelLoggerDelegate delegate;

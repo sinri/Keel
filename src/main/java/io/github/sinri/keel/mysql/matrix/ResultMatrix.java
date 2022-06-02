@@ -32,14 +32,6 @@ public interface ResultMatrix {
     JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError;
 
     /**
-     * @param row
-     * @param classOfTableRow
-     * @param <T>
-     * @return
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
      * @since 1.10
      */
     static <T extends AbstractRow> T buildTableRow(JsonObject row, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -47,14 +39,6 @@ public interface ResultMatrix {
     }
 
     /**
-     * @param rowList
-     * @param classOfTableRow
-     * @param <T>
-     * @return
-     * @throws NoSuchMethodException
-     * @throws InvocationTargetException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
      * @since 1.10
      */
     static <T extends AbstractRow> List<T> buildTableRowList(List<JsonObject> rowList, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -66,18 +50,11 @@ public interface ResultMatrix {
     }
 
     /**
-     * @param index
-     * @param classOfTableRow
-     * @param <T>
-     * @return
      * @since 1.10
      */
     <T extends AbstractRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
 
     /**
-     * @param classOfTableRow
-     * @param <T>
-     * @return
      * @since 1.10
      */
     <T extends AbstractRow> List<T> buildTableRowList(Class<T> classOfTableRow);

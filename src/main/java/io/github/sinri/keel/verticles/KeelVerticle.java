@@ -1,7 +1,7 @@
 package io.github.sinri.keel.verticles;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -38,16 +38,6 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
                 .put("class", this.getClass().getName())
                 .put("config", this.config())
                 .put("deployment_id", this.deploymentID());
-    }
-
-    @Deprecated(since = "2.4", forRemoval = true)
-    protected final SqlConnection getMySqlConnection() {
-        return Keel.getMySqlConnectionInContext(this.context);
-    }
-
-    @Deprecated(since = "2.4", forRemoval = true)
-    protected final void setMySqlConnection(SqlConnection sqlConnect) {
-        Keel.setMySqlConnectionInContext(this.context, sqlConnect);
     }
 
     /**

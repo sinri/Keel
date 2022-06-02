@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
 
@@ -24,7 +24,6 @@ public abstract class KeelQueueTask extends KeelVerticle {
     /**
      * 被设计在seeker.seek方法中调用
      *
-     * @return
      */
     public Future<Void> lockTaskBeforeDeployment() {
         // 如果需要就重载此方法

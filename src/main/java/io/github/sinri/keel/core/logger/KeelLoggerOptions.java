@@ -17,6 +17,7 @@ import java.util.List;
  * 本类提供了静态方法以从 Keel 的标准配置文件中查找给定的 aspect 对应的配置并根据结果来生成实例。
  * 注意，aspect 不是 property，而是POJO中所有 properties 的归类名。
  */
+@Deprecated(since = "2.6", forRemoval = true)
 public class KeelLoggerOptions extends KeelOptions {
     public String dir;
     public String level;//lowestLevel

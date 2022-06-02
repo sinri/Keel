@@ -15,10 +15,12 @@ public class KeelSyncFileLogger extends AbstractKeelLogger {
     }
 
     @Override
-    public void setCategoryPrefix(String categoryPrefix) {
+    public KeelLogger setCategoryPrefix(String categoryPrefix) {
         super.setCategoryPrefix(categoryPrefix);
 
         resetReadyWriter();
+
+        return this;
     }
 
     protected synchronized void resetReadyWriter() {

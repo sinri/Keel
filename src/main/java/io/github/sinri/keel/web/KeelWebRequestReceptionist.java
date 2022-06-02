@@ -3,7 +3,7 @@ package io.github.sinri.keel.web;
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpMethod;

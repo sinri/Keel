@@ -58,7 +58,7 @@ public interface KeelLogger {
      *
      * @param categoryPrefix the category prefix string
      */
-    void setCategoryPrefix(String categoryPrefix);
+    KeelLogger setCategoryPrefix(String categoryPrefix);
 
     void debug(String msg);
 

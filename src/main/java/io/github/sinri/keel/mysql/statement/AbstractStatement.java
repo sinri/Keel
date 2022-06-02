@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.matrix.ResultMatrixWithVertx;
 import io.vertx.core.Future;

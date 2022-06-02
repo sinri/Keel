@@ -86,8 +86,6 @@ public class ConditionsComponent {
     }
 
     /**
-     * @param mapping
-     * @return
      * @since 2.0
      */
     public final ConditionsComponent quickMapping(JsonObject mapping) {
@@ -96,9 +94,6 @@ public class ConditionsComponent {
     }
 
     /**
-     * @param key
-     * @param value
-     * @return
      * @since 2.0
      */
     public final ConditionsComponent quickMapping(String key, Object value) {

@@ -2,7 +2,7 @@ package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger2.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
 
@@ -140,7 +140,6 @@ public abstract class KeelQueue extends KeelVerticle {
         /**
          * 找出一个task且其已完成lockTaskBeforeDeployment方法的调用
          *
-         * @return
          */
         Future<KeelQueueTask> seek();
 
