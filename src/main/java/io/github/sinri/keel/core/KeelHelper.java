@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -337,5 +338,26 @@ public class KeelHelper {
      */
     public static String getJsonForObjectWhoseItemKeysSorted(JsonObject object) {
         return getSortedJsonObject(object).toString();
+    }
+
+    /**
+     * @param format "yyyyMMdd" or "yyyy-MM-dd HH:mm:ss", etc. if null, return null
+     * @return the date string or null
+     * @since 2.6
+     */
+    public static String getCurrentDateExpression(String format) {
+        Date currentTime = new Date();
+        return getDateExpression(currentTime, format);
+    }
+
+    /**
+     * @since 2.6
+     */
+    public static String getDateExpression(Date date, String format) {
+        if (format == null || format.isEmpty()) {
+            return null;
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
+        return formatter.format(date);
     }
 }

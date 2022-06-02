@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
  * @param <V> class for value
  * @since 1.9
  */
+@Deprecated(since = "2.6")
 public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
     protected final Cache<K, ValueWrapper<V>> cache;
 

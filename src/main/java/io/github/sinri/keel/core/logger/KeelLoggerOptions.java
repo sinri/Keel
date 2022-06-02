@@ -27,7 +27,7 @@ public class KeelLoggerOptions extends KeelOptions {
     public boolean showVerticleDeploymentID;
     public String fileOutputCharset;
     public String compositionStyle;
-    public String throwableStackIgnorePackages;
+    public String ignorableStackPackages;
 
     protected String aspect;
 
@@ -177,10 +177,10 @@ public class KeelLoggerOptions extends KeelOptions {
     /**
      * @since 2.5
      */
-    public List<String> getThrowableStackIgnorePackages() {
+    public List<String> getIgnorableStackPackages() {
         List<String> list = new ArrayList<>();
-        if (this.throwableStackIgnorePackages != null) {
-            String[] split = this.throwableStackIgnorePackages.split("[\\s;,]+");
+        if (this.ignorableStackPackages != null) {
+            String[] split = this.ignorableStackPackages.split("[\\s;,]+");
             for (var x : split) {
                 var y = x.trim();
                 if (!y.isEmpty()) {
@@ -194,8 +194,8 @@ public class KeelLoggerOptions extends KeelOptions {
     /**
      * @since 2.5
      */
-    public KeelLoggerOptions setThrowableStackIgnorePackages(String throwableStackIgnorePackages) {
-        this.throwableStackIgnorePackages = throwableStackIgnorePackages;
+    public KeelLoggerOptions setIgnorableStackPackages(String ignorableStackPackages) {
+        this.ignorableStackPackages = ignorableStackPackages;
         return this;
     }
 
@@ -203,7 +203,7 @@ public class KeelLoggerOptions extends KeelOptions {
      * @since 2.5
      */
     public KeelLoggerOptions setThrowableStackIgnorePackages(Collection<String> throwableStackIgnorePackages) {
-        this.throwableStackIgnorePackages = KeelHelper.joinStringArray(throwableStackIgnorePackages, ",");
+        this.ignorableStackPackages = KeelHelper.joinStringArray(throwableStackIgnorePackages, ",");
         return this;
     }
 
@@ -211,7 +211,7 @@ public class KeelLoggerOptions extends KeelOptions {
      * @since 2.5
      */
     public String verifyIgnorableThrowableStackPackage(String stack) {
-        for (var x : this.getThrowableStackIgnorePackages()) {
+        for (var x : this.getIgnorableStackPackages()) {
             if (stack.startsWith(x)) {
                 return x;
             }
