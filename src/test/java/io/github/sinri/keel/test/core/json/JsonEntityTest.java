@@ -11,7 +11,8 @@ public class JsonEntityTest {
                 .put("formBody", 3);
 
         RequestBody requestBody = new RequestBody(x);
-        requestBody.validate();
+        boolean validated = requestBody.validate();
+        System.out.println("validated: " + validated);
     }
 
     public static class RequestBody extends EntityWithJsonObject {

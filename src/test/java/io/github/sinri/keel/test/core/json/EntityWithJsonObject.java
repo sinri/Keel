@@ -115,7 +115,7 @@ abstract public class EntityWithJsonObject {
             }
             return true;
         } catch (InvocationTargetException | IllegalAccessException | ClassCastException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return false;
         }
     }

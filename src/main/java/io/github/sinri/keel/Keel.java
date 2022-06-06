@@ -70,6 +70,7 @@ public class Keel {
      */
     public static KeelLogger standaloneLogger(String aspect) {
         KeelLoggerOptions options = new KeelLoggerOptions()
+                .addIgnorableStackPackage("io.vertx,io.netty,java.lang")
                 .loadForAspect(aspect);
         return KeelLogger.createLogger(options);
     }
@@ -77,6 +78,7 @@ public class Keel {
     public static KeelLogger outputLogger(String aspect) {
         KeelLoggerOptions options = new KeelLoggerOptions()
                 .setCompositionStyle(KeelLoggerOptions.CompositionStyle.THREE_LINES)
+                .addIgnorableStackPackage("io.vertx,io.netty,java.lang")
                 .loadForAspect(aspect)
                 .setImplement("print");
         return KeelLogger.createLogger(options);
