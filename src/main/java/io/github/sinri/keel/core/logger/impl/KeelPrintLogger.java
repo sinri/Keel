@@ -1,4 +1,8 @@
-package io.github.sinri.keel.core.logger;
+package io.github.sinri.keel.core.logger.impl;
+
+import io.github.sinri.keel.core.logger.AbstractKeelLogger;
+import io.github.sinri.keel.core.logger.KeelLogLevel;
+import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 
 /**
  * Print contents to STDOUT.

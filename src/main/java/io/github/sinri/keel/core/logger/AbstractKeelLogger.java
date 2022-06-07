@@ -4,7 +4,6 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelHelper;
 import io.vertx.core.json.JsonObject;
 
-import java.io.File;
 import java.util.UUID;
 
 abstract public class AbstractKeelLogger implements KeelLogger {
@@ -278,76 +277,6 @@ abstract public class AbstractKeelLogger implements KeelLogger {
             String text = KeelHelper.getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " [REMARK] " + remark + System.lineSeparator() + buildStackChainText(Thread.currentThread().getStackTrace());
             text(text);
         }
-    }
-
-    /**
-     * From Aspect and Category Prefix
-     * Aspect: a | a/b
-     * Category Prefix: EMPTY | x
-     *
-     * @return computed Relative Directory Path
-     */
-    protected String computeRelativeDirPath() {
-        return KeelHelper.joinStringArray(options.getAspectComponentList(), File.separator);
-    }
-
-    protected String computeFileName() {
-        String prefix;
-        if (this.getCategoryPrefix() != null && !this.getCategoryPrefix().isEmpty()) {
-            prefix = this.getCategoryPrefix();
-        } else {
-            prefix = options.getSubject();
-        }
-
-        String currentDateExpression = KeelHelper.getCurrentDateExpression(this.options.getFileRotateFormat());
-        if (currentDateExpression != null) {
-            return prefix + "-" + currentDateExpression + ".log";
-        } else {
-            return prefix + ".log";
-        }
-
-    }
-
-    /**
-     * @return File or null
-     */
-    protected File getOutputTargetFile() {
-        File logRootDirectory = this.options.getDir();
-        if (logRootDirectory == null) {
-            // directly output to stdout, FORMAT
-            // DATETIME [LEVEL] <ASPECT> MSG | CONTEXT
-            new KeelPrintLogger(options).warning("Log Root Directory is not valid");
-            return null;
-        }
-
-        if (logRootDirectory.exists()) {
-            if (logRootDirectory.isFile()) {
-                // directly output to the file `logRootDirectory`, FORMAT
-                // DATETIME [LEVEL] <ASPECT> MSG | CONTEXT
-                return logRootDirectory;
-            }
-        }
-        File dir = new File(logRootDirectory.getAbsolutePath() + File.separator + computeRelativeDirPath());
-
-        String realPath = dir.getAbsolutePath();
-
-        String currentDateExpression = KeelHelper.getCurrentDateExpression(this.options.getDirArchiveFormat());
-        if (currentDateExpression != null) {
-            realPath += File.separator + currentDateExpression;
-            dir = new File(realPath);
-        }
-
-        realPath += File.separator + computeFileName();
-
-        File file = new File(realPath);
-        File parentFile = file.getParentFile();
-        if (parentFile != null && !parentFile.exists()) {
-            if (!parentFile.mkdirs()) {
-                new KeelPrintLogger(options).warning("Cannot MKDIRS: " + dir.getAbsolutePath());
-            }
-        }
-
-        return file;
     }
 
     @Override

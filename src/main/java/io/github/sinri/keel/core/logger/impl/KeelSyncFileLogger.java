@@ -1,11 +1,15 @@
-package io.github.sinri.keel.core.logger;
+package io.github.sinri.keel.core.logger.impl;
+
+import io.github.sinri.keel.core.logger.AbstractKeelFileLogger;
+import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class KeelSyncFileLogger extends AbstractKeelLogger {
+public class KeelSyncFileLogger extends AbstractKeelFileLogger {
 
     protected String readyWriterFilePath;
     protected BufferedWriter readyWriter;
@@ -36,7 +40,7 @@ public class KeelSyncFileLogger extends AbstractKeelLogger {
     }
 
     protected synchronized BufferedWriter getWriter() {
-        File outputTargetFile = this.getOutputTargetFile();
+        File outputTargetFile = this.computeFile();
         if (outputTargetFile == null) {
             return null;
         }
@@ -83,6 +87,5 @@ public class KeelSyncFileLogger extends AbstractKeelLogger {
             }
         }
     }
-
 
 }

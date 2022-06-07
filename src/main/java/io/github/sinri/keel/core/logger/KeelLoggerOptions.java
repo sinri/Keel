@@ -168,12 +168,23 @@ public class KeelLoggerOptions {
         return this;
     }
 
+    @Deprecated(since = "2.6")
     public String getDirArchiveFormat() {
         return pojo.archive;
     }
 
+    @Deprecated(since = "2.6")
     public KeelLoggerOptions setDirArchiveFormat(String dirArchiveFormat) {
         this.pojo.archive = dirArchiveFormat;
+        return this;
+    }
+
+    public String getArchivePath() {
+        return this.pojo.archivePath;
+    }
+
+    public KeelLoggerOptions setArchivePath(String archivePath) {
+        this.pojo.archivePath = archivePath;
         return this;
     }
 
@@ -229,21 +240,22 @@ public class KeelLoggerOptions {
         /**
          * 决定日志输出文件是否按时间滚动分割；
          * 如果其非空，则文件名中加上按此时间格式所示标签。
-         *
-         * @see AbstractKeelLogger#computeFileName()
          */
         public String rotate;
         /**
          * 决定日志输出文件是否按时间滚动归档到相应目录；
          * 如果其非空，则目录按此时间格式所示细分归档。
-         *
-         * @see AbstractKeelLogger#getOutputTargetFile()
          */
+        @Deprecated(since = "2.6")
         public String archive;
         /**
+         * 决定日志输出文件归档的相应目录；
+         * 如果其非空，则目录按此细分归档。
+         * FORMAT SAMPLE: A/B/C-{yyyy-MM-dd...}/D
+         */
+        public String archivePath;
+        /**
          * 如果日志输出目标需要且可以手动开启关闭，此选项可以用于决定是否保持输出器常开。
-         *
-         * @see KeelSyncFileLogger#getWriter()
          */
         public boolean keepWriterReady;
         /**
@@ -287,6 +299,7 @@ public class KeelLoggerOptions {
             this.showThreadID = true;
             this.fileOutputCharset = null;
             this.archive = null;
+            this.archivePath = null;
             this.showVerticleDeploymentID = true;
             this.compositionStyle = CompositionStyle.ONE_LINE.name();
             this.implement = null;

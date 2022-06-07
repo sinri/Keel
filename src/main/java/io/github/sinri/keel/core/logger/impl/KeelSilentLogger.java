@@ -1,5 +1,7 @@
-package io.github.sinri.keel.core.logger;
+package io.github.sinri.keel.core.logger.impl;
 
+import io.github.sinri.keel.core.logger.KeelLogLevel;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.json.JsonObject;
 
 /**

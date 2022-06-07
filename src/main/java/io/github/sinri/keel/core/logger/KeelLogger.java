@@ -1,5 +1,8 @@
 package io.github.sinri.keel.core.logger;
 
+import io.github.sinri.keel.core.logger.impl.KeelPrintLogger;
+import io.github.sinri.keel.core.logger.impl.KeelSilentLogger;
+import io.github.sinri.keel.core.logger.impl.KeelSyncFileLogger;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;

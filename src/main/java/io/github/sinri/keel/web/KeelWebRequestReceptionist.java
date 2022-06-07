@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureRecursion;
+import io.github.sinri.keel.core.controlflow.FutureForEach;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
@@ -155,23 +155,18 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
         parseClientIPChain();
 
         // filters
-        List<Class<? extends KeelWebRequestFilter>> filterClassList = this.getFilterClassList();
-        FutureRecursion.call(
-                        0,
-                        filterIndex -> Future.succeededFuture(filterIndex < filterClassList.size()),
-                        filterIndex -> {
-                            Class<? extends KeelWebRequestFilter> filterClass = filterClassList.get(filterIndex);
+        FutureForEach.call(
+                        this.getFilterClassList(),
+                        filterClass -> {
                             KeelWebRequestFilter filter;
                             try {
                                 filter = filterClass.getConstructor().newInstance();
                             } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                                 return Future.failedFuture(e);
                             }
-                            return filter.shouldHandleThisRequest(getRoutingContext())
-                                    .compose(ok -> Future.succeededFuture(filterIndex + 1));
+                            return filter.shouldHandleThisRequest(getRoutingContext());
                         }
                 )
-                .compose(x -> Future.succeededFuture())
                 .compose(filtersPassed -> this.dealWithRequest())
                 .compose(responseObject -> {
                     getLogger().debug("RECEPTIONIST DONE FOR " + deploymentID());
