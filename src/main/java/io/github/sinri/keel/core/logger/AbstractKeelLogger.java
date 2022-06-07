@@ -64,7 +64,7 @@ abstract public class AbstractKeelLogger implements KeelLogger {
         } else if (this.options.getCompositionStyle() == KeelLoggerOptions.CompositionStyle.THREE_LINES) {
             content = meta + System.lineSeparator() + msg;
             if (context != null) {
-                content += System.lineSeparator() + "context: " + context;
+                content += System.lineSeparator() + context;
             }
         } else {
             // as ONE_LINE

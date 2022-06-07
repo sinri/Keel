@@ -1,5 +1,6 @@
 package io.github.sinri.keel;
 
+import io.github.sinri.keel.core.helper.*;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
@@ -127,5 +128,40 @@ public class Keel {
      */
     public static JsonObject getDeployedKeelVerticleInfo(String deploymentID) {
         return deployedKeelVerticleMap.get(deploymentID);
+    }
+
+    /**
+     * @since 2.6
+     */
+    public static KeelStringHelper stringHelper() {
+        return KeelStringHelper.getInstance();
+    }
+
+    /**
+     * @since 2.6
+     */
+    public static KeelJsonHelper jsonHelper() {
+        return KeelJsonHelper.getInstance();
+    }
+
+    /**
+     * @since 2.6
+     */
+    public static KeelFileHelper fileHelper() {
+        return KeelFileHelper.getInstance();
+    }
+
+    /**
+     * @since 2.6
+     */
+    public static KeelReflectionHelper reflectionHelper() {
+        return KeelReflectionHelper.getInstance();
+    }
+
+    /**
+     * @since 2.6
+     */
+    public static KeelDateTimeHelper dateTimeHelper() {
+        return KeelDateTimeHelper.getInstance();
     }
 }
