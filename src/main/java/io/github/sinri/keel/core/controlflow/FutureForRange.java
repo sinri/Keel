@@ -6,6 +6,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
+ * 让同一个异步任务按照设定连续运行一定的次数。
+ *
  * @since 1.13
  */
 public class FutureForRange {
@@ -31,7 +33,7 @@ public class FutureForRange {
         this.step = 1;
     }
 
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static <T> Future<Void> quick(Integer times, Function<Integer, Future<Void>> handleFunction) {
         return call(times, handleFunction);
     }

@@ -257,4 +257,42 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
         super.stop();
         Keel.unregisterDeployedKeelVerticle(this.deploymentID());
     }
+
+    /**
+     * 实验运用中。
+     *
+     * @since 2.6
+     */
+    public <T extends AbstractRequestBodyReader> Future<T> initializeRequestBodyReader(Class<T> tClass) {
+        try {
+            T t = tClass.getConstructor(RoutingContext.class)
+                    .newInstance(this.routingContext);
+            return t.loadAndValidate()
+                    .compose(v -> {
+                        return Future.succeededFuture(t);
+                    });
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            getLogger().exception(e);
+            return Future.failedFuture(e);
+        }
+    }
+
+    /**
+     * 实验运用中。
+     *
+     * @since 2.6
+     */
+    protected static abstract class AbstractRequestBodyReader {
+        private final RoutingContext routingContext;
+
+        public AbstractRequestBodyReader(RoutingContext routingContext) {
+            this.routingContext = routingContext;
+        }
+
+        protected RoutingContext getRoutingContext() {
+            return routingContext;
+        }
+
+        abstract public Future<Void> loadAndValidate();
+    }
 }

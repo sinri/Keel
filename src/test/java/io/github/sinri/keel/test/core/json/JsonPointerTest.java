@@ -31,7 +31,7 @@ public class JsonPointerTest {
                 .append(tinyPointer);
 
         JsonObject jsonObject = new JsonObject()
-                .put("a", new JsonObject()
+                .put("a1", new JsonObject()
                         .put("b", new JsonArray()
                                 .add(new JsonObject()
                                         .put("c", new JsonObject()

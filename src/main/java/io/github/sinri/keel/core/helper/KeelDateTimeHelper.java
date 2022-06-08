@@ -3,6 +3,9 @@ package io.github.sinri.keel.core.helper;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * @since 2.6
+ */
 public class KeelDateTimeHelper {
     private static final KeelDateTimeHelper instance = new KeelDateTimeHelper();
 

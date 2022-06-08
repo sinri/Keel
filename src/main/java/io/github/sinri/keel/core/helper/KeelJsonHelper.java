@@ -6,7 +6,9 @@ import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
+/**
+ * @since 2.6
+ */
 public class KeelJsonHelper {
     private static final KeelJsonHelper instance = new KeelJsonHelper();
 
@@ -16,21 +18,6 @@ public class KeelJsonHelper {
 
     public static KeelJsonHelper getInstance() {
         return instance;
-    }
-
-    public static void main(String[] args) {
-        KeelJsonHelper keelJsonHelper = new KeelJsonHelper();
-        List<Object> keychain = new ArrayList<>();
-//        keychain.add("a");
-//        keychain.add("b");
-        keychain.add(0);
-        keychain.add(1);
-        keychain.add("c");
-        keychain.add(2);
-        JsonObject jsonObject = keelJsonHelper.writeIntoJsonObject(new JsonObject(), keychain, "X");
-        System.out.println(jsonObject.encodePrettily());
-        JsonArray jsonArray = keelJsonHelper.writeIntoJsonArray(new JsonArray(), keychain, "X");
-        System.out.println(jsonArray.encodePrettily());
     }
 
     public JsonObject writeIntoJsonObject(JsonObject jsonObject, String key, Object value) {
@@ -44,7 +31,6 @@ public class KeelJsonHelper {
                 for (var i = jsonArray.size(); i <= index; i++) {
                     jsonArray.add(null);
                 }
-//                jsonArray.add(value);
             }
             jsonArray.set(index, value);
         } else {
@@ -138,6 +124,53 @@ public class KeelJsonHelper {
         }
 
         return jsonArray;
+    }
+
+    public Object readFromJsonObject(JsonObject jsonObject, String key) {
+        return jsonObject.getValue(key);
+    }
+
+    public Object readFromJsonArray(JsonArray jsonArray, int index) {
+        return jsonArray.getValue(index);
+    }
+
+    public Object readFromJsonObject(JsonObject jsonObject, List<Object> keychain) {
+        if (keychain == null || keychain.isEmpty()) {
+            throw new RuntimeException();
+        }
+        var key = keychain.get(0);
+        Object x = readFromJsonObject(jsonObject, String.valueOf(key));
+        if (keychain.size() == 1) {
+            return x;
+        }
+        List<Object> nextKeychain = keychain.subList(1, keychain.size());
+        if (x instanceof JsonObject) {
+            return readFromJsonObject((JsonObject) x, nextKeychain);
+        } else if (x instanceof JsonArray) {
+            return readFromJsonArray((JsonArray) x, nextKeychain);
+        }
+        throw new RuntimeException();
+    }
+
+    public Object readFromJsonArray(JsonArray jsonArray, List<Object> keychain) {
+        if (keychain == null || keychain.isEmpty()) {
+            throw new RuntimeException();
+        }
+        var key = keychain.get(0);
+        if (key instanceof Long || key instanceof Integer || key instanceof Short) {
+            Object x = readFromJsonArray(jsonArray, ((Number) key).intValue());
+            if (keychain.size() == 1) {
+                return x;
+            }
+            List<Object> nextKeychain = keychain.subList(1, keychain.size());
+            if (x instanceof JsonObject) {
+                return readFromJsonObject((JsonObject) x, nextKeychain);
+            } else if (x instanceof JsonArray) {
+                return readFromJsonArray((JsonArray) x, nextKeychain);
+            }
+            throw new RuntimeException();
+        }
+        throw new RuntimeException();
     }
 
     /**

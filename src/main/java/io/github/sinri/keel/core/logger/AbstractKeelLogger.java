@@ -86,20 +86,11 @@ abstract public class AbstractKeelLogger implements KeelLogger {
         return uniqueLoggerID;
     }
 
-    public void debug(String msg) {
-        debug(msg, null);
-    }
-
     @Override
     public void debug(String msg, JsonObject context) {
         if (this.isThisLevelVisible(KeelLogLevel.DEBUG)) {
             writeLog(KeelLogLevel.DEBUG, msg, context);
         }
-    }
-
-    @Override
-    public void info(String msg) {
-        info(msg, null);
     }
 
     @Override
@@ -110,20 +101,10 @@ abstract public class AbstractKeelLogger implements KeelLogger {
     }
 
     @Override
-    public void notice(String msg) {
-        notice(msg, null);
-    }
-
-    @Override
     public void notice(String msg, JsonObject context) {
         if (this.isThisLevelVisible(KeelLogLevel.NOTICE)) {
             writeLog(KeelLogLevel.NOTICE, msg, context);
         }
-    }
-
-    @Override
-    public void warning(String msg) {
-        warning(msg, null);
     }
 
     @Override
@@ -134,11 +115,6 @@ abstract public class AbstractKeelLogger implements KeelLogger {
     }
 
     @Override
-    public void error(String msg) {
-        error(msg, null);
-    }
-
-    @Override
     public void error(String msg, JsonObject context) {
         if (this.isThisLevelVisible(KeelLogLevel.ERROR)) {
             writeLog(KeelLogLevel.ERROR, msg, context);
@@ -146,25 +122,10 @@ abstract public class AbstractKeelLogger implements KeelLogger {
     }
 
     @Override
-    public void fatal(String msg) {
-        fatal(msg, null);
-    }
-
-    @Override
     public void fatal(String msg, JsonObject context) {
         if (this.isThisLevelVisible(KeelLogLevel.FATAL)) {
             writeLog(KeelLogLevel.FATAL, msg, context);
         }
-    }
-
-    @Override
-    public void exception(Throwable throwable) {
-        exception(KeelLogLevel.ERROR, null, throwable);
-    }
-
-    @Override
-    public void exception(String msg, Throwable throwable) {
-        exception(KeelLogLevel.ERROR, msg, throwable);
     }
 
     @Override

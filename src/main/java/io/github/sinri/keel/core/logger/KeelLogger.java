@@ -63,33 +63,49 @@ public interface KeelLogger {
      */
     KeelLogger setCategoryPrefix(String categoryPrefix);
 
-    void debug(String msg);
+    default void debug(String msg) {
+        debug(msg, null);
+    }
 
     void debug(String msg, JsonObject context);
 
-    void info(String msg);
+    default void info(String msg) {
+        info(msg, null);
+    }
 
     void info(String msg, JsonObject context);
 
-    void notice(String msg);
+    default void notice(String msg) {
+        notice(msg, null);
+    }
 
     void notice(String msg, JsonObject context);
 
-    void warning(String msg);
+    default void warning(String msg) {
+        warning(msg, null);
+    }
 
     void warning(String msg, JsonObject context);
 
-    void error(String msg);
+    default void error(String msg) {
+        error(msg, null);
+    }
 
     void error(String msg, JsonObject context);
 
-    void fatal(String msg);
+    default void fatal(String msg) {
+        fatal(msg, null);
+    }
 
     void fatal(String msg, JsonObject context);
 
-    void exception(Throwable throwable);
+    default void exception(Throwable throwable) {
+        exception(KeelLogLevel.ERROR, null, throwable);
+    }
 
-    void exception(String msg, Throwable throwable);
+    default void exception(String msg, Throwable throwable) {
+        exception(KeelLogLevel.ERROR, msg, throwable);
+    }
 
     void exception(KeelLogLevel level, String msg, Throwable throwable);
 

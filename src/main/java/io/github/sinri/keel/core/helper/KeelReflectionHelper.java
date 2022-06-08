@@ -3,6 +3,9 @@ package io.github.sinri.keel.core.helper;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
+/**
+ * @since 2.6
+ */
 public class KeelReflectionHelper {
     private static final KeelReflectionHelper instance = new KeelReflectionHelper();
 
@@ -25,5 +28,12 @@ public class KeelReflectionHelper {
             return defaultAnnotation;
         }
         return annotation;
+    }
+
+    /**
+     * @since 2.6
+     */
+    public <T extends Annotation> T getAnnotationOfMethod(Method method, Class<T> classOfAnnotation) {
+        return getAnnotationOfMethod(method, classOfAnnotation, null);
     }
 }
