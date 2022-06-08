@@ -1,7 +1,6 @@
 package io.github.sinri.keel.core.logger;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.KeelHelper;
 import io.vertx.core.json.JsonObject;
 
 import java.util.UUID;
@@ -49,7 +48,7 @@ abstract public class AbstractKeelLogger implements KeelLogger {
             verticleDeploymentInfo = "{" + Keel.getVertx().getOrCreateContext().deploymentID() + "} ";
         }
 
-        String meta = KeelHelper.getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " "
+        String meta = Keel.dateTimeHelper().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " "
                 + "[" + level.name() + "] "
                 + "<" + subject + "> "
                 + threadInfo
@@ -274,7 +273,7 @@ abstract public class AbstractKeelLogger implements KeelLogger {
     @Override
     public void reportCurrentRuntimeCodeLocation(String remark) {
         if (this.isThisLevelVisible(KeelLogLevel.NOTICE)) {
-            String text = KeelHelper.getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " [REMARK] " + remark + System.lineSeparator() + buildStackChainText(Thread.currentThread().getStackTrace());
+            String text = Keel.dateTimeHelper().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " [REMARK] " + remark + System.lineSeparator() + buildStackChainText(Thread.currentThread().getStackTrace());
             text(text);
         }
     }

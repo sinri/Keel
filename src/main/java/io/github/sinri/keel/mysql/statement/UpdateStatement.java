@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
 
 import java.util.ArrayList;
@@ -93,12 +93,12 @@ public class UpdateStatement extends AbstractModifyStatement {
             sql += " " + schema + ".";
         }
         sql += table;
-        sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "SET " + KeelHelper.joinStringArray(assignments, ",");
+        sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "SET " + Keel.stringHelper().joinStringArray(assignments, ",");
         if (!whereConditionsComponent.isEmpty()) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "WHERE " + whereConditionsComponent;
         }
         if (!sortRules.isEmpty()) {
-            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + KeelHelper.joinStringArray(sortRules, ",");
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + Keel.stringHelper().joinStringArray(sortRules, ",");
         }
         if (limit > 0) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "LIMIT " + limit;

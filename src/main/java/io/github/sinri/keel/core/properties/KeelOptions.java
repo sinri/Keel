@@ -2,7 +2,7 @@ package io.github.sinri.keel.core.properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
@@ -24,7 +24,7 @@ abstract public class KeelOptions {
 
 
     public static <T extends KeelOptions> T loadWithYamlFilePath(String yamlFilePath, Class<T> classOfT) throws IOException {
-        byte[] bytes = KeelHelper.readFileAsByteArray(yamlFilePath, true);
+        byte[] bytes = Keel.fileHelper().readFileAsByteArray(yamlFilePath, true);
 
         var mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
@@ -33,7 +33,7 @@ abstract public class KeelOptions {
     }
 
     public static <T extends KeelOptions> T loadWithJsonObjectFilePath(String jsonObjectFilePath, Class<T> classOfT) throws IOException {
-        byte[] bytes = KeelHelper.readFileAsByteArray(jsonObjectFilePath, true);
+        byte[] bytes = Keel.fileHelper().readFileAsByteArray(jsonObjectFilePath, true);
         return loadWithJsonObject(new JsonObject(Buffer.buffer(bytes)), classOfT);
     }
 

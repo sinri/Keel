@@ -1,6 +1,6 @@
 package io.github.sinri.keel.core.helper;
 
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.properties.KeelOptions;
 
 import java.io.IOException;
@@ -60,7 +60,7 @@ public class KeelFileHelper {
         List<JarEntry> jarEntryList = new ArrayList<>();
         try {
             // should root ends with '/'?
-            URL url = KeelHelper.class.getClassLoader().getResource(root);
+            URL url = Keel.class.getClassLoader().getResource(root);
             if (url == null) {
                 throw new RuntimeException("Resource is not found");
             }

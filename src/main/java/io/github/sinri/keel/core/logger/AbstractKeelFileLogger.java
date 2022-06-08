@@ -1,6 +1,6 @@
 package io.github.sinri.keel.core.logger;
 
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.impl.KeelPrintLogger;
 
 import java.io.File;
@@ -28,7 +28,13 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
      * @return computed Relative Directory Path
      */
     private String computeRelativeDirPath() {
-        StringBuilder relativePath = new StringBuilder(KeelHelper.joinStringArray(options.getAspectComponentList(), File.separator));
+        StringBuilder relativePath = new StringBuilder(
+                Keel.stringHelper()
+                        .joinStringArray(
+                                options.getAspectComponentList(),
+                                File.separator
+                        )
+        );
 
         Pattern pattern = Pattern.compile("\\{([A-Za-z: _.]+)}");
         if (this.options.getArchivePath() != null) {
@@ -40,12 +46,12 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
                 Matcher matcher = pattern.matcher(part);
                 String parsedPart = matcher.replaceAll(matchResult -> {
                     String format = matchResult.group(1);
-                    return KeelHelper.getCurrentDateExpression(format);
+                    return Keel.dateTimeHelper().getCurrentDateExpression(format);
                 });
                 relativePath.append(File.separator).append(parsedPart);
             }
         } else if (this.options.getDirArchiveFormat() != null) {
-            String currentDateExpression = KeelHelper.getCurrentDateExpression(this.options.getDirArchiveFormat());
+            String currentDateExpression = Keel.dateTimeHelper().getCurrentDateExpression(this.options.getDirArchiveFormat());
             if (currentDateExpression != null) {
                 relativePath.append(File.separator).append(currentDateExpression);
             }
@@ -62,7 +68,7 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
             prefix = options.getSubject();
         }
 
-        String currentDateExpression = KeelHelper.getCurrentDateExpression(this.options.getFileRotateFormat());
+        String currentDateExpression = Keel.dateTimeHelper().getCurrentDateExpression(this.options.getFileRotateFormat());
         if (currentDateExpression != null) {
             return prefix + "-" + currentDateExpression + ".log";
         } else {
