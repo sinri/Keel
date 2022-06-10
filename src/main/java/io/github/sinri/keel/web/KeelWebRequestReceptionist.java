@@ -24,7 +24,6 @@ import java.util.*;
 abstract public class KeelWebRequestReceptionist extends KeelVerticle {
     public static final String RoutingContextDatumKeyOfClientIPChain = "client_ip_chain";
     public static final String RoutingContextDatumKeyOfRequestID = "request_id";
-
     private final RoutingContext routingContext;
     private String requestID;
 
@@ -167,7 +166,9 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                             return filter.shouldHandleThisRequest(getRoutingContext());
                         }
                 )
-                .compose(filtersPassed -> this.dealWithRequest())
+                .compose(filtersPassed -> {
+                    return this.dealWithRequest();
+                })
                 .compose(responseObject -> {
                     getLogger().debug("RECEPTIONIST DONE FOR " + deploymentID());
 
@@ -263,7 +264,8 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
      *
      * @since 2.6
      */
-    public <T extends AbstractRequestBodyReader> Future<T> initializeRequestBodyReader(Class<T> tClass) {
+    @Deprecated
+    private <T extends AbstractRequestBodyReader> Future<T> initializeRequestBodyReader(Class<T> tClass) {
         try {
             T t = tClass.getConstructor(RoutingContext.class)
                     .newInstance(this.routingContext);
@@ -282,6 +284,7 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
      *
      * @since 2.6
      */
+    @Deprecated
     protected static abstract class AbstractRequestBodyReader {
         private final RoutingContext routingContext;
 

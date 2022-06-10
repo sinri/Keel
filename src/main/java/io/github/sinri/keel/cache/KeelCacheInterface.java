@@ -1,6 +1,7 @@
 package io.github.sinri.keel.cache;
 
 import io.github.sinri.keel.cache.impl.KeelCacheAlef;
+import io.github.sinri.keel.cache.impl.KeelCacheDummy;
 import io.vertx.core.Future;
 
 import java.util.concurrent.ConcurrentMap;
@@ -21,6 +22,13 @@ public interface KeelCacheInterface<K, V> {
      */
     static <K, V> KeelCacheInterface<K, V> createDefaultInstance() {
         return new KeelCacheAlef<>();
+    }
+
+    /**
+     * @since 2.6
+     */
+    static <K, V> KeelCacheInterface<K, V> getDummyInstance() {
+        return new KeelCacheDummy<>();
     }
 
     /**
