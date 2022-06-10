@@ -32,11 +32,11 @@ abstract public class KeelWebRequestCacheableReceptionist extends KeelWebRequest
     abstract protected long getLifeInSeconds();
 
     @Override
-    protected final Future<Object> dealWithRequest() {
+    protected Future<Object> handlerForFiltersPassed() {
         String key = getRequestDigestAsCacheKey();
 
         if (key == null) {
-            return this.computeResultToCache();
+            return this.dealWithRequest();
         }
 
         String md5_of_key = Keel.stringHelper().md5(key);
@@ -44,7 +44,7 @@ abstract public class KeelWebRequestCacheableReceptionist extends KeelWebRequest
         Object cached = cacheInstance.read(key);
         if (cached == null) {
             this.getRoutingContext().put(FIELD_USE_CACHE, false);
-            return this.computeResultToCache()
+            return this.dealWithRequest()
                     .compose(result -> {
                         getCacheLogger().notice("CACHING", new JsonObject()
                                 .put("md5", md5_of_key)
@@ -61,6 +61,4 @@ abstract public class KeelWebRequestCacheableReceptionist extends KeelWebRequest
             return Future.succeededFuture(cached);
         }
     }
-
-    abstract protected Future<Object> computeResultToCache();
 }

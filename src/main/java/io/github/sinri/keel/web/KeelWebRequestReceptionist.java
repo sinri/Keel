@@ -154,20 +154,9 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
         parseClientIPChain();
 
         // filters
-        FutureForEach.call(
-                        this.getFilterClassList(),
-                        filterClass -> {
-                            KeelWebRequestFilter filter;
-                            try {
-                                filter = filterClass.getConstructor().newInstance();
-                            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                                return Future.failedFuture(e);
-                            }
-                            return filter.shouldHandleThisRequest(getRoutingContext());
-                        }
-                )
+        dealWithFilters()
                 .compose(filtersPassed -> {
-                    return this.dealWithRequest();
+                    return this.handlerForFiltersPassed();
                 })
                 .compose(responseObject -> {
                     getLogger().debug("RECEPTIONIST DONE FOR " + deploymentID());
@@ -184,6 +173,25 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                     getLogger().debug("RECEPTIONIST eventually undeploy me!");
                     return undeployMe();
                 });
+    }
+
+    protected Future<Void> dealWithFilters() {
+        return FutureForEach.call(
+                this.getFilterClassList(),
+                filterClass -> {
+                    KeelWebRequestFilter filter;
+                    try {
+                        filter = filterClass.getConstructor().newInstance();
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                        return Future.failedFuture(e);
+                    }
+                    return filter.shouldHandleThisRequest(getRoutingContext());
+                }
+        );
+    }
+
+    protected Future<Object> handlerForFiltersPassed() {
+        return this.dealWithRequest();
     }
 
     abstract protected Future<Object> dealWithRequest();
