@@ -9,21 +9,21 @@ import java.util.Map;
 /**
  * @since 2.7
  */
-public class JsonArrayScheme implements JsonElementScheme {
-    private final Map<Integer, JsonElementScheme> indexedElementSchemeMap = new LinkedHashMap<>();
-    private JsonElementScheme defaultElementScheme;
+public class JsonArrayScheme extends JsonValueScheme<JsonArray> {
+    private final Map<Integer, JsonElementScheme<?>> indexedElementSchemeMap = new LinkedHashMap<>();
+    private JsonElementScheme<?> defaultElementScheme;
     private boolean allowEmpty = true;
     private Integer minLength = 0;
     private Integer maxLength = Integer.MAX_VALUE;
-    private boolean nullable = false;
-    private boolean optional = false;
+//    private boolean nullable = false;
+//    private boolean optional = false;
 
-    public JsonArrayScheme setDefaultElementScheme(JsonElementScheme defaultElementScheme) {
+    public JsonArrayScheme setDefaultElementScheme(JsonElementScheme<?> defaultElementScheme) {
         this.defaultElementScheme = defaultElementScheme;
         return this;
     }
 
-    public JsonArrayScheme setElementSchemeForIndex(int index, JsonElementScheme elementScheme) {
+    public JsonArrayScheme setElementSchemeForIndex(int index, JsonElementScheme<?> elementScheme) {
         this.indexedElementSchemeMap.put(index, elementScheme);
         return this;
     }
@@ -54,8 +54,8 @@ public class JsonArrayScheme implements JsonElementScheme {
         });
         return new JsonObject()
                 .put("scheme_type", getJsonElementSchemeType())
-                .put("nullable", nullable)
-                .put("optional", optional)
+                .put("nullable", isNullable())
+                .put("optional", isOptional())
                 .put("default_element", defaultElementScheme)
                 .put("indexed_elements", indexTypeMap)
                 .put("allow_empty", allowEmpty)
@@ -65,9 +65,10 @@ public class JsonArrayScheme implements JsonElementScheme {
     }
 
     @Override
-    public JsonElementScheme reloadDataFromJsonObject(JsonObject jsonObject) {
-        this.nullable = jsonObject.getBoolean("nullable", false);
-        this.optional = jsonObject.getBoolean("optional", false);
+    public JsonElementScheme<JsonArray> reloadDataFromJsonObject(JsonObject jsonObject) {
+        super.reloadDataFromJsonObject(jsonObject);
+//        this.nullable = jsonObject.getBoolean("nullable", false);
+//        this.optional = jsonObject.getBoolean("optional", false);
         this.allowEmpty = jsonObject.getBoolean("allow_empty", true);
 
         this.minLength = jsonObject.getInteger("min_length", 0);
@@ -87,7 +88,7 @@ public class JsonArrayScheme implements JsonElementScheme {
                 int i = Integer.parseInt(entry.getKey());
                 Object v = entry.getValue();
                 if (v instanceof JsonObject) {
-                    JsonElementScheme jsonElementScheme = JsonElementScheme.fromJsonObject((JsonObject) v);
+                    JsonElementScheme<?> jsonElementScheme = JsonElementScheme.fromJsonObject((JsonObject) v);
                     this.indexedElementSchemeMap.put(i, jsonElementScheme);
                 } else {
                     throw new RuntimeException();
@@ -102,15 +103,97 @@ public class JsonArrayScheme implements JsonElementScheme {
         return JsonElementSchemeType.JsonArray;
     }
 
+//    @Override
+//    public boolean isNullable() {
+//        return nullable;
+//    }
+
     @Override
-    public boolean isNullable() {
-        return nullable;
+    public void digest(JsonArray jsonArray) throws JsonSchemeMismatchException {
+        if (jsonArray == null) {
+            if (!isNullable()) {
+                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleNullableNotAllowed);
+            }
+            return;
+        }
+//        if (jsonArray instanceof JsonArray) {
+        if (jsonArray.size() == 0) {
+            if (!this.isAllowEmpty()) {
+                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleEmptyArrayNotAllowed);
+            }
+        }
+
+        for (Integer i : this.indexedElementSchemeMap.keySet()) {
+            JsonElementScheme<?> elementScheme = this.indexedElementSchemeMap.get(i);
+
+            if (i >= 0 && i < jsonArray.size()) {
+                try {
+                    if (elementScheme instanceof JsonObjectScheme) {
+                        ((JsonObjectScheme) elementScheme).digest(jsonArray.getJsonObject(i));
+                    } else if (elementScheme instanceof JsonArrayScheme) {
+                        ((JsonArrayScheme) elementScheme).digest(jsonArray.getJsonArray(i));
+                    } else if (elementScheme instanceof JsonNumberScheme) {
+                        ((JsonNumberScheme) elementScheme).digest(jsonArray.getNumber(i));
+                    } else if (elementScheme instanceof JsonStringScheme) {
+                        ((JsonStringScheme) elementScheme).digest(jsonArray.getString(i));
+                    } else if (elementScheme instanceof JsonBooleanScheme) {
+                        ((JsonBooleanScheme) elementScheme).digest(jsonArray.getBoolean(i));
+                    } else if (elementScheme instanceof JsonNullScheme) {
+                        ((JsonNullScheme) elementScheme).digest(jsonArray.getValue(i));
+                    } else if (elementScheme instanceof JsonPlainScheme) {
+                        ((JsonPlainScheme) elementScheme).digest(jsonArray.getValue(i));
+                    } else {
+                        throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleSchemeError);
+                    }
+                } catch (JsonSchemeMismatchException subException) {
+                    throw new JsonSchemeMismatchException("INDEX[" + i + "]", subException);
+                }
+            } else {
+                if (!elementScheme.isOptional()) {
+                    throw new JsonSchemeMismatchException("INDEX[" + i + "]", JsonSchemeMismatchException.RuleValueLacked);
+                }
+            }
+        }
+
+        for (var i = 0; i < jsonArray.size(); i++) {
+            if (this.indexedElementSchemeMap.containsKey(i)) {
+                continue;
+            }
+
+            JsonElementScheme<?> elementScheme = this.defaultElementScheme;
+
+            try {
+                if (elementScheme instanceof JsonObjectScheme) {
+                    ((JsonObjectScheme) elementScheme).digest(jsonArray.getJsonObject(i));
+                } else if (elementScheme instanceof JsonArrayScheme) {
+                    ((JsonArrayScheme) elementScheme).digest(jsonArray.getJsonArray(i));
+                } else if (elementScheme instanceof JsonNumberScheme) {
+                    ((JsonNumberScheme) elementScheme).digest(jsonArray.getNumber(i));
+                } else if (elementScheme instanceof JsonStringScheme) {
+                    ((JsonStringScheme) elementScheme).digest(jsonArray.getString(i));
+                } else if (elementScheme instanceof JsonBooleanScheme) {
+                    ((JsonBooleanScheme) elementScheme).digest(jsonArray.getBoolean(i));
+                } else if (elementScheme instanceof JsonNullScheme) {
+                    ((JsonNullScheme) elementScheme).digest(jsonArray.getValue(i));
+                } else if (elementScheme instanceof JsonPlainScheme) {
+                    ((JsonPlainScheme) elementScheme).digest(jsonArray.getValue(i));
+                } else {
+                    throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleSchemeError);
+                }
+            } catch (JsonSchemeMismatchException subException) {
+                throw new JsonSchemeMismatchException("INDEX[" + i + "]", subException);
+            }
+        }
+//        }else {
+//            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueTypeNotExpected);
+//        }
+        this.digested = jsonArray;
     }
 
-    public JsonArrayScheme setNullable(boolean nullable) {
-        this.nullable = nullable;
-        return this;
-    }
+//    public JsonArrayScheme setNullable(boolean nullable) {
+//        this.nullable = nullable;
+//        return this;
+//    }
 
     public boolean isAllowEmpty() {
         return allowEmpty;
@@ -121,70 +204,109 @@ public class JsonArrayScheme implements JsonElementScheme {
         return this;
     }
 
-    public boolean validate(JsonArray jsonArray) {
-        if (jsonArray == null) {
-            return isNullable();
-        }
-        if (jsonArray.size() == 0) {
-            if (!this.isAllowEmpty()) {
-                return false;
-            }
-        }
+//    public void validate(Object jsonArray) throws JsonSchemeMismatchException {
+//        if (jsonArray == null) {
+//            if (!isNullable()) {
+//                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleNullableNotAllowed);
+//            }
+//            return;
+//        }
+//        if (jsonArray instanceof JsonArray) {
+//            if (((JsonArray) jsonArray).size() == 0) {
+//                if (!this.isAllowEmpty()) {
+//                    throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleEmptyArrayNotAllowed);
+//                }
+//            }
+//
+//            for (Integer i : this.indexedElementSchemeMap.keySet()) {
+//                JsonElementScheme<?> elementScheme = this.indexedElementSchemeMap.get(i);
+//
+//                if (i >= 0 && i < ((JsonArray) jsonArray).size()) {
+//                    try {
+//                        if (elementScheme instanceof JsonObjectScheme) {
+//                            ((JsonObjectScheme) elementScheme).validate(((JsonArray) jsonArray).getJsonObject(i));
+//                        } else if (elementScheme instanceof JsonArrayScheme) {
+//                            ((JsonArrayScheme) elementScheme).validate(((JsonArray) jsonArray).getJsonArray(i));
+//                        }
+//                        else if (elementScheme instanceof JsonNumberScheme) {
+//                            ((JsonNumberScheme) elementScheme).digest(((JsonArray) jsonArray).getNumber(i));
+//                        }
+//                        else if (elementScheme instanceof JsonStringScheme) {
+//                            ((JsonStringScheme) elementScheme).digest(((JsonArray) jsonArray).getString(i));
+//                        }
+//                        else if (elementScheme instanceof JsonBooleanScheme) {
+//                            ((JsonBooleanScheme) elementScheme).digest(((JsonArray) jsonArray).getBoolean(i));
+//                        }
+//                        else if (elementScheme instanceof JsonNullScheme) {
+//                            ((JsonNullScheme) elementScheme).digest(((JsonArray) jsonArray).getValue(i));
+//                        }
+//                        else if (elementScheme instanceof JsonPlainScheme) {
+//                            ((JsonPlainScheme) elementScheme).digest(((JsonArray) jsonArray).getValue(i));
+//                        }
+//                        else {
+//                            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleSchemeError);
+//                        }
+//                    } catch (JsonSchemeMismatchException subException) {
+//                        throw new JsonSchemeMismatchException("INDEX[" + i + "]",subException);
+//                    }
+//                } else {
+//                    if (!elementScheme.isOptional()) {
+//                        throw new JsonSchemeMismatchException( "INDEX[" + i + "]",JsonSchemeMismatchException.RuleValueLacked);
+//                    }
+//                }
+//            }
+//
+//            for (var i = 0; i < ((JsonArray) jsonArray).size(); i++) {
+//                if (this.indexedElementSchemeMap.containsKey(i)) {
+//                    continue;
+//                }
+//
+//                JsonElementScheme<?> elementScheme = this.defaultElementScheme;
+//
+//                try {
+//                    if (elementScheme instanceof JsonObjectScheme) {
+//                        ((JsonObjectScheme) elementScheme).validate(((JsonArray) jsonArray).getJsonObject(i));
+//                    } else if (elementScheme instanceof JsonArrayScheme) {
+//                        ((JsonArrayScheme) elementScheme).validate(((JsonArray) jsonArray).getJsonArray(i));
+//                    }
+//                    else if (elementScheme instanceof JsonNumberScheme) {
+//                        ((JsonNumberScheme) elementScheme).digest(((JsonArray) jsonArray).getNumber(i));
+//                    }
+//                    else if (elementScheme instanceof JsonStringScheme) {
+//                        ((JsonStringScheme) elementScheme).digest(((JsonArray) jsonArray).getString(i));
+//                    }
+//                    else if (elementScheme instanceof JsonBooleanScheme) {
+//                        ((JsonBooleanScheme) elementScheme).digest(((JsonArray) jsonArray).getBoolean(i));
+//                    }
+//                    else if (elementScheme instanceof JsonNullScheme) {
+//                        ((JsonNullScheme) elementScheme).digest(((JsonArray) jsonArray).getValue(i));
+//                    }
+//                    else if (elementScheme instanceof JsonPlainScheme) {
+//                        ((JsonPlainScheme) elementScheme).digest(((JsonArray) jsonArray).getValue(i));
+//                    }
+//                    else {
+//                        throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleSchemeError);
+//                    }
+//                } catch (JsonSchemeMismatchException subException) {
+//                    throw new JsonSchemeMismatchException("INDEX[" + i + "]",subException);
+//                }
+//            }
+//        }else {
+//            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueTypeNotExpected);
+//        }
+//    }
 
-        for (Integer i : this.indexedElementSchemeMap.keySet()) {
-            JsonElementScheme elementScheme = this.indexedElementSchemeMap.get(i);
+//    @Override
+//    public boolean isOptional() {
+//        return optional;
+//    }
+//
+//    public JsonArrayScheme setOptional(boolean optional) {
+//        this.optional = optional;
+//        return this;
+//    }
 
-            if (i >= 0 && i < jsonArray.size()) {
-                if (elementScheme instanceof JsonObjectScheme) {
-                    var validated = ((JsonObjectScheme) elementScheme).validate(jsonArray.getJsonObject(i));
-                    if (!validated) return false;
-                } else if (elementScheme instanceof JsonArrayScheme) {
-                    var validated = ((JsonArrayScheme) elementScheme).validate(jsonArray.getJsonArray(i));
-                    if (!validated) return false;
-                } else if (elementScheme instanceof JsonValueScheme) {
-                    var validated = ((JsonValueScheme) elementScheme).validate(jsonArray.getValue(i));
-                    if (!validated) return false;
-                } else {
-                    throw new RuntimeException("SCHEME ERROR");
-                }
-            } else {
-                if (!elementScheme.isOptional()) {
-                    return false;
-                }
-            }
-        }
-
-        for (var i = 0; i < jsonArray.size(); i++) {
-            if (this.indexedElementSchemeMap.containsKey(i)) {
-                continue;
-            }
-
-            JsonElementScheme elementScheme = this.defaultElementScheme;
-
-            if (elementScheme instanceof JsonObjectScheme) {
-                var validated = ((JsonObjectScheme) elementScheme).validate(jsonArray.getJsonObject(i));
-                if (!validated) return false;
-            } else if (elementScheme instanceof JsonArrayScheme) {
-                var validated = ((JsonArrayScheme) elementScheme).validate(jsonArray.getJsonArray(i));
-                if (!validated) return false;
-            } else if (elementScheme instanceof JsonValueScheme) {
-                var validated = ((JsonValueScheme) elementScheme).validate(jsonArray.getValue(i));
-                if (!validated) return false;
-            } else {
-                throw new RuntimeException("SCHEME ERROR");
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public boolean isOptional() {
-        return optional;
-    }
-
-    public JsonArrayScheme setOptional(boolean optional) {
-        this.optional = optional;
-        return this;
+    public JsonArray getDigested() {
+        return this.digested;
     }
 }

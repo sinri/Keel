@@ -5,7 +5,7 @@ import io.vertx.core.json.JsonObject;
 /**
  * @since 2.7
  */
-public class JsonBooleanScheme extends JsonValueScheme {
+public class JsonBooleanScheme extends JsonValueScheme<Boolean> {
     private Boolean expected;
 
     public JsonBooleanScheme() {
@@ -34,20 +34,51 @@ public class JsonBooleanScheme extends JsonValueScheme {
     }
 
     @Override
-    public JsonElementScheme reloadDataFromJsonObject(JsonObject jsonObject) {
+    public JsonElementScheme<Boolean> reloadDataFromJsonObject(JsonObject jsonObject) {
         super.reloadDataFromJsonObject(jsonObject);
         this.expected = jsonObject.getBoolean("expected");
         return this;
     }
 
-    public boolean validate(Object object) {
+//    public void validate(Object object) throws JsonSchemeMismatchException {
+//        if (object == null) {
+//            if (!isNullable()) {
+//                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleNullableNotAllowed);
+//            }
+//        }
+//        if (object instanceof Boolean) {
+//            if (expected != null) {
+//                if (object != expected) {
+//                    throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
+//                }
+//            }
+//        }else {
+//            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueTypeNotExpected);
+//        }
+//    }
+
+    @Override
+    public void digest(Boolean object) throws JsonSchemeMismatchException {
         if (object == null) {
-            return isNullable();
+            if (!isNullable()) {
+                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleNullableNotAllowed);
+            }
+            return;
         }
-        if (object instanceof Boolean) {
-            if (expected == null) return true;
-            return object == expected;
+//        if (object instanceof Boolean) {
+        if (expected != null) {
+            if (object != expected) {
+                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
+            }
         }
-        return false;
+//        }else {
+//            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueTypeNotExpected);
+//        }
+        this.digested = object;
+    }
+
+    @Override
+    public Boolean getDigested() {
+        return digested;
     }
 }

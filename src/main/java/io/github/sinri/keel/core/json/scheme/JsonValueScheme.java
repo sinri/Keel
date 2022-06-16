@@ -1,12 +1,11 @@
 package io.github.sinri.keel.core.json.scheme;
 
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 /**
  * @since 2.7
  */
-public class JsonValueScheme implements JsonElementScheme {
+abstract public class JsonValueScheme<T> implements JsonElementScheme<T> {
 
     private boolean nullable = false;
     private boolean optional = false;
@@ -20,37 +19,40 @@ public class JsonValueScheme implements JsonElementScheme {
                 ;
     }
 
-    @Override
-    public JsonElementScheme reloadDataFromJsonObject(JsonObject jsonObject) {
-        this.nullable = jsonObject.getBoolean("nullable", false);
-        this.optional = jsonObject.getBoolean("optional", false);
-        return this;
-    }
+    protected T digested;
 
-    @Override
-    public JsonElementSchemeType getJsonElementSchemeType() {
-        return JsonElementSchemeType.JsonValue;
-    }
 
-    public boolean validate(Object object) {
-        if (object instanceof JsonObject || object instanceof JsonArray) {
-            return false;
-        } else {
-            if (object == null) {
-                return isNullable();
-            } else {
-                // not null
-                return true;
-            }
-        }
-    }
+//    public void validate(Object object) throws JsonSchemeMismatchException {
+//        if (object == null) {
+//            if(!isNullable()){
+//                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleNullableNotAllowed);
+//            }
+//        }
+//    }
 
     @Override
     public boolean isNullable() {
         return nullable;
     }
 
-    public JsonValueScheme setNullable(boolean nullable) {
+    @Override
+    public JsonElementScheme<T> reloadDataFromJsonObject(JsonObject jsonObject) {
+        this.nullable = jsonObject.getBoolean("nullable", false);
+        this.optional = jsonObject.getBoolean("optional", false);
+        return this;
+    }
+
+    @Override
+    public void digest(T object) throws JsonSchemeMismatchException {
+        if (object == null) {
+            if (!isNullable()) {
+                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleNullableNotAllowed);
+            }
+        }
+        this.digested = object;
+    }
+
+    public JsonValueScheme<T> setNullable(boolean nullable) {
         this.nullable = nullable;
         return this;
     }
@@ -60,8 +62,13 @@ public class JsonValueScheme implements JsonElementScheme {
         return optional;
     }
 
-    public JsonValueScheme setOptional(boolean optional) {
+    public JsonValueScheme<T> setOptional(boolean optional) {
         this.optional = optional;
         return this;
+    }
+
+    @Override
+    public T getDigested() {
+        return digested;
     }
 }

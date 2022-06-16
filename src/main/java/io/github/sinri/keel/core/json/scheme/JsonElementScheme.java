@@ -6,16 +6,16 @@ import io.vertx.core.json.JsonObject;
 /**
  * @since 2.7
  */
-interface JsonElementScheme extends JsonifiableEntity<JsonElementScheme> {
-    static JsonElementScheme fromJsonObject(JsonObject jsonObject) {
+public interface JsonElementScheme<T> extends JsonifiableEntity<JsonElementScheme<T>> {
+    static JsonElementScheme<?> fromJsonObject(JsonObject jsonObject) {
         JsonElementSchemeType scheme_type = JsonElementSchemeType.valueOf(jsonObject.getString("scheme_type"));
         switch (scheme_type) {
             case JsonArray:
                 return new JsonArrayScheme().reloadDataFromJsonObject(jsonObject);
             case JsonObject:
                 return new JsonObjectScheme().reloadDataFromJsonObject(jsonObject);
-            case JsonValue:
-                return new JsonValueScheme().reloadDataFromJsonObject(jsonObject);
+            case JsonPlain:
+                return new JsonPlainScheme().reloadDataFromJsonObject(jsonObject);
             case JsonBoolean:
                 return new JsonBooleanScheme().reloadDataFromJsonObject(jsonObject);
             case JsonNumber:
@@ -34,10 +34,14 @@ interface JsonElementScheme extends JsonifiableEntity<JsonElementScheme> {
 
     boolean isNullable();
 
+    void digest(T object) throws JsonSchemeMismatchException;
+
+    T getDigested();
+
     enum JsonElementSchemeType {
         JsonObject,
         JsonArray,
-        JsonValue,
+        JsonPlain,
         JsonBoolean,
         JsonNumber,
         JsonString,

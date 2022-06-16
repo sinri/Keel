@@ -1,10 +1,13 @@
 package io.github.sinri.keel.core.helper;
 
+import io.github.sinri.keel.Keel;
 import io.vertx.core.buffer.Buffer;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @since 2.6
@@ -183,5 +186,56 @@ public class KeelStringHelper {
      */
     public String encodeHexWithUpperDigits(Buffer buffer, int since, int length) {
         return encodeHexWithDigits(HEX_DIGITS_UPPER, buffer, since, length);
+    }
+
+    /**
+     * @since 2.7
+     */
+    public String fromUnderScoreCaseToCamelCase(String underScoreCase) {
+        if (underScoreCase == null) {
+            return null;
+        }
+        String[] parts = underScoreCase.toLowerCase().split("[\\s_]");
+        List<String> camel = new ArrayList<>();
+        for (var part : parts) {
+            if (part != null && !part.isEmpty() && !part.isBlank()) {
+                camel.add(part.substring(0, 1).toUpperCase() + part.substring(1));
+            }
+        }
+        return Keel.stringHelper().joinStringArray(camel, "");
+    }
+
+    /**
+     * @since 2.7
+     */
+    public String fromCamelCaseToUserScoreCase(String camelCase) {
+        if (camelCase == null) {
+            return null;
+        }
+        if (camelCase.isEmpty() || camelCase.isBlank()) {
+            return "";
+        }
+        if (camelCase.length() == 1) {
+            return camelCase.toLowerCase();
+        }
+        List<String> parts = new ArrayList<>();
+        StringBuilder part = new StringBuilder();
+        for (int i = 0; i < camelCase.length(); i++) {
+            String current = camelCase.substring(i, i + 1);
+            if (current.matches("[\\s_]")) continue;
+            if (part.length() == 0) {
+                part.append(current.toLowerCase());
+            } else {
+                if (current.matches("[A-Z]")) {
+                    parts.add(part.toString());
+                    part = new StringBuilder();
+                }
+                part.append(current.toLowerCase());
+            }
+        }
+        if (part.length() > 0) {
+            parts.add(part.toString());
+        }
+        return Keel.stringHelper().joinStringArray(parts, "_");
     }
 }

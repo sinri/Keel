@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 /**
  * @since 2.7
  */
-public class JsonStringScheme extends JsonValueScheme {
+public class JsonStringScheme extends JsonValueScheme<String> {
 
     private Pattern pattern;
     private boolean allowEmpty = true;
@@ -55,7 +55,7 @@ public class JsonStringScheme extends JsonValueScheme {
     }
 
     @Override
-    public JsonElementScheme reloadDataFromJsonObject(JsonObject jsonObject) {
+    public JsonElementScheme<String> reloadDataFromJsonObject(JsonObject jsonObject) {
         super.reloadDataFromJsonObject(jsonObject);
 
         this.allowBlank = jsonObject.getBoolean("allow_blank", true);
@@ -70,23 +70,58 @@ public class JsonStringScheme extends JsonValueScheme {
         return this;
     }
 
+//    @Override
+//    public void validate(Object object) throws JsonSchemeMismatchException {
+//        if (object == null) {
+//            if(! isNullable()){
+//                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleNullableNotAllowed);
+//            }
+//        }
+//        if (object instanceof String) {
+//            if (((String) object).isEmpty() && !isAllowEmpty()) {
+//                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
+//            }
+//            if (((String) object).isBlank() && !isAllowBlank()) {
+//                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
+//            }
+//            if (this.pattern != null) {
+//                if(! this.pattern.matcher((CharSequence) object).matches()){
+//                    throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
+//                }
+//            }
+//        }else {
+//            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueTypeNotExpected);
+//        }
+//    }
+
     @Override
-    public boolean validate(Object object) {
+    public void digest(String object) throws JsonSchemeMismatchException {
         if (object == null) {
-            return isNullable();
+            if (!isNullable()) {
+                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleNullableNotAllowed);
+            }
+            return;
         }
-        if (object instanceof String) {
-            if (((String) object).isEmpty() && !isAllowEmpty()) {
-                return false;
-            }
-            if (((String) object).isBlank() && !isAllowBlank()) {
-                return false;
-            }
-            if (this.pattern != null) {
-                return this.pattern.matcher((CharSequence) object).matches();
-            }
-            return true;
+//        if (object instanceof String) {
+        if (object.isEmpty() && !isAllowEmpty()) {
+            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
         }
-        return false;
+        if (object.isBlank() && !isAllowBlank()) {
+            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
+        }
+        if (this.pattern != null) {
+            if (!this.pattern.matcher(object).matches()) {
+                throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
+            }
+        }
+//        }else {
+//            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueTypeNotExpected);
+//        }
+        this.digested = object;
+    }
+
+    @Override
+    public String getDigested() {
+        return this.digested;
     }
 }

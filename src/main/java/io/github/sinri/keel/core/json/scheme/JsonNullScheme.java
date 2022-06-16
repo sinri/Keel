@@ -5,7 +5,7 @@ import io.vertx.core.json.JsonObject;
 /**
  * @since 2.7
  */
-public class JsonNullScheme extends JsonValueScheme {
+public class JsonNullScheme extends JsonValueScheme<Object> {
     public JsonNullScheme() {
         super();
         this.setNullable(true);
@@ -23,12 +23,27 @@ public class JsonNullScheme extends JsonValueScheme {
     }
 
     @Override
-    public JsonElementScheme reloadDataFromJsonObject(JsonObject jsonObject) {
+    public JsonElementScheme<Object> reloadDataFromJsonObject(JsonObject jsonObject) {
         return super.reloadDataFromJsonObject(jsonObject);
     }
 
+//    @Override
+//    public void validate(Object object) throws JsonSchemeMismatchException {
+//        if( object != null){
+//            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
+//        }
+//    }
+
     @Override
-    public boolean validate(Object object) {
-        return object == null;
+    public void digest(Object object) throws JsonSchemeMismatchException {
+        if (object != null) {
+            throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
+        }
+        this.digested = null;
+    }
+
+    @Override
+    public Object getDigested() {
+        return this.digested;
     }
 }
