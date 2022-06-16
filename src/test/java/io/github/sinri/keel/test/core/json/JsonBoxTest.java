@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.core.json;
 
-import io.github.sinri.keel.core.json.box.JsonBox;
+import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -33,14 +33,12 @@ public class JsonBoxTest {
         System.out.println(box1.getBox2().getB());
     }
 
-    public static class Box1 extends JsonBox {
-        public Box1(JsonObject jsonObject) {
-            super(jsonObject);
-        }
+    public static class Box1 implements JsonifiableEntity<Box1> {
+        private JsonObject jsonObject;
 
-        @Override
-        public boolean validate() {
-            return true;
+        public Box1(JsonObject jsonObject) {
+            super();
+            this.reloadDataFromJsonObject(jsonObject);
         }
 
         public String getStringValue1() {
@@ -76,18 +74,27 @@ public class JsonBoxTest {
         }
 
         public Box2 getBox2() {
-            return this.readBox(Box2.class, "json_object_5");
-        }
-    }
-
-    public static class Box2 extends JsonBox {
-        public Box2(JsonObject jsonObject) {
-            super(jsonObject);
+            return this.readJsonifiableEntity(Box2.class, "json_object_5");
         }
 
         @Override
-        public boolean validate() {
-            return true;
+        public JsonObject toJsonObject() {
+            return this.jsonObject;
+        }
+
+        @Override
+        public Box1 reloadDataFromJsonObject(JsonObject jsonObject) {
+            this.jsonObject = jsonObject;
+            return this;
+        }
+    }
+
+    public static class Box2 implements JsonifiableEntity<Box2> {
+        private JsonObject jsonObject;
+
+        public Box2(JsonObject jsonObject) {
+            super();
+            this.reloadDataFromJsonObject(jsonObject);
         }
 
         public String getA() {
@@ -96,6 +103,17 @@ public class JsonBoxTest {
 
         public Integer getB() {
             return readInteger("b");
+        }
+
+        @Override
+        public JsonObject toJsonObject() {
+            return this.jsonObject;
+        }
+
+        @Override
+        public Box2 reloadDataFromJsonObject(JsonObject jsonObject) {
+            this.jsonObject = jsonObject;
+            return this;
         }
     }
 }
