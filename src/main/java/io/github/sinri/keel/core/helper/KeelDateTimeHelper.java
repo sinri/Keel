@@ -1,6 +1,8 @@
 package io.github.sinri.keel.core.helper;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -36,5 +38,17 @@ public class KeelDateTimeHelper {
         }
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(date);
+    }
+
+    /**
+     * From MySQL DataTime String to Standard Expression
+     *
+     * @param localDateTimeExpression yyyy-MM-ddTHH:mm:ss
+     * @return yyyy-MM-dd HH:mm:ss
+     * @since 2.7
+     */
+    public String getMySQLFormatLocalDateTimeExpression(String localDateTimeExpression) {
+        return LocalDateTime.parse(localDateTimeExpression)
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 }

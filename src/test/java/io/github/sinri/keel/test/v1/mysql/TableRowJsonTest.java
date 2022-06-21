@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.v1.mysql;
 
-import io.github.sinri.keel.mysql.matrix.AbstractRow;
+import io.github.sinri.keel.mysql.matrix.SimpleResultRow;
 import io.vertx.core.json.JsonObject;
 
 public class TableRowJsonTest {
@@ -12,7 +12,7 @@ public class TableRowJsonTest {
         System.out.println(jsonObject.toString());
     }
 
-    public static class C1 extends AbstractRow {
+    public static class C1 extends SimpleResultRow {
         public C1(JsonObject tableRow) {
             super(tableRow);
         }

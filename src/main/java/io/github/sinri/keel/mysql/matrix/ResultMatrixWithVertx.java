@@ -1,5 +1,6 @@
 package io.github.sinri.keel.mysql.matrix;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -70,7 +71,7 @@ public class ResultMatrixWithVertx implements ResultMatrix {
         }
     }
 
-    public <T extends AbstractRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
+    public <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
         try {
             return ResultMatrix.buildTableRow(getRowByIndex(index), classOfTableRow);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
@@ -78,12 +79,20 @@ public class ResultMatrixWithVertx implements ResultMatrix {
         }
     }
 
-    public <T extends AbstractRow> List<T> buildTableRowList(Class<T> classOfTableRow) {
+    public <T extends ResultRow> List<T> buildTableRowList(Class<T> classOfTableRow) {
         try {
             return ResultMatrix.buildTableRowList(getRowList(), classOfTableRow);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * @since 2.7
+     */
+    @Override
+    public String getOneColumnOfFirstRowAsDateTime(String columnName) throws KeelSQLResultRowIndexError {
+        return Keel.dateTimeHelper().getMySQLFormatLocalDateTimeExpression(getFirstRow().getString(columnName));
     }
 
     public String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError {
@@ -100,6 +109,18 @@ public class ResultMatrixWithVertx implements ResultMatrix {
 
     public Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelSQLResultRowIndexError {
         return getFirstRow().getLong(columnName);
+    }
+
+    /**
+     * @since 2.7
+     */
+    @Override
+    public List<String> getOneColumnAsDateTime(String columnName) {
+        List<String> x = new ArrayList<>();
+        for (var row : rowList) {
+            x.add(Keel.dateTimeHelper().getMySQLFormatLocalDateTimeExpression(row.getString(columnName)));
+        }
+        return x;
     }
 
     public List<String> getOneColumnAsString(String columnName) {

@@ -14,18 +14,22 @@ import java.util.function.Function;
 /**
  * @since 1.10 Designed for a wrapper of each row in ResultMatrix
  * @since 2.0 renamed from AbstractTableRow
+ * @since 2.7 renamed from AbstractRow
  */
-public abstract class AbstractRow {
-    private final JsonObject row;
+public class SimpleResultRow implements ResultRow {
+    private JsonObject row;
 
-    public AbstractRow(JsonObject tableRow) {
-        this.row = tableRow;
+    public SimpleResultRow(JsonObject tableRow) {
+        this.reloadDataFromJsonObject(tableRow);
     }
 
     /**
+     * @see ResultRow#fetchResultRows(SqlConnection, AbstractReadStatement, Class)
      * @since 2.1
+     * @deprecated
      */
-    public static <T extends AbstractRow> Future<List<T>> fetchTableRowList(
+    @Deprecated(since = "2.7", forRemoval = true)
+    public static <T extends SimpleResultRow> Future<List<T>> fetchTableRowList(
             SqlConnection sqlConnection,
             AbstractReadStatement readStatement,
             Class<T> classOfTableRow
@@ -38,9 +42,12 @@ public abstract class AbstractRow {
     }
 
     /**
+     * @see ResultRow#fetchResultRow(SqlConnection, AbstractReadStatement, Class)
      * @since 2.1
+     * @deprecated
      */
-    public static <T extends AbstractRow> Future<T> fetchTableRow(
+    @Deprecated(since = "2.7", forRemoval = true)
+    public static <T extends SimpleResultRow> Future<T> fetchTableRow(
             SqlConnection sqlConnection,
             AbstractReadStatement readStatement,
             Class<T> classOfTableRow
@@ -60,9 +67,12 @@ public abstract class AbstractRow {
     /**
      * @param rows collection of AbstractTableRow
      * @return a json array
+     * @see ResultRow#batchToJsonArray(Collection)
      * @since 1.13
+     * @deprecated
      */
-    public static JsonArray rowsToJsonArray(Collection<? extends AbstractRow> rows) {
+    @Deprecated(since = "2.7", forRemoval = true)
+    public static JsonArray rowsToJsonArray(Collection<? extends SimpleResultRow> rows) {
         JsonArray array = new JsonArray();
         rows.forEach(row -> array.add(row.getRow()));
         return array;
@@ -72,25 +82,25 @@ public abstract class AbstractRow {
      * @param rows        collection of AbstractTableRow
      * @param transformer a function, AbstractTableRow->JsonObject
      * @return a json array
+     * @see ResultRow#batchToJsonArray(Collection, Function)
      * @since 1.13
+     * @deprecated
      */
-    public static JsonArray rowsToJsonArray(Collection<? extends AbstractRow> rows, Function<AbstractRow, JsonObject> transformer) {
+    @Deprecated(since = "2.7", forRemoval = true)
+    public static JsonArray rowsToJsonArray(Collection<? extends SimpleResultRow> rows, Function<SimpleResultRow, JsonObject> transformer) {
         JsonArray array = new JsonArray();
         rows.forEach(row -> array.add(transformer.apply(row)));
         return array;
     }
 
-    public JsonObject getRow() {
+    @Override
+    public final JsonObject toJsonObject() {
         return row;
     }
 
-    public String getFieldAsString(String field) {
-        return row.getString(field);
+    @Override
+    public final ResultRow reloadDataFromJsonObject(JsonObject jsonObject) {
+        this.row = jsonObject;
+        return this;
     }
-
-    public Number getFieldAsNumber(String field) {
-        return row.getNumber(field);
-    }
-
-
 }

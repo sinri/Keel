@@ -34,14 +34,14 @@ public interface ResultMatrix {
     /**
      * @since 1.10
      */
-    static <T extends AbstractRow> T buildTableRow(JsonObject row, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    static <T extends ResultRow> T buildTableRow(JsonObject row, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return classOfTableRow.getConstructor(JsonObject.class).newInstance(row);
     }
 
     /**
      * @since 1.10
      */
-    static <T extends AbstractRow> List<T> buildTableRowList(List<JsonObject> rowList, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    static <T extends ResultRow> List<T> buildTableRowList(List<JsonObject> rowList, Class<T> classOfTableRow) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         ArrayList<T> list = new ArrayList<>();
         for (var x : rowList) {
             list.add(ResultMatrix.buildTableRow(x, classOfTableRow));
@@ -52,12 +52,14 @@ public interface ResultMatrix {
     /**
      * @since 1.10
      */
-    <T extends AbstractRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
+    <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
 
     /**
      * @since 1.10
      */
-    <T extends AbstractRow> List<T> buildTableRowList(Class<T> classOfTableRow);
+    <T extends ResultRow> List<T> buildTableRowList(Class<T> classOfTableRow);
+
+    String getOneColumnOfFirstRowAsDateTime(String columnName) throws KeelSQLResultRowIndexError;
 
     String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError;
 
@@ -66,6 +68,8 @@ public interface ResultMatrix {
     Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelSQLResultRowIndexError;
 
     Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelSQLResultRowIndexError;
+
+    List<String> getOneColumnAsDateTime(String columnName);
 
     List<String> getOneColumnAsString(String columnName);
 
