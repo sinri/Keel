@@ -28,8 +28,9 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
 
     /**
      * @since 2.4 do not rely on context anymore
+     * @since 2.7 became public
      */
-    protected final void setLogger(KeelLogger logger) {
+    public final void setLogger(KeelLogger logger) {
         this.logger = logger;
     }
 

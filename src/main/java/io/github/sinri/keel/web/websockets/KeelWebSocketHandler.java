@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web.websockets;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -13,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * @since 2.2
+ * @since 2.7 加入了默认接触部署的逻辑
  */
 abstract public class KeelWebSocketHandler extends KeelVerticle {
 
@@ -130,12 +132,16 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
         webSocket
                 .handler(this::handleBuffer)
                 .exceptionHandler(this::handleException)
-                .endHandler(end -> this.handleEnd());
+                .endHandler(end -> {
+                    this.handleEnd();
+                    this.undeploy();
+                });
 
         shouldReject()
                 .compose(shouldReject -> {
                     if (shouldReject) {
                         webSocket.reject();
+                        return this.undeploy();
                     } else {
                         accept();
                     }
@@ -153,7 +159,18 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
 
     abstract protected void handleException(Throwable throwable);
 
+    /**
+     * @since 2.7 无需额外调用 undeploy，由类的基本实现保证。
+     */
     abstract protected void handleEnd();
+
+    protected final Future<Void> undeploy() {
+        String deploymentID = deploymentID();
+        return this.undeployMe().compose(v -> {
+            Keel.unregisterDeployedKeelVerticle(deploymentID);
+            return Future.succeededFuture();
+        });
+    }
 
     protected final Future<Void> writeText(String text) {
         return webSocket.writeTextMessage(text);
@@ -166,7 +183,11 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
         return webSocket.write(buffer);
     }
 
+    /**
+     * @since 2.7 关闭后解除部署
+     */
     protected final Future<Void> close() {
-        return webSocket.close();
+        return webSocket.close()
+                .compose(v -> this.undeploy());
     }
 }

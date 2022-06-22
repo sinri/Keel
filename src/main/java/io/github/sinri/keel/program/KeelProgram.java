@@ -14,10 +14,11 @@ import java.util.List;
 
 /**
  * @since 2.0
+ * @since 2.7 rename back to KeelProgram from KeelProgramAsVerticle
  */
-public abstract class KeelProgramAsVerticle extends KeelVerticle {
+public abstract class KeelProgram extends KeelVerticle {
 
-    public static void runProgramAndExit(KeelProgramAsVerticle programVerticle, List<String> args) {
+    public static void runProgramAndExit(KeelProgram programVerticle, List<String> args) {
         List<Option> options = programVerticle.defineCLIOptions();
         CLI cli = CLI.create(programVerticle.getClass().getName());
         for (var option : options) {
