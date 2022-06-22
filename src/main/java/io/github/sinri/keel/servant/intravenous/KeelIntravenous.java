@@ -4,36 +4,42 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
 /**
  * 静脉滴注，用于小规模实时排队处理异步小任务（DROP），强行避免并发。
  *
  * @param <R> 小任务（DROP）的运行结论
- * @param <T> 小任务（DROP）
+ * @param <D> 小任务（DROP）
  * @since 2.7
  */
-public class KeelIntravenous<R, T extends KeelIntravenousDrop> extends KeelVerticle {
-    private final Queue<T> queue;
-    private final KeelIntravenousConsumer<R, T> consumer;
+public class KeelIntravenous<R, D extends KeelIntravenousDrop> extends KeelVerticle {
+    private final Queue<D> queue;
+    private final KeelIntravenousConsumer<R, D> consumer;
     private long restMS = 100L;
     private Function<KeelIntravenousTaskConclusion<R>, Future<Void>> taskConclusionHandler;
 
-    public KeelIntravenous(KeelIntravenousConsumer<R, T> consumer) {
+    private final AtomicBoolean finishFlag = new AtomicBoolean(false);
+    private final AtomicBoolean finishedFlag = new AtomicBoolean(false);
+    private Handler<Void> finishHandler = null;
+
+    public KeelIntravenous(KeelIntravenousConsumer<R, D> consumer) {
         this.queue = new ConcurrentLinkedQueue<>();
         this.consumer = consumer;
         setLogger(Keel.outputLogger("KeelIntravenous"));
         this.taskConclusionHandler = null;
     }
 
-    protected KeelIntravenousConsumer<R, T> getConsumer() {
+    protected KeelIntravenousConsumer<R, D> getConsumer() {
         return consumer;
     }
 
-    public KeelIntravenous<R, T> setTaskConclusionHandler(Function<KeelIntravenousTaskConclusion<R>, Future<Void>> taskConclusionHandler) {
+    public KeelIntravenous<R, D> setTaskConclusionHandler(Function<KeelIntravenousTaskConclusion<R>, Future<Void>> taskConclusionHandler) {
         this.taskConclusionHandler = taskConclusionHandler;
         return this;
     }
@@ -42,7 +48,7 @@ public class KeelIntravenous<R, T extends KeelIntravenousDrop> extends KeelVerti
         return restMS;
     }
 
-    public KeelIntravenous<R, T> setRestMS(long restMS) {
+    public KeelIntravenous<R, D> setRestMS(long restMS) {
         this.restMS = restMS;
         return this;
     }
@@ -60,7 +66,7 @@ public class KeelIntravenous<R, T extends KeelIntravenousDrop> extends KeelVerti
                             return Future.succeededFuture(!this.queue.isEmpty());
                         },
                         b -> {
-                            T task = this.queue.poll();
+                            D task = this.queue.poll();
                             if (task == null) return Future.succeededFuture(false);
                             getLogger().info("[READY  ] TASK " + task.getReference());
                             return this.getConsumer()
@@ -87,15 +93,59 @@ public class KeelIntravenous<R, T extends KeelIntravenousDrop> extends KeelVerti
                     return Future.succeededFuture();
                 })
                 .eventually(over -> {
-                    Keel.getVertx().setTimer(getRestMS(), timerID -> {
-                        routine();
-                    });
+                    if (this.finishFlag.get()) {
+                        this.finishedFlag.set(true);
+                        if (this.finishHandler != null) {
+                            this.finishHandler.handle(null);
+                        }
+                    } else {
+                        Keel.getVertx().setTimer(getRestMS(), timerID -> {
+                            routine();
+                        });
+                    }
                     return Future.succeededFuture();
                 });
 
     }
 
-    public void addNewTask(T task) {
-        this.queue.add(task);
+    /**
+     * @deprecated use drip instead
+     */
+    @Deprecated(forRemoval = true)
+    public void addNewTask(D task) {
+        this.drip(task);
+    }
+
+    public void drip(D drop) {
+        this.queue.add(drop);
+    }
+
+    /**
+     * Tell KeelIntravenous instance to stop receive drops.
+     */
+    public void finish() {
+        this.finishFlag.set(true);
+    }
+
+    /**
+     * Tell KeelIntravenous instance to stop receive new drops,
+     * and let finishHandler be called when cycle actually stopped.
+     *
+     * @param finishHandler the finish event handler
+     */
+    public void finish(Handler<Void> finishHandler) {
+        this.finishFlag.set(true);
+        this.finishHandler = finishHandler;
+    }
+
+    /**
+     * @return true if KeelIntravenous is already finished.
+     */
+    public boolean isFinished() {
+        return this.finishedFlag.get();
+    }
+
+    public int getDropCount() {
+        return this.queue.size();
     }
 }

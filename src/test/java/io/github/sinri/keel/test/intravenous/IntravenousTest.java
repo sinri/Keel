@@ -23,7 +23,7 @@ public class IntravenousTest {
             int finalI = i;
             Future.succeededFuture()
                     .compose(v -> {
-                        intravenous.addNewTask(new Drop("T-" + finalI));
+                        intravenous.drip(new Drop("T-" + finalI));
                         return Future.succeededFuture();
                     });
         }
