@@ -1,17 +1,20 @@
-package io.github.sinri.keel.servant;
+package io.github.sinri.keel.servant.sundial;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class KeelCronParser {
+public class KeelCronExpression {
+    private final String rawCronExpression;
     final Set<Integer> minuteOptions = new HashSet<>();
     final Set<Integer> hourOptions = new HashSet<>();
     final Set<Integer> dayOptions = new HashSet<>();
     final Set<Integer> monthOptions = new HashSet<>();
     final Set<Integer> weekdayOptions = new HashSet<>();
 
-    public KeelCronParser(String rawCronExpression) {
+    public KeelCronExpression(String rawCronExpression) {
+        this.rawCronExpression = rawCronExpression;
+
         String[] parts = rawCronExpression.trim().split("\\s+");
         if (parts.length != 5) {
             throw new RuntimeException("Invalid Cron Expression");
@@ -98,5 +101,14 @@ public class KeelCronParser {
 
             throw new IllegalArgumentException();
         }
+    }
+
+    public String getRawCronExpression() {
+        return rawCronExpression;
+    }
+
+    @Override
+    public String toString() {
+        return getRawCronExpression();
     }
 }
