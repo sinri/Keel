@@ -29,7 +29,7 @@ public class IntravenousTest {
         }
     }
 
-    private static class Consumer extends KeelIntravenousConsumer<JsonObject, Drop> {
+    private static class Consumer implements KeelIntravenousConsumer<JsonObject, Drop> {
 
         @Override
         public Future<KeelIntravenousTaskConclusion<JsonObject>> handle(Drop drop) {

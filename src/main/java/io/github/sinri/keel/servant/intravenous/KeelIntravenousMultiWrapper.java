@@ -4,23 +4,24 @@ import io.vertx.core.Future;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 /**
  * @since 2.7
  */
-abstract public class KeelIntravenousMultiWrapper<Hash, Result, Drop extends KeelIntravenousDrop> {
+public class KeelIntravenousMultiWrapper<Hash, Result, Drop extends KeelIntravenousDrop> {
     private final Map<Hash, KeelIntravenous<Result, Drop>> intravenousMap = new ConcurrentHashMap<>();
 
     private final KeelIntravenousConsumer<Result, Drop> consumer;
+    private final Function<Drop, Future<Hash>> dropHashFunction;
 
-    public KeelIntravenousMultiWrapper(KeelIntravenousConsumer<Result, Drop> consumer) {
+    public KeelIntravenousMultiWrapper(KeelIntravenousConsumer<Result, Drop> consumer, Function<Drop, Future<Hash>> dropHashFunction) {
         this.consumer = consumer;
+        this.dropHashFunction = dropHashFunction;
     }
 
-    abstract protected Future<Hash> computeHashForDrop(Drop drop);
-
     public Future<Void> drip(Drop drop) {
-        return this.computeHashForDrop(drop)
+        return this.dropHashFunction.apply(drop)
                 .compose(hash -> {
                     KeelIntravenous<Result, Drop> resultDropKeelIntravenous = this.ensureIntravenousForHash(hash);
                     resultDropKeelIntravenous.drip(drop);

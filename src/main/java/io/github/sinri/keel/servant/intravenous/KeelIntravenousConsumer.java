@@ -9,6 +9,6 @@ import io.vertx.core.Future;
  * @param <D> 点滴
  * @since 2.7
  */
-abstract public class KeelIntravenousConsumer<R, D extends KeelIntravenousDrop> {
-    abstract public Future<KeelIntravenousTaskConclusion<R>> handle(D drop);
+public interface KeelIntravenousConsumer<R, D extends KeelIntravenousDrop> {
+    Future<KeelIntravenousTaskConclusion<R>> handle(D drop);
 }
