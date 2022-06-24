@@ -49,7 +49,7 @@ public class KeelFileHelper {
      * @return the URL of target file; if not there, null return.
      */
     public URL getUrlOfFileInJar(String filePath) {
-        return KeelOptions.class.getClassLoader().getResource(filePath);
+        return Keel.class.getClassLoader().getResource(filePath);
     }
 
     /**

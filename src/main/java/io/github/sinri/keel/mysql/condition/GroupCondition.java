@@ -3,7 +3,7 @@ package io.github.sinri.keel.mysql.condition;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GroupCondition extends KeelMySQLCondition {
+public class GroupCondition implements KeelMySQLCondition {
     public static final String JUNCTION_FOR_AND = "AND";
     public static final String JUNCTION_FOR_OR = "OR";
 

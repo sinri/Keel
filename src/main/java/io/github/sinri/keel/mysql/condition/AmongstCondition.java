@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class AmongstCondition extends KeelMySQLCondition {
+public class AmongstCondition implements KeelMySQLCondition {
     public static final String OP_IN = "IN";
 
     protected String element;

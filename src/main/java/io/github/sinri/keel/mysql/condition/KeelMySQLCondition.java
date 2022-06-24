@@ -1,6 +1,8 @@
 package io.github.sinri.keel.mysql.condition;
 
-
-public abstract class KeelMySQLCondition {
-    abstract public String toString();
+/**
+ * @since 2.8 became interface
+ */
+public interface KeelMySQLCondition {
+    String toString();
 }

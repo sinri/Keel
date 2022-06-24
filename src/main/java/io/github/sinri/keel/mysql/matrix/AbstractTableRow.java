@@ -27,8 +27,10 @@ public abstract class AbstractTableRow extends SimpleResultRow {
      */
     abstract public String getTableName();
 
+    @Deprecated(since = "2.8")
     abstract protected String getPKFiledName();
 
+    @Deprecated(since = "2.8")
     protected Future<Long> insertThisRowForPK(SqlConnection sqlConnection) {
         return new WriteIntoStatement()
                 .intoTable(getSchemaName(), getTableName())
@@ -36,6 +38,7 @@ public abstract class AbstractTableRow extends SimpleResultRow {
                 .executeForLastInsertedID(sqlConnection);
     }
 
+    @Deprecated(since = "2.8")
     protected Future<Long> replaceThisRowForPK(SqlConnection sqlConnection) {
         return new WriteIntoStatement(WriteIntoStatement.REPLACE)
                 .intoTable(getSchemaName(), getTableName())
@@ -43,6 +46,7 @@ public abstract class AbstractTableRow extends SimpleResultRow {
                 .executeForLastInsertedID(sqlConnection);
     }
 
+    @Deprecated(since = "2.8")
     protected Future<Integer> updateThisRow(SqlConnection sqlConnection) {
         UpdateStatement updateStatement = new UpdateStatement()
                 .table(getSchemaName(), getTableName())
@@ -60,6 +64,7 @@ public abstract class AbstractTableRow extends SimpleResultRow {
         return updateStatement.limit(1).executeForAffectedRows(sqlConnection);
     }
 
+    @Deprecated(since = "2.8")
     protected Future<Integer> deleteThisRow(SqlConnection sqlConnection) {
         return new DeleteStatement()
                 .from(getSchemaName(), getTableName())

@@ -2,7 +2,7 @@ package io.github.sinri.keel.mysql.condition;
 
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
 
-public class CompareCondition extends KeelMySQLCondition {
+public class CompareCondition implements KeelMySQLCondition {
     public static final String OP_EQ = "=";
     public static final String OP_NEQ = "<>";
     public static final String OP_NULL_SAFE_EQ = "<=>";

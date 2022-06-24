@@ -59,15 +59,25 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
         return toJsonObject();
     }
 
+    @Deprecated(since = "2.8")
     default String getFieldAsString(String field) {
-        return getRow().getString(field);
+        return readString(field);
     }
 
+    @Deprecated(since = "2.8")
     default Number getFieldAsNumber(String field) {
-        return getRow().getNumber(field);
+        return readNumber(field);
     }
 
+    @Deprecated(since = "2.8")
     default String getFieldAsDateTime(String filed) {
         return Keel.dateTimeHelper().getMySQLFormatLocalDateTimeExpression(getRow().getString(filed));
+    }
+
+    /**
+     * @since 2.8
+     */
+    default String readDateTime(String filed) {
+        return Keel.dateTimeHelper().getMySQLFormatLocalDateTimeExpression(readString(filed));
     }
 }

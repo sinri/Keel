@@ -36,4 +36,11 @@ public class KeelReflectionHelper {
     public <T extends Annotation> T getAnnotationOfMethod(Method method, Class<T> classOfAnnotation) {
         return getAnnotationOfMethod(method, classOfAnnotation, null);
     }
+
+    /**
+     * @since 2.8
+     */
+    public <T extends Annotation> T getAnnotationOfClass(Class<?> anyClass, Class<T> classOfAnnotation) {
+        return anyClass.getAnnotation(classOfAnnotation);
+    }
 }
