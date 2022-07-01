@@ -97,4 +97,13 @@ public class KeelSundial {
         boolean done = Keel.getVertx().cancelTimer(byMinuteTimerID);
         getLogger().info("stopped timer " + byMinuteTimerID + ": " + done);
     }
+
+    /**
+     * @since 2.8
+     */
+    public KeelSundial unregisterAllWorkers() {
+        registeredWorkers.clear();
+        getLogger().info("unregister all workers");
+        return this;
+    }
 }

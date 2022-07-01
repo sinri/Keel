@@ -2,6 +2,7 @@ package io.github.sinri.keel.servant.intravenous;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -33,6 +34,11 @@ public class KeelIntravenous<R, D extends KeelIntravenousDrop> extends KeelVerti
         this.consumer = consumer;
         setLogger(Keel.outputLogger("KeelIntravenous"));
         this.taskConclusionHandler = null;
+    }
+
+    @Override
+    public KeelLogger getLogger() {
+        return super.getLogger();
     }
 
     protected KeelIntravenousConsumer<R, D> getConsumer() {
