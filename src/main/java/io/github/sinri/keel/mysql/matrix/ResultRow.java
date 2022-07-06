@@ -9,10 +9,15 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * @since 2.7
+ */
 public interface ResultRow extends JsonifiableEntity<ResultRow> {
     static <T extends ResultRow> Future<List<T>> fetchResultRows(
             SqlConnection sqlConnection,
@@ -77,7 +82,22 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
     /**
      * @since 2.8
      */
-    default String readDateTime(String filed) {
-        return Keel.dateTimeHelper().getMySQLFormatLocalDateTimeExpression(readString(filed));
+    default String readDateTime(String field) {
+        return LocalDateTime.parse(readString(field))
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    default String readDate(String field) {
+        return readString(field);
+    }
+
+    default String readTime(String field) {
+        return readString(field)
+                .replaceAll("[PTS]+", "")
+                .replaceAll("[HM]", ":");
+    }
+
+    default String readTimestamp(String field) {
+        return readDateTime(field);
     }
 }
