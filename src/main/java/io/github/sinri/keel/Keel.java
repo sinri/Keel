@@ -16,9 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Keel {
-//    private static final String KEY_MYSQL_CONNECTION = "MySQLConnection";
-//    private static final String KEY_KEEL_LOGGER = "KeelLogger";
-
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
 

@@ -11,7 +11,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 用于快速根据数据库中的表结构生成AbstractTableRow的实现类的代码
+ * 用于快速根据数据库中的表结构生成AbstractTableRow的实现类的代码生成工具。
+ * 为安全起见，默认不打开覆盖开关。
  *
  * @since 2.8
  */
@@ -20,11 +21,13 @@ public class TableRowClassGenerator {
     private final SqlConnection sqlConnection;
     private final Set<String> tableSet;
     private String schema;
+    private boolean rewrite;
 
     public TableRowClassGenerator(SqlConnection sqlConnection) {
         this.sqlConnection = sqlConnection;
         this.schema = null;
         this.tableSet = new HashSet<>();
+        this.rewrite = false;
     }
 
     public TableRowClassGenerator forSchema(String schema) {
@@ -39,6 +42,11 @@ public class TableRowClassGenerator {
 
     public TableRowClassGenerator forTable(String table) {
         this.tableSet.add(table);
+        return this;
+    }
+
+    public TableRowClassGenerator setRewrite(boolean rewrite) {
+        this.rewrite = rewrite;
         return this;
     }
 
@@ -84,7 +92,7 @@ public class TableRowClassGenerator {
                 tables,
                 table -> {
                     String className = Keel.stringHelper().fromUnderScoreCaseToCamelCase(table) + "TableRow";
-                    className = className.substring(0, 1).toUpperCase() + className.substring(1);
+//                    className = className.substring(0, 1).toUpperCase() + className.substring(1);
                     String classFile = packagePath + "/" + className + ".java";
 
                     String sql = "show full columns in ";
@@ -136,7 +144,24 @@ public class TableRowClassGenerator {
                             })
                             .compose(done -> {
                                 classContent.append("\n}\n");
-                                return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(classContent.toString()));
+                                if (this.rewrite) {
+                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(classContent.toString()));
+                                } else {
+                                    return Keel.getVertx().fileSystem().exists(classFile)
+                                            .compose(existed -> {
+                                                if (existed) {
+                                                    return Keel.getVertx().fileSystem().readFile(classFile)
+                                                            .compose(existedContentBuffer -> {
+                                                                return Keel.getVertx().fileSystem().writeFile(
+                                                                        classFile,
+                                                                        existedContentBuffer.appendString("\n\n").appendString(classContent.toString())
+                                                                );
+                                                            });
+                                                } else {
+                                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(classContent.toString()));
+                                                }
+                                            });
+                                }
                             });
                 }
         );
