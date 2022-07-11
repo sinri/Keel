@@ -28,7 +28,11 @@ public class FutureRecursion<T> {
                             } else {
                                 return Future.succeededFuture(previousT);
                             }
-                        }));
+                        })
+                        .onFailure(throwable -> {
+                            throw new RuntimeException("FutureRecursion::recur failed in routine", throwable);
+                        })
+                );
     }
 
     public static <T> Future<T> call(

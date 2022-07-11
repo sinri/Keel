@@ -56,7 +56,10 @@ public class FutureForRange {
         for (Integer t = start; t < end; t += step) {
             Integer finalT = t;
             var f = futureAtomicReference.get()
-                    .compose(previous -> handleFunction.apply(finalT));
+                    .compose(previous -> handleFunction.apply(finalT))
+                    .onFailure(throwable -> {
+                        throw new RuntimeException("FutureForRange::run failed in routine", throwable);
+                    });
             futureAtomicReference.set(f);
         }
         return futureAtomicReference.get();
