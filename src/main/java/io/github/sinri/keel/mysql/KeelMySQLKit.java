@@ -89,8 +89,15 @@ public class KeelMySQLKit {
                                 throwable.getMessage(),
                         throwable
                 )))
-                .compose(sqlConnection -> function.apply(sqlConnection)
-                        .onComplete(asyncResult -> sqlConnection.close())
+                .compose(sqlConnection -> Future.succeededFuture()
+                        .compose(v -> {
+                            try {
+                                return function.apply(sqlConnection);
+                            } catch (Throwable throwable) {
+                                return Future.failedFuture(throwable);
+                            }
+                        })
+                        .eventually(v -> sqlConnection.close())
                 );
     }
 
@@ -106,17 +113,24 @@ public class KeelMySQLKit {
                         throwable
                 )))
                 .compose(sqlConnection -> sqlConnection.begin()
-                        .compose(transaction -> function.apply(sqlConnection)
+                        .compose(transaction -> Future.succeededFuture()
+                                .compose(v -> {
+                                    try {
+                                        return function.apply(sqlConnection);
+                                    } catch (Throwable throwable) {
+                                        return Future.failedFuture(throwable);
+                                    }
+                                })
                                 .compose(res -> transaction.commit()
                                         .compose((v) -> Future.succeededFuture(res))
                                 )
                                 .recover(err -> {
-                                            if (err instanceof TransactionRollbackException) {
-                                                return Future.failedFuture(err);
-                                            }
-                                            return transaction.rollback()
-                                                    .compose(v -> Future.failedFuture(new KeelMySQLException(
-                                                                    "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
+                                    if (err instanceof TransactionRollbackException) {
+                                        return Future.failedFuture(err);
+                                    }
+                                    return transaction.rollback()
+                                            .compose(v -> Future.failedFuture(new KeelMySQLException(
+                                                            "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
                                                                             " a rollback performed after an error met, cause message: " +
                                                                             err.getMessage(),
                                                                     err
