@@ -16,11 +16,17 @@ import io.vertx.core.Future;
  * @since 2.6.1
  */
 public class PoolSourceTest {
+    private static KeelLogger logger;
+
     public static void main(String[] args) {
         SharedTestBootstrap.initialize();
 
-        KeelLogger logger = Keel.outputLogger("main");
+        logger = Keel.outputLogger("main");
 
+        test_for_inner_exception();
+    }
+
+    private static void test_for_connection_timeout() {
         for (int i = 0; i < 512; i++) {
             int finalI = i;
             SharedTestBootstrap.getMySQLKit()
@@ -42,5 +48,47 @@ public class PoolSourceTest {
                         }
                     });
         }
+    }
+
+    private static void test_for_idle_timeout() {
+        // 这个实验确认了idle的特性：
+        //  并不会因为线程sleep而close掉sql connection
+        logger.info("test_for_idle_timeout start");
+        SharedTestBootstrap.getMySQLKit()
+                .withConnection(sqlConnection -> {
+                    logger.info("got sql connection");
+                    return sqlConnection.query("select sleep(18) as x")
+                            .execute()
+                            .compose(rows -> {
+                                logger.info("ran sql for 18s over: " + rows.toString());
+                                return Future.succeededFuture();
+                            })
+                            .compose(v -> {
+                                try {
+                                    Thread.sleep(19 * 1000);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                logger.info("slept for 19s");
+                                return sqlConnection.query("select 1 as y")
+                                        .execute()
+                                        .compose(rows -> {
+                                            logger.info("ran sql after sleeping: " + rows.toString());
+                                            return Future.succeededFuture();
+                                        });
+                            });
+                })
+                .onFailure(throwable -> {
+                    logger.exception(throwable);
+                });
+    }
+
+    private static void test_for_inner_exception() {
+        SharedTestBootstrap.getMySQLKit().withTransaction(sqlConnection -> {
+                    throw new RuntimeException("INNER ERROR 1");
+                })
+                .onFailure(throwable -> {
+                    logger.exception("OUTSIDE TAIL", throwable);
+                });
     }
 }
