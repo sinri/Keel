@@ -50,7 +50,8 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                             logger.debug("receptionistClass " + receptionistClass.getName() + " deployed as " + deploymentID);
                             return Future.succeededFuture();
                         });
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException e) {
                 logger.exception("receptionistClass " + receptionistClass.getName() + " cannot be deployed", e);
                 ctx.fail(404);
             }
@@ -141,6 +142,13 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
 
         setLogger(prepareLogger());
 
+        getLogger().debug("REQUEST METHOD: " + this.getRoutingContext().request().method().name());
+        getLogger().debug("PATH: " + this.getRoutingContext().request().path());
+        for (Map.Entry<String, String> header : this.getRoutingContext().request().headers()) {
+            getLogger().debug("HEADER " + header.getKey() + ": " + header.getValue());
+        }
+
+
         // check method
         if (getAcceptableMethod() != null && !getAcceptableMethod().isEmpty()) {
             if (!getAcceptableMethod().contains(this.getRoutingContext().request().method().name())) {
@@ -152,6 +160,7 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
 
         // client ip chain
         parseClientIPChain();
+        getLogger().debug("REQUEST FROM IP CHAIN: " + this.getRoutingContext().get(RoutingContextDatumKeyOfClientIPChain));
 
         // filters
         dealWithFilters()
@@ -182,7 +191,8 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                     KeelWebRequestFilter filter;
                     try {
                         filter = filterClass.getConstructor().newInstance();
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                             NoSuchMethodException e) {
                         return Future.failedFuture(e);
                     }
                     return filter.shouldHandleThisRequest(getRoutingContext());
@@ -281,7 +291,8 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                     .compose(v -> {
                         return Future.succeededFuture(t);
                     });
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             getLogger().exception(e);
             return Future.failedFuture(e);
         }
