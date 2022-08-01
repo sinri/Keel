@@ -33,7 +33,7 @@ public class IntravenousTest {
 
         @Override
         public Future<KeelIntravenousTaskConclusion<JsonObject>> handle(Drop drop) {
-            return Keel.getMySQLKit().getPool().withConnection(sqlConnection -> {
+            return Keel.getMySQLKit().withConnection(sqlConnection -> {
                 return sqlConnection.query("select now() as x")
                         .execute()
                         .compose(rows -> {
