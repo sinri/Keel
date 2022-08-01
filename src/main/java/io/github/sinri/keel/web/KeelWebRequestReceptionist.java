@@ -26,10 +26,22 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
     public static final String RoutingContextDatumKeyOfRequestID = "request_id";
     private final RoutingContext routingContext;
     private String requestID;
+    /**
+     * @since 2.6.1
+     */
+    private boolean verbose = false;
 
     public KeelWebRequestReceptionist(RoutingContext routingContext) {
         this.routingContext = routingContext;
         this.requestID = new Date().getTime() + "#UNDEPLOYED";
+    }
+
+    /**
+     * @since 2.6.1
+     */
+    public KeelWebRequestReceptionist setVerbose(boolean verbose) {
+        this.verbose = verbose;
+        return this;
     }
 
     public static void registerRoute(
@@ -142,10 +154,12 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
 
         setLogger(prepareLogger());
 
-        getLogger().debug("REQUEST METHOD: " + this.getRoutingContext().request().method().name());
-        getLogger().debug("PATH: " + this.getRoutingContext().request().path());
-        for (Map.Entry<String, String> header : this.getRoutingContext().request().headers()) {
-            getLogger().debug("HEADER " + header.getKey() + ": " + header.getValue());
+        if (verbose) {
+            getLogger().debug("REQUEST METHOD: " + this.getRoutingContext().request().method().name());
+            getLogger().debug("PATH: " + this.getRoutingContext().request().path());
+            for (Map.Entry<String, String> header : this.getRoutingContext().request().headers()) {
+                getLogger().debug("HEADER " + header.getKey() + ": " + header.getValue());
+            }
         }
 
 
@@ -160,7 +174,9 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
 
         // client ip chain
         parseClientIPChain();
-        getLogger().debug("REQUEST FROM IP CHAIN: " + this.getRoutingContext().get(RoutingContextDatumKeyOfClientIPChain));
+        if (verbose) {
+            getLogger().debug("REQUEST FROM IP CHAIN: " + this.getRoutingContext().get(RoutingContextDatumKeyOfClientIPChain));
+        }
 
         // filters
         dealWithFilters()
@@ -168,7 +184,7 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                     return this.handlerForFiltersPassed();
                 })
                 .compose(responseObject -> {
-                    getLogger().debug("RECEPTIONIST DONE FOR " + deploymentID());
+                    getLogger().info("RECEPTIONIST DONE FOR " + deploymentID());
 
                     return respond(responseObject);
                 })
@@ -236,7 +252,9 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
             } else {
                 jsonObject.put("code", "OK").put("data", result);
             }
-            getLogger().debug("Response for request [" + getRequestID() + "] as json", jsonObject);
+            if (verbose) {
+                getLogger().debug("Response for request [" + getRequestID() + "] as json", jsonObject);
+            }
             return this.getRoutingContext().json(jsonObject);
         } else {
             // NON JSON, AS certain MIME string to output, 500 for ERROR
@@ -261,12 +279,14 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
             } else {
                 data = result.toString();
             }
-            getLogger().debug(
-                    "Response for request [" + getRequestID() + "] as " + this.getResponseHeaderContentType(),
-                    new JsonObject()
-                            .put("code", code)
-                            .put("data", data)
-            );
+            if (verbose) {
+                getLogger().debug(
+                        "Response for request [" + getRequestID() + "] as " + this.getResponseHeaderContentType(),
+                        new JsonObject()
+                                .put("code", code)
+                                .put("data", data)
+                );
+            }
             return this.getRoutingContext().response().setStatusCode(code).end(data);
         }
     }
