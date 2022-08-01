@@ -1,13 +1,9 @@
 package io.github.sinri.keel.core.logger;
 
-/**
- * The Keel Log Level Enum
- * Since 1.10 the SILENT added
- */
 public enum KeelLogLevel {
     DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL, SILENT;
 
-    public boolean isMoreSeriousThan(KeelLogLevel standardLevel) {
+    public boolean isEnoughSeriousAs(KeelLogLevel standardLevel) {
         return this.ordinal() >= standardLevel.ordinal();
     }
 

@@ -5,9 +5,10 @@ import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
-import java.sql.Statement;
+import java.util.function.Function;
 
 /**
  * 在 Keel 2.0 中，有一个异象，是将所有逻辑扔进 Verticle 里运行来模拟同一线程。
@@ -16,28 +17,56 @@ import java.sql.Statement;
  */
 abstract public class KeelVerticle extends AbstractVerticle implements VerticleAbleToUndeployItself {
 
+    private KeelLogger logger = KeelLogger.silentLogger();
+
+    /**
+     * @since 2.4 do not rely on context anymore
+     */
     protected KeelLogger getLogger() {
-        return Keel.getKeelLoggerInContext();
+        return logger;
     }
 
-    protected final void setLogger(KeelLogger logger) {
-        Keel.setKeelLoggerInContext(logger);
+    /**
+     * @since 2.4 do not rely on context anymore
+     * @since 2.7 became public
+     */
+    public final void setLogger(KeelLogger logger) {
+        this.logger = logger;
     }
 
-    protected final SqlConnection getMySqlConnection() {
-        return Keel.getMySqlConnectionInContext();
+    public JsonObject getVerticleInfo() {
+        return new JsonObject()
+                .put("class", this.getClass().getName())
+                .put("config", this.config())
+                .put("deployment_id", this.deploymentID());
     }
 
-    protected final void setMySqlConnection(SqlConnection sqlConnect) {
-        Keel.setMySqlConnectionInContext(sqlConnect);
+    /**
+     * @since 2.4
+     */
+    protected final <R> Future<R> executeWithMySQL(Function<SqlConnection, Future<R>> executor) {
+        return Keel.getMySQLKit().withConnection(executor);
     }
 
-    protected final Statement getJDBCStatement() {
-        return Keel.getJDBCStatementInContext();
+    /**
+     * @since 2.4
+     */
+    protected final <R> Future<R> executeWithMySQL(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
+        return Keel.getMySQLKit(dataSourceName).withConnection(executor);
     }
 
-    protected final void setJDBCStatement(Statement statement) {
-        Keel.setJDBCStatementInContext(statement);
+    /**
+     * @since 2.4
+     */
+    protected final <R> Future<R> executeWithinMySQLTransaction(Function<SqlConnection, Future<R>> executor) {
+        return Keel.getMySQLKit().withTransaction(executor);
+    }
+
+    /**
+     * @since 2.4
+     */
+    protected final <R> Future<R> executeWithinMySQLTransaction(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
+        return Keel.getMySQLKit(dataSourceName).withTransaction(executor);
     }
 
     @Override

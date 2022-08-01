@@ -42,6 +42,8 @@ public abstract class KeelQueue extends KeelVerticle {
     abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
 
     public void start() {
+        Keel.registerDeployedKeelVerticle(this);
+
         // 部署之后重新加载一遍
         this.logger = prepareLogger();
         setLogger(this.logger);
@@ -126,21 +128,10 @@ public abstract class KeelQueue extends KeelVerticle {
     }
 
     @Override
-    public void stop() throws Exception {
+    public void stop() {
         this.queueStatus = QueueStatus.STOPPED;
-    }
 
-    public interface KeelQueueNextTaskSeeker {
-        Future<Boolean> hasMore();
-
-        /**
-         * 找出一个task且其已完成lockTaskBeforeDeployment方法的调用
-         *
-         * @return
-         */
-        Future<KeelQueueTask> seek();
-
-        long waitingMs();
+        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
     }
 
     public enum QueueSignal {

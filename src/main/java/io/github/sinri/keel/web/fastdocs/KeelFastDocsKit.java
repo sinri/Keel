@@ -40,7 +40,7 @@ public class KeelFastDocsKit {
         this.staticHandler = StaticHandler.create();
         this.rootURLPath = rootURLPath;
         this.rootMarkdownFilePath = rootMarkdownFilePath;
-        this.logger = KeelLogger.buildSilentLogger();
+        this.logger = KeelLogger.silentLogger();
     }
 
     /**

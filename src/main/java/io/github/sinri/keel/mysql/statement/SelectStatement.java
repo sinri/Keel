@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.condition.CompareCondition;
 import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.KeelMySQLCondition;
@@ -80,8 +80,8 @@ public class SelectStatement extends AbstractReadStatement {
     }
 
     /**
-     * @param function
-     * @return
+     * @param function ConditionsComponent -> ConditionsComponent it self
+     * @return this
      * @since 1.4
      */
     public SelectStatement where(Function<ConditionsComponent, ConditionsComponent> function) {
@@ -137,22 +137,22 @@ public class SelectStatement extends AbstractReadStatement {
         if (columns.isEmpty()) {
             sql.append("*");
         } else {
-            sql.append(KeelHelper.joinStringArray(columns, ","));
+            sql.append(Keel.stringHelper().joinStringArray(columns, ","));
         }
         if (!tables.isEmpty()) {
-            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("FROM ").append(KeelHelper.joinStringArray(tables, AbstractStatement.SQL_COMPONENT_SEPARATOR));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("FROM ").append(Keel.stringHelper().joinStringArray(tables, AbstractStatement.SQL_COMPONENT_SEPARATOR));
         }
         if (!whereConditionsComponent.isEmpty()) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("WHERE ").append(whereConditionsComponent);
         }
         if (!categories.isEmpty()) {
-            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("GROUP BY ").append(KeelHelper.joinStringArray(categories, ","));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("GROUP BY ").append(Keel.stringHelper().joinStringArray(categories, ","));
         }
         if (!havingConditionsComponent.isEmpty()) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("HAVING ").append(havingConditionsComponent);
         }
         if (!sortRules.isEmpty()) {
-            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("ORDER BY ").append(KeelHelper.joinStringArray(sortRules, ","));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("ORDER BY ").append(Keel.stringHelper().joinStringArray(sortRules, ","));
         }
         if (limit > 0) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("LIMIT ").append(limit).append(" OFFSET ").append(offset);
@@ -213,7 +213,7 @@ public class SelectStatement extends AbstractReadStatement {
             }
             if (!onConditions.isEmpty()) {
                 s += " ON ";
-                s += KeelHelper.joinStringArray(onConditions, " AND ");
+                s += Keel.stringHelper().joinStringArray(onConditions, " AND ");
             }
             return s;
         }

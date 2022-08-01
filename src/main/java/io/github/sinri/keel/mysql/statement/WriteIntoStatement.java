@@ -1,23 +1,17 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.KeelHelper;
-import io.github.sinri.keel.mysql.DuplexExecutorForMySQL;
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
-import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
-import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
 
 public class WriteIntoStatement extends AbstractModifyStatement {
     /**
@@ -262,7 +256,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             sql += schema + ".";
         }
         sql += table;
-        sql += " (" + KeelHelper.joinStringArray(columns, ",") + ")";
+        sql += " (" + Keel.stringHelper().joinStringArray(columns, ",") + ")";
         if (sourceTableName != null) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "TABLE " + sourceTableName;
         } else if (sourceSelectSQL != null) {
@@ -271,67 +265,20 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "VALUES" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             for (List<String> row : batchValues) {
-                items.add("(" + KeelHelper.joinStringArray(row, ",") + ")");
+                items.add("(" + Keel.stringHelper().joinStringArray(row, ",") + ")");
             }
-            sql += KeelHelper.joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
+            sql += Keel.stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         if (!onDuplicateKeyUpdateAssignmentMap.isEmpty()) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ON DUPLICATE KEY UPDATE" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             onDuplicateKeyUpdateAssignmentMap.forEach((key, value) -> items.add(key + " = " + value));
-            sql += KeelHelper.joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
+            sql += Keel.stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         if (!getRemarkAsComment().isEmpty()) {
             sql += "\n-- " + getRemarkAsComment() + "\n";
         }
         return sql;
-    }
-
-
-    @Override
-    @Deprecated
-    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
-        String sql = this.toString();
-        getSqlAuditLogger().info(sql);
-        return KeelJDBCForMySQL.executeForInsertion(this.toString(), statement);
-    }
-
-    /**
-     * @return the MySQLExecutor for last inserted ID
-     * @since 1.10
-     * @deprecated since 2.1
-     */
-    @Deprecated
-    public DuplexExecutorForMySQL<Long> getExecutorForLastInsertedID() {
-        return new DuplexExecutorForMySQL<>(
-                this::executeForLastInsertedID,
-                this::blockedExecuteForLastInsertedID
-        );
-    }
-
-    /**
-     * @param idChecker
-     * @param recoveredValue
-     * @param <R>
-     * @return
-     * @since 1.10
-     * @deprecated since 2.1
-     */
-    @Deprecated
-    public <R> DuplexExecutorForMySQL<R> getExecutorForLastInsertedID(Function<Long, R> idChecker, R recoveredValue) {
-        return new DuplexExecutorForMySQL<>(
-                sqlConnection -> executeForLastInsertedID(sqlConnection)
-                        .compose(id -> Future.succeededFuture(idChecker.apply(id)))
-                        .recover(throwable -> Future.succeededFuture(recoveredValue)),
-                statement -> {
-                    try {
-                        long id = blockedExecuteForLastInsertedID(statement);
-                        return idChecker.apply(id);
-                    } catch (SQLException sqlException) {
-                        return recoveredValue;
-                    }
-                }
-        );
     }
 
     /**
@@ -342,31 +289,35 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      */
     public Future<Long> executeForLastInsertedID(SqlConnection sqlConnection) {
         return execute(sqlConnection)
-                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getLastInsertedID()))
-//                .recover(throwable -> {
-//                    Keel.outputLogger("MySQL").warning(getClass().getName() + " executeForLastInsertedID failed [" + throwable.getMessage() + "] when executing SQL: " + this);
-//                    return Future.succeededFuture(-1L);
-//                })
-                ;
+                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getLastInsertedID()));
     }
 
-    @Deprecated
-    public long blockedExecuteForLastInsertedID(Statement statement) throws SQLException {
-        return blockedExecute(statement).getLastInsertedID();
-    }
+    /**
+     * 按照最大块尺寸分裂！
+     *
+     * @param chunkSize an integer
+     * @return a list of WriteIntoStatement
+     * @since 2.3
+     */
+    public List<WriteIntoStatement> divide(int chunkSize) {
+        if (sourceTableName != null || sourceSelectSQL != null) {
+            return List.of(this);
+        }
 
-    @Deprecated
-    public long blockedExecuteForLastInsertedID() throws SQLException {
-        return blockedExecute().getLastInsertedID();
-    }
+        List<WriteIntoStatement> list = new ArrayList<>();
+        int size = this.batchValues.size();
+        for (int chunkStartIndex = 0; chunkStartIndex < size; chunkStartIndex += chunkSize) {
+            WriteIntoStatement chunkWIS = new WriteIntoStatement(this.writeType);
 
-    @Deprecated
-    public final long executeForLastInsertedID() throws SQLException {
-        return blockedExecuteForLastInsertedID();
-    }
+            chunkWIS.columns.addAll(this.columns);
+            chunkWIS.onDuplicateKeyUpdateAssignmentMap.putAll(this.onDuplicateKeyUpdateAssignmentMap);
+            chunkWIS.ignoreMark = this.ignoreMark;
+            chunkWIS.schema = this.schema;
+            chunkWIS.table = this.table;
+            chunkWIS.batchValues.addAll(this.batchValues.subList(chunkStartIndex, Math.min(size, chunkStartIndex + chunkSize)));
 
-    @Deprecated
-    public final long executeForLastInsertedID(Statement statement) throws SQLException {
-        return blockedExecuteForLastInsertedID(statement);
+            list.add(chunkWIS);
+        }
+        return list;
     }
 }

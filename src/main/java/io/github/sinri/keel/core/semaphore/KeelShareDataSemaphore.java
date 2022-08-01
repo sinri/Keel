@@ -20,7 +20,7 @@ public class KeelShareDataSemaphore {
     public KeelShareDataSemaphore(String name, int permits) {
         this.name = name;
         this.permits = permits;
-        this.logger = KeelLogger.buildSilentLogger();
+        this.logger = KeelLogger.silentLogger();
     }
 
     public KeelShareDataSemaphore(String name, int permits, KeelLogger logger) {

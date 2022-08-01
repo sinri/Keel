@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.fastdocs.page;
 
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.markdown.KeelMarkdownKit;
 import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;
@@ -46,7 +46,7 @@ public class MarkdownPageBuilder implements FastDocsContentResponder {
             href.append(component);
             x.add("<a href='" + href + (component.endsWith(".md") ? "" : "/index.md") + "'>" + component + "</a>");
         }
-        return KeelHelper.joinStringArray(x, "&nbsp;‣&nbsp;");
+        return Keel.stringHelper().joinStringArray(x, "&nbsp;‣&nbsp;");
     }
 
     protected String getFooterDivContent() {

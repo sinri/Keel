@@ -10,7 +10,7 @@ import io.vertx.sqlclient.SqlConnection;
 /**
  * @since 2.0
  */
-public abstract class AbstractTableRow extends AbstractRow {
+public abstract class AbstractTableRow extends SimpleResultRow {
     public AbstractTableRow(JsonObject tableRow) {
         super(tableRow);
     }

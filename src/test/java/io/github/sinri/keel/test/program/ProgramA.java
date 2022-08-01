@@ -2,7 +2,7 @@ package io.github.sinri.keel.test.program;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.program.KeelProgramAsVerticle;
+import io.github.sinri.keel.program.KeelProgram;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.Future;
 import io.vertx.core.cli.Option;
@@ -10,12 +10,12 @@ import io.vertx.core.cli.Option;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProgramA extends KeelProgramAsVerticle {
+public class ProgramA extends KeelProgram {
     public static void main(String[] args) {
         SharedTestBootstrap.initialize();
 
         ProgramA programA = new ProgramA();
-        KeelProgramAsVerticle.runProgramAndExit(programA, List.of(args));
+        KeelProgram.runProgramAndExit(programA, List.of(args));
     }
 
     @Override

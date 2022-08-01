@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.condition.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -82,12 +82,10 @@ public class ConditionsComponent {
     @Override
     public String toString() {
         if (conditions.isEmpty()) return "";
-        return KeelHelper.joinStringArray(conditions, " and ");
+        return Keel.stringHelper().joinStringArray(conditions, " and ");
     }
 
     /**
-     * @param mapping
-     * @return
      * @since 2.0
      */
     public final ConditionsComponent quickMapping(JsonObject mapping) {
@@ -96,9 +94,6 @@ public class ConditionsComponent {
     }
 
     /**
-     * @param key
-     * @param value
-     * @return
      * @since 2.0
      */
     public final ConditionsComponent quickMapping(String key, Object value) {

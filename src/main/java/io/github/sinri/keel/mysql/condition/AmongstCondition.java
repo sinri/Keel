@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.condition;
 
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
 import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
 
@@ -68,9 +68,6 @@ public class AmongstCondition extends KeelMySQLCondition {
     }
 
     /**
-     * @param targetSet
-     * @param needQuoting
-     * @return
      * @since 1.4
      */
     public AmongstCondition amongst(Collection<?> targetSet, boolean needQuoting) {
@@ -86,8 +83,6 @@ public class AmongstCondition extends KeelMySQLCondition {
     }
 
     /**
-     * @param targetSet
-     * @return
      * @since 1.4
      */
     public AmongstCondition amongst(Collection<?> targetSet) {
@@ -138,7 +133,7 @@ public class AmongstCondition extends KeelMySQLCondition {
         if (inverseOperator) {
             s += " NOT";
         }
-        s += " " + OP_IN + " (" + KeelHelper.joinStringArray(targetSet, ",") + ")";
+        s += " " + OP_IN + " (" + Keel.stringHelper().joinStringArray(targetSet, ",") + ")";
         return s;
     }
 }

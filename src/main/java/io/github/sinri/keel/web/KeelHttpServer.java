@@ -1,6 +1,9 @@
 package io.github.sinri.keel.web;
 
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.web.websockets.KeelWebSocketHandler;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
@@ -23,7 +26,7 @@ public class KeelHttpServer {
         this.vertx = vertx;
         server = vertx.createHttpServer(options);
         router = Router.router(vertx);
-        logger = new KeelLogger();
+        logger = Keel.outputLogger(getClass().getName());
         this.closeVertXWhenTerminated = closeVertXWhenTerminated;
     }
 
@@ -39,6 +42,13 @@ public class KeelHttpServer {
         return router;
     }
 
+    /**
+     * @since 2.4
+     */
+    public void setWebSocketHandlerToServer(Class<? extends KeelWebSocketHandler> handlerClass, DeploymentOptions deploymentOptions) {
+        this.server.webSocketHandler(websocket -> KeelWebSocketHandler.handle(websocket, handlerClass, getLogger(), deploymentOptions));
+    }
+
     public void listen() {
         server.requestHandler(router)
                 .exceptionHandler(throwable -> {
@@ -47,10 +57,10 @@ public class KeelHttpServer {
                 .listen(httpServerAsyncResult -> {
                     if (httpServerAsyncResult.succeeded()) {
                         HttpServer httpServer = httpServerAsyncResult.result();
-                        logger.info("HTTP Server Established: " + httpServer.toString() + " Actual Port: " + httpServer.actualPort());
+                        logger.info("HTTP Server Established, Actual Port: " + httpServer.actualPort());
                     } else {
                         Throwable throwable = httpServerAsyncResult.cause();
-                        logger.fatal(throwable.getMessage());
+                        logger.exception("Listen failed", throwable);
 
                         if (closeVertXWhenTerminated) {
                             vertx.close()

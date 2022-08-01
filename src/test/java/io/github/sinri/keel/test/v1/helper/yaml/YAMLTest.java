@@ -2,7 +2,7 @@ package io.github.sinri.keel.test.v1.helper.yaml;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 
 import java.io.IOException;
 
@@ -10,7 +10,7 @@ public class YAMLTest {
     public static void main(String[] args) {
         byte[] bytes = new byte[0];
         try {
-            bytes = KeelHelper.readFileAsByteArray("test.yml", true);
+            bytes = Keel.fileHelper().readFileAsByteArray("test.yml", true);
         } catch (IOException e) {
             e.printStackTrace();
         }

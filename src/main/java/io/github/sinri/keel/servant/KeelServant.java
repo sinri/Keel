@@ -7,6 +7,10 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.function.Function;
 
+/**
+ * @deprecated KeelServant 是 Vert.x 的 EventBus 消息机制的简单封装，似乎并没有特别大的价值，不如……
+ */
+@Deprecated(since = "2.7", forRemoval = true)
 public class KeelServant {
     private final String channelName;
     private final MessageConsumer<Object> consumer;

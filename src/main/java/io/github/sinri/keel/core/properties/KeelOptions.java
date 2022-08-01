@@ -2,7 +2,7 @@ package io.github.sinri.keel.core.properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
@@ -24,7 +24,7 @@ abstract public class KeelOptions {
 
 
     public static <T extends KeelOptions> T loadWithYamlFilePath(String yamlFilePath, Class<T> classOfT) throws IOException {
-        byte[] bytes = KeelHelper.readFileAsByteArray(yamlFilePath, true);
+        byte[] bytes = Keel.fileHelper().readFileAsByteArray(yamlFilePath, true);
 
         var mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
@@ -33,7 +33,7 @@ abstract public class KeelOptions {
     }
 
     public static <T extends KeelOptions> T loadWithJsonObjectFilePath(String jsonObjectFilePath, Class<T> classOfT) throws IOException {
-        byte[] bytes = KeelHelper.readFileAsByteArray(jsonObjectFilePath, true);
+        byte[] bytes = Keel.fileHelper().readFileAsByteArray(jsonObjectFilePath, true);
         return loadWithJsonObject(new JsonObject(Buffer.buffer(bytes)), classOfT);
     }
 
@@ -56,7 +56,11 @@ abstract public class KeelOptions {
 
                 Class<?> type = field.getType();
                 if (type == boolean.class || type == Boolean.class) {
-                    field.setBoolean(this, value.toString().equals(BOOL_YES));
+                    if (value instanceof Boolean) {
+                        field.setBoolean(this, (Boolean) value);
+                    } else {
+                        field.setBoolean(this, value.toString().equals(BOOL_YES));
+                    }
                 } else if (type == Byte.class || type == byte.class) {
                     field.setByte(this, Byte.parseByte(value.toString()));
                 } else if (type == short.class || type == Short.class) {

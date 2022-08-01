@@ -1,12 +1,8 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
-import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
-import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -97,12 +93,12 @@ public class UpdateStatement extends AbstractModifyStatement {
             sql += " " + schema + ".";
         }
         sql += table;
-        sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "SET " + KeelHelper.joinStringArray(assignments, ",");
+        sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "SET " + Keel.stringHelper().joinStringArray(assignments, ",");
         if (!whereConditionsComponent.isEmpty()) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "WHERE " + whereConditionsComponent;
         }
         if (!sortRules.isEmpty()) {
-            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + KeelHelper.joinStringArray(sortRules, ",");
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + Keel.stringHelper().joinStringArray(sortRules, ",");
         }
         if (limit > 0) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "LIMIT " + limit;
@@ -112,16 +108,4 @@ public class UpdateStatement extends AbstractModifyStatement {
         }
         return sql;
     }
-
-
-
-    @Override
-    @Deprecated
-    public ResultMatrix blockedExecute(Statement statement) throws SQLException {
-        String sql = this.toString();
-        getSqlAuditLogger().info(sql);
-        return KeelJDBCForMySQL.executeForModification(this.toString(), statement);
-    }
-
-
 }

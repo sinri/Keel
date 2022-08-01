@@ -1,6 +1,6 @@
 package io.github.sinri.keel.core.properties;
 
-import io.github.sinri.keel.core.KeelHelper;
+import io.github.sinri.keel.Keel;
 import io.vertx.core.json.JsonObject;
 
 import java.io.File;
@@ -147,8 +147,8 @@ public class KeelPropertiesReader {
         Set<String> plainKeySet = getPlainKeySet();
         for (var plainKey : plainKeySet) {
             String[] components = plainKey.split("\\.");
-            List<String> keychain = Arrays.asList(components);
-            KeelHelper.writeIntoJsonObject(jsonObject, keychain, getProperty(plainKey));
+            List<Object> keychain = Arrays.asList(components);
+            Keel.jsonHelper().writeIntoJsonObject(jsonObject, keychain, getProperty(plainKey));
         }
         return jsonObject;
     }

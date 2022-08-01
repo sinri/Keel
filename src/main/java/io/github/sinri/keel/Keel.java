@@ -1,32 +1,28 @@
 package io.github.sinri.keel;
 
+import io.github.sinri.keel.core.helper.*;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.KeelMySQLOptions;
-import io.github.sinri.keel.mysql.jdbc.KeelJDBCForMySQL;
+import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.sqlclient.SqlConnection;
+import io.vertx.core.json.JsonObject;
 
-import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Keel {
-    private static final String KEY_MYSQL_CONNECTION = "MySQLConnection";
-    @Deprecated
-    private static final String KEY_JDBC_STATEMENT = "JDBCStatement";
-    private static final String KEY_KEEL_LOGGER = "KeelLogger";
+//    private static final String KEY_MYSQL_CONNECTION = "MySQLConnection";
+//    private static final String KEY_KEEL_LOGGER = "KeelLogger";
 
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
-    private static final Map<String, KeelLogger> loggerMap = new HashMap<>();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
 
-    @Deprecated
-    private static final Map<String, KeelJDBCForMySQL> mysqlKitWithJDBCMap = new HashMap<>();
+    private static final Map<String, JsonObject> deployedKeelVerticleMap = new HashMap<>();
 
     private static Vertx vertx;
 
@@ -55,7 +51,9 @@ public class Keel {
 
     /**
      * @since 2.1
+     * @deprecated since 2.3
      */
+    @Deprecated(since = "2.3", forRemoval = true)
     public static void closeVertx() {
         if (vertx != null) {
             vertx.close();
@@ -72,26 +70,19 @@ public class Keel {
      * @since 1.11
      */
     public static KeelLogger standaloneLogger(String aspect) {
-        return new KeelLogger(KeelLoggerOptions.generateOptionsForAspectWithPropertiesReader(aspect));
-    }
-
-    /**
-     * Get a shared KeelLogger instance.
-     *
-     * @param aspect aspect
-     * @return KeelLogger, if already shared, use existed.
-     */
-    public static KeelLogger logger(String aspect) {
-        if (loggerMap.containsKey(aspect)) {
-            return loggerMap.get(aspect);
-        }
-        KeelLogger logger = standaloneLogger(aspect);
-        loggerMap.put(aspect, logger);
-        return logger;
+        KeelLoggerOptions options = new KeelLoggerOptions()
+                .addIgnorableStackPackage("io.vertx,io.netty,java.lang")
+                .loadForAspect(aspect);
+        return KeelLogger.createLogger(options);
     }
 
     public static KeelLogger outputLogger(String aspect) {
-        return new KeelLogger(KeelLoggerOptions.generateOptionsForAspectWithPropertiesReader(aspect).setDir(""));
+        KeelLoggerOptions options = new KeelLoggerOptions()
+                .setCompositionStyle(KeelLoggerOptions.CompositionStyle.THREE_LINES)
+                .addIgnorableStackPackage("io.vertx,io.netty,java.lang")
+                .loadForAspect(aspect)
+                .setImplement("print");
+        return KeelLogger.createLogger(options);
     }
 
     public static KeelMySQLKit getMySQLKit(String dataSourceName) {
@@ -113,85 +104,64 @@ public class Keel {
     }
 
     /**
-     * @param dataSourceName the data source name
-     * @return KeelJDBCForMySQL
-     * @since 1.10
-     * @deprecated since 2.1
+     * @param keelVerticle KeelVerticle Instance (deployed)
+     * @since 2.2
      */
-    @Deprecated
-    public static KeelJDBCForMySQL getMySQLKitWithJDBC(String dataSourceName) {
-        if (!mysqlKitWithJDBCMap.containsKey(dataSourceName)) {
-            KeelMySQLOptions keelMySQLOptions = KeelMySQLOptions.generateOptionsForDataSourceWithPropertiesReader(dataSourceName);
-            KeelJDBCForMySQL keelJDBCForMySQL = new KeelJDBCForMySQL(keelMySQLOptions);
-            mysqlKitWithJDBCMap.put(dataSourceName, keelJDBCForMySQL);
+    public static void registerDeployedKeelVerticle(KeelVerticle keelVerticle) {
+        if (keelVerticle.deploymentID() != null) {
+            deployedKeelVerticleMap.put(keelVerticle.deploymentID(), keelVerticle.getVerticleInfo());
         }
-        return mysqlKitWithJDBCMap.get(dataSourceName);
     }
 
     /**
-     * @return getMySQLKitWithJDBC(mysql.default_data_source_name);
-     * @since 1.10
-     * @deprecated since 2.1
+     * @param deploymentID DeploymentID of KeelVerticle Instance (deployed)
+     * @since 2.2
      */
-    @Deprecated
-    public static KeelJDBCForMySQL getMySQLKitWithJDBC() {
-        String defaultName = propertiesReader.getProperty("mysql.default_data_source_name");
-        return getMySQLKitWithJDBC(defaultName);
+    public static void unregisterDeployedKeelVerticle(String deploymentID) {
+        deployedKeelVerticleMap.remove(deploymentID);
     }
 
     /**
-     * @return
-     * @since 2.0
+     * @param deploymentID ID of deployment for one Verticle deployed
+     * @return the information json object
+     * @since 2.2
      */
-    public static SqlConnection getMySqlConnectionInContext() {
-        return Keel.getVertx().getOrCreateContext().get(KEY_MYSQL_CONNECTION);
+    public static JsonObject getDeployedKeelVerticleInfo(String deploymentID) {
+        return deployedKeelVerticleMap.get(deploymentID);
     }
 
     /**
-     * @param sqlConnection
-     * @since 2.0
+     * @since 2.6
      */
-    public static void setMySqlConnectionInContext(SqlConnection sqlConnection) {
-        Keel.getVertx().getOrCreateContext().put(KEY_MYSQL_CONNECTION, sqlConnection);
+    public static KeelStringHelper stringHelper() {
+        return KeelStringHelper.getInstance();
     }
 
     /**
-     * @return
-     * @since 2.0
-     * @deprecated since 2.1
+     * @since 2.6
      */
-    @Deprecated
-    public static Statement getJDBCStatementInContext() {
-        return Keel.getVertx().getOrCreateContext().get(KEY_JDBC_STATEMENT);
+    public static KeelJsonHelper jsonHelper() {
+        return KeelJsonHelper.getInstance();
     }
 
     /**
-     * @param statement
-     * @since 2.0
-     * @deprecated since 2.1
+     * @since 2.6
      */
-    @Deprecated
-    public static void setJDBCStatementInContext(Statement statement) {
-        Keel.getVertx().getOrCreateContext().put(KEY_JDBC_STATEMENT, statement);
+    public static KeelFileHelper fileHelper() {
+        return KeelFileHelper.getInstance();
     }
 
     /**
-     * @return
-     * @since 2.0
+     * @since 2.6
      */
-    public static KeelLogger getKeelLoggerInContext() {
-        KeelLogger logger = Keel.getVertx().getOrCreateContext().get(KEY_KEEL_LOGGER);
-        if (logger == null) {
-            logger = KeelLogger.buildSilentLogger();
-        }
-        return logger;
+    public static KeelReflectionHelper reflectionHelper() {
+        return KeelReflectionHelper.getInstance();
     }
 
     /**
-     * @param logger
-     * @since 2.0
+     * @since 2.6
      */
-    public static void setKeelLoggerInContext(KeelLogger logger) {
-        Keel.getVertx().getOrCreateContext().put(KEY_KEEL_LOGGER, logger);
+    public static KeelDateTimeHelper dateTimeHelper() {
+        return KeelDateTimeHelper.getInstance();
     }
 }

@@ -5,7 +5,7 @@ import io.vertx.core.Future;
 import java.util.function.Function;
 
 /**
- * 使用递归传递Future的方式实现了不可预测的中止条件下的异步循环体
+ * 使用递归传递Future的方式实现了不可预测的中止条件下的异步循环体。
  *
  * @param <T> 循环依据
  * @since 1.13

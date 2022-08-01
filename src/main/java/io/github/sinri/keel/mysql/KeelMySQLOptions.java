@@ -13,10 +13,24 @@ public class KeelMySQLOptions extends KeelOptions {
     public String schema;
     public String charset;
     public boolean useAffectedRows;
+
+    public boolean allowPublicKeyRetrieval;
+    /**
+     * @since 2.7.1
+     */
+    public int poolConnectionTimeout = 30;// sec;
+
     public int poolMaxSize;
     public boolean poolShared;
+    /**
+     * @since 2.7.1
+     */
+    public int poolEventLoopSize = 0;// sec; 0 -> reuse current event-loop
+    /**
+     * @since 2.7.1
+     */
+    public int poolIdleTimeout = 0; // sec; 0 -> no timeout
     protected String dataSourceName;
-    public boolean allowPublicKeyRetrieval;
 
     public KeelMySQLOptions() {
         this.host = "127.0.0.1";
@@ -60,7 +74,12 @@ public class KeelMySQLOptions extends KeelOptions {
     public PoolOptions buildPoolOptions() {
         return new PoolOptions()
                 .setMaxSize(this.poolMaxSize)
-                .setShared(this.poolShared);
+                .setShared(this.poolShared)
+                .setShared(this.poolShared)
+                .setConnectionTimeout(this.poolConnectionTimeout)
+                .setEventLoopSize(this.poolEventLoopSize)
+                .setIdleTimeout(this.poolIdleTimeout)
+                ;
     }
 
     public String buildJDBCConnectionString() {

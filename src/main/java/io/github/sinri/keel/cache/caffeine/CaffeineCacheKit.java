@@ -4,19 +4,19 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.Expiry;
 import io.github.sinri.keel.cache.KeelCacheInterface;
+import io.github.sinri.keel.cache.ValueWrapper;
 import org.checkerframework.checker.index.qual.NonNegative;
 
-import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 /**
  * @param <K> class for key
  * @param <V> class for value
  * @since 1.9
  */
+@Deprecated(since = "2.6")
 public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
     protected final Cache<K, ValueWrapper<V>> cache;
 
@@ -25,17 +25,17 @@ public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
                 .expireAfter(new Expiry<K, ValueWrapper<V>>() {
                     @Override
                     public long expireAfterCreate(K key, ValueWrapper<V> valueWrapper, long currentTime) {
-                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath());
+                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath()) - currentTime;
                     }
 
                     @Override
                     public long expireAfterUpdate(K key, ValueWrapper<V> valueWrapper, long currentTime, @NonNegative long currentDuration) {
-                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath());
+                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath()) - currentTime;
                     }
 
                     @Override
                     public long expireAfterRead(K key, ValueWrapper<V> valueWrapper, long currentTime, @NonNegative long currentDuration) {
-                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath());
+                        return TimeUnit.SECONDS.toNanos(valueWrapper.getDeath()) - currentTime;
                     }
                 })
                 .build();
@@ -55,25 +55,11 @@ public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
     public V read(K key, V fallbackValue) {
         ValueWrapper<V> valueWrapper = this.cache.getIfPresent(key);
         if (valueWrapper == null) return fallbackValue;
-        return valueWrapper.getValue();
-    }
-
-    @Override
-    public V read(K key, Function<? super K, ? extends V> fallbackValueGenerator, V fallbackValue) {
-        return read(key, fallbackValueGenerator, fallbackValue, 1L);
-    }
-
-    @Override
-    public V read(K key, Function<? super K, ? extends V> fallbackValueGenerator, V fallbackValue, long lifeInSeconds) {
-        ValueWrapper<V> valueWrapper = this.cache.get(
-                key,
-                k -> {
-                    V v = fallbackValueGenerator.apply(k);
-                    return new ValueWrapper<>(v, lifeInSeconds);
-                }
-        );
-        if (valueWrapper == null) return fallbackValue;
-        return valueWrapper.getValue();
+        if (valueWrapper.isAliveNow()) {
+            return valueWrapper.getValue();
+        } else {
+            return fallbackValue;
+        }
     }
 
     @Override
@@ -105,33 +91,5 @@ public class CaffeineCacheKit<K, V> implements KeelCacheInterface<K, V> {
             }
         });
         return map;
-    }
-
-    protected static class ValueWrapper<P> {
-        private final P value;
-        private final long death;
-        private final long birth;
-
-        public ValueWrapper(P value, long lifeInSeconds) {
-            this.value = value;
-            this.birth = new Date().getTime();
-            this.death = this.birth + lifeInSeconds * 1000L;
-        }
-
-        public long getBirth() {
-            return birth;
-        }
-
-        public long getDeath() {
-            return death;
-        }
-
-        public P getValue() {
-            return value;
-        }
-
-        public boolean isAliveNow() {
-            return (new Date().getTime()) < this.death;
-        }
     }
 }
