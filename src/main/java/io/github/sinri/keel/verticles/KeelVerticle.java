@@ -44,28 +44,28 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
      * @since 2.4
      */
     protected final <R> Future<R> executeWithMySQL(Function<SqlConnection, Future<R>> executor) {
-        return Keel.getMySQLKit().getPool().withConnection(executor);
+        return Keel.getMySQLKit().withConnection(executor);
     }
 
     /**
      * @since 2.4
      */
     protected final <R> Future<R> executeWithMySQL(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
-        return Keel.getMySQLKit(dataSourceName).getPool().withConnection(executor);
+        return Keel.getMySQLKit(dataSourceName).withConnection(executor);
     }
 
     /**
      * @since 2.4
      */
     protected final <R> Future<R> executeWithinMySQLTransaction(Function<SqlConnection, Future<R>> executor) {
-        return Keel.getMySQLKit().getPool().withTransaction(executor);
+        return Keel.getMySQLKit().withTransaction(executor);
     }
 
     /**
      * @since 2.4
      */
     protected final <R> Future<R> executeWithinMySQLTransaction(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
-        return Keel.getMySQLKit(dataSourceName).getPool().withTransaction(executor);
+        return Keel.getMySQLKit(dataSourceName).withTransaction(executor);
     }
 
     @Override
