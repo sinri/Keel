@@ -1,6 +1,7 @@
 package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.mysql.exception.KeelMySQLException;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.matrix.ResultMatrixWithVertx;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
@@ -9,6 +10,7 @@ import io.vertx.core.Vertx;
 import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.SqlConnection;
+import io.vertx.sqlclient.TransactionRollbackException;
 import io.vertx.sqlclient.Tuple;
 
 import java.time.LocalDateTime;
@@ -71,8 +73,76 @@ public class KeelMySQLKit {
         return toMySQLDatetime(LocalDateTime.now());
     }
 
+    @Deprecated(since = "2.8")
     public MySQLPool getPool() {
         return pool;
+    }
+
+    /**
+     * @since 2.8
+     */
+    public <T> Future<T> withConnection(Function<SqlConnection, Future<T>> function) {
+        return pool.getConnection()
+                .recover(throwable -> Future.failedFuture(new KeelMySQLException(
+                        "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withConnection`," +
+                                " failed to get connection from the pool, cause message: " +
+                                throwable.getMessage(),
+                        throwable
+                )))
+                .compose(sqlConnection -> function.apply(sqlConnection)
+                        .onComplete(asyncResult -> sqlConnection.close())
+                );
+    }
+
+    /**
+     * @since 2.8
+     */
+    public <T> Future<T> withTransaction(Function<SqlConnection, Future<T>> function) {
+        return pool.getConnection()
+                .recover(throwable -> Future.failedFuture(new KeelMySQLException(
+                        "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
+                                " failed to get connection from the pool, cause message: " +
+                                throwable.getMessage(),
+                        throwable
+                )))
+                .compose(sqlConnection -> sqlConnection.begin()
+                        .compose(transaction -> function.apply(sqlConnection)
+                                .compose(res -> transaction.commit()
+                                        .compose((v) -> Future.succeededFuture(res))
+                                )
+                                .recover(err -> {
+                                            if (err instanceof TransactionRollbackException) {
+                                                return Future.failedFuture(err);
+                                            }
+                                            return transaction.rollback()
+                                                    .compose(v -> Future.failedFuture(new KeelMySQLException(
+                                                                    "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
+                                                                            " a rollback performed after an error met, cause message: " +
+                                                                            err.getMessage(),
+                                                                    err
+                                                            )),
+                                                            rollbackFailure -> Future.failedFuture(new KeelMySQLException(
+                                                                    "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
+                                                                            " after an error met (cause message: " + err.getMessage() + ")," +
+                                                                            " a rollback performed but failed (cause message: " + rollbackFailure.getMessage() + ")",
+                                                                    new KeelMySQLException(
+                                                                            "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
+                                                                                    " a rollback should be performed after an error met, cause message: " +
+                                                                                    err.getMessage(),
+                                                                            err
+                                                                    )
+                                                            ))
+                                                    )
+                                                    .compose(v -> {
+                                                        // would not come here
+                                                        return Future.succeededFuture();
+                                                    });
+
+                                        }
+                                )
+                        )
+                        .onComplete(ar -> sqlConnection.close())
+                );
     }
 
     /**
@@ -216,7 +286,7 @@ public class KeelMySQLKit {
     public <T> Future<T> executeInTransaction(Function<SqlConnection, Future<T>> transactionBody) {
         AtomicReference<T> finalResult = new AtomicReference<>();
         AtomicReference<Throwable> cause = new AtomicReference<>();
-        return getPool()
+        return pool
                 .withTransaction(transactionBody)
                 .onSuccess(finalResult::set)
                 .onFailure(cause::set)
@@ -234,7 +304,7 @@ public class KeelMySQLKit {
      * @since 1.4
      */
     public Future<ResultMatrix> queryInConnection(SelectStatement selection) {
-        return getPool().withConnection(
+        return pool.withConnection(
                 sqlConnection -> KeelMySQLKit.executeSqlForResultMatrix(
                         sqlConnection,
                         selection.toString(),

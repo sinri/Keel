@@ -17,7 +17,7 @@ import java.util.function.Function;
 
 public class RepeatFutureTest {
     protected static void testFutureFor(int limit) {
-        SharedTestBootstrap.getMySQLKit().getPool()
+        SharedTestBootstrap.getMySQLKit()
                 .withConnection(sqlConnection -> {
                     return FutureFor.call(
                             0, i -> i < limit, i -> i + 1,
@@ -47,7 +47,7 @@ public class RepeatFutureTest {
     }
 
     protected static void testFutureForRange(int limit) {
-        SharedTestBootstrap.getMySQLKit().getPool()
+        SharedTestBootstrap.getMySQLKit()
                 .withConnection(sqlConnection -> {
                     return FutureForRange.call(
                             limit,
@@ -81,7 +81,7 @@ public class RepeatFutureTest {
         for (var i = 0; i < limit; i++) {
             list.add(i);
         }
-        SharedTestBootstrap.getMySQLKit().getPool()
+        SharedTestBootstrap.getMySQLKit()
                 .withConnection(sqlConnection -> {
                     return FutureForEach.call(
                             list,

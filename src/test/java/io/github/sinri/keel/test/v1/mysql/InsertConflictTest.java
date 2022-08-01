@@ -30,7 +30,7 @@ public class InsertConflictTest {
 //                    System.out.println("FAILED: "+throwable.getMessage()+" / "+ throwable.getClass());
 //                })
 //                .eventually(v->Keel.getVertx().close());
-        SharedTestBootstrap.getMySQLKit().getPool()
+        SharedTestBootstrap.getMySQLKit()
                 .withConnection(writeIntoStatement::executeForAffectedRows)
                 .compose(afx -> {
                     System.out.println("AFX " + afx);

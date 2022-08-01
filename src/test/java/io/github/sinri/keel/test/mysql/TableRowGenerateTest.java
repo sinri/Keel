@@ -11,7 +11,8 @@ public class TableRowGenerateTest {
 
         KeelLogger logger = Keel.outputLogger("main");
 
-        SharedTestBootstrap.getMySQLKit().getPool().withConnection(sqlConnection -> {
+        SharedTestBootstrap.getMySQLKit()
+                .withConnection(sqlConnection -> {
                     return new TableRowClassGenerator(sqlConnection)
 //                            .forSchema("docker_test")
                             .setRewrite(true)

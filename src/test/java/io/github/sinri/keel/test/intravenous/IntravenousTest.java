@@ -33,36 +33,37 @@ public class IntravenousTest {
 
         @Override
         public Future<KeelIntravenousTaskConclusion<JsonObject>> handle(Drop drop) {
-            return Keel.getMySQLKit().getPool().withConnection(sqlConnection -> {
-                return sqlConnection.query("select now() as x")
-                        .execute()
-                        .compose(rows -> {
-                            return Future.succeededFuture(new ResultMatrixWithVertx(rows));
-                        })
-                        .compose(resultMatrixWithVertx -> {
-                            try {
-                                var x = resultMatrixWithVertx.getOneColumnOfFirstRowAsDateTime("x");
+            return Keel.getMySQLKit()
+                    .withConnection(sqlConnection -> {
+                        return sqlConnection.query("select now() as x")
+                                .execute()
+                                .compose(rows -> {
+                                    return Future.succeededFuture(new ResultMatrixWithVertx(rows));
+                                })
+                                .compose(resultMatrixWithVertx -> {
+                                    try {
+                                        var x = resultMatrixWithVertx.getOneColumnOfFirstRowAsDateTime("x");
 
-                                return Future.succeededFuture(
-                                        new TaskConclusion(
-                                                drop.getReference(),
-                                                true,
-                                                x,
-                                                resultMatrixWithVertx.getFirstRow()
-                                        )
-                                );
-                            } catch (KeelSQLResultRowIndexError e) {
+                                        return Future.succeededFuture(
+                                                new TaskConclusion(
+                                                        drop.getReference(),
+                                                        true,
+                                                        x,
+                                                        resultMatrixWithVertx.getFirstRow()
+                                                )
+                                        );
+                                    } catch (KeelSQLResultRowIndexError e) {
 //                                e.printStackTrace();
-                                return Future.succeededFuture(
-                                        new TaskConclusion(
-                                                drop.getReference(),
-                                                false,
-                                                e.getClass() + ": " + e.getMessage()
-                                        )
-                                );
-                            }
-                        });
-            });
+                                        return Future.succeededFuture(
+                                                new TaskConclusion(
+                                                        drop.getReference(),
+                                                        false,
+                                                        e.getClass() + ": " + e.getMessage()
+                                                )
+                                        );
+                                    }
+                                });
+                    });
         }
     }
 
