@@ -25,15 +25,20 @@ public interface JsonifiableEntity<E> extends ClusterSerializable, Iterable<Map.
 
     /**
      * @since 2.7
+     * @since 2.8 If java.lang.ClassCastException occurred, return null instead.
      */
     default <T> T read(Function<JsonPointer, Class<T>> func) {
-        JsonPointer jsonPointer = JsonPointer.create();
-        Class<T> tClass = func.apply(jsonPointer);
-        Object o = jsonPointer.queryJson(toJsonObject());
-        if (o == null) {
+        try {
+            JsonPointer jsonPointer = JsonPointer.create();
+            Class<T> tClass = func.apply(jsonPointer);
+            Object o = jsonPointer.queryJson(toJsonObject());
+            if (o == null) {
+                return null;
+            }
+            return tClass.cast(o);
+        } catch (ClassCastException castException) {
             return null;
         }
-        return tClass.cast(o);
     }
 
     /**
