@@ -6,7 +6,6 @@ import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.matrix.ResultMatrixWithVertx;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.vertx.core.Future;
-import io.vertx.core.Vertx;
 import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.SqlConnection;
@@ -22,11 +21,11 @@ public class KeelMySQLKit {
     private final MySQLPool pool;
     private final KeelMySQLOptions options;
 
-    public KeelMySQLKit(Vertx vertx, KeelMySQLOptions options) {
+    public KeelMySQLKit(KeelMySQLOptions options) {
         this.options = options;
-        Keel.outputLogger(getClass().getName()).info("useAffectedRows: " + options.useAffectedRows);
+        // Keel.outputLogger(getClass().getName()).info("useAffectedRows: " + options.useAffectedRows);
         pool = MySQLPool.pool(
-                vertx,
+                Keel.getVertx(),
                 options.buildMySQLConnectOptions(),
                 options.buildPoolOptions()
         );

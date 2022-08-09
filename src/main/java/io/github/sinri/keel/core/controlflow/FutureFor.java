@@ -40,9 +40,12 @@ public class FutureFor<T> {
         for (T i = initValue; shouldContinueFunction.apply(i); i = pointerModifyFunction.apply(i)) {
             T finalT = i;
             var f = futureAtomicReference.get()
-                    .compose(previous -> handleFunction.apply(finalT))
-                    .onFailure(throwable -> {
-                        throw new RuntimeException("FutureFor::run failed in routine", throwable);
+                    .compose(previous -> {
+                        try {
+                            return handleFunction.apply(finalT);
+                        } catch (Throwable throwable) {
+                            return Future.failedFuture(throwable);
+                        }
                     });
             futureAtomicReference.set(f);
         }

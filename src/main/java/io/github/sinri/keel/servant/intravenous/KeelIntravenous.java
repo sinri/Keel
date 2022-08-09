@@ -75,8 +75,14 @@ public class KeelIntravenous<R, D extends KeelIntravenousDrop> extends KeelVerti
                             D task = this.queue.poll();
                             if (task == null) return Future.succeededFuture(false);
                             getLogger().info("[READY  ] TASK " + task.getReference());
-                            return this.getConsumer()
-                                    .handle(task)
+                            return Future.succeededFuture()
+                                    .compose(v -> {
+                                        try {
+                                            return this.getConsumer().handle(task);
+                                        } catch (Throwable throwable) {
+                                            return Future.failedFuture(throwable);
+                                        }
+                                    })
                                     .compose(rConclusion -> {
                                         if (rConclusion.isDone()) {
                                             getLogger().info("[  DONE] TASK " + task.getReference() + " Feedback: " + rConclusion.getFeedback() + " Result: " + rConclusion.getResult());

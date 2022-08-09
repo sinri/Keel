@@ -28,6 +28,7 @@ public class SimpleJsonifiableEntity implements JsonifiableEntity<SimpleJsonifia
 
     @Override
     public SimpleJsonifiableEntity reloadDataFromJsonObject(JsonObject jsonObject) {
+        Objects.requireNonNull(jsonObject);
         this.jsonObject = jsonObject;
         return this;
     }

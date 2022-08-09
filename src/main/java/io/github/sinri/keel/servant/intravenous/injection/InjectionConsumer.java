@@ -7,6 +7,7 @@ import io.vertx.core.Future;
 /**
  * @since 2.8
  */
+@Deprecated(forRemoval = true, since = "2.8")
 class InjectionConsumer implements KeelIntravenousConsumer<Object, InjectionDrop> {
     @Override
     public Future<KeelIntravenousTaskConclusion<Object>> handle(InjectionDrop drop) {

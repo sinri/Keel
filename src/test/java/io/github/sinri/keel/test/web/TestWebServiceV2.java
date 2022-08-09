@@ -18,7 +18,7 @@ public class TestWebServiceV2 {
 
         KeelLogger routerLogger = Keel.standaloneLogger("router");
 
-        KeelHttpServer khs = new KeelHttpServer(Keel.getVertx(), new HttpServerOptions().setPort(14000), true);
+        KeelHttpServer khs = new KeelHttpServer(new HttpServerOptions().setPort(14000), true);
 
         new BlackBox("/blackbox", "/Users/leqee/code/Keel/log")
                 .registerToRoute(khs.getRouter());

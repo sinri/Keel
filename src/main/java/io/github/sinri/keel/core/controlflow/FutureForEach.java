@@ -32,9 +32,12 @@ public class FutureForEach<T> {
         futureAtomicReference.set(Future.succeededFuture());
         collection.forEach(t -> {
             var future = futureAtomicReference.get()
-                    .compose(previousK -> asyncItemProcessFunction.apply(t))
-                    .onFailure(throwable -> {
-                        throw new RuntimeException("FutureForEach::process failed in routine", throwable);
+                    .compose(previousK -> {
+                        try {
+                            return asyncItemProcessFunction.apply(t);
+                        } catch (Throwable throwable) {
+                            return Future.failedFuture(throwable);
+                        }
                     });
             futureAtomicReference.set(future);
         });

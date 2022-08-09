@@ -10,6 +10,7 @@ import java.util.function.Function;
 /**
  * @since 2.8
  */
+@Deprecated(forRemoval = true, since = "2.8")
 public class KeelInjection {
     private final KeelIntravenous<Object, InjectionDrop> intravenous;
 
@@ -39,22 +40,39 @@ public class KeelInjection {
 //        this.intravenous.drip(new InjectionDrop(reference, function));
 //    }
 
+    public void drip(Function<String, Future<Void>> function) {
+        this.drip(null, function);
+    }
+
     public void drip(String reference, Function<String, Future<Void>> function) {
-        this.intravenous.drip(new InjectionDrop(reference, r -> {
-            this.intravenous.getLogger().info("TASK [" + r + "] START");
-            return function.apply(r)
-                    .compose(done -> {
-                        this.intravenous.getLogger().info("TASK [" + r + "] DONE");
-                        return Future.succeededFuture(
-                                KeelIntravenousTaskConclusion.createForObject(r, true, "Done", null)
-                        );
-                    })
-                    .recover(throwable -> {
-                        this.intravenous.getLogger().exception("TASK [" + r + "] FAILED", throwable);
-                        return Future.succeededFuture(
-                                KeelIntravenousTaskConclusion.createForObject(r, false, throwable.getClass() + ": " + throwable.getMessage(), null)
-                        );
-                    });
-        }));
+        InjectionDrop drop = new InjectionDrop(
+                reference,
+                r -> {
+                    this.intravenous.getLogger().info("TASK [" + r + "] START");
+                    return Future.succeededFuture()
+                            .compose(v -> {
+                                try {
+                                    return function.apply(r);
+                                } catch (Throwable throwable) {
+                                    return Future.failedFuture(throwable);
+                                }
+                            })
+                            .compose(
+                                    done -> {
+                                        this.intravenous.getLogger().info("TASK [" + r + "] DONE");
+                                        return Future.succeededFuture(
+                                                KeelIntravenousTaskConclusion.createForObject(r, true, "Done", null)
+                                        );
+                                    },
+                                    throwable -> {
+                                        this.intravenous.getLogger().exception("TASK [" + r + "] FAILED", throwable);
+                                        return Future.succeededFuture(
+                                                KeelIntravenousTaskConclusion.createForObject(r, false, throwable.getClass() + ": " + throwable.getMessage(), null)
+                                        );
+                                    }
+                            );
+                }
+        );
+        this.intravenous.drip(drop);
     }
 }

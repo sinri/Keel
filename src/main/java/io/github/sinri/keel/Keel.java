@@ -85,7 +85,7 @@ public class Keel {
     public static KeelMySQLKit getMySQLKit(String dataSourceName) {
         if (!mysqlKitMap.containsKey(dataSourceName)) {
             KeelMySQLOptions keelMySQLOptions = KeelMySQLOptions.generateOptionsForDataSourceWithPropertiesReader(dataSourceName);
-            KeelMySQLKit keelMySQLKit = new KeelMySQLKit(Keel.getVertx(), keelMySQLOptions);
+            KeelMySQLKit keelMySQLKit = new KeelMySQLKit(keelMySQLOptions);
             mysqlKitMap.put(dataSourceName, keelMySQLKit);
         }
         return mysqlKitMap.get(dataSourceName);
