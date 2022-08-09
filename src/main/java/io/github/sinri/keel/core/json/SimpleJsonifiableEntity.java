@@ -26,10 +26,13 @@ public class SimpleJsonifiableEntity implements JsonifiableEntity<SimpleJsonifia
         return jsonObject;
     }
 
+    /**
+     * @since 2.8 allow jsonObject as null (treated as empty json object)
+     */
     @Override
     public SimpleJsonifiableEntity reloadDataFromJsonObject(JsonObject jsonObject) {
-        Objects.requireNonNull(jsonObject);
-        this.jsonObject = jsonObject;
+        // Objects.requireNonNull(jsonObject);
+        this.jsonObject = Objects.requireNonNullElseGet(jsonObject, JsonObject::new);
         return this;
     }
 

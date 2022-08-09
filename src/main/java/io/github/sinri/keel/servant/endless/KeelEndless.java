@@ -8,6 +8,11 @@ import java.util.function.Supplier;
 
 /**
  * 任务定期触发器，隔一段时间调用任务供应商获取任务执行。
+ * Timer Triggered
+ * - START
+ * - Supplier.get()
+ * - Set Next Timer
+ * - END
  *
  * @since 2.7
  */
@@ -15,8 +20,20 @@ public class KeelEndless extends KeelVerticle {
     private final long restMS;
     private final Supplier<Future<Void>> supplier;
 
+    /**
+     * @param restMS   干完一组事情后休息的时间长度，单位为 千分之一秒
+     * @param supplier
+     */
     public KeelEndless(long restMS, Supplier<Future<Void>> supplier) {
         this.restMS = restMS;
+        this.supplier = supplier;
+    }
+
+    /**
+     * @since 2.8
+     */
+    public KeelEndless(Supplier<Future<Void>> supplier) {
+        this.restMS = 30 * 1000L;// 30s
         this.supplier = supplier;
     }
 

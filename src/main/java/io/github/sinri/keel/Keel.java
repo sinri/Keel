@@ -19,6 +19,7 @@ public class Keel {
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
 
+    @Deprecated(since = "2.8")
     private static final Map<String, JsonObject> deployedKeelVerticleMap = new HashMap<>();
 
     private static Vertx vertx;
@@ -104,6 +105,7 @@ public class Keel {
      * @param keelVerticle KeelVerticle Instance (deployed)
      * @since 2.2
      */
+    @Deprecated(since = "2.8")
     public static void registerDeployedKeelVerticle(KeelVerticle keelVerticle) {
         if (keelVerticle.deploymentID() != null) {
             deployedKeelVerticleMap.put(keelVerticle.deploymentID(), keelVerticle.getVerticleInfo());
@@ -114,6 +116,7 @@ public class Keel {
      * @param deploymentID DeploymentID of KeelVerticle Instance (deployed)
      * @since 2.2
      */
+    @Deprecated(since = "2.8")
     public static void unregisterDeployedKeelVerticle(String deploymentID) {
         deployedKeelVerticleMap.remove(deploymentID);
     }
@@ -123,6 +126,7 @@ public class Keel {
      * @return the information json object
      * @since 2.2
      */
+    @Deprecated(since = "2.8")
     public static JsonObject getDeployedKeelVerticleInfo(String deploymentID) {
         return deployedKeelVerticleMap.get(deploymentID);
     }

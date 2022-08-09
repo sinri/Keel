@@ -1,6 +1,5 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
@@ -17,13 +16,13 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     abstract public String getTaskCategory();
 
+    @Deprecated(since = "2.8")
     abstract public boolean isRunSerially();
 
     abstract protected KeelLogger prepareLogger();
 
     /**
      * 被设计在seeker.seek方法中调用
-     *
      */
     public Future<Void> lockTaskBeforeDeployment() {
         // 如果需要就重载此方法
@@ -32,11 +31,12 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     // as verticle
     public final void start() {
-        Keel.registerDeployedKeelVerticle(this);
+//        Keel.registerDeployedKeelVerticle(this);
 
         setLogger(prepareLogger());
         notifyAfterDeployed();
-        run()
+        Future.succeededFuture()
+                .compose(v -> run())
                 .recover(throwable -> {
                     getLogger().exception("KeelQueueTask Caught throwable from Method run", throwable);
                     return Future.succeededFuture();
@@ -61,6 +61,6 @@ public abstract class KeelQueueTask extends KeelVerticle {
     @Override
     public void stop() throws Exception {
         super.stop();
-        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
+//        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
     }
 }

@@ -11,6 +11,7 @@ import io.vertx.ext.web.RoutingContext;
 /**
  * @since 2.6
  */
+@Deprecated(since = "2.8")
 abstract public class KeelWebRequestCacheableReceptionist extends KeelWebRequestReceptionist {
     public static final String FIELD_CACHE_KEY_MD5 = "cache_key_md5";
     public static final String FIELD_USE_CACHE = "used_cache";

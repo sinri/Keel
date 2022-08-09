@@ -6,7 +6,6 @@ import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 
 import java.util.Objects;
 import java.util.Queue;
@@ -33,10 +32,7 @@ public class KeelInjection extends KeelVerticle {
     @Override
     public void start() throws Exception {
         this.interval = Objects.requireNonNullElse(
-                new SimpleJsonifiableEntity(
-                        Objects.requireNonNullElse(config(), new JsonObject())
-                )
-                        .readLong("interval"),
+                new SimpleJsonifiableEntity(config()).readLong("interval"),
                 1000L
         );
 
@@ -60,19 +56,13 @@ public class KeelInjection extends KeelVerticle {
         return FutureUntil.call(() -> {
                     InjectionDrop drop = queue.poll();
                     if (drop == null) {
-                        // stop
+                        // stop FutureUntil
                         return Future.succeededFuture(true);
                     }
-                    // handle
-                    try {
-                        return drop.handle()
-                                .compose(v -> {
-                                    // next
-                                    return Future.succeededFuture(false);
-                                });
-                    } catch (Throwable throwable) {
-                        return Future.failedFuture(throwable);
-                    }
+                    // handle drop and continue FutureUntil
+                    return Future.succeededFuture()
+                            .compose(v -> drop.handle())
+                            .compose(handled -> Future.succeededFuture(false));
                 })
                 .onComplete(asyncResult -> {
                     if (asyncResult.failed()) {
@@ -97,16 +87,8 @@ public class KeelInjection extends KeelVerticle {
             return Future.succeededFuture(false);
         }
         return Future.succeededFuture()
-                .compose(v -> {
-                    try {
-                        return drop.handle();
-                    } catch (Throwable throwable) {
-                        return Future.failedFuture(throwable);
-                    }
-                })
-                .compose(handled -> {
-                    return Future.succeededFuture(true);
-                });
+                .compose(v -> drop.handle())
+                .compose(handled -> Future.succeededFuture(true));
     }
 
     public synchronized Future<Boolean> drip(Supplier<Future<Void>> dropSupplier) {

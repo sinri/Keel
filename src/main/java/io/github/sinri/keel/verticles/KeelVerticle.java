@@ -5,7 +5,6 @@ import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
 import java.util.function.Function;
@@ -15,14 +14,15 @@ import java.util.function.Function;
  *
  * @since 2.0
  */
-abstract public class KeelVerticle extends AbstractVerticle implements VerticleAbleToUndeployItself {
+abstract public class KeelVerticle extends AbstractVerticle implements KeelVerticleInterface {
 
     private KeelLogger logger = KeelLogger.silentLogger();
 
     /**
      * @since 2.4 do not rely on context anymore
+     * @since 2.8 become public
      */
-    protected KeelLogger getLogger() {
+    public KeelLogger getLogger() {
         return logger;
     }
 
@@ -34,16 +34,10 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
         this.logger = logger;
     }
 
-    public JsonObject getVerticleInfo() {
-        return new JsonObject()
-                .put("class", this.getClass().getName())
-                .put("config", this.config())
-                .put("deployment_id", this.deploymentID());
-    }
-
     /**
      * @since 2.4
      */
+    @Deprecated(since = "2.8", forRemoval = true)
     protected final <R> Future<R> executeWithMySQL(Function<SqlConnection, Future<R>> executor) {
         return Keel.getMySQLKit().withConnection(executor);
     }
@@ -51,6 +45,7 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
     /**
      * @since 2.4
      */
+    @Deprecated(since = "2.8", forRemoval = true)
     protected final <R> Future<R> executeWithMySQL(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
         return Keel.getMySQLKit(dataSourceName).withConnection(executor);
     }
@@ -58,6 +53,7 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
     /**
      * @since 2.4
      */
+    @Deprecated(since = "2.8", forRemoval = true)
     protected final <R> Future<R> executeWithinMySQLTransaction(Function<SqlConnection, Future<R>> executor) {
         return Keel.getMySQLKit().withTransaction(executor);
     }
@@ -65,27 +61,17 @@ abstract public class KeelVerticle extends AbstractVerticle implements VerticleA
     /**
      * @since 2.4
      */
+    @Deprecated(since = "2.8", forRemoval = true)
     protected final <R> Future<R> executeWithinMySQLTransaction(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
         return Keel.getMySQLKit(dataSourceName).withTransaction(executor);
     }
 
-    @Override
-    public Future<Void> undeployMe() {
-        return VerticleAbleToUndeployItself.undeploy(deploymentID());
-    }
-
-    public final Future<String> deployMe() {
-        return deployMe(new DeploymentOptions());
-    }
-
-    public final Future<String> deployMe(DeploymentOptions deploymentOptions) {
-        return Keel.getVertx().deployVerticle(this, deploymentOptions);
-    }
-
+    @Deprecated(since = "2.8")
     public final Future<String> deployMeAsWorker() {
-        return deployMeAsWorker(new DeploymentOptions());
+        return Keel.getVertx().deployVerticle(this, new DeploymentOptions().setWorker(true));
     }
 
+    @Deprecated(since = "2.8")
     public final Future<String> deployMeAsWorker(DeploymentOptions deploymentOptions) {
         return Keel.getVertx().deployVerticle(this, deploymentOptions.setWorker(true));
     }

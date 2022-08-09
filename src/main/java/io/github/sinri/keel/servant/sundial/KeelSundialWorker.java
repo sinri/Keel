@@ -1,7 +1,9 @@
 package io.github.sinri.keel.servant.sundial;
 
 import io.github.sinri.keel.core.logger.KeelLogger;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 import java.util.Calendar;
 import java.util.function.Function;
@@ -61,4 +63,17 @@ public interface KeelSundialWorker {
      * @return 任务的结束future
      */
     Future<Void> work(Calendar calendar);
+
+    /**
+     * @since 2.8
+     */
+    default void work(Calendar calendar, Handler<AsyncResult<Void>> asyncResultHandler) {
+        Future.succeededFuture()
+                .compose(v -> work(calendar))
+                .onComplete(asyncResultHandler);
+    }
+
+    default KeelSundialWorkerMeta getMeta() {
+        return new KeelSundialWorkerMeta(getName(), getParsedCronExpression().getRawCronExpression(), getParallelLimit());
+    }
 }

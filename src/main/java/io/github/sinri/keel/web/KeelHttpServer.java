@@ -4,6 +4,7 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.web.websockets.KeelWebSocketHandler;
 import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
@@ -36,6 +37,16 @@ public class KeelHttpServer {
 
     public Router getRouter() {
         return router;
+    }
+
+    /**
+     * 给你一个router去安装routes吧！
+     *
+     * @since 2.8
+     */
+    public KeelHttpServer configureRoutes(Handler<Router> routeConfigureHandler) {
+        routeConfigureHandler.handle(getRouter());
+        return this;
     }
 
     /**
