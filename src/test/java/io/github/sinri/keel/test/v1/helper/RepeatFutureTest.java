@@ -7,7 +7,7 @@ import io.github.sinri.keel.core.controlflow.FutureForEach;
 import io.github.sinri.keel.core.controlflow.FutureForRange;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
-import io.github.sinri.keel.mysql.matrix.ResultMatrixWithVertx;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.Future;
 
@@ -25,7 +25,7 @@ public class RepeatFutureTest {
                                 System.out.println("handle object " + k + " ...");
                                 return sqlConnection.query("select (" + k + "*2) as y")
                                         .execute()
-                                        .compose(rows -> Future.succeededFuture(new ResultMatrixWithVertx(rows)))
+                                        .compose(rows -> Future.succeededFuture(ResultMatrix.create(rows)))
                                         .compose(resultMatrix -> {
                                             Long y = null;
                                             try {
@@ -55,7 +55,7 @@ public class RepeatFutureTest {
                                 System.out.println("handle object " + i + " ...");
                                 return sqlConnection.query("select (" + i + "*2) as y")
                                         .execute()
-                                        .compose(rows -> Future.succeededFuture(new ResultMatrixWithVertx(rows)))
+                                        .compose(rows -> Future.succeededFuture(ResultMatrix.create(rows)))
                                         .compose(resultMatrix -> {
                                             Long y = null;
                                             try {
@@ -88,7 +88,7 @@ public class RepeatFutureTest {
                             item -> {
                                 return sqlConnection.query("select (" + item + "*2) as x")
                                         .execute()
-                                        .compose(rows -> Future.succeededFuture(new ResultMatrixWithVertx(rows)))
+                                        .compose(rows -> Future.succeededFuture(ResultMatrix.create(rows)))
                                         .compose(resultMatrixWithVertx -> {
                                             try {
                                                 Long y = resultMatrixWithVertx.getFirstRow().getLong("x");

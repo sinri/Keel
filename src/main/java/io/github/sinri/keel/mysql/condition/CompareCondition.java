@@ -170,6 +170,9 @@ public class CompareCondition implements KeelMySQLCondition {
         return this.operator(OP_EQ).compareExpression(fieldName).againstValue(value);
     }
 
+    /**
+     * 生成SQL的条件表达式文本
+     */
     @Override
     public String toString() {
         String x = leftSide + " " + operator + " " + rightSide;

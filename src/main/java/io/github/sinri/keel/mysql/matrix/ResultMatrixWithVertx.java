@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * @since 1.8
  */
-public class ResultMatrixWithVertx implements ResultMatrix {
+class ResultMatrixWithVertx implements ResultMatrix {
     private final RowSet<Row> rowSet;
     private final List<Row> rowList = new ArrayList<>();
 
@@ -63,6 +63,9 @@ public class ResultMatrixWithVertx implements ResultMatrix {
         return getRowByIndex(0);
     }
 
+    /**
+     * @throws KeelSQLResultRowIndexError 行号不正确时抛出异常
+     */
     public JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError {
         try {
             return rowList.get(index).toJson();
@@ -71,18 +74,27 @@ public class ResultMatrixWithVertx implements ResultMatrix {
         }
     }
 
+    /**
+     * @throws KeelSQLResultRowIndexError 行号不正确时抛出异常
+     * @throws RuntimeException           封装类的时候可能会抛出异常
+     */
     public <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
         try {
             return ResultMatrix.buildTableRow(getRowByIndex(index), classOfTableRow);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * @throws RuntimeException 封装类的时候可能会抛出异常
+     */
     public <T extends ResultRow> List<T> buildTableRowList(Class<T> classOfTableRow) {
         try {
             return ResultMatrix.buildTableRowList(getRowList(), classOfTableRow);
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }

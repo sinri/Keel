@@ -1,5 +1,7 @@
 package io.github.sinri.keel.mysql.condition;
 
+import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +31,11 @@ public class GroupCondition implements KeelMySQLCondition {
         return this;
     }
 
+    /**
+     * 生成SQL的组合逻辑条件表达式文本。如果出错，则抛出 KeelSQLGenerateError 异常。
+     *
+     * @throws KeelSQLGenerateError sql generate error
+     */
     @Override
     public String toString() {
         if (conditions.isEmpty()) {

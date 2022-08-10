@@ -2,7 +2,7 @@ package io.github.sinri.keel.test.intravenous;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
-import io.github.sinri.keel.mysql.matrix.ResultMatrixWithVertx;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.servant.intravenous.KeelIntravenous;
 import io.github.sinri.keel.servant.intravenous.KeelIntravenousConsumer;
 import io.github.sinri.keel.servant.intravenous.KeelIntravenousDrop;
@@ -38,7 +38,7 @@ public class IntravenousTest {
                         return sqlConnection.query("select now() as x")
                                 .execute()
                                 .compose(rows -> {
-                                    return Future.succeededFuture(new ResultMatrixWithVertx(rows));
+                                    return Future.succeededFuture(ResultMatrix.create(rows));
                                 })
                                 .compose(resultMatrixWithVertx -> {
                                     try {

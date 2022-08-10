@@ -4,6 +4,8 @@ package io.github.sinri.keel.mysql.matrix;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.sqlclient.Row;
+import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.data.Numeric;
 
 import java.lang.reflect.InvocationTargetException;
@@ -55,9 +57,11 @@ public interface ResultMatrix {
     <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
 
     /**
-     * @since 1.10
+     * @since 2.8
      */
-    <T extends ResultRow> List<T> buildTableRowList(Class<T> classOfTableRow);
+    static ResultMatrix create(RowSet<Row> rowSet) {
+        return new ResultMatrixWithVertx(rowSet);
+    }
 
     String getOneColumnOfFirstRowAsDateTime(String columnName) throws KeelSQLResultRowIndexError;
 
@@ -78,4 +82,10 @@ public interface ResultMatrix {
     List<Long> getOneColumnAsLong(String columnName);
 
     List<Integer> getOneColumnAsInteger(String columnName);
+
+    /**
+     * @throws RuntimeException 封装类的时候可能会抛出异常
+     * @since 1.10
+     */
+    <T extends ResultRow> List<T> buildTableRowList(Class<T> classOfTableRow);
 }

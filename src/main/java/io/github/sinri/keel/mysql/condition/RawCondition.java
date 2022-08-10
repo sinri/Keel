@@ -15,6 +15,9 @@ public class RawCondition implements KeelMySQLCondition {
         this.rawConditionExpression = rawConditionExpression;
     }
 
+    /**
+     * 生成SQL的源格式表达式文本
+     */
     @Override
     public String toString() {
         return rawConditionExpression;
