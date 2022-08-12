@@ -2,6 +2,7 @@ package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.properties.KeelOptions;
+import io.vertx.core.net.ClientOptionsBase;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
@@ -13,6 +14,11 @@ public class KeelMySQLOptions extends KeelOptions {
     public String schema;
     public String charset;
     public boolean useAffectedRows;
+    /**
+     * @since 2.8
+     * The default value of connect timeout = 60000 ms = 60s
+     */
+    public int connectionTimeout = ClientOptionsBase.DEFAULT_CONNECT_TIMEOUT;
     public int poolMaxSize;
     public boolean poolShared;
     /**
@@ -66,7 +72,8 @@ public class KeelMySQLOptions extends KeelOptions {
                 .setUser(username)
                 .setPassword(password)
                 .setCharset(charset)
-                .setUseAffectedRows(useAffectedRows);
+                .setUseAffectedRows(useAffectedRows)
+                .setConnectTimeout(connectionTimeout);
     }
 
     public PoolOptions buildPoolOptions() {

@@ -37,7 +37,8 @@ public interface KeelLogger {
             return (KeelLogger) Class.forName(keelLoggerOptions.getImplement())
                     .getConstructor(KeelLoggerOptions.class)
                     .newInstance(keelLoggerOptions);
-        } catch (ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+        } catch (ClassCastException | InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException | ClassNotFoundException e) {
             e.printStackTrace();
             // deal with printLogger()
             return new KeelPrintLogger(keelLoggerOptions);
@@ -62,6 +63,13 @@ public interface KeelLogger {
      * @param categoryPrefix the category prefix string
      */
     KeelLogger setCategoryPrefix(String categoryPrefix);
+
+    /**
+     * 设置在标准的日志级别日志内容中固定添加的前缀文字
+     *
+     * @since 2.8
+     */
+    KeelLogger setContextPrefix(String prefix);
 
     default void debug(String msg) {
         debug(msg, null);
@@ -128,4 +136,6 @@ public interface KeelLogger {
     void text(KeelLogLevel logLevel, String text, String lineEnding);
 
     void reportCurrentRuntimeCodeLocation(String remark);
+
+
 }

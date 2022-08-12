@@ -3,12 +3,14 @@ package io.github.sinri.keel.core.logger;
 import io.github.sinri.keel.Keel;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Objects;
 import java.util.UUID;
 
 abstract public class AbstractKeelLogger implements KeelLogger {
     private final String uniqueLoggerID;
     protected KeelLoggerOptions options;
     private String categoryPrefix;
+    private String contentPrefix = "";
 
     public AbstractKeelLogger(KeelLoggerOptions options) {
         this.options = options;
@@ -31,6 +33,22 @@ abstract public class AbstractKeelLogger implements KeelLogger {
     public KeelLogger setCategoryPrefix(String categoryPrefix) {
         this.categoryPrefix = categoryPrefix;
         return this;
+    }
+
+    /**
+     * @since 2.8
+     */
+    @Override
+    public KeelLogger setContextPrefix(String prefix) {
+        this.contentPrefix = Objects.requireNonNullElse(prefix, "");
+        return this;
+    }
+
+    /**
+     * @since 2.8
+     */
+    protected String getContentPrefix() {
+        return Objects.requireNonNullElse(this.contentPrefix, "");
     }
 
     protected String createTextFromLog(KeelLogLevel level, String msg, JsonObject context) {
@@ -56,18 +74,30 @@ abstract public class AbstractKeelLogger implements KeelLogger {
 
         String content;
         if (this.options.getCompositionStyle() == KeelLoggerOptions.CompositionStyle.TWO_LINES) {
-            content = meta + System.lineSeparator() + msg;
+            content = meta + System.lineSeparator();
+            if (this.getContentPrefix().length() > 0) {
+                content += this.getContentPrefix() + " ";
+            }
+            content += msg;
             if (context != null) {
                 content += " | " + context;
             }
         } else if (this.options.getCompositionStyle() == KeelLoggerOptions.CompositionStyle.THREE_LINES) {
-            content = meta + System.lineSeparator() + msg;
+            content = meta + System.lineSeparator();
+            if (this.getContentPrefix().length() > 0) {
+                content += this.getContentPrefix() + " ";
+            }
+            content += msg;
             if (context != null) {
                 content += System.lineSeparator() + context;
             }
         } else {
             // as ONE_LINE
-            content = meta + msg;
+            content = meta;
+            if (this.getContentPrefix().length() > 0) {
+                content += this.getContentPrefix() + " ";
+            }
+            content += msg;
             if (context != null) {
                 content += " | " + context;
             }

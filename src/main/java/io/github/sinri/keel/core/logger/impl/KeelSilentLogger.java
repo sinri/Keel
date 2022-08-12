@@ -31,6 +31,11 @@ public class KeelSilentLogger implements KeelLogger {
     }
 
     @Override
+    public KeelLogger setContextPrefix(String prefix) {
+        return this;
+    }
+
+    @Override
     public void debug(String msg) {
 
     }
