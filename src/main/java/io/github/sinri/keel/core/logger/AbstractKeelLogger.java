@@ -1,6 +1,7 @@
 package io.github.sinri.keel.core.logger;
 
 import io.github.sinri.keel.Keel;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
 import java.util.Objects;
@@ -39,7 +40,7 @@ abstract public class AbstractKeelLogger implements KeelLogger {
      * @since 2.8
      */
     @Override
-    public KeelLogger setContextPrefix(String prefix) {
+    public KeelLogger setContentPrefix(String prefix) {
         this.contentPrefix = Objects.requireNonNullElse(prefix, "");
         return this;
     }
@@ -282,6 +283,17 @@ abstract public class AbstractKeelLogger implements KeelLogger {
     public void text(KeelLogLevel logLevel, String text, String lineEnding) {
         if (this.isThisLevelVisible(logLevel)) {
             text(text, lineEnding);
+        }
+    }
+
+    @Override
+    public void buffer(KeelLogLevel logLevel, boolean showAscii, Buffer buffer) {
+        if (this.isThisLevelVisible(logLevel)) {
+            String hexMatrix = Keel.stringHelper().bufferToHexMatrix(buffer, 32);
+            if (showAscii) {
+                hexMatrix += System.lineSeparator() + buffer.toString();
+            }
+            text(logLevel, hexMatrix, System.lineSeparator());
         }
     }
 }

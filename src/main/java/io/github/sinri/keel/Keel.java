@@ -165,4 +165,8 @@ public class Keel {
     public static KeelDateTimeHelper dateTimeHelper() {
         return KeelDateTimeHelper.getInstance();
     }
+
+    public static KeelNetHelper netHelper() {
+        return KeelNetHelper.getInstance();
+    }
 }

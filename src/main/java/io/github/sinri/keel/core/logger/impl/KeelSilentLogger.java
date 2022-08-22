@@ -2,6 +2,7 @@ package io.github.sinri.keel.core.logger.impl;
 
 import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -31,7 +32,7 @@ public class KeelSilentLogger implements KeelLogger {
     }
 
     @Override
-    public KeelLogger setContextPrefix(String prefix) {
+    public KeelLogger setContentPrefix(String prefix) {
         return this;
     }
 
@@ -127,6 +128,11 @@ public class KeelSilentLogger implements KeelLogger {
 
     @Override
     public void reportCurrentRuntimeCodeLocation(String remark) {
+
+    }
+
+    @Override
+    public void buffer(KeelLogLevel logLevel, boolean showAscii, Buffer buffer) {
 
     }
 }

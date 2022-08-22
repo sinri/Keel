@@ -1,9 +1,10 @@
 package io.github.sinri.keel.core.helper;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.properties.KeelOptions;
+import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.file.Files;
@@ -32,12 +33,19 @@ public class KeelFileHelper {
             return Files.readAllBytes(Path.of(filePath));
         } catch (IOException e) {
             if (seekInsideJarWhenNotFound) {
-                URL resource = KeelOptions.class.getClassLoader().getResource(filePath);
-                if (resource == null) {
-                    throw new IOException("Embedded one is not found after not found in FS: " + filePath, e);
+                InputStream resourceAsStream = KeelPropertiesReader.class.getClassLoader().getResourceAsStream(filePath);
+                if (resourceAsStream == null) {
+                    // not found resource
+                    throw new IOException("file also not in jar", e);
                 }
-                String file = resource.getFile();
-                return Files.readAllBytes(Path.of(file));
+                return resourceAsStream.readAllBytes();
+
+//                URL resource = KeelOptions.class.getClassLoader().getResource(filePath);
+//                if (resource == null) {
+//                    throw new IOException("Embedded one is not found after not found in FS: " + filePath, e);
+//                }
+//                String file = resource.getFile();
+//                return Files.readAllBytes(Path.of(file));
             } else {
                 throw e;
             }
