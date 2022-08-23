@@ -4,6 +4,7 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureUntil;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
+import io.vertx.core.eventbus.MessageConsumer;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -25,32 +26,14 @@ public class KeelSisiodosi {
     private final String eventBusAddress;
     private final Queue<Function<Void, Future<Void>>> dripQueue;
     private KeelLogger logger;
+    private MessageConsumer<Object> consumer;
 
     public KeelSisiodosi(String eventBusAddress) {
         this.eventBusAddress = eventBusAddress;
         this.dripQueue = new ConcurrentLinkedQueue<>();
-        this.logger = KeelLogger.silentLogger();//Keel.outputLogger("KeelSisiodosi").setCategoryPrefix(eventBusAddress);
+        this.logger = KeelLogger.silentLogger();
 
-        Keel.getEventBus().consumer(eventBusAddress, message -> {
-            // drip comes
-            Keel.getVertx().sharedData().getLock(eventBusAddress)
-                    .onComplete(asyncLock -> {
-                        if (asyncLock.failed()) {
-                            getLogger().exception("ACQUIRE LOCK FAILED", asyncLock.cause());
-                            Keel.getVertx().setTimer(1000L, timer -> {
-                                getLogger().debug("sendDropHandlerWorkMessage, NOW 1s LATER SINCE ACQUIRE LOCK FAILED");
-                                sendDropHandlerWorkMessage();
-                            });
-                        } else {
-                            getLogger().debug("ACQUIRED LOCK");
-                            cleanDropHandlerQueue()
-                                    .onComplete(done -> {
-                                        asyncLock.result().release();
-                                        getLogger().debug("RELEASED LOCK");
-                                    });
-                        }
-                    });
-        });
+        start();
     }
 
     public KeelLogger getLogger() {
@@ -93,5 +76,65 @@ public class KeelSisiodosi {
     public void drop(Function<Void, Future<Void>> drip) {
         dripQueue.offer(drip);
         sendDropHandlerWorkMessage();
+    }
+
+    protected void start() {
+        if (this.consumer != null) {
+            throw new RuntimeException("START WITH NON-NULL CONSUMER???");
+        }
+
+        this.consumer = Keel.getVertx().eventBus().consumer(eventBusAddress);
+        this.consumer
+                .handler(message -> {
+                    // drip comes
+                    Keel.getVertx().sharedData().getLockWithTimeout(eventBusAddress, 100L, asyncLock -> {
+                        if (asyncLock.failed()) {
+                            getLogger().exception("ACQUIRE LOCK FAILED", asyncLock.cause());
+                            long delay = (long) (Math.random() * 300L + 100L);
+                            Keel.getVertx().setTimer(delay, timer -> {
+                                sendDropHandlerWorkMessage();
+                            });
+                            return;
+                        }
+
+                        getLogger().debug("ACQUIRED LOCK");
+                        cleanDropHandlerQueue()
+                                .onComplete(done -> {
+                                    asyncLock.result().release();
+                                    getLogger().debug("RELEASED LOCK");
+                                });
+                    });
+                })
+                .endHandler(end -> {
+                    // Set an end handler.
+                    // Once the stream has ended, and there is no more data to be read,
+                    // this handler will be called.
+                    getLogger().debug("END");
+                })
+                .exceptionHandler(throwable -> {
+                    // Set an exception handler on the read stream.
+                    getLogger().exception("ERROR", throwable);
+                })
+                .completionHandler(ar -> {
+                    // Optional method which can be called to indicate
+                    // when the registration has been propagated across the cluster.
+                });
+    }
+
+    public Future<Void> stop() {
+        if (this.consumer != null) {
+            return this.consumer.unregister()
+                    .onSuccess(v -> this.consumer = null);
+        } else {
+            return Future.succeededFuture();
+        }
+    }
+
+    public Future<Void> restart() {
+        return stop()
+                .compose(v -> {
+                    start();
+                    return Future.succeededFuture();
+                });
     }
 }
