@@ -50,4 +50,17 @@ public class KeelNetHelper {
             return null;
         }
     }
+
+    public byte[] convertIPv4ToAddressBytes(long ipv4AsLong) {
+        return new byte[]{
+                (byte) (ipv4AsLong >> 24),
+                (byte) ((ipv4AsLong >> 16) & 0xFF),
+                (byte) ((ipv4AsLong >> 8) & 0xFF),
+                (byte) (ipv4AsLong & 0xFF),
+        };
+    }
+
+    public byte[] convertIPv4ToAddressBytes(String ipv4) {
+        return convertIPv4ToAddressBytes(this.convertIPv4ToNumber(ipv4));
+    }
 }

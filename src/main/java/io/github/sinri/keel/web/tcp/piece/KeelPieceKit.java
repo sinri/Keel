@@ -1,4 +1,4 @@
-package io.github.sinri.keel.web.socket.piece;
+package io.github.sinri.keel.web.tcp.piece;
 
 import io.vertx.core.buffer.Buffer;
 
@@ -13,12 +13,20 @@ import java.util.function.Consumer;
  * @since 2.8
  */
 public abstract class KeelPieceKit<P extends KeelPiece> implements Consumer<Buffer> {
-    private final Buffer buffer;
+    private Buffer buffer;
     private final Queue<P> pieceQueue;
 
     public KeelPieceKit() {
         this.buffer = Buffer.buffer();
         this.pieceQueue = new ConcurrentLinkedQueue<>();
+    }
+
+    protected Buffer getBuffer() {
+        return buffer;
+    }
+
+    protected void cutBuffer(int newStart) {
+        buffer = buffer.getBuffer(newStart, buffer.length());
     }
 
     public Queue<P> getPieceQueue() {

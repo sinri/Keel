@@ -1,4 +1,4 @@
-package io.github.sinri.keel.web.socket;
+package io.github.sinri.keel.web.tcp;
 
 import io.vertx.core.Future;
 import io.vertx.core.Handler;

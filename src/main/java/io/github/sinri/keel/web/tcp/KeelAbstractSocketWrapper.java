@@ -1,4 +1,4 @@
-package io.github.sinri.keel.web.socket;
+package io.github.sinri.keel.web.tcp;
 
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.servant.sisiodosi.KeelSisiodosi;
@@ -117,6 +117,7 @@ abstract public class KeelAbstractSocketWrapper {
         Future<Void> future = this.socket.write(s);
         if (this.socket.writeQueueFull()) {
             this.socket.pause();
+            getLogger().info("Write Queue Full, PAUSE");
         }
         return future;
     }
@@ -125,6 +126,7 @@ abstract public class KeelAbstractSocketWrapper {
         Future<Void> future = this.socket.write(s, enc);
         if (this.socket.writeQueueFull()) {
             this.socket.pause();
+            getLogger().info("Write Queue Full, PAUSE");
         }
         return future;
     }
@@ -133,6 +135,7 @@ abstract public class KeelAbstractSocketWrapper {
         Future<Void> future = this.socket.write(buffer);
         if (this.socket.writeQueueFull()) {
             this.socket.pause();
+            getLogger().info("Write Queue Full, PAUSE");
         }
         return future;
     }

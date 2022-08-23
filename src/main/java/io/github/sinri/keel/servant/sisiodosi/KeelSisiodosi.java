@@ -6,6 +6,7 @@ import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
 import io.vertx.core.eventbus.MessageConsumer;
 
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
@@ -27,6 +28,10 @@ public class KeelSisiodosi {
     private final Queue<Function<Void, Future<Void>>> dripQueue;
     private KeelLogger logger;
     private MessageConsumer<Object> consumer;
+    private Supplier<Long> lockAcquireTimoutSupplier = () -> 10L;
+    private Supplier<Long> lockAcquireRetryDelaySupplier = () -> {
+        return (long) (Math.random() * 30L + 10L);
+    };
 
     public KeelSisiodosi(String eventBusAddress) {
         this.eventBusAddress = eventBusAddress;
@@ -78,6 +83,18 @@ public class KeelSisiodosi {
         sendDropHandlerWorkMessage();
     }
 
+    public KeelSisiodosi setLockAcquireRetryDelaySupplier(Supplier<Long> lockAcquireRetryDelaySupplier) {
+        Objects.requireNonNull(lockAcquireRetryDelaySupplier);
+        this.lockAcquireRetryDelaySupplier = lockAcquireRetryDelaySupplier;
+        return this;
+    }
+
+    public KeelSisiodosi setLockAcquireTimoutSupplier(Supplier<Long> lockAcquireTimoutSupplier) {
+        Objects.requireNonNull(lockAcquireTimoutSupplier);
+        this.lockAcquireTimoutSupplier = lockAcquireTimoutSupplier;
+        return this;
+    }
+
     protected void start() {
         if (this.consumer != null) {
             throw new RuntimeException("START WITH NON-NULL CONSUMER???");
@@ -87,10 +104,10 @@ public class KeelSisiodosi {
         this.consumer
                 .handler(message -> {
                     // drip comes
-                    Keel.getVertx().sharedData().getLockWithTimeout(eventBusAddress, 100L, asyncLock -> {
+                    Keel.getVertx().sharedData().getLockWithTimeout(eventBusAddress, lockAcquireTimoutSupplier.get(), asyncLock -> {
                         if (asyncLock.failed()) {
                             getLogger().exception("ACQUIRE LOCK FAILED", asyncLock.cause());
-                            long delay = (long) (Math.random() * 300L + 100L);
+                            long delay = lockAcquireRetryDelaySupplier.get();
                             Keel.getVertx().setTimer(delay, timer -> {
                                 sendDropHandlerWorkMessage();
                             });

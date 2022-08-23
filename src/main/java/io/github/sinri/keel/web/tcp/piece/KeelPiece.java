@@ -1,4 +1,4 @@
-package io.github.sinri.keel.web.socket.piece;
+package io.github.sinri.keel.web.tcp.piece;
 
 import io.vertx.core.buffer.Buffer;
 
