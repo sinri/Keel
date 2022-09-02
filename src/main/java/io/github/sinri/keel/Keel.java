@@ -1,6 +1,8 @@
 package io.github.sinri.keel;
 
 import io.github.sinri.keel.core.helper.*;
+import io.github.sinri.keel.core.helper.encryption.KeelCryptographyHelper;
+import io.github.sinri.keel.core.helper.encryption.KeelDigestHelper;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
@@ -166,7 +168,31 @@ public class Keel {
         return KeelDateTimeHelper.getInstance();
     }
 
+    /**
+     * @since 2.8
+     */
     public static KeelNetHelper netHelper() {
         return KeelNetHelper.getInstance();
+    }
+
+    /**
+     * @since 2.8
+     */
+    public static KeelDigestHelper digestHelper() {
+        return KeelDigestHelper.getInstance();
+    }
+
+    /**
+     * @since 2.8
+     */
+    public static KeelCryptographyHelper cryptographyHelper() {
+        return KeelCryptographyHelper.getInstance();
+    }
+
+    /**
+     * @since 2.8
+     */
+    public static KeelBinaryHelper binaryHelper() {
+        return KeelBinaryHelper.getInstance();
     }
 }

@@ -157,6 +157,11 @@
             <version>23.0.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.70</version>
+        </dependency>
         <!--        <dependency>-->
         <!--            <groupId>com.github.jsqlparser</groupId>-->
         <!--            <artifactId>jsqlparser</artifactId>-->
@@ -221,6 +226,17 @@
                                     <goal>shade</goal>
                                 </goals>
                                 <configuration>
+                                    <filters>
+                                        <filter>
+                                            <artifact>org.bouncycastle:*</artifact>
+                                            <excludes>
+                                                <exclude>META-INF/*.SF</exclude>
+                                                <exclude>META-INF/*.DSA</exclude>
+                                                <exclude>META-INF/*.RSA</exclude>
+                                            </excludes>
+                                        </filter>
+                                    </filters>
+                                    <shadedArtifactAttached>true</shadedArtifactAttached>
                                     <transformers>
                                         <transformer
                                                 implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
