@@ -2,6 +2,7 @@ package io.github.sinri.keel.mysql.matrix;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureForEach;
+import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.sqlclient.SqlConnection;
@@ -9,6 +10,7 @@ import io.vertx.sqlclient.SqlConnection;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * 用于快速根据数据库中的表结构生成AbstractTableRow的实现类的代码生成工具。
@@ -95,76 +97,137 @@ public class TableRowClassGenerator {
 //                    className = className.substring(0, 1).toUpperCase() + className.substring(1);
                     String classFile = packagePath + "/" + className + ".java";
 
-                    String sql = "show full columns in ";
-                    if (schema != null && !schema.isEmpty() && !schema.isBlank()) {
-                        sql += "`" + schema + "`.";
-                    }
-                    sql += "`" + table + "`;";
-
-                    StringBuilder classContent = new StringBuilder();
-                    classContent
-                            .append("package ").append(packageName).append(";").append("\n")
-                            .append("import io.github.sinri.keel.mysql.matrix.AbstractTableRow;\n")
-                            .append("import io.vertx.core.Future;\n")
-                            .append("import io.vertx.core.json.JsonObject;\n")
-                            .append("\n")
-                            .append("public class ").append(className).append(" extends AbstractTableRow {").append("\n");
-                    if (this.schema != null && !this.schema.isEmpty() && !this.schema.isBlank()) {
-                        classContent.append("\tpublic static final String SCHEMA = \"").append(schema).append("\";\n");
-                    }
-                    classContent.append("\n")
-                            .append("\tpublic static final String TABLE = \"").append(table).append("\";\n")
-                            .append("\n")
-                            .append("\t").append("public ").append(className).append("(JsonObject tableRow) {\n")
-                            .append("\t\tsuper(tableRow);\n")
-                            .append("\t}\n")
-                            .append("\n")
-                            .append("\t@Override\n")
-                            .append("\tpublic String sourceTableName() {\n")
-                            .append("\t\treturn TABLE;\n")
-                            .append("\t}\n")
-                            .append("\n");
-                    if (this.schema != null && !this.schema.isEmpty() && !this.schema.isBlank()) {
-                        classContent.append("\tpublic String sourceSchemaName(){\n")
-                                .append("\t\treturn SCHEMA;\n")
-                                .append("\t}\n");
-                    }
-
-                    return sqlConnection.query(sql)
-                            .execute()
-                            .compose(rows -> {
-                                rows.forEach(row -> {
-                                    String field = row.getString("Field");
-                                    String type = row.getString("Type");
-                                    String comment = row.getString("Comment");
-
-                                    classContent.append(this.buildFieldGetter(field, type, comment)).append("\n");
-                                });
-                                return Future.succeededFuture();
-                            })
-                            .compose(done -> {
-                                classContent.append("\n}\n");
-                                if (this.rewrite) {
-                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(classContent.toString()));
+                    return Future.succeededFuture()
+                            .compose(v -> {
+                                if (schema == null || schema.isEmpty() || schema.isBlank()) {
+                                    return getTableComment(sqlConnection, table, null);
                                 } else {
-                                    return Keel.getVertx().fileSystem().exists(classFile)
-                                            .compose(existed -> {
-                                                if (existed) {
-                                                    return Keel.getVertx().fileSystem().readFile(classFile)
-                                                            .compose(existedContentBuffer -> {
-                                                                return Keel.getVertx().fileSystem().writeFile(
-                                                                        classFile,
-                                                                        existedContentBuffer.appendString("\n\n").appendString(classContent.toString())
-                                                                );
-                                                            });
-                                                } else {
-                                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(classContent.toString()));
-                                                }
-                                            });
+                                    return getTableComment(sqlConnection, table, schema);
                                 }
+                            })
+                            .compose(table_comment -> {
+                                StringBuilder classContent = new StringBuilder();
+                                classContent
+                                        .append("package ").append(packageName).append(";").append("\n")
+                                        .append("import io.github.sinri.keel.mysql.matrix.AbstractTableRow;\n")
+                                        .append("import io.vertx.core.Future;\n")
+                                        .append("import io.vertx.core.json.JsonObject;\n")
+                                        .append("\n")
+                                        .append("/**\n");
+                                if (table_comment == null || table_comment.isEmpty() || table_comment.isBlank()) {
+                                    classContent.append(" * Table ").append(table).append(" has no table comment.\n");
+                                } else {
+                                    classContent.append(" * ").append(table_comment).append("\n");
+                                }
+                                classContent.append(" * (´^ω^`)\n");
+                                if (schema != null && !schema.isEmpty() && !schema.isBlank()) {
+                                    classContent.append(" * SCHEMA: ").append(schema).append("\n");
+                                }
+                                classContent
+                                        .append(" * TABLE: ").append(table).append("\n")
+                                        .append(" * (*￣∇￣*)\n")
+                                        .append(" * NOTICE BY KEEL:\n")
+                                        .append(" * \tTo avoid being rewritten, do not modify this file manually, unless editable confirmed.\n")
+                                        .append(" * \tIt was auto-generated on ").append(KeelMySQLKit.nowAsMySQLDatetime()).append(".\n")
+                                        .append(" * @see ").append(this.getClass().getName()).append("\n")
+                                        .append(" */\n")
+                                        .append("public class ").append(className).append(" extends AbstractTableRow {").append("\n");
+                                if (this.schema != null && !this.schema.isEmpty() && !this.schema.isBlank()) {
+                                    classContent.append("\tpublic static final String SCHEMA = \"").append(schema).append("\";\n");
+                                }
+                                classContent.append("\n")
+                                        .append("\tpublic static final String TABLE = \"").append(table).append("\";\n")
+                                        .append("\n")
+                                        .append("\t").append("public ").append(className).append("(JsonObject tableRow) {\n")
+                                        .append("\t\tsuper(tableRow);\n")
+                                        .append("\t}\n")
+                                        .append("\n")
+                                        .append("\t@Override\n")
+                                        .append("\tpublic String sourceTableName() {\n")
+                                        .append("\t\treturn TABLE;\n")
+                                        .append("\t}\n")
+                                        .append("\n");
+                                if (this.schema != null && !this.schema.isEmpty() && !this.schema.isBlank()) {
+                                    classContent.append("\tpublic String sourceSchemaName(){\n")
+                                            .append("\t\treturn SCHEMA;\n")
+                                            .append("\t}\n");
+                                }
+
+                                String sql_for_columns = "show full columns in ";
+                                if (schema != null && !schema.isEmpty() && !schema.isBlank()) {
+                                    sql_for_columns += "`" + schema + "`.";
+                                }
+                                sql_for_columns += "`" + table + "`;";
+                                return sqlConnection.query(sql_for_columns)
+                                        .execute()
+                                        .compose(rows -> {
+                                            rows.forEach(row -> {
+                                                String field = row.getString("Field");
+                                                String type = row.getString("Type");
+                                                String comment = row.getString("Comment");
+
+                                                classContent.append(this.buildFieldGetter(field, type, comment)).append("\n");
+                                            });
+                                            return Future.succeededFuture();
+                                        })
+                                        .compose(done -> {
+                                            String sql_sct = "show create table ";
+                                            if (schema != null && !schema.isEmpty() && !schema.isBlank()) {
+                                                sql_sct += "`" + schema + "`.";
+                                            }
+                                            sql_sct += "`" + table + "`;";
+                                            return sqlConnection.query(sql_sct)
+                                                    .execute()
+                                                    .compose(rows -> {
+                                                        AtomicReference<String> creation = new AtomicReference<>();
+                                                        rows.forEach(row -> {
+                                                            creation.set(row.getString(1));
+                                                        });
+                                                        return Future.succeededFuture(creation.get());
+                                                    });
+                                        })
+                                        .compose(creation -> {
+                                            classContent.append("\n}\n");
+                                            if (creation != null) {
+                                                classContent.append("\n/*\n").append(creation).append("\n */\n");
+                                            }
+                                            if (this.rewrite) {
+                                                return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(classContent.toString()));
+                                            } else {
+                                                return Keel.getVertx().fileSystem().exists(classFile)
+                                                        .compose(existed -> {
+                                                            if (existed) {
+                                                                return Keel.getVertx().fileSystem().readFile(classFile)
+                                                                        .compose(existedContentBuffer -> {
+                                                                            return Keel.getVertx().fileSystem().writeFile(
+                                                                                    classFile,
+                                                                                    existedContentBuffer.appendString("\n\n").appendString(classContent.toString())
+                                                                            );
+                                                                        });
+                                                            } else {
+                                                                return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(classContent.toString()));
+                                                            }
+                                                        });
+                                            }
+                                        });
                             });
                 }
         );
+    }
+
+    private Future<String> getTableComment(SqlConnection sqlConnection, String table, String schema) {
+        String sql_for_table_comment = "SELECT TABLE_COMMENT " +
+                "FROM INFORMATION_SCHEMA.TABLES " +
+                "WHERE TABLE_NAME = '" + table + "' " +
+                (schema == null ? "" : ("AND TABLE_SCHEMA = '" + schema + "' "));
+        return sqlConnection.query(sql_for_table_comment).execute()
+                .compose(rows -> {
+                    AtomicReference<String> comment = new AtomicReference<>();
+                    rows.forEach(row -> {
+                        comment.set(row.getString("TABLE_COMMENT"));
+                    });
+                    return Future.succeededFuture(comment.get());
+                });
     }
 
     private String buildFieldGetter(String field, String type, String comment) {
@@ -204,7 +267,8 @@ public class TableRowClassGenerator {
         }
 
         return "\t/*\n" +
-                "\t * COLUMN COMMENT: " + comment + "\n" +
+                (comment == null ? "" : ("\t * " + comment + "\n\t * \n")) +
+                "\t * Field `" + field + "` of type `" + type + "`.\n" +
                 "\t */\n" +
                 "\tpublic " + returnType + " " + getter + "() {" + "\n" +
                 "\t\t" + "return " + readMethod + "(\"" + field + "\");" + "\n" +
