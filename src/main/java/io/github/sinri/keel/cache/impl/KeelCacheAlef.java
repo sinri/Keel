@@ -12,19 +12,26 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
     private final ConcurrentMap<K, ValueWrapper<V>> map;
+    private long defaultLifeInSeconds = 1000L;
 
     public KeelCacheAlef() {
         this.map = new ConcurrentHashMap<>();
     }
 
     @Override
-    public void save(K key, V value, long lifeInSeconds) {
-        this.map.put(key, new ValueWrapper<>(value, lifeInSeconds));
+    public long getDefaultLifeInSeconds() {
+        return defaultLifeInSeconds;
     }
 
     @Override
-    public V read(K key) {
-        return read(key, null);
+    public KeelCacheInterface<K, V> setDefaultLifeInSeconds(long lifeInSeconds) {
+        defaultLifeInSeconds = lifeInSeconds;
+        return this;
+    }
+
+    @Override
+    public void save(K key, V value, long lifeInSeconds) {
+        this.map.put(key, new ValueWrapper<>(value, lifeInSeconds));
     }
 
     @Override

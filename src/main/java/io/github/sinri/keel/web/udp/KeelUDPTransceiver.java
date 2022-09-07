@@ -12,8 +12,9 @@ import java.util.function.BiConsumer;
 
 /**
  * @since 2.8
+ * Once named KeelUDPServer.
  */
-public class KeelUDPServer {
+public class KeelUDPTransceiver {
     private final int port;
     private final DatagramSocket udpServer;
     private KeelLogger logger;
@@ -21,7 +22,7 @@ public class KeelUDPServer {
         // do nothing
     };
 
-    public KeelUDPServer(int port) {
+    public KeelUDPTransceiver(int port) {
         this.port = port;
         this.udpServer = Keel.getVertx().createDatagramSocket();
         this.logger = KeelLogger.silentLogger();
@@ -31,12 +32,12 @@ public class KeelUDPServer {
         return logger;
     }
 
-    public KeelUDPServer setLogger(KeelLogger logger) {
+    public KeelUDPTransceiver setLogger(KeelLogger logger) {
         this.logger = logger;
         return this;
     }
 
-    public KeelUDPServer setDatagramSocketConsumer(BiConsumer<SocketAddress, Buffer> datagramSocketConsumer) {
+    public KeelUDPTransceiver setDatagramSocketConsumer(BiConsumer<SocketAddress, Buffer> datagramSocketConsumer) {
         Objects.requireNonNull(datagramSocketConsumer);
         this.datagramSocketConsumer = datagramSocketConsumer;
         return this;
