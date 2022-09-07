@@ -13,7 +13,8 @@ import java.util.function.Function;
  *
  * @since 2.7
  */
-public interface KeelSundialWorker {
+public interface KeelSundialWorker extends KeelSundialWorkerCore {
+    @Deprecated(since = "2.8")
     static KeelSundialWorker build(
             String name,
             String rawCronExpression,
@@ -25,6 +26,25 @@ public interface KeelSundialWorker {
                 name,
                 rawCronExpression,
                 workFunction,
+                parallelLimit,
+                logger
+        );
+    }
+
+    /**
+     * @since 2.8
+     */
+    static KeelSundialWorker build(
+            String name,
+            String rawCronExpression,
+            KeelSundialWorkerCore workerCore,
+            int parallelLimit,
+            KeelLogger logger
+    ) {
+        return new KeelSundialWorkerImpl(
+                name,
+                rawCronExpression,
+                workerCore::work,
                 parallelLimit,
                 logger
         );
@@ -57,12 +77,6 @@ public interface KeelSundialWorker {
     }
 
     KeelLogger getLogger();
-
-    /**
-     * @param calendar 触发的日历时间
-     * @return 任务的结束future
-     */
-    Future<Void> work(Calendar calendar);
 
     /**
      * @since 2.8
