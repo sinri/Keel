@@ -266,12 +266,16 @@ public class TableRowClassGenerator {
             readMethod = "readString";
         }
 
-        return "\t/*\n" +
-                (comment == null ? "" : ("\t * " + comment + "\n\t * \n")) +
-                "\t * Field `" + field + "` of type `" + type + "`.\n" +
+        String s = "\t/*\n";
+        if (comment != null && !comment.isEmpty() && !comment.isBlank()) {
+            s += "\t * " + comment + "\n\t * \n";
+        }
+        s += "\t * Field `" + field + "` of type `" + type + "`.\n" +
                 "\t */\n" +
                 "\tpublic " + returnType + " " + getter + "() {" + "\n" +
                 "\t\t" + "return " + readMethod + "(\"" + field + "\");" + "\n" +
                 "\t}" + "\n";
+
+        return s;
     }
 }
