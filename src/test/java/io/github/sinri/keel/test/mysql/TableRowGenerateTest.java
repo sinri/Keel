@@ -16,6 +16,7 @@ public class TableRowGenerateTest {
                     return new TableRowClassGenerator(sqlConnection)
 //                            .forSchema("docker_test")
                             .setRewrite(true)
+                            .setSupportLooseEnum(true)
                             .generate(
                                     "io.github.sinri.keel.test.mysql.ag",
                                     "/Users/leqee/code/Keel/src/test/java/io/github/sinri/keel/test/mysql/ag"
