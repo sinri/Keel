@@ -34,7 +34,7 @@ public abstract class KeelPieceKit<P extends KeelPiece> implements Consumer<Buff
     }
 
     /**
-     * @implNote THREAD SAFE NEEDED
+     * THREAD SAFE NEEDED
      */
     @Override
     public void accept(Buffer incomingBuffer) {
@@ -56,7 +56,7 @@ public abstract class KeelPieceKit<P extends KeelPiece> implements Consumer<Buff
      * or return null.
      *
      * @return first piece or null.
-     * @implNote THREAD SAFE NEEDED.
+     *  THREAD SAFE NEEDED.
      */
     abstract protected P parseFirstPieceFromBuffer();
 }

@@ -22,13 +22,14 @@ public interface KeelVerticleInterface extends Verticle {
     }
 
     /**
-     * @implNote copied from AbstractVerticle
+     * copied from AbstractVerticle
+     *
      * @since 2.8
      */
     String deploymentID();
 
     /**
-     * @implNote copied from AbstractVerticle
+     * copied from AbstractVerticle
      * @since 2.8
      */
     JsonObject config();

@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 /**
  * @since 2.7 moved here
- * @since 2.8 extends Supplier<Future<KeelQueueTask>>
+ * @since 2.8 extends Supplier{Future{KeelQueueTask}}
  */
 public interface KeelQueueNextTaskSeeker extends Supplier<Future<KeelQueueTask>> {
     @Deprecated(since = "2.8", forRemoval = true)
