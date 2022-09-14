@@ -91,41 +91,6 @@ public class KeelMySQLKit {
     /**
      * @since 1.1
      */
-    public static Future<ResultMatrix> executeSqlForResultMatrix(
-            SqlConnection sqlConnection,
-            String sqlTemplate,
-            Tuple data,
-            boolean useRecover
-    ) {
-        Future<ResultMatrix> future = sqlConnection.preparedQuery(sqlTemplate).execute(data).compose(rows -> {
-            return Future.succeededFuture(ResultMatrix.create(rows));
-        });
-        if (useRecover) {
-            future = future.recover(throwable -> Future.succeededFuture(null));
-        }
-        return future;
-    }
-
-    /**
-     * @since 1.1
-     */
-    public static Future<ResultMatrix> executeSqlForResultMatrix(
-            SqlConnection sqlConnection,
-            String sqlTemplate,
-            boolean useRecover
-    ) {
-        Future<ResultMatrix> future = sqlConnection.preparedQuery(sqlTemplate).execute().compose(rows -> {
-            return Future.succeededFuture(ResultMatrix.create(rows));
-        });
-        if (useRecover) {
-            future = future.recover(throwable -> Future.succeededFuture(null));
-        }
-        return future;
-    }
-
-    /**
-     * @since 1.1
-     */
     public static Future<Long> executeSqlForLastInsertedID(
             SqlConnection sqlConnection,
             String sqlTemplate,
@@ -193,6 +158,41 @@ public class KeelMySQLKit {
         });
         if (useRecover) {
             future = future.recover(throwable -> Future.succeededFuture(-1));
+        }
+        return future;
+    }
+
+    /**
+     * @since 1.1
+     */
+    public static Future<ResultMatrix> executeSqlForResultMatrix(
+            SqlConnection sqlConnection,
+            String sqlTemplate,
+            Tuple data,
+            boolean useRecover
+    ) {
+        Future<ResultMatrix> future = sqlConnection.preparedQuery(sqlTemplate).execute(data).compose(rows -> {
+            return Future.succeededFuture(ResultMatrix.create(rows));
+        });
+        if (useRecover) {
+            future = future.recover(throwable -> Future.succeededFuture(null));
+        }
+        return future;
+    }
+
+    /**
+     * @since 1.1
+     */
+    public static Future<ResultMatrix> executeSqlForResultMatrix(
+            SqlConnection sqlConnection,
+            String sqlTemplate,
+            boolean useRecover
+    ) {
+        Future<ResultMatrix> future = sqlConnection.preparedQuery(sqlTemplate).execute().compose(rows -> {
+            return Future.succeededFuture(ResultMatrix.create(rows));
+        });
+        if (useRecover) {
+            future = future.recover(throwable -> Future.succeededFuture(null));
         }
         return future;
     }

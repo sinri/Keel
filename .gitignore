@@ -94,3 +94,4 @@ src/main/resources/config.properties
 src/main/resources/config.yml
 src/test/resources/config.properties
 src/test/resources/config.yml
+src/test/java/io/github/sinri/keel/test/mysql/ag
