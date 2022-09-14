@@ -313,7 +313,7 @@ public class TableRowClassGenerator {
                     classContent
                             .append("package ").append(packageName).append(";").append("\n")
                             .append("import io.github.sinri.keel.mysql.matrix.AbstractTableRow;\n")
-                            .append("import io.vertx.core.Future;\n")
+                            //.append("import io.vertx.core.Future;\n")
                             .append("import io.vertx.core.json.JsonObject;\n")
                             .append("\n")
                             .append("/**\n");
