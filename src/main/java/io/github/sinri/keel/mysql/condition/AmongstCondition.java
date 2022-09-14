@@ -10,9 +10,8 @@ import java.util.List;
 
 public class AmongstCondition implements KeelMySQLCondition {
     public static final String OP_IN = "IN";
-
-    protected String element;
     protected final List<String> targetSet;
+    protected String element;
     protected boolean inverseOperator;
 
     public AmongstCondition() {

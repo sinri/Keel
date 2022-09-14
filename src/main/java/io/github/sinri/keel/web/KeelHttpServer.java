@@ -12,10 +12,8 @@ import io.vertx.ext.web.Router;
 public class KeelHttpServer {
     protected final HttpServer server;
     protected final Router router;
-
-    protected KeelLogger logger;
-
     protected final Boolean closeVertXWhenTerminated;
+    protected KeelLogger logger;
 
     public KeelHttpServer(
             HttpServerOptions options,

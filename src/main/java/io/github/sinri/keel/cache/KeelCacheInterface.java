@@ -60,6 +60,11 @@ public interface KeelCacheInterface<K, V> {
     long getDefaultLifeInSeconds();
 
     /**
+     * @since 2.8
+     */
+    KeelCacheInterface<K, V> setDefaultLifeInSeconds(long lifeInSeconds);
+
+    /**
      * Save an item (as key and value pair) into cache, keep it available for a certain time.
      *
      * @param key           key
@@ -67,11 +72,6 @@ public interface KeelCacheInterface<K, V> {
      * @param lifeInSeconds The lifetime of the cache item, in seconds.
      */
     void save(K key, V value, long lifeInSeconds);
-
-    /**
-     * @since 2.8
-     */
-    KeelCacheInterface<K, V> setDefaultLifeInSeconds(long lifeInSeconds);
 
     /**
      * @since 2.8

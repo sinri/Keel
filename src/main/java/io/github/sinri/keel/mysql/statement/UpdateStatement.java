@@ -9,6 +9,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class UpdateStatement extends AbstractModifyStatement {
+    final List<String> assignments = new ArrayList<>();
+    //    final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
+    final ConditionsComponent whereConditionsComponent = new ConditionsComponent();
+    final List<String> sortRules = new ArrayList<>();
     /**
      * UPDATE [LOW_PRIORITY] [IGNORE] table_reference
      * SET assignment_list
@@ -20,10 +24,6 @@ public class UpdateStatement extends AbstractModifyStatement {
     String ignoreMark = "";
     String schema;
     String table;
-    final List<String> assignments = new ArrayList<>();
-    //    final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
-    final ConditionsComponent whereConditionsComponent = new ConditionsComponent();
-    final List<String> sortRules = new ArrayList<>();
     long limit = 0;
 
     public UpdateStatement() {

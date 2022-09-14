@@ -13,9 +13,9 @@ import java.util.UUID;
  */
 abstract public class AbstractStatement {
     protected static KeelLogger sqlAuditLogger = KeelLogger.silentLogger();
-    private String remarkAsComment = "";
-
+    protected static String SQL_COMPONENT_SEPARATOR = " ";//"\n";
     protected final String statement_uuid;
+    private String remarkAsComment = "";
 
     public AbstractStatement() {
         this.statement_uuid = UUID.randomUUID().toString();
@@ -25,14 +25,18 @@ abstract public class AbstractStatement {
         return sqlAuditLogger;
     }
 
+    public static void setSqlAuditLogger(KeelLogger sqlAuditLogger) {
+        AbstractStatement.sqlAuditLogger = sqlAuditLogger;
+    }
+
+    public static void setSqlComponentSeparator(String sqlComponentSeparator) {
+        SQL_COMPONENT_SEPARATOR = sqlComponentSeparator;
+    }
+
     /**
      * @return The SQL Generated
      */
     public abstract String toString();
-
-    public static void setSqlAuditLogger(KeelLogger sqlAuditLogger) {
-        AbstractStatement.sqlAuditLogger = sqlAuditLogger;
-    }
 
     protected String getRemarkAsComment() {
         return remarkAsComment;
@@ -45,12 +49,6 @@ abstract public class AbstractStatement {
         remarkAsComment = remarkAsComment.replaceAll("[\\r\\n]+", "¦");
         this.remarkAsComment = remarkAsComment;
         return this;
-    }
-
-    protected static String SQL_COMPONENT_SEPARATOR = " ";//"\n";
-
-    public static void setSqlComponentSeparator(String sqlComponentSeparator) {
-        SQL_COMPONENT_SEPARATOR = sqlComponentSeparator;
     }
 
     /**

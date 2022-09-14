@@ -14,8 +14,8 @@ import java.util.*;
  */
 public class KeelSundial {
     private final KeelLogger logger;
-    private Long byMinuteTimerID = null;
     private final Map<String, KeelSundialWorker> registeredWorkers = new HashMap<>();
+    private Long byMinuteTimerID = null;
 
     public KeelSundial(KeelLogger logger) {
         this.logger = logger;

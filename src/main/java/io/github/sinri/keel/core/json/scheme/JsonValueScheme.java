@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
  */
 abstract public class JsonValueScheme<T> implements JsonElementScheme<T> {
 
+    protected T digested;
     private boolean nullable = false;
     private boolean optional = false;
 
@@ -18,8 +19,6 @@ abstract public class JsonValueScheme<T> implements JsonElementScheme<T> {
                 .put("optional", optional)
                 ;
     }
-
-    protected T digested;
 
 
 //    public void validate(Object object) throws JsonSchemeMismatchException {
@@ -33,6 +32,11 @@ abstract public class JsonValueScheme<T> implements JsonElementScheme<T> {
     @Override
     public boolean isNullable() {
         return nullable;
+    }
+
+    public JsonValueScheme<T> setNullable(boolean nullable) {
+        this.nullable = nullable;
+        return this;
     }
 
     @Override
@@ -50,11 +54,6 @@ abstract public class JsonValueScheme<T> implements JsonElementScheme<T> {
             }
         }
         this.digested = object;
-    }
-
-    public JsonValueScheme<T> setNullable(boolean nullable) {
-        this.nullable = nullable;
-        return this;
     }
 
     @Override

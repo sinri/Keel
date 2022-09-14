@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.function.Function;
 
 public class SelectStatement extends AbstractReadStatement {
-    private final List<String> tables = new ArrayList<>();
-    private final List<String> columns = new ArrayList<>();
     //    private final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
     final ConditionsComponent whereConditionsComponent = new ConditionsComponent();
-    private final List<String> categories = new ArrayList<>();
     //    private final List<KeelMySQLCondition> havingConditions = new ArrayList<>();
     final ConditionsComponent havingConditionsComponent = new ConditionsComponent();
+    private final List<String> tables = new ArrayList<>();
+    private final List<String> columns = new ArrayList<>();
+    private final List<String> categories = new ArrayList<>();
     private final List<String> sortRules = new ArrayList<>();
     private long offset = 0;
     private long limit = 0;
@@ -182,9 +182,9 @@ public class SelectStatement extends AbstractReadStatement {
 
     public static class JoinComponent {
         final String joinType;
+        final List<KeelMySQLCondition> onConditions = new ArrayList<>();
         String tableExpression;
         String alias;
-        final List<KeelMySQLCondition> onConditions = new ArrayList<>();
 
         public JoinComponent(String joinType) {
             this.joinType = joinType;

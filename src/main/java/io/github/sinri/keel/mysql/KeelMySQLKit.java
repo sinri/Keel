@@ -30,10 +30,6 @@ public class KeelMySQLKit {
         );
     }
 
-    public KeelMySQLOptions getOptions() {
-        return options;
-    }
-
     protected static String makePlaceholderString(int x) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < x; i++) {
@@ -127,11 +123,6 @@ public class KeelMySQLKit {
         return future;
     }
 
-    @Deprecated(since = "2.8")
-    public MySQLPool getPool() {
-        return pool;
-    }
-
     /**
      * @since 1.1
      */
@@ -204,6 +195,15 @@ public class KeelMySQLKit {
             future = future.recover(throwable -> Future.succeededFuture(-1));
         }
         return future;
+    }
+
+    public KeelMySQLOptions getOptions() {
+        return options;
+    }
+
+    @Deprecated(since = "2.8")
+    public MySQLPool getPool() {
+        return pool;
     }
 
     /**

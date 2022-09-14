@@ -22,11 +22,10 @@ import java.util.function.Function;
 public class KeelIntravenous<R, D extends KeelIntravenousDrop> extends KeelVerticle {
     private final Queue<D> queue;
     private final KeelIntravenousConsumer<R, D> consumer;
-    private long restMS = 100L;
-    private Function<KeelIntravenousTaskConclusion<R>, Future<Void>> taskConclusionHandler;
-
     private final AtomicBoolean finishFlag = new AtomicBoolean(false);
     private final AtomicBoolean finishedFlag = new AtomicBoolean(false);
+    private long restMS = 100L;
+    private Function<KeelIntravenousTaskConclusion<R>, Future<Void>> taskConclusionHandler;
     private Handler<Void> finishHandler = null;
 
     public KeelIntravenous(KeelIntravenousConsumer<R, D> consumer) {

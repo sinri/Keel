@@ -11,13 +11,13 @@ import java.io.InputStream;
  */
 public class MarkdownCssBuilder implements FastDocsContentResponder {
 
+    private static String cssFileContent = null;
     private final PageBuilderOptions options;
 
     public MarkdownCssBuilder(PageBuilderOptions options) {
         this.options = options;
     }
 
-    private static String cssFileContent = null;
     protected String buildPage() {
         if (cssFileContent == null) {
             InputStream resourceAsStream = MarkdownCssBuilder.class.getClassLoader()

@@ -108,7 +108,6 @@ public class KeelStringHelper {
     }
 
 
-
     /**
      * @since 2.7
      */
