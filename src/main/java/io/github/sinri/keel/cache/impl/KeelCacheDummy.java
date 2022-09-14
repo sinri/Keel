@@ -8,6 +8,16 @@ import java.util.concurrent.ConcurrentMap;
 public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
 
     @Override
+    public long getDefaultLifeInSeconds() {
+        return 0;
+    }
+
+    @Override
+    public KeelCacheInterface<K, V> setDefaultLifeInSeconds(long lifeInSeconds) {
+        return this;
+    }
+
+    @Override
     public void save(K key, V value, long lifeInSeconds) {
 
     }

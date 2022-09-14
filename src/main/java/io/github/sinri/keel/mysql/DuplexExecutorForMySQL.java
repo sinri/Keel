@@ -11,7 +11,7 @@ import java.sql.Statement;
  * @since 1.13
  * @deprecated since 2.1
  */
-@Deprecated
+@Deprecated(since = "2.1")
 public class DuplexExecutorForMySQL<T> extends DuplexExecutor<T, SqlConnection, Statement, SQLException> {
     public DuplexExecutorForMySQL(
             AsyncExecutor<T, SqlConnection> asyncExecutor,

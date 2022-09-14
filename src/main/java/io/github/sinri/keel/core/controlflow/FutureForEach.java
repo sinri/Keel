@@ -31,7 +31,14 @@ public class FutureForEach<T> {
         AtomicReference<Future<Void>> futureAtomicReference = new AtomicReference<>();
         futureAtomicReference.set(Future.succeededFuture());
         collection.forEach(t -> {
-            var future = futureAtomicReference.get().compose(previousK -> asyncItemProcessFunction.apply(t));
+            var future = futureAtomicReference.get()
+                    .compose(previousK -> {
+                        try {
+                            return asyncItemProcessFunction.apply(t);
+                        } catch (Throwable throwable) {
+                            return Future.failedFuture(throwable);
+                        }
+                    });
             futureAtomicReference.set(future);
         });
         return futureAtomicReference.get();

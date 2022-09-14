@@ -2,7 +2,7 @@ package io.github.sinri.keel.test.intravenous;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
-import io.github.sinri.keel.mysql.matrix.ResultMatrixWithVertx;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.servant.intravenous.KeelIntravenous;
 import io.github.sinri.keel.servant.intravenous.KeelIntravenousConsumer;
 import io.github.sinri.keel.servant.intravenous.KeelIntravenousDrop;
@@ -33,36 +33,37 @@ public class IntravenousTest {
 
         @Override
         public Future<KeelIntravenousTaskConclusion<JsonObject>> handle(Drop drop) {
-            return Keel.getMySQLKit().withConnection(sqlConnection -> {
-                return sqlConnection.query("select now() as x")
-                        .execute()
-                        .compose(rows -> {
-                            return Future.succeededFuture(new ResultMatrixWithVertx(rows));
-                        })
-                        .compose(resultMatrixWithVertx -> {
-                            try {
-                                var x = resultMatrixWithVertx.getOneColumnOfFirstRowAsDateTime("x");
+            return Keel.getMySQLKit()
+                    .withConnection(sqlConnection -> {
+                        return sqlConnection.query("select now() as x")
+                                .execute()
+                                .compose(rows -> {
+                                    return Future.succeededFuture(ResultMatrix.create(rows));
+                                })
+                                .compose(resultMatrixWithVertx -> {
+                                    try {
+                                        var x = resultMatrixWithVertx.getOneColumnOfFirstRowAsDateTime("x");
 
-                                return Future.succeededFuture(
-                                        new TaskConclusion(
-                                                drop.getReference(),
-                                                true,
-                                                x,
-                                                resultMatrixWithVertx.getFirstRow()
-                                        )
-                                );
-                            } catch (KeelSQLResultRowIndexError e) {
+                                        return Future.succeededFuture(
+                                                new TaskConclusion(
+                                                        drop.getReference(),
+                                                        true,
+                                                        x,
+                                                        resultMatrixWithVertx.getFirstRow()
+                                                )
+                                        );
+                                    } catch (KeelSQLResultRowIndexError e) {
 //                                e.printStackTrace();
-                                return Future.succeededFuture(
-                                        new TaskConclusion(
-                                                drop.getReference(),
-                                                false,
-                                                e.getClass() + ": " + e.getMessage()
-                                        )
-                                );
-                            }
-                        });
-            });
+                                        return Future.succeededFuture(
+                                                new TaskConclusion(
+                                                        drop.getReference(),
+                                                        false,
+                                                        e.getClass() + ": " + e.getMessage()
+                                                )
+                                        );
+                                    }
+                                });
+                    });
         }
     }
 

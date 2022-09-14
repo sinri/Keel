@@ -16,6 +16,9 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
      */
     public Future<Integer> executeForAffectedRows(SqlConnection sqlConnection) {
         return execute(sqlConnection)
-                .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getTotalAffectedRows()));
+                .compose(resultMatrix -> {
+                    var afx = resultMatrix.getTotalAffectedRows();
+                    return Future.succeededFuture(afx);
+                });
     }
 }

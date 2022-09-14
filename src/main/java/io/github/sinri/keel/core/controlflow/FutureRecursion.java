@@ -19,16 +19,40 @@ public class FutureRecursion<T> {
         this.singleRecursionFunction = singleRecursionFunction;
     }
 
+    private Future<T> run(T initValue) {
+        return recur(Future.succeededFuture(initValue));
+    }
+
+
     private Future<T> recur(Future<T> previousFuture) {
-        return previousFuture
-                .compose(previousT -> this.shouldNextFunction.apply(previousT)
-                        .compose(shouldNext -> {
-                            if (shouldNext) {
-                                return recur(singleRecursionFunction.apply(previousT));
-                            } else {
-                                return Future.succeededFuture(previousT);
-                            }
-                        }));
+        return previousFuture.compose(previousT -> {
+                    return Future.succeededFuture()
+                            .compose(v -> {
+                                try {
+                                    return this.shouldNextFunction.apply(previousT);
+                                } catch (Throwable throwable) {
+                                    return Future.failedFuture(throwable);
+                                }
+                            })
+                            .compose(shouldNext -> {
+                                if (shouldNext) {
+                                    return Future.succeededFuture()
+                                            .compose(v -> {
+                                                try {
+                                                    return singleRecursionFunction.apply(previousT);
+                                                } catch (Throwable throwable) {
+                                                    return Future.failedFuture(throwable);
+                                                }
+                                            })
+                                            .compose(nextT -> {
+                                                return recur(Future.succeededFuture(nextT));
+                                            });
+                                } else {
+                                    return Future.succeededFuture(previousT);
+                                }
+                            });
+                }
+        );
     }
 
     public static <T> Future<T> call(
@@ -42,7 +66,4 @@ public class FutureRecursion<T> {
                 .run(initValue);
     }
 
-    private Future<T> run(T initValue) {
-        return recur(Future.succeededFuture(initValue));
-    }
 }

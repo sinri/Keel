@@ -7,8 +7,11 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
+import java.util.Objects;
+
 /**
  * @since 2.0
+ * @since 2.8 rename and remove
  */
 public abstract class AbstractTableRow extends SimpleResultRow {
     public AbstractTableRow(JsonObject tableRow) {
@@ -18,34 +21,52 @@ public abstract class AbstractTableRow extends SimpleResultRow {
     /**
      * @return default null
      */
-    public String getSchemaName() {
+    public String sourceSchemaName() {
         return null;
+    }
+
+    @Deprecated(since = "2.8", forRemoval = true)
+    public final String getSchemaName() {
+        return sourceSchemaName();
     }
 
     /**
      * @return table name
      */
-    abstract public String getTableName();
+    abstract public String sourceTableName();
 
-    abstract protected String getPKFiledName();
+    @Deprecated(since = "2.8", forRemoval = true)
+    public final String getTableName() {
+        return sourceTableName();
+    }
 
+    @Deprecated(since = "2.8", forRemoval = true)
+    protected String getPKFiledName() {
+        return null;
+    }
+
+    @Deprecated(since = "2.8", forRemoval = true)
     protected Future<Long> insertThisRowForPK(SqlConnection sqlConnection) {
         return new WriteIntoStatement()
-                .intoTable(getSchemaName(), getTableName())
+                .intoTable(sourceSchemaName(), sourceTableName())
                 .macroWriteOneRowWithJsonObject(getRow())
                 .executeForLastInsertedID(sqlConnection);
     }
 
+    @Deprecated(since = "2.8", forRemoval = true)
     protected Future<Long> replaceThisRowForPK(SqlConnection sqlConnection) {
+        Objects.requireNonNull(getPKFiledName());
         return new WriteIntoStatement(WriteIntoStatement.REPLACE)
-                .intoTable(getSchemaName(), getTableName())
+                .intoTable(sourceSchemaName(), sourceTableName())
                 .macroWriteOneRowWithJsonObject(getRow())
                 .executeForLastInsertedID(sqlConnection);
     }
 
+    @Deprecated(since = "2.8", forRemoval = true)
     protected Future<Integer> updateThisRow(SqlConnection sqlConnection) {
+        Objects.requireNonNull(getPKFiledName());
         UpdateStatement updateStatement = new UpdateStatement()
-                .table(getSchemaName(), getTableName())
+                .table(sourceSchemaName(), sourceTableName())
                 .where(conditionsComponent -> conditionsComponent
                         .quickMapping(getPKFiledName(), getFieldAsNumber(getPKFiledName()).longValue()));
         this.getRow().forEach(entry -> {
@@ -60,9 +81,11 @@ public abstract class AbstractTableRow extends SimpleResultRow {
         return updateStatement.limit(1).executeForAffectedRows(sqlConnection);
     }
 
+    @Deprecated(since = "2.8", forRemoval = true)
     protected Future<Integer> deleteThisRow(SqlConnection sqlConnection) {
+        Objects.requireNonNull(getPKFiledName());
         return new DeleteStatement()
-                .from(getSchemaName(), getTableName())
+                .from(sourceSchemaName(), sourceTableName())
                 .where(conditionsComponent -> conditionsComponent
                         .quickMapping(getPKFiledName(), getFieldAsNumber(getPKFiledName()).longValue()))
                 .limit(1)

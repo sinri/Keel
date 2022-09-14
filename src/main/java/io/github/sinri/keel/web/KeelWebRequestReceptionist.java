@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureForEach;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.core.logger.KeelLogger;
@@ -134,7 +133,7 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
     public void start() throws Exception {
         super.start();
 
-        Keel.registerDeployedKeelVerticle(this);
+//        Keel.registerDeployedKeelVerticle(this);
 
         this.requestID = prepareRequestID();
         this.getRoutingContext().put(RoutingContextDatumKeyOfRequestID, this.requestID);
@@ -265,6 +264,6 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
     @Override
     public void stop() throws Exception {
         super.stop();
-        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
+//        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
     }
 }

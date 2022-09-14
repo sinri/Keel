@@ -2,6 +2,7 @@ package io.github.sinri.keel.servant.intravenous;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureRecursion;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -21,10 +22,11 @@ import java.util.function.Function;
 public class KeelIntravenous<R, D extends KeelIntravenousDrop> extends KeelVerticle {
     private final Queue<D> queue;
     private final KeelIntravenousConsumer<R, D> consumer;
-    private final AtomicBoolean finishFlag = new AtomicBoolean(false);
-    private final AtomicBoolean finishedFlag = new AtomicBoolean(false);
     private long restMS = 100L;
     private Function<KeelIntravenousTaskConclusion<R>, Future<Void>> taskConclusionHandler;
+
+    private final AtomicBoolean finishFlag = new AtomicBoolean(false);
+    private final AtomicBoolean finishedFlag = new AtomicBoolean(false);
     private Handler<Void> finishHandler = null;
 
     public KeelIntravenous(KeelIntravenousConsumer<R, D> consumer) {
@@ -32,6 +34,11 @@ public class KeelIntravenous<R, D extends KeelIntravenousDrop> extends KeelVerti
         this.consumer = consumer;
         setLogger(Keel.outputLogger("KeelIntravenous"));
         this.taskConclusionHandler = null;
+    }
+
+    @Override
+    public KeelLogger getLogger() {
+        return super.getLogger();
     }
 
     protected KeelIntravenousConsumer<R, D> getConsumer() {
@@ -68,8 +75,14 @@ public class KeelIntravenous<R, D extends KeelIntravenousDrop> extends KeelVerti
                             D task = this.queue.poll();
                             if (task == null) return Future.succeededFuture(false);
                             getLogger().info("[READY  ] TASK " + task.getReference());
-                            return this.getConsumer()
-                                    .handle(task)
+                            return Future.succeededFuture()
+                                    .compose(v -> {
+                                        try {
+                                            return this.getConsumer().handle(task);
+                                        } catch (Throwable throwable) {
+                                            return Future.failedFuture(throwable);
+                                        }
+                                    })
                                     .compose(rConclusion -> {
                                         if (rConclusion.isDone()) {
                                             getLogger().info("[  DONE] TASK " + task.getReference() + " Feedback: " + rConclusion.getFeedback() + " Result: " + rConclusion.getResult());

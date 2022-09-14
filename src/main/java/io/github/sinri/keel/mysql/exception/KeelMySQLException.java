@@ -1,7 +1,7 @@
 package io.github.sinri.keel.mysql.exception;
 
 /**
- * @since 2.7.1
+ * @since 2.8
  */
 public class KeelMySQLException extends Exception {
     public KeelMySQLException(String msg) {

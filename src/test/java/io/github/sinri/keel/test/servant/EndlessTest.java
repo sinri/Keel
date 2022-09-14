@@ -35,10 +35,7 @@ public class EndlessTest {
 
         new KeelEndless(
                 1000L,
-                () -> {
-//                    return blockMode();
-                    return nonBlockMode();
-                }
+                EndlessTest::blockMode
         ).deployMe();
     }
 }

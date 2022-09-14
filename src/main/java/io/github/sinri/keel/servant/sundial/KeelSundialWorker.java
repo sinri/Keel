@@ -1,7 +1,9 @@
 package io.github.sinri.keel.servant.sundial;
 
 import io.github.sinri.keel.core.logger.KeelLogger;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 import java.util.Calendar;
 import java.util.function.Function;
@@ -11,7 +13,8 @@ import java.util.function.Function;
  *
  * @since 2.7
  */
-public interface KeelSundialWorker {
+public interface KeelSundialWorker extends KeelSundialWorkerCore {
+    @Deprecated(since = "2.8")
     static KeelSundialWorker build(
             String name,
             String rawCronExpression,
@@ -23,6 +26,25 @@ public interface KeelSundialWorker {
                 name,
                 rawCronExpression,
                 workFunction,
+                parallelLimit,
+                logger
+        );
+    }
+
+    /**
+     * @since 2.8
+     */
+    static KeelSundialWorker build(
+            String name,
+            String rawCronExpression,
+            KeelSundialWorkerCore workerCore,
+            int parallelLimit,
+            KeelLogger logger
+    ) {
+        return new KeelSundialWorkerImpl(
+                name,
+                rawCronExpression,
+                workerCore::work,
                 parallelLimit,
                 logger
         );
@@ -57,8 +79,15 @@ public interface KeelSundialWorker {
     KeelLogger getLogger();
 
     /**
-     * @param calendar 触发的日历时间
-     * @return 任务的结束future
+     * @since 2.8
      */
-    Future<Void> work(Calendar calendar);
+    default void work(Calendar calendar, Handler<AsyncResult<Void>> asyncResultHandler) {
+        Future.succeededFuture()
+                .compose(v -> work(calendar))
+                .onComplete(asyncResultHandler);
+    }
+
+    default KeelSundialWorkerMeta getMeta() {
+        return new KeelSundialWorkerMeta(getName(), getParsedCronExpression().getRawCronExpression(), getParallelLimit());
+    }
 }

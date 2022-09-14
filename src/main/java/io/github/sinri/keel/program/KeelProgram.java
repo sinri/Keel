@@ -33,7 +33,10 @@ public abstract class KeelProgram extends KeelVerticle {
             optionMap.put(option.getLongName(), optionValue);
         }
 
-        programVerticle.deployMeAsWorker(new DeploymentOptions().setConfig(optionMap));
+        programVerticle.deployMe(new DeploymentOptions()
+                .setWorker(true)
+                .setConfig(optionMap)
+        );
     }
 
     abstract protected KeelLogger prepareLogger();
@@ -44,15 +47,15 @@ public abstract class KeelProgram extends KeelVerticle {
     public final void start() throws Exception {
         super.start();
 
-        Keel.registerDeployedKeelVerticle(this);
+        // Keel.registerDeployedKeelVerticle(this);
 
         setLogger(prepareLogger());
-        execute()
+        Future.succeededFuture()
+                .compose(v -> execute())
                 .compose(v -> {
                     getLogger().notice("DONE");
                     return Future.succeededFuture();
-                })
-                .recover(throwable -> {
+                }, throwable -> {
                     getLogger().exception("FAILED", throwable);
                     return Future.succeededFuture();
                 })
@@ -70,6 +73,6 @@ public abstract class KeelProgram extends KeelVerticle {
     @Override
     public void stop() throws Exception {
         super.stop();
-        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
+//        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
     }
 }

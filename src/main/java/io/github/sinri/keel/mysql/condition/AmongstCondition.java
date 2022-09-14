@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class AmongstCondition extends KeelMySQLCondition {
+public class AmongstCondition implements KeelMySQLCondition {
     public static final String OP_IN = "IN";
 
     protected String element;
@@ -123,6 +123,11 @@ public class AmongstCondition extends KeelMySQLCondition {
         return this;
     }
 
+    /**
+     * 生成SQL的比较条件表达式文本。如果出错，则抛出 KeelSQLGenerateError 异常。
+     *
+     * @throws KeelSQLGenerateError sql generate error
+     */
     @Override
     public String toString() {
         if (targetSet.isEmpty()) {

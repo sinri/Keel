@@ -32,6 +32,34 @@ public interface KeelCacheInterface<K, V> {
     }
 
     /**
+     * @param cache         KeelCacheInterface
+     * @param key           cache key
+     * @param generator     if not cached for key, use this function to generate one asynchronously
+     * @param lifeInSeconds life in seconds
+     * @param <K>           key type
+     * @param <V>           value type
+     * @return future of value
+     * @since 2.1
+     */
+    @Deprecated(forRemoval = true, since = "2.8")
+    static <K, V> Future<V> ensureAndRead(KeelCacheInterface<K, V> cache, K key, Function<K, Future<V>> generator, long lifeInSeconds) {
+        V existed = cache.read(key);
+        if (existed != null) {
+            return Future.succeededFuture(existed);
+        }
+        return generator.apply(key)
+                .compose(v -> {
+                    cache.save(key, v, lifeInSeconds);
+                    return Future.succeededFuture(v);
+                });
+    }
+
+    /**
+     * @since 2.8
+     */
+    long getDefaultLifeInSeconds();
+
+    /**
      * Save an item (as key and value pair) into cache, keep it available for a certain time.
      *
      * @param key           key
@@ -41,12 +69,16 @@ public interface KeelCacheInterface<K, V> {
     void save(K key, V value, long lifeInSeconds);
 
     /**
-     * Read an available cached item with key, or return `null` when not found.
-     *
-     * @param key key
-     * @return value of found available cached item, or `null`
+     * @since 2.8
      */
-    V read(K key);
+    KeelCacheInterface<K, V> setDefaultLifeInSeconds(long lifeInSeconds);
+
+    /**
+     * @since 2.8
+     */
+    default void save(K key, V value) {
+        save(key, value, getDefaultLifeInSeconds());
+    }
 
     /**
      * Read an available cached item with key, or return `fallbackValue` when not found.
@@ -56,6 +88,16 @@ public interface KeelCacheInterface<K, V> {
      * @return value of found available cached item, or `fallbackValue`
      */
     V read(K key, V fallbackValue);
+
+    /**
+     * Read an available cached item with key, or return `null` when not found.
+     *
+     * @param key key
+     * @return value of found available cached item, or `null`
+     */
+    default V read(K key) {
+        return this.read(key, null);
+    }
 
     /**
      * Remove the cached item with key.
@@ -81,25 +123,17 @@ public interface KeelCacheInterface<K, V> {
     ConcurrentMap<K, V> getSnapshotMap();
 
     /**
-     * @param cache         KeelCacheInterface
-     * @param key           cache key
-     * @param generator     if not cached for key, use this function to generate one asynchronously
-     * @param lifeInSeconds life in seconds
-     * @param <K>           key type
-     * @param <V>           value type
-     * @return future of value
-     * @since 2.1
+     * @since 2.8
      */
-    static <K, V> Future<V> ensureAndRead(KeelCacheInterface<K, V> cache, K key, Function<K, Future<V>> generator, long lifeInSeconds) {
-        V existed = cache.read(key);
+    default Future<V> read(K key, Function<K, Future<V>> generator, long lifeInSeconds) {
+        V existed = this.read(key);
         if (existed != null) {
             return Future.succeededFuture(existed);
         }
         return generator.apply(key)
                 .compose(v -> {
-                    cache.save(key, v, lifeInSeconds);
+                    this.save(key, v, lifeInSeconds);
                     return Future.succeededFuture(v);
                 });
     }
-
 }

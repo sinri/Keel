@@ -6,7 +6,6 @@ import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
 /**
  * @since 2.6
  */

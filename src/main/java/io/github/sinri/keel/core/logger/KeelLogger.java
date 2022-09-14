@@ -3,6 +3,7 @@ package io.github.sinri.keel.core.logger;
 import io.github.sinri.keel.core.logger.impl.KeelPrintLogger;
 import io.github.sinri.keel.core.logger.impl.KeelSilentLogger;
 import io.github.sinri.keel.core.logger.impl.KeelSyncFileLogger;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
@@ -63,6 +64,13 @@ public interface KeelLogger {
      * @param categoryPrefix the category prefix string
      */
     KeelLogger setCategoryPrefix(String categoryPrefix);
+
+    /**
+     * 设置在标准的日志级别日志内容中固定添加的前缀文字
+     *
+     * @since 2.8
+     */
+    KeelLogger setContentPrefix(String prefix);
 
     default void debug(String msg) {
         debug(msg, null);
@@ -129,4 +137,16 @@ public interface KeelLogger {
     void text(KeelLogLevel logLevel, String text, String lineEnding);
 
     void reportCurrentRuntimeCodeLocation(String remark);
+
+    /**
+     * @since 2.8
+     */
+    default void buffer(Buffer buffer) {
+        buffer(KeelLogLevel.DEBUG, true, buffer);
+    }
+
+    /**
+     * @since 2.8
+     */
+    void buffer(KeelLogLevel logLevel, boolean showAscii, Buffer buffer);
 }

@@ -33,11 +33,6 @@ public class FutureForRange {
         this.step = 1;
     }
 
-    @Deprecated(forRemoval = true)
-    public static <T> Future<Void> quick(Integer times, Function<Integer, Future<Void>> handleFunction) {
-        return call(times, handleFunction);
-    }
-
     public static <T> Future<Void> call(Integer start, Integer end, Integer step, Function<Integer, Future<Void>> handleFunction) {
         return new FutureForRange(start, end, step).run(handleFunction);
     }
@@ -56,7 +51,13 @@ public class FutureForRange {
         for (Integer t = start; t < end; t += step) {
             Integer finalT = t;
             var f = futureAtomicReference.get()
-                    .compose(previous -> handleFunction.apply(finalT));
+                    .compose(previous -> {
+                        try {
+                            return handleFunction.apply(finalT);
+                        } catch (Throwable throwable) {
+                            return Future.failedFuture(throwable);
+                        }
+                    });
             futureAtomicReference.set(f);
         }
         return futureAtomicReference.get();

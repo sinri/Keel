@@ -40,7 +40,13 @@ public class FutureFor<T> {
         for (T i = initValue; shouldContinueFunction.apply(i); i = pointerModifyFunction.apply(i)) {
             T finalT = i;
             var f = futureAtomicReference.get()
-                    .compose(previous -> handleFunction.apply(finalT));
+                    .compose(previous -> {
+                        try {
+                            return handleFunction.apply(finalT);
+                        } catch (Throwable throwable) {
+                            return Future.failedFuture(throwable);
+                        }
+                    });
             futureAtomicReference.set(f);
         }
         return futureAtomicReference.get();

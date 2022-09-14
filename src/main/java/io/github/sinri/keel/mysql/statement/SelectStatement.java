@@ -5,6 +5,7 @@ import io.github.sinri.keel.mysql.condition.CompareCondition;
 import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.KeelMySQLCondition;
 import io.github.sinri.keel.mysql.condition.RawCondition;
+import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +29,9 @@ public class SelectStatement extends AbstractReadStatement {
     }
 
     public SelectStatement from(String tableExpression, String alias) {
+        if (tableExpression == null || tableExpression.trim().equals("")) {
+            throw new KeelSQLGenerateError("Select from null");
+        }
         String x = tableExpression;
         if (alias != null) {
             x += " AS " + alias;
@@ -38,6 +42,16 @@ public class SelectStatement extends AbstractReadStatement {
             tables.set(0, x);
         }
         return this;
+    }
+
+    /**
+     * @since 2.8
+     */
+    public SelectStatement from(AbstractReadStatement subQuery, String alias) {
+        if (alias == null) {
+            throw new KeelSQLGenerateError("Sub Query without alias");
+        }
+        return this.from("(" + subQuery.toString() + ")", alias);
     }
 
     public SelectStatement leftJoin(Function<JoinComponent, JoinComponent> joinFunction) {

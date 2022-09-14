@@ -4,13 +4,12 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.web.websockets.KeelWebSocketHandler;
 import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Vertx;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
 
 public class KeelHttpServer {
-    protected final Vertx vertx;
     protected final HttpServer server;
     protected final Router router;
 
@@ -19,13 +18,11 @@ public class KeelHttpServer {
     protected final Boolean closeVertXWhenTerminated;
 
     public KeelHttpServer(
-            Vertx vertx,
             HttpServerOptions options,
             Boolean closeVertXWhenTerminated
     ) {
-        this.vertx = vertx;
-        server = vertx.createHttpServer(options);
-        router = Router.router(vertx);
+        server = Keel.getVertx().createHttpServer(options);
+        router = Router.router(Keel.getVertx());
         logger = Keel.outputLogger(getClass().getName());
         this.closeVertXWhenTerminated = closeVertXWhenTerminated;
     }
@@ -40,6 +37,16 @@ public class KeelHttpServer {
 
     public Router getRouter() {
         return router;
+    }
+
+    /**
+     * 给你一个router去安装routes吧！
+     *
+     * @since 2.8
+     */
+    public KeelHttpServer configureRoutes(Handler<Router> routeConfigureHandler) {
+        routeConfigureHandler.handle(getRouter());
+        return this;
     }
 
     /**
@@ -63,7 +70,7 @@ public class KeelHttpServer {
                         logger.exception("Listen failed", throwable);
 
                         if (closeVertXWhenTerminated) {
-                            vertx.close()
+                            Keel.getVertx().close()
                                     .onSuccess(v -> logger.info("VertX Instance Closed"))
                                     .onFailure(vertxCloseFailed -> logger.error("VertX Instance Closing Failure: " + vertxCloseFailed.getMessage()));
                         }
@@ -81,7 +88,7 @@ public class KeelHttpServer {
             }
 
             if (closeVertXWhenTerminated) {
-                vertx.close()
+                Keel.getVertx().close()
                         .onSuccess(v -> logger.info("VertX Instance Closed"))
                         .onFailure(vertxCloseFailed -> logger.error("VertX Instance Closing Failure: " + vertxCloseFailed.getMessage()));
             }

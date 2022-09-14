@@ -1,6 +1,8 @@
 package io.github.sinri.keel;
 
 import io.github.sinri.keel.core.helper.*;
+import io.github.sinri.keel.core.helper.encryption.KeelCryptographyHelper;
+import io.github.sinri.keel.core.helper.encryption.KeelDigestHelper;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
@@ -16,12 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Keel {
-//    private static final String KEY_MYSQL_CONNECTION = "MySQLConnection";
-//    private static final String KEY_KEEL_LOGGER = "KeelLogger";
-
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
 
+    @Deprecated(since = "2.8")
     private static final Map<String, JsonObject> deployedKeelVerticleMap = new HashMap<>();
 
     private static Vertx vertx;
@@ -88,7 +88,7 @@ public class Keel {
     public static KeelMySQLKit getMySQLKit(String dataSourceName) {
         if (!mysqlKitMap.containsKey(dataSourceName)) {
             KeelMySQLOptions keelMySQLOptions = KeelMySQLOptions.generateOptionsForDataSourceWithPropertiesReader(dataSourceName);
-            KeelMySQLKit keelMySQLKit = new KeelMySQLKit(Keel.getVertx(), keelMySQLOptions);
+            KeelMySQLKit keelMySQLKit = new KeelMySQLKit(keelMySQLOptions);
             mysqlKitMap.put(dataSourceName, keelMySQLKit);
         }
         return mysqlKitMap.get(dataSourceName);
@@ -107,6 +107,7 @@ public class Keel {
      * @param keelVerticle KeelVerticle Instance (deployed)
      * @since 2.2
      */
+    @Deprecated(since = "2.8")
     public static void registerDeployedKeelVerticle(KeelVerticle keelVerticle) {
         if (keelVerticle.deploymentID() != null) {
             deployedKeelVerticleMap.put(keelVerticle.deploymentID(), keelVerticle.getVerticleInfo());
@@ -117,6 +118,7 @@ public class Keel {
      * @param deploymentID DeploymentID of KeelVerticle Instance (deployed)
      * @since 2.2
      */
+    @Deprecated(since = "2.8")
     public static void unregisterDeployedKeelVerticle(String deploymentID) {
         deployedKeelVerticleMap.remove(deploymentID);
     }
@@ -126,6 +128,7 @@ public class Keel {
      * @return the information json object
      * @since 2.2
      */
+    @Deprecated(since = "2.8")
     public static JsonObject getDeployedKeelVerticleInfo(String deploymentID) {
         return deployedKeelVerticleMap.get(deploymentID);
     }
@@ -163,5 +166,33 @@ public class Keel {
      */
     public static KeelDateTimeHelper dateTimeHelper() {
         return KeelDateTimeHelper.getInstance();
+    }
+
+    /**
+     * @since 2.8
+     */
+    public static KeelNetHelper netHelper() {
+        return KeelNetHelper.getInstance();
+    }
+
+    /**
+     * @since 2.8
+     */
+    public static KeelDigestHelper digestHelper() {
+        return KeelDigestHelper.getInstance();
+    }
+
+    /**
+     * @since 2.8
+     */
+    public static KeelCryptographyHelper cryptographyHelper() {
+        return KeelCryptographyHelper.getInstance();
+    }
+
+    /**
+     * @since 2.8
+     */
+    public static KeelBinaryHelper binaryHelper() {
+        return KeelBinaryHelper.getInstance();
     }
 }

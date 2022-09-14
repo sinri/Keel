@@ -63,12 +63,30 @@ public class KeelPropertiesReader {
         }
     }
 
+    /**
+     * @since 2.8 增加了值有可去空白文字的警告
+     */
     public String getProperty(String key) {
-        return properties.getProperty(key);
+        var x = properties.getProperty(key);
+        if (x != null) {
+            if (x.trim().length() != x.length()) {
+                Keel.outputLogger(getClass().getName()).warning("property value might need being trimmed", new JsonObject().put("key", key));
+            }
+        }
+        return x;
     }
 
+    /**
+     * @since 2.8 增加了值有可去空白文字的警告
+     */
     public String getProperty(String key, String defaultValue) {
-        return properties.getProperty(key, defaultValue);
+        var x = properties.getProperty(key, defaultValue);
+        if (x != null && !Objects.equals(x, defaultValue)) {
+            if (x.trim().length() != x.length()) {
+                Keel.outputLogger(getClass().getName()).warning("property value might need being trimmed", new JsonObject().put("key", key));
+            }
+        }
+        return x;
     }
 
     public String getProperty(List<String> keys) {
@@ -157,6 +175,7 @@ public class KeelPropertiesReader {
      * @param classOfT class of the target class of subclass of KeelOptions
      * @param <T>      the target class of subclass of KeelOptions
      * @return the generated instance of the target class of subclass of KeelOptions
+     * @throws RuntimeException when InstantiationException, IllegalAccessException, InvocationTargetException or NoSuchMethodException occurred.
      * @since 1.11
      */
     public <T extends KeelOptions> T toConfiguration(Class<T> classOfT) {
@@ -164,7 +183,8 @@ public class KeelPropertiesReader {
             T options = classOfT.getConstructor().newInstance();
             options.overwritePropertiesWithJsonObject(this.toJsonObject());
             return options;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }

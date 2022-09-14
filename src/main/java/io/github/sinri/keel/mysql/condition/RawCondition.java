@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.condition;
 
-public class RawCondition extends KeelMySQLCondition {
+public class RawCondition implements KeelMySQLCondition {
     private String rawConditionExpression;
 
     public RawCondition() {
@@ -15,6 +15,9 @@ public class RawCondition extends KeelMySQLCondition {
         this.rawConditionExpression = rawConditionExpression;
     }
 
+    /**
+     * 生成SQL的源格式表达式文本
+     */
     @Override
     public String toString() {
         return rawConditionExpression;

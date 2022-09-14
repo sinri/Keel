@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.websockets;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -168,7 +167,7 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
     protected final Future<Void> undeploy() {
         String deploymentID = deploymentID();
         return this.undeployMe().compose(v -> {
-            Keel.unregisterDeployedKeelVerticle(deploymentID);
+//            Keel.unregisterDeployedKeelVerticle(deploymentID);
             return Future.succeededFuture();
         });
     }
