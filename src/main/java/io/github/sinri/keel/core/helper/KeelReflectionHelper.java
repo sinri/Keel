@@ -40,7 +40,7 @@ public class KeelReflectionHelper {
     /**
      * @return Returns this element's annotation for the specified type if such an annotation is present, else null.
      * @throws NullPointerException – if the given annotation class is null
-     * Note that any annotation returned by this method is a declaration annotation.
+     *                              Note that any annotation returned by this method is a declaration annotation.
      * @since 2.8
      */
     public <T extends Annotation> T getAnnotationOfClass(Class<?> anyClass, Class<T> classOfAnnotation) {

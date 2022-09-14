@@ -5,12 +5,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class KeelCronExpression {
-    private final String rawCronExpression;
     final Set<Integer> minuteOptions = new HashSet<>();
     final Set<Integer> hourOptions = new HashSet<>();
     final Set<Integer> dayOptions = new HashSet<>();
     final Set<Integer> monthOptions = new HashSet<>();
     final Set<Integer> weekdayOptions = new HashSet<>();
+    private final String rawCronExpression;
 
     public KeelCronExpression(String rawCronExpression) {
         this.rawCronExpression = rawCronExpression;

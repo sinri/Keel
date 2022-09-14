@@ -382,8 +382,8 @@ public class BCrypt {
      *
      * @param d   the byte array to encode
      * @param len the number of bytes to encode
-     * @throws IllegalArgumentException if the length is invalid
      * @return base64-encoded string
+     * @throws IllegalArgumentException if the length is invalid
      */
     private static String encode_base64(byte[] d, int len)
             throws IllegalArgumentException {
@@ -438,8 +438,8 @@ public class BCrypt {
      *
      * @param s       the string to decode
      * @param maxolen the maximum number of bytes to decode
-     * @throws IllegalArgumentException if maxolen is invalid
      * @return an array containing the decoded bytes
+     * @throws IllegalArgumentException if maxolen is invalid
      */
     private static byte[] decode_base64(String s, int maxolen)
             throws IllegalArgumentException {

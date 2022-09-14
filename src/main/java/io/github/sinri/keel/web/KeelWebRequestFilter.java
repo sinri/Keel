@@ -15,15 +15,6 @@ import java.util.List;
 public abstract class KeelWebRequestFilter {
     protected Method method;
 
-    public String filterName() {
-        return getClass().getName();
-    }
-
-    public KeelWebRequestFilter setTargetMethod(Method method) {
-        this.method = method;
-        return this;
-    }
-
     /**
      * @since 2.4
      */
@@ -36,6 +27,15 @@ public abstract class KeelWebRequestFilter {
             });
         }
         return list;
+    }
+
+    public String filterName() {
+        return getClass().getName();
+    }
+
+    public KeelWebRequestFilter setTargetMethod(Method method) {
+        this.method = method;
+        return this;
     }
 
     abstract public Future<Void> shouldHandleThisRequest(RoutingContext ctx);

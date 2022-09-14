@@ -33,8 +33,8 @@ public class KeelMySQLOptions extends KeelOptions {
      * @since 2.8
      */
     public int poolIdleTimeout = 0; // sec; 0 -> no timeout
-    protected String dataSourceName;
     public boolean allowPublicKeyRetrieval;
+    protected String dataSourceName;
 
     public KeelMySQLOptions() {
         this.host = "127.0.0.1";

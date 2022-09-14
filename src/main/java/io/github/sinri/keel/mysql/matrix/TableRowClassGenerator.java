@@ -23,16 +23,16 @@ import java.util.regex.Pattern;
  */
 public class TableRowClassGenerator {
 
-    private final SqlConnection sqlConnection;
-    private final Set<String> tableSet;
-    private String schema;
-    private boolean rewrite;
     private static final Pattern patternForLooseEnum;
 
     static {
         patternForLooseEnum = Pattern.compile("Enum\\{([A-Za-z0-9_, ]+)}");
     }
 
+    private final SqlConnection sqlConnection;
+    private final Set<String> tableSet;
+    private String schema;
+    private boolean rewrite;
     /**
      * Generate an Enum in the class and let the getter return the enum.
      * Loose Enum means that, you use a String field in table, but you defined some values in Java as Enum.

@@ -18,11 +18,22 @@ import java.util.List;
 import java.util.jar.JarEntry;
 
 public class CataloguePageBuilder implements FastDocsContentResponder {
+    private static String catalogueDivContentCache = null;
     private final PageBuilderOptions options;
     private final boolean embedded;
     private final String actualFileRootOutsideJAR;
 
-    private static String catalogueDivContentCache = null;
+    public CataloguePageBuilder(PageBuilderOptions options) {
+        this.options = options;
+
+        URL x = KeelPropertiesReader.class.getClassLoader().getResource(this.options.rootMarkdownFilePath);
+        if (x == null) {
+            throw new IllegalArgumentException("rootMarkdownFilePath is not available in File System");
+        }
+        this.embedded = x.toString().contains("!/");
+        this.actualFileRootOutsideJAR = x.getPath();
+        options.logger.debug("EMBEDDED: " + embedded + " url: " + x + " actualFileRootOutsideJAR: " + actualFileRootOutsideJAR);
+    }
 
     @Override
     public void setRoutingContext(RoutingContext ctx) {
@@ -106,18 +117,6 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
                 "    </script>\n" +
                 "</body>\n" +
                 "</html>";
-    }
-
-    public CataloguePageBuilder(PageBuilderOptions options) {
-        this.options = options;
-
-        URL x = KeelPropertiesReader.class.getClassLoader().getResource(this.options.rootMarkdownFilePath);
-        if (x == null) {
-            throw new IllegalArgumentException("rootMarkdownFilePath is not available in File System");
-        }
-        this.embedded = x.toString().contains("!/");
-        this.actualFileRootOutsideJAR = x.getPath();
-        options.logger.debug("EMBEDDED: " + embedded + " url: " + x + " actualFileRootOutsideJAR: " + actualFileRootOutsideJAR);
     }
 
     private boolean isFromDoc() {
@@ -316,9 +315,9 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
     }
 
     protected static class TreeNode {
+        private final List<TreeNode> _children = new ArrayList<>();
         public String href;
         public String name;
-        private final List<TreeNode> _children = new ArrayList<>();
         public int level;
 
         public void addChild(TreeNode child) {

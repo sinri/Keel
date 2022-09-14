@@ -6,18 +6,6 @@ package io.github.sinri.keel.servant.intravenous;
  */
 public interface KeelIntravenousTaskConclusion<R> {
 
-    String getTaskReference();
-
-    boolean isDone();
-
-    default String getFeedback() {
-        return "";
-    }
-
-    default R getResult() {
-        return null;
-    }
-
     /**
      * @since 2.8
      */
@@ -59,5 +47,17 @@ public interface KeelIntravenousTaskConclusion<R> {
         return new KeelIntravenousTaskConclusionForObject(reference, done)
                 .setFeedback(feedback)
                 .setResult(result);
+    }
+
+    String getTaskReference();
+
+    boolean isDone();
+
+    default String getFeedback() {
+        return "";
+    }
+
+    default R getResult() {
+        return null;
     }
 }

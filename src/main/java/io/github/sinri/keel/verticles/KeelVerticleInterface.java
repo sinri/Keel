@@ -30,6 +30,7 @@ public interface KeelVerticleInterface extends Verticle {
 
     /**
      * copied from AbstractVerticle
+     *
      * @since 2.8
      */
     JsonObject config();

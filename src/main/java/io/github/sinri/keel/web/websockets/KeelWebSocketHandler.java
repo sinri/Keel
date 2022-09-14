@@ -36,7 +36,8 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
         T keelWebSocketHandler;
         try {
             keelWebSocketHandler = handlerClass.getConstructor(ServerWebSocket.class).newInstance(webSocket);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             e.printStackTrace();
             webSocket.reject();
             return;

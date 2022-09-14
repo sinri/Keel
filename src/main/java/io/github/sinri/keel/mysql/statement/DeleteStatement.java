@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.function.Function;
 
 public class DeleteStatement extends AbstractModifyStatement {
+    // final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
+    final ConditionsComponent whereConditionsComponent = new ConditionsComponent();
+    final List<String> sortRules = new ArrayList<>();
     /**
      * DELETE [LOW_PRIORITY] [QUICK] [IGNORE] FROM tbl_name [[AS] tbl_alias]
      * [PARTITION (partition_name [, partition_name] ...)]
@@ -17,11 +20,6 @@ public class DeleteStatement extends AbstractModifyStatement {
 
     String schema;
     String table;
-
-    // final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
-    final ConditionsComponent whereConditionsComponent = new ConditionsComponent();
-
-    final List<String> sortRules = new ArrayList<>();
     long limit = 0;
 
     public DeleteStatement() {

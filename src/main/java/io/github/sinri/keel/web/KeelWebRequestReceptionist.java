@@ -49,7 +49,8 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                             logger.debug("receptionistClass " + receptionistClass.getName() + " deployed as " + deploymentID);
                             return Future.succeededFuture();
                         });
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException e) {
                 logger.exception("receptionistClass " + receptionistClass.getName() + " cannot be deployed", e);
                 ctx.fail(404);
             }
@@ -181,7 +182,8 @@ abstract public class KeelWebRequestReceptionist extends KeelVerticle {
                     KeelWebRequestFilter filter;
                     try {
                         filter = filterClass.getConstructor().newInstance();
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                             NoSuchMethodException e) {
                         return Future.failedFuture(e);
                     }
                     return filter.shouldHandleThisRequest(getRoutingContext());

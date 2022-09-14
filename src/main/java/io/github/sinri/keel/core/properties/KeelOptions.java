@@ -42,7 +42,8 @@ abstract public class KeelOptions {
             T options = classOfT.getConstructor().newInstance();
             options.overwritePropertiesWithJsonObject(jsonObject);
             return options;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             e.printStackTrace();
             return null;
         }

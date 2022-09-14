@@ -19,20 +19,6 @@ import java.util.List;
  */
 public interface ResultMatrix {
 
-    List<JsonObject> getRowList();
-
-    int getTotalFetchedRows();
-
-    int getTotalAffectedRows();
-
-    long getLastInsertedID();
-
-    JsonArray toJsonArray();
-
-    JsonObject getFirstRow() throws KeelSQLResultRowIndexError;
-
-    JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError;
-
     /**
      * @since 1.10
      */
@@ -52,16 +38,30 @@ public interface ResultMatrix {
     }
 
     /**
-     * @since 1.10
-     */
-    <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
-
-    /**
      * @since 2.8
      */
     static ResultMatrix create(RowSet<Row> rowSet) {
         return new ResultMatrixWithVertx(rowSet);
     }
+
+    List<JsonObject> getRowList();
+
+    int getTotalFetchedRows();
+
+    int getTotalAffectedRows();
+
+    long getLastInsertedID();
+
+    JsonArray toJsonArray();
+
+    JsonObject getFirstRow() throws KeelSQLResultRowIndexError;
+
+    JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError;
+
+    /**
+     * @since 1.10
+     */
+    <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
 
     String getOneColumnOfFirstRowAsDateTime(String columnName) throws KeelSQLResultRowIndexError;
 

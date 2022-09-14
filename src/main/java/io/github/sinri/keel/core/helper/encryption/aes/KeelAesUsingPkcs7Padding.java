@@ -14,6 +14,13 @@ abstract public class KeelAesUsingPkcs7Padding extends KeelAesBase {
 //    }
 
     /**
+     * @param key AES要求密钥长度为128位或192位或256位，java默认限制AES密钥长度最多128位
+     */
+    public KeelAesUsingPkcs7Padding(String key) {
+        super(key);
+    }
+
+    /**
      * 直接使用static代码块引用 org.bouncycastle.jce.provider.BouncyCastleProvider 会引起shade问题：
      * `Invalid signature file digest for Manifest main attributes`。
      * 当需要使用BC支持时，应当在POM引入相应的依赖，在MAIN的初始化中提前调用此方法
@@ -35,12 +42,5 @@ abstract public class KeelAesUsingPkcs7Padding extends KeelAesBase {
                  NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * @param key AES要求密钥长度为128位或192位或256位，java默认限制AES密钥长度最多128位
-     */
-    public KeelAesUsingPkcs7Padding(String key) {
-        super(key);
     }
 }
