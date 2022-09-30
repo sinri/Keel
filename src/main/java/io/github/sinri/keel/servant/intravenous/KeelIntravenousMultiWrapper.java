@@ -8,7 +8,9 @@ import java.util.function.Function;
 
 /**
  * @since 2.7
+ * @since 2.8.1 deprecated
  */
+@Deprecated
 public class KeelIntravenousMultiWrapper<Hash, Result, Drop extends KeelIntravenousDrop> {
     private final Map<Hash, KeelIntravenous<Result, Drop>> intravenousMap = new ConcurrentHashMap<>();
 

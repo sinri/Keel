@@ -9,17 +9,6 @@ import java.util.function.Supplier;
  * @since 2.8 extends Supplier{Future{KeelQueueTask}}
  */
 public interface KeelQueueNextTaskSeeker extends Supplier<Future<KeelQueueTask>> {
-    @Deprecated(since = "2.8", forRemoval = true)
-    Future<Boolean> hasMore();
-
-    /**
-     * 找出一个task且其已完成lockTaskBeforeDeployment方法的调用。
-     * 自2.8版本开始，应使用get方法。
-     */
-    @Deprecated(since = "2.8", forRemoval = true)
-    default Future<KeelQueueTask> seek() {
-        return get();
-    }
 
     /**
      * 找出一个task且其已完成lockTaskBeforeDeployment方法的调用

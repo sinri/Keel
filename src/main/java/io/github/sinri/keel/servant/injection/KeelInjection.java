@@ -99,4 +99,11 @@ public class KeelInjection extends KeelVerticle {
     public interface InjectionDrop {
         Future<Void> handle();
     }
+
+    /**
+     * @since 2.8.1
+     */
+    public int getDropCount() {
+        return this.queue.size();
+    }
 }

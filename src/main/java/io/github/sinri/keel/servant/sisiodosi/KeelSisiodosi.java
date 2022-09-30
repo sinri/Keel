@@ -20,6 +20,10 @@ import java.util.function.Supplier;
  * <p>
  * Like KeelEndless, it use EventBus to notify rather than timer.
  * </p>
+ * <p>
+ * (1) start
+ * (2)
+ * </p>
  *
  * @since 2.8
  */
