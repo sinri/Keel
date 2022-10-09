@@ -104,6 +104,13 @@ public class KeelLoggerOptions {
         return null;
     }
 
+    /**
+     * @since 2.8.1
+     */
+    public Set<String> getIgnorableStackPackageSet() {
+        return ignorableStackPackageSet;
+    }
+
     public CompositionStyle getCompositionStyle() {
         return Objects.requireNonNullElse(CompositionStyle.valueOf(this.pojo.compositionStyle), CompositionStyle.ONE_LINE);
     }

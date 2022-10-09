@@ -2,8 +2,8 @@ package io.github.sinri.keel.test.web.receptionist;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.web.KeelWebRequestFilter;
-import io.github.sinri.keel.web.KeelWebRequestReceptionist;
+import io.github.sinri.keel.web.legacy.KeelWebRequestFilter;
+import io.github.sinri.keel.web.legacy.KeelWebRequestReceptionist;
 import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;
 

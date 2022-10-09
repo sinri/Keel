@@ -7,8 +7,8 @@ import io.github.sinri.keel.test.web.receptionist.ReceptionistA;
 import io.github.sinri.keel.test.web.receptionist.RootPathReceptionist;
 import io.github.sinri.keel.test.web.ws.WebSocketTest2;
 import io.github.sinri.keel.web.KeelHttpServer;
-import io.github.sinri.keel.web.KeelWebRequestReceptionist;
 import io.github.sinri.keel.web.blackbox.BlackBox;
+import io.github.sinri.keel.web.legacy.KeelWebRequestReceptionist;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.handler.StaticHandler;
 

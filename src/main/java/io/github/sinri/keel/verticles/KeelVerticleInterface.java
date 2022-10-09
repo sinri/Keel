@@ -12,14 +12,6 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.14
  */
 public interface KeelVerticleInterface extends Verticle {
-    /**
-     * @see KeelVerticleInterface#undeployMe()
-     * @deprecated use class method instead
-     */
-    @Deprecated(since = "2.8")
-    static Future<Void> undeploy(String deploymentID) {
-        return Keel.getVertx().undeploy(deploymentID);
-    }
 
     /**
      * copied from AbstractVerticle

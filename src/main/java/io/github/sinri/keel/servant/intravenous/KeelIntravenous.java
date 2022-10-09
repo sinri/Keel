@@ -119,14 +119,6 @@ public class KeelIntravenous<R, D extends KeelIntravenousDrop> extends KeelVerti
 
     }
 
-    /**
-     * @deprecated use drip instead
-     */
-    @Deprecated(forRemoval = true)
-    public void addNewTask(D task) {
-        this.drip(task);
-    }
-
     public void drip(D drop) {
         this.queue.add(drop);
     }

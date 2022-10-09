@@ -16,9 +16,6 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     abstract public String getTaskCategory();
 
-    @Deprecated(since = "2.8")
-    abstract public boolean isRunSerially();
-
     abstract protected KeelLogger prepareLogger();
 
     /**

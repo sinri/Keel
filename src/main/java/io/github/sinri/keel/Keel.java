@@ -8,11 +8,9 @@ import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.KeelMySQLOptions;
-import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.json.JsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,9 +18,6 @@ import java.util.Map;
 public class Keel {
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
-
-    @Deprecated(since = "2.8")
-    private static final Map<String, JsonObject> deployedKeelVerticleMap = new HashMap<>();
 
     private static Vertx vertx;
 
@@ -101,36 +96,6 @@ public class Keel {
     public static KeelMySQLKit getMySQLKit() {
         String defaultName = propertiesReader.getProperty("mysql.default_data_source_name");
         return getMySQLKit(defaultName);
-    }
-
-    /**
-     * @param keelVerticle KeelVerticle Instance (deployed)
-     * @since 2.2
-     */
-    @Deprecated(since = "2.8")
-    public static void registerDeployedKeelVerticle(KeelVerticle keelVerticle) {
-        if (keelVerticle.deploymentID() != null) {
-            deployedKeelVerticleMap.put(keelVerticle.deploymentID(), keelVerticle.getVerticleInfo());
-        }
-    }
-
-    /**
-     * @param deploymentID DeploymentID of KeelVerticle Instance (deployed)
-     * @since 2.2
-     */
-    @Deprecated(since = "2.8")
-    public static void unregisterDeployedKeelVerticle(String deploymentID) {
-        deployedKeelVerticleMap.remove(deploymentID);
-    }
-
-    /**
-     * @param deploymentID ID of deployment for one Verticle deployed
-     * @return the information json object
-     * @since 2.2
-     */
-    @Deprecated(since = "2.8")
-    public static JsonObject getDeployedKeelVerticleInfo(String deploymentID) {
-        return deployedKeelVerticleMap.get(deploymentID);
     }
 
     /**

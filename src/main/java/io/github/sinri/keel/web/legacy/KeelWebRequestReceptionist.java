@@ -1,9 +1,10 @@
-package io.github.sinri.keel.web;
+package io.github.sinri.keel.web.legacy;
 
 import io.github.sinri.keel.core.controlflow.FutureForEach;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
+import io.github.sinri.keel.web.ApiMeta;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
@@ -19,7 +20,9 @@ import java.util.*;
 
 /**
  * @since 2.0
+ * @since 2.8.1 moved here
  */
+@Deprecated
 abstract public class KeelWebRequestReceptionist extends KeelVerticle {
     public static final String RoutingContextDatumKeyOfClientIPChain = "client_ip_chain";
     public static final String RoutingContextDatumKeyOfRequestID = "request_id";

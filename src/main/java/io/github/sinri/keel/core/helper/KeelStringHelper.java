@@ -6,6 +6,7 @@ import io.vertx.core.buffer.Buffer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @since 2.6
@@ -159,5 +160,115 @@ public class KeelStringHelper {
         return Keel.stringHelper().joinStringArray(parts, "_");
     }
 
+    /**
+     * @since 2.8.1
+     */
+    public String buildStackChainText(StackTraceElement[] stackTrace, Set<String> ignorableStackPackageSet) {
+        StringBuilder sb = new StringBuilder();
+        if (stackTrace != null) {
+            String ignoringClassPackage = null;
+            int ignoringCount = 0;
+            for (StackTraceElement stackTranceItem : stackTrace) {
+                String className = stackTranceItem.getClassName();
+                String matchedClassPackage = null;
+                for (var cp : ignorableStackPackageSet) {
+                    if (className.startsWith(cp)) {
+                        matchedClassPackage = cp;
+                        break;
+                    }
+                }
+                if (matchedClassPackage == null) {
+                    if (ignoringCount > 0) {
+                        sb.append("\t\t")
+                                .append("[").append(ignoringCount).append("] ")
+                                .append(ignoringClassPackage)
+                                .append(System.lineSeparator());
 
+                        ignoringClassPackage = null;
+                        ignoringCount = 0;
+                    }
+
+                    sb.append("\t\t")
+                            .append(stackTranceItem.getClassName())
+                            .append(".")
+                            .append(stackTranceItem.getMethodName())
+                            .append(" (")
+                            .append(stackTranceItem.getFileName())
+                            .append(":")
+                            .append(stackTranceItem.getLineNumber())
+                            .append(")")
+                            .append(System.lineSeparator());
+                } else {
+                    if (ignoringCount > 0) {
+                        if (ignoringClassPackage.equals(matchedClassPackage)) {
+                            ignoringCount += 1;
+                        } else {
+                            sb.append("\t\t")
+                                    .append("[").append(ignoringCount).append("] ")
+                                    .append(ignoringClassPackage)
+                                    .append(System.lineSeparator());
+
+                            ignoringClassPackage = matchedClassPackage;
+                            ignoringCount = 1;
+                        }
+                    } else {
+                        ignoringClassPackage = matchedClassPackage;
+                        ignoringCount = 1;
+                    }
+                }
+            }
+            if (ignoringCount > 0) {
+                sb.append("\t\t")
+                        .append("[").append(ignoringCount).append("] ")
+                        .append(ignoringClassPackage)
+                        .append(System.lineSeparator());
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * @since 2.8.1
+     */
+    public String buildStackChainText(StackTraceElement[] stackTrace) {
+        return buildStackChainText(stackTrace, Set.of());
+    }
+
+    /**
+     * @since 2.8.1
+     */
+    public String renderThrowableChain(Throwable throwable, Set<String> ignorableStackPackageSet) {
+        if (throwable == null) return "";
+        Throwable cause = throwable.getCause();
+        StringBuilder sb = new StringBuilder();
+        sb
+                .append("\t")
+                .append(throwable.getClass().getName())
+                .append(": ")
+                .append(throwable.getMessage())
+                .append(System.lineSeparator())
+                .append(buildStackChainText(throwable.getStackTrace(), ignorableStackPackageSet));
+
+        while (cause != null) {
+            sb
+                    .append("\t↑ ")
+                    .append(cause.getClass().getName())
+                    .append(": ")
+                    .append(cause.getMessage())
+                    .append(System.lineSeparator())
+                    .append(buildStackChainText(cause.getStackTrace(), ignorableStackPackageSet))
+            ;
+
+            cause = cause.getCause();
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * @since 2.8.1
+     */
+    public String renderThrowableChain(Throwable throwable) {
+        return renderThrowableChain(throwable, Set.of());
+    }
 }

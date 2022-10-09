@@ -15,4 +15,10 @@ public @interface ApiMeta {
     String[] allowMethods() default {"POST"};
 
     boolean requestBodyNeeded() default true;
+
+    /**
+     * @return timeout in ms. default is 10s. if 0, no timeout.
+     * @since 2.8.1
+     */
+    long timeout() default 10_000;
 }

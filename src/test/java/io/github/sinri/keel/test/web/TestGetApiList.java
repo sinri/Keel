@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.web;
 
-import io.github.sinri.keel.web.KeelWebRequestReceptionist;
+import io.github.sinri.keel.web.legacy.KeelWebRequestReceptionist;
 import org.reflections.Reflections;
 
 import java.util.Set;

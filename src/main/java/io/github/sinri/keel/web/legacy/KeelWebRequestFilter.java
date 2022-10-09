@@ -1,4 +1,4 @@
-package io.github.sinri.keel.web;
+package io.github.sinri.keel.web.legacy;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -11,7 +11,9 @@ import java.util.List;
 /**
  * @since 1.1
  * @since 1.10 became abstract
+ * @since 2.8.1 moved here
  */
+@Deprecated
 public abstract class KeelWebRequestFilter {
     protected Method method;
 
