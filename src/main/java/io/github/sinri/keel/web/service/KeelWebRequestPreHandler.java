@@ -23,5 +23,5 @@ public abstract class KeelWebRequestPreHandler implements Handler<RoutingContext
                 .onFailure(routingContext::fail);
     }
 
-    abstract protected Future<Object> handleRequest(RoutingContext routingContext);
+    abstract protected Future<Void> handleRequest(RoutingContext routingContext);
 }
