@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureUntil1;
+import io.github.sinri.keel.core.controlflow.FutureUntil;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -105,7 +105,7 @@ public abstract class KeelQueue extends KeelVerticle {
 
     private Future<Void> whenSignalRunCame(KeelQueueNextTaskSeeker nextTaskSeeker) {
         this.queueStatus = QueueStatus.RUNNING;
-        return FutureUntil1.call(() -> {
+        return FutureUntil.call(() -> {
                     return Future.succeededFuture()
                             .compose(v -> nextTaskSeeker.get())
                             .compose(task -> {

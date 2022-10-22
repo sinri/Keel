@@ -20,7 +20,8 @@ public class KeelSisiodosiTest {
         KeelLogger logger = Keel.outputLogger();
 
         KeelSisiodosi.deployOneInstance(
-                new KeelSisiodosiWithTimer.Options(),
+                new KeelSisiodosiWithTimer.Options()
+        ).onSuccess(
                 sisiodosi -> {
                     sisiodosi.setLogger(logger);
                     FutureForRange.call(100, i -> {
@@ -32,14 +33,6 @@ public class KeelSisiodosiTest {
                                 int i1 = new Random().nextInt(300);
                                 logger.info("DRIPPED " + finalI + " and then sleep " + (long) i1);
                                 return FutureSleep.call(i1);
-//                                try {
-//
-//                                    Thread.sleep(i1);
-//                                } catch (InterruptedException e) {
-//                                    throw new RuntimeException(e);
-//                                }
-//
-//                                return Future.succeededFuture();
                             })
                             .onFailure(throwable -> {
                                 logger.exception("RANGE ERROR", throwable);

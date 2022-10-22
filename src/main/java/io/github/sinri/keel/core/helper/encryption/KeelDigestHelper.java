@@ -34,7 +34,7 @@ public class KeelDigestHelper {
         String raw = "LongLongAgo12325485!#_^!%";
         String php_hash = "$2y$10$voiaPUYpMVtujEkFTQLsgeMPCZ9QEfmS7rbh5PCP9zt5Gpd3/kv4i";
 
-        Boolean r = Keel.digestHelper().php_password_verify(raw, php_hash);
+        boolean r = Keel.digestHelper().php_password_verify(raw, php_hash);
         System.out.println("r=" + r);
 
         System.out.println("another = " + Keel.digestHelper().php_password_hash(raw));

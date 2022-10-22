@@ -54,6 +54,13 @@ public interface KeelSisiodosi extends KeelVerticleInterface {
     int getSizeThreshold();
 
     /**
+     * @return 一回にともに処理する雫の数
+     */
+    default int getBatchDrips() {
+        return 1;
+    }
+
+    /**
      * @param drip 雫。それを処理して、一つの予期を返してすら、次の雫に移行するか終わるかが許される。
      */
     void drop(Supplier<Future<Object>> drip);

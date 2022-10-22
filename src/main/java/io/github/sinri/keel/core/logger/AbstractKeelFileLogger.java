@@ -38,7 +38,7 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
 
         Pattern pattern = Pattern.compile("\\{([A-Za-z: _.]+)}");
         if (this.options.getArchivePath() != null) {
-            String[] parts = this.options.getArchivePath().split("[/]+");
+            String[] parts = this.options.getArchivePath().split("/+");
             for (String part : parts) {
                 if (part == null || part.trim().isEmpty()) {
                     continue;
@@ -49,11 +49,6 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
                     return Keel.dateTimeHelper().getCurrentDateExpression(format);
                 });
                 relativePath.append(File.separator).append(parsedPart);
-            }
-        } else if (this.options.getDirArchiveFormat() != null) {
-            String currentDateExpression = Keel.dateTimeHelper().getCurrentDateExpression(this.options.getDirArchiveFormat());
-            if (currentDateExpression != null) {
-                relativePath.append(File.separator).append(currentDateExpression);
             }
         }
 

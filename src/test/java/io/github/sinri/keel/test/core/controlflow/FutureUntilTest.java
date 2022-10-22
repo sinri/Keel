@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.core.controlflow;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureUntil1;
+import io.github.sinri.keel.core.controlflow.FutureUntil;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.Future;
@@ -16,7 +16,7 @@ public class FutureUntilTest {
 
         AtomicInteger atomicInteger = new AtomicInteger(0);
 
-        FutureUntil1.call(() -> {
+        FutureUntil.call(() -> {
                     int i = atomicInteger.incrementAndGet();
                     logger.info("FutureUntil calling, i=" + atomicInteger.get());
                     if (i == 5) {

@@ -175,17 +175,6 @@ public class KeelLoggerOptions {
         return this;
     }
 
-    @Deprecated(since = "2.6")
-    public String getDirArchiveFormat() {
-        return pojo.archive;
-    }
-
-    @Deprecated(since = "2.6")
-    public KeelLoggerOptions setDirArchiveFormat(String dirArchiveFormat) {
-        this.pojo.archive = dirArchiveFormat;
-        return this;
-    }
-
     public String getArchivePath() {
         return this.pojo.archivePath;
     }
@@ -250,12 +239,6 @@ public class KeelLoggerOptions {
          */
         public String rotate;
         /**
-         * 决定日志输出文件是否按时间滚动归档到相应目录；
-         * 如果其非空，则目录按此时间格式所示细分归档。
-         */
-        @Deprecated(since = "2.6")
-        public String archive;
-        /**
          * 决定日志输出文件归档的相应目录；
          * 如果其非空，则目录按此细分归档。
          * FORMAT SAMPLE: A/B/C-{yyyy-MM-dd...}/D
@@ -305,7 +288,6 @@ public class KeelLoggerOptions {
             this.keepWriterReady = true;
             this.showThreadID = true;
             this.fileOutputCharset = null;
-            this.archive = null;
             this.archivePath = null;
             this.showVerticleDeploymentID = true;
             this.compositionStyle = CompositionStyle.ONE_LINE.name();
