@@ -10,10 +10,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 /**
- * @since 2.8.1
+ * @since 2.9
  * Experimental
  */
-@Deprecated(since = "2.8.1")
+@Deprecated(since = "2.9", forRemoval = true)
 public class KeelSisiodosi2 {
     private final Queue<Supplier<Future<Void>>> drops = new ConcurrentLinkedQueue<>();
     private final String lockName;

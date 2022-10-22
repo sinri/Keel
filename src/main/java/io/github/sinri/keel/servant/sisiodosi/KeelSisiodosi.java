@@ -4,7 +4,6 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 
 import java.util.function.Supplier;
 
@@ -14,26 +13,12 @@ import java.util.function.Supplier;
  * KeelSisiodosi receives tasks (as drips) continually,
  * and holds them for a batch handle job.
  *
- * @since 2.8.1
+ * @since 2.9
  */
 public interface KeelSisiodosi extends KeelVerticleInterface {
-    static void deployOneInstance(
-            KeelSisiodosiWithTimer.Options options,
-            Handler<KeelSisiodosi> keelSisiodosiHandler
-    ) {
-        KeelSisiodosiWithTimer keelSisiodosiWithTimer = new KeelSisiodosiWithTimer()
+    static KeelSisiodosi getOneInstanceToDeploy(KeelSisiodosiWithTimer.Options options) {
+        return new KeelSisiodosiWithTimer()
                 .setOptions(options);
-        Keel.getVertx().deployVerticle(
-                keelSisiodosiWithTimer,
-                new DeploymentOptions().setWorker(true),
-                ar -> {
-                    if (ar.succeeded()) {
-                        keelSisiodosiHandler.handle(keelSisiodosiWithTimer);
-                    } else {
-                        throw new RuntimeException(new RuntimeException(ar.cause()));
-                    }
-                }
-        );
     }
 
     static Future<KeelSisiodosi> deployOneInstance(KeelSisiodosiWithTimer.Options options) {

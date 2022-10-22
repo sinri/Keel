@@ -15,7 +15,7 @@ import java.util.function.BooleanSupplier;
 /**
  * @param <K>
  * @param <V>
- * @since 2.8.1
+ * @since 2.9
  */
 public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<K, V> {
     private final Lock lock;

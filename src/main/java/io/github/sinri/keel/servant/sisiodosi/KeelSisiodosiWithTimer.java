@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.sisiodosi;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureUntil;
+import io.github.sinri.keel.core.controlflow.FutureUntil1;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 /**
- * @since 2.8.1
+ * @since 2.9
  */
 public class KeelSisiodosiWithTimer extends AbstractVerticle implements KeelSisiodosi {
     private final Queue<Supplier<Future<Object>>> drips = new ConcurrentLinkedQueue<>();
@@ -105,7 +105,7 @@ public class KeelSisiodosiWithTimer extends AbstractVerticle implements KeelSisi
 
     private void pour() {
         getLogger().debug("POUR START");
-        FutureUntil.call(this::pourOneDrip)
+        FutureUntil1.call(this::pourOneDrip)
                 .onComplete(poured -> {
                     getLogger().debug("POUR END");
                     restingStartTime.set(new Date().getTime());

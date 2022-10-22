@@ -161,7 +161,7 @@ public class KeelStringHelper {
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public String buildStackChainText(StackTraceElement[] stackTrace, Set<String> ignorableStackPackageSet) {
         StringBuilder sb = new StringBuilder();
@@ -228,14 +228,14 @@ public class KeelStringHelper {
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public String buildStackChainText(StackTraceElement[] stackTrace) {
         return buildStackChainText(stackTrace, Set.of());
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public String renderThrowableChain(Throwable throwable, Set<String> ignorableStackPackageSet) {
         if (throwable == null) return "";
@@ -266,7 +266,7 @@ public class KeelStringHelper {
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public String renderThrowableChain(Throwable throwable) {
         return renderThrowableChain(throwable, Set.of());

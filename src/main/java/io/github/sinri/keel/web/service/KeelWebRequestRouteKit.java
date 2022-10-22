@@ -18,13 +18,13 @@ import java.util.Set;
 
 /**
  * @param <S>
- * @since 2.8.1
+ * @since 2.9
  */
 public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
     private final Router router;
     private final Class<S> classOfService;
     private final List<Handler<RoutingContext>> extraPreHandlers = new ArrayList<>();
-    private int timeoutStatusCode = 509;
+    //private int timeoutStatusCode = 509;
     private String uploadDirectory = BodyHandler.DEFAULT_UPLOADS_DIRECTORY;
 
     public KeelWebRequestRouteKit(Class<S> classOfService) {
@@ -37,10 +37,10 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
         this.router = router;
     }
 
-    public KeelWebRequestRouteKit<S> setTimeoutStatusCode(int timeoutStatusCode) {
-        this.timeoutStatusCode = timeoutStatusCode;
-        return this;
-    }
+//    public KeelWebRequestRouteKit<S> setTimeoutStatusCode(int timeoutStatusCode) {
+//        this.timeoutStatusCode = timeoutStatusCode;
+//        return this;
+//    }
 
     public KeelWebRequestRouteKit<S> setUploadDirectory(String uploadDirectory) {
         this.uploadDirectory = uploadDirectory;
@@ -86,7 +86,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
             route.handler(BodyHandler.create(uploadDirectory));
 
             if (apiMeta.timeout() > 0) {
-                route.handler(TimeoutHandler.create(apiMeta.timeout(), timeoutStatusCode));
+                route.handler(TimeoutHandler.create(apiMeta.timeout(), apiMeta.statusCodeForTimeout()));
             }
 
             if (!extraPreHandlers.isEmpty()) {

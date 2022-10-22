@@ -20,7 +20,7 @@ import java.util.*;
 
 /**
  * @since 2.0
- * @since 2.8.1 moved here
+ * @since 2.9 moved here
  */
 @Deprecated
 abstract public class KeelWebRequestReceptionist extends KeelVerticle {

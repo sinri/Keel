@@ -18,7 +18,13 @@ public @interface ApiMeta {
 
     /**
      * @return timeout in ms. default is 10s. if 0, no timeout.
-     * @since 2.8.1
+     * @since 2.9
      */
     long timeout() default 10_000;
+
+    /**
+     * @return the HTTP RESPONSE STATUS CODE for timeout.
+     * @since 2.9
+     */
+    int statusCodeForTimeout() default 509;
 }

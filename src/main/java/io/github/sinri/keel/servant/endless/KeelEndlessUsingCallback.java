@@ -5,7 +5,7 @@ import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Handler;
 
 /**
- * @since 2.8.1
+ * @since 2.8
  * Experimental
  */
 public class KeelEndlessUsingCallback extends KeelVerticle {

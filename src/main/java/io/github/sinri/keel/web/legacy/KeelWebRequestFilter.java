@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * @since 1.1
  * @since 1.10 became abstract
- * @since 2.8.1 moved here
+ * @since 2.9 moved here
  */
 @Deprecated
 public abstract class KeelWebRequestFilter {

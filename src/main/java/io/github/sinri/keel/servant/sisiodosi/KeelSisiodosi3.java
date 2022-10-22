@@ -13,9 +13,9 @@ import java.util.function.Supplier;
  * Experimental!
  * Use Executors.newSingleThreadExecutor().
  *
- * @since 2.8.1
+ * @since 2.8
  */
-@Deprecated(since = "2.8.1")
+@Deprecated(since = "2.9", forRemoval = true)
 public class KeelSisiodosi3 {
     private final Queue<Handler<Void>> queue;
     private final ExecutorService singleThreadExecutorService;

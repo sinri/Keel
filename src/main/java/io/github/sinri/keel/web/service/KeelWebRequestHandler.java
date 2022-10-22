@@ -6,32 +6,36 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 /**
- * @since 2.8.1
+ * @since 2.9
  */
-public interface KeelWebRequestHandler extends Handler<RoutingContext> {
+abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
+    private RoutingContext routingContext;
+    private boolean verbose = false;
 
+    public RoutingContext getRoutingContext() {
+        return routingContext;
+    }
 
-    RoutingContext getRoutingContext();
+    public void setRoutingContext(RoutingContext routingContext) {
+        this.routingContext = routingContext;
+    }
 
-    void setRoutingContext(RoutingContext routingContext);
+    public boolean getVerbose() {
+        return verbose;
+    }
 
-    boolean getVerbose();
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
 
-    void setVerbose(boolean verbose);
-
-    /**
-     * If using Future would not be easy, override it.
-     */
-    void handleRequest();
-
-    default void respondOnSuccess(Object data) {
+    protected void respondOnSuccess(Object data) {
         getRoutingContext().json(new JsonObject()
                 .put("code", "OK")
                 .put("data", data)
         );
     }
 
-    default void respondOnFailure(Throwable throwable) {
+    protected void respondOnFailure(Throwable throwable) {
         var x = new JsonObject()
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
@@ -41,4 +45,11 @@ public interface KeelWebRequestHandler extends Handler<RoutingContext> {
         }
         getRoutingContext().json(x);
     }
+
+    public final void handle(RoutingContext routingContext) {
+        setRoutingContext(routingContext);
+        handleRequest();
+    }
+
+    abstract protected void handleRequest();
 }

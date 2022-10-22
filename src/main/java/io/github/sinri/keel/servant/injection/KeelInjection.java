@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.injection;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureUntil;
+import io.github.sinri.keel.core.controlflow.FutureUntil1;
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticle;
@@ -53,7 +53,7 @@ public class KeelInjection extends KeelVerticle {
      * @return 要么执行完全部队列中的任务返回 success future，要么中途出错返回 failed future
      */
     private Future<Void> handleDrops() {
-        return FutureUntil.call(() -> {
+        return FutureUntil1.call(() -> {
                     InjectionDrop drop = queue.poll();
                     if (drop == null) {
                         // stop FutureUntil
@@ -101,7 +101,7 @@ public class KeelInjection extends KeelVerticle {
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public int getDropCount() {
         return this.queue.size();

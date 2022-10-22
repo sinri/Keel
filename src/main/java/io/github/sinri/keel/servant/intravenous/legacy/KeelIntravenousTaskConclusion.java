@@ -1,9 +1,10 @@
-package io.github.sinri.keel.servant.intravenous;
+package io.github.sinri.keel.servant.intravenous.legacy;
 
 /**
  * @param <R>
  * @since 2.7
  */
+@Deprecated(since = "2.9", forRemoval = true)
 public interface KeelIntravenousTaskConclusion<R> {
 
     /**

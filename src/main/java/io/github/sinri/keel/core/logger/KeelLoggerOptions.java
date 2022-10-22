@@ -105,7 +105,7 @@ public class KeelLoggerOptions {
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public Set<String> getIgnorableStackPackageSet() {
         return ignorableStackPackageSet;

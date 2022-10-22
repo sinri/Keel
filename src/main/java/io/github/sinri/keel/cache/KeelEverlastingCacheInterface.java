@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * @param <K>
  * @param <V>
- * @since 2.8.1
+ * @since 2.9
  */
 public interface KeelEverlastingCacheInterface<K, V> {
     static <K, V> KeelEverlastingCacheInterface<K, V> createDefaultInstance() {

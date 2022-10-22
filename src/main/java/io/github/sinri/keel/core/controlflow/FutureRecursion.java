@@ -9,7 +9,9 @@ import java.util.function.Function;
  *
  * @param <T> 循环依据
  * @since 1.13
+ * @deprecated use FutureUntil
  */
+@Deprecated(since = "2.9", forRemoval = true)
 public class FutureRecursion<T> {
     private final Function<T, Future<Boolean>> shouldNextFunction;
     private final Function<T, Future<T>> singleRecursionFunction;

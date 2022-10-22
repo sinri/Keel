@@ -1,8 +1,9 @@
-package io.github.sinri.keel.servant.intravenous;
+package io.github.sinri.keel.servant.intravenous.legacy;
 
 /**
  * @since 2.8
  */
+@Deprecated(since = "2.9", forRemoval = true)
 class KeelIntravenousTaskConclusionForObject implements KeelIntravenousTaskConclusion<Object> {
     private final String taskReference;
     private final boolean done;

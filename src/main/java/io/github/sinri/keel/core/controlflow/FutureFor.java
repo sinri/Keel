@@ -8,6 +8,7 @@ import java.util.function.Function;
 /**
  * @since 1.13
  */
+@Deprecated(since = "2.9", forRemoval = true)
 public class FutureFor<T> {
     private final Function<T, Future<Void>> handleFunction;
 

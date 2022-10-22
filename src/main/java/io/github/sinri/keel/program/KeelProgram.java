@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @since 2.0
  * @since 2.7 Rename back to KeelProgram from KeelProgramAsVerticle.
- * @since 2.8.1 Greatly changed. No longer using Verticle with vertx cmd usage.
+ * @since 2.9 Greatly changed. No longer using Verticle with vertx cmd usage.
  */
 public abstract class KeelProgram {
     private KeelLogger logger;

@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.sisiodosi;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureUntil;
+import io.github.sinri.keel.core.controlflow.FutureUntil1;
 import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
@@ -28,7 +28,7 @@ import java.util.function.Supplier;
  *
  * @since 2.8
  */
-@Deprecated(since = "2.8.1")
+@Deprecated(since = "2.9", forRemoval = true)
 public class KeelSisiodosi1 {
     private final String eventBusAddress;
     private final Queue<Function<Void, Future<Void>>> dripQueue;
@@ -62,7 +62,7 @@ public class KeelSisiodosi1 {
 
     private Future<Void> cleanDropHandlerQueue() {
         this.logger.debug("cleanDropHandlerQueue start");
-        return FutureUntil.call(
+        return FutureUntil1.call(
                 new Supplier<Future<Boolean>>() {
                     @Override
                     public Future<Boolean> get() {
@@ -85,7 +85,7 @@ public class KeelSisiodosi1 {
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public int getDripQueueSize() {
         return dripQueue.size();

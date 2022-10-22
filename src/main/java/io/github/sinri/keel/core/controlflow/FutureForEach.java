@@ -2,6 +2,7 @@ package io.github.sinri.keel.core.controlflow;
 
 import io.vertx.core.Future;
 
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -18,16 +19,28 @@ public class FutureForEach<T> {
         this.asyncItemProcessFunction = itemProcessor;
     }
 
-    @Deprecated
-    public static <T> Future<Void> quick(Iterable<T> collection, Function<T, Future<Void>> itemProcessor) {
-        return call(collection, itemProcessor);
-    }
-
     public static <T> Future<Void> call(Iterable<T> collection, Function<T, Future<Void>> itemProcessor) {
         return new FutureForEach<T>(itemProcessor).process(collection);
     }
 
     private Future<Void> process(Iterable<T> collection) {
+        Iterator<T> iterator = collection.iterator();
+        return FutureUntil.call(() -> Future.succeededFuture()
+                .compose(v -> {
+                    if (iterator.hasNext()) {
+                        T next = iterator.next();
+                        return asyncItemProcessFunction.apply(next);
+                    } else {
+                        return Future.succeededFuture();
+                    }
+                })
+                .compose(v -> {
+                    return Future.succeededFuture(!iterator.hasNext());
+                }));
+    }
+
+    @Deprecated
+    private Future<Void> processWithFutureRecursion(Iterable<T> collection) {
         AtomicReference<Future<Void>> futureAtomicReference = new AtomicReference<>();
         futureAtomicReference.set(Future.succeededFuture());
         collection.forEach(t -> {

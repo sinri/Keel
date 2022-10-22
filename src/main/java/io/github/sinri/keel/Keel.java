@@ -87,7 +87,7 @@ public class Keel {
     /**
      * This method to get output logger, with all options could be overwritten.
      *
-     * @since 2.8.1
+     * @since 2.9
      */
     public static KeelLogger outputLogger(String aspect, Handler<KeelLoggerOptions> optionsHandler) {
         KeelLoggerOptions options = new KeelLoggerOptions()
@@ -100,7 +100,7 @@ public class Keel {
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public static KeelLogger outputLogger(Handler<KeelLoggerOptions> optionsHandler) {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
@@ -114,7 +114,7 @@ public class Keel {
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public static KeelLogger outputLogger() {
         return outputLogger(keelLoggerOptions -> keelLoggerOptions.setLowestVisibleLogLevel(KeelLogLevel.DEBUG));
@@ -202,14 +202,14 @@ public class Keel {
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public static <R> Future<R> executeWithinLock(String lockName, Supplier<Future<R>> supplier) {
         return executeWithinLock(lockName, 10_000L, supplier);
     }
 
     /**
-     * @since 2.8.1
+     * @since 2.9
      */
     public static <R> Future<R> executeWithinLock(String lockName, long timeout, Supplier<Future<R>> supplier) {
         return getVertx().sharedData().getLockWithTimeout(lockName, timeout)

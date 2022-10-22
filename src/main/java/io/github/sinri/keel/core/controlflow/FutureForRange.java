@@ -46,11 +46,11 @@ public class FutureForRange {
     }
 
     /**
-     * @since 2.8.1 use FutureUntil to avoid Thread Blocking Issue.
+     * @since 2.9 use FutureUntil to avoid Thread Blocking Issue.
      */
     private Future<Void> run(Function<Integer, Future<Void>> handleFunction) {
         AtomicInteger indexRef = new AtomicInteger(start);
-        return FutureUntil3.call(() -> {
+        return FutureUntil.call(() -> {
             if (indexRef.get() < end) {
                 return Future.succeededFuture()
                         .compose(v -> {
@@ -64,21 +64,5 @@ public class FutureForRange {
                 return Future.succeededFuture(true);
             }
         });
-
-//        AtomicReference<Future<Void>> futureAtomicReference = new AtomicReference<>();
-//        futureAtomicReference.set(Future.succeededFuture(null));
-//        for (Integer t = start; t < end; t += step) {
-//            Integer finalT = t;
-//            var f = futureAtomicReference.get()
-//                    .compose(previous -> {
-//                        try {
-//                            return handleFunction.apply(finalT);
-//                        } catch (Throwable throwable) {
-//                            return Future.failedFuture(throwable);
-//                        }
-//                    });
-//            futureAtomicReference.set(f);
-//        }
-//        return futureAtomicReference.get();
     }
 }

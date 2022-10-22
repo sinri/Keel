@@ -1,4 +1,4 @@
-package io.github.sinri.keel.servant.intravenous;
+package io.github.sinri.keel.servant.intravenous.legacy;
 
 /**
  * 小任务，相当于静脉滴注的一滴。
@@ -6,6 +6,7 @@ package io.github.sinri.keel.servant.intravenous;
  *
  * @since 2.7
  */
+@Deprecated(since = "2.9", forRemoval = true)
 public interface KeelIntravenousDrop {
 
     String getReference();

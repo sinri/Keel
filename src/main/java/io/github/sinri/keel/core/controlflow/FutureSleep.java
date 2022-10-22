@@ -5,11 +5,15 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
 /**
- * @since 2.8.1
+ * 将延时执行转换成Future供compose使用。
+ * Promise 真是个好东西！
+ *
+ * @since 2.9
  */
 public class FutureSleep {
     public static Future<Void> call(long time) {
         Promise<Void> promise = Promise.promise();
+        if (time < 1) time = 1;
         Keel.getVertx().setTimer(time, x -> promise.complete());
         return promise.future();
     }

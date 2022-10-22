@@ -3,9 +3,9 @@ package io.github.sinri.keel.web.service;
 import io.vertx.core.Future;
 
 /**
- * @since 2.8.1
+ * @since 2.9
  */
-public abstract class KeelWebRequestFutureHandler extends KeelWebRequestHandlerImplBase {
+public abstract class KeelWebRequestFutureHandler extends KeelWebRequestHandler {
 
 
     abstract protected Future<Object> handleRequestForFuture();
