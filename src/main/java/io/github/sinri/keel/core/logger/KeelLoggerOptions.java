@@ -81,7 +81,7 @@ public class KeelLoggerOptions {
         return KeelLogLevel.valueOf(this.pojo.level);
     }
 
-    public KeelLoggerOptions getLowestVisibleLogLevel(KeelLogLevel logLevel) {
+    public KeelLoggerOptions setLowestVisibleLogLevel(KeelLogLevel logLevel) {
         this.pojo.level = logLevel.name();
         return this;
     }

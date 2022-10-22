@@ -2,8 +2,6 @@ package io.github.sinri.keel.program;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticle;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.cli.CLI;
 import io.vertx.core.cli.CommandLine;
@@ -11,56 +9,66 @@ import io.vertx.core.cli.Option;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @since 2.0
- * @since 2.7 rename back to KeelProgram from KeelProgramAsVerticle
+ * @since 2.7 Rename back to KeelProgram from KeelProgramAsVerticle.
+ * @since 2.8.1 Greatly changed. No longer using Verticle with vertx cmd usage.
  */
-public abstract class KeelProgram extends KeelVerticle {
+public abstract class KeelProgram {
+    private KeelLogger logger;
+    private JsonObject optionMap;
 
-    public static void runProgramAndExit(KeelProgram programVerticle, List<String> args) {
-        List<Option> options = programVerticle.defineCLIOptions();
-        CLI cli = CLI.create(programVerticle.getClass().getName());
+    public KeelProgram() {
+
+    }
+
+    public static void runProgramAndExit(KeelProgram program, List<String> args) {
+        List<Option> options = program.defineCLIOptions();
+        CLI cli = CLI.create(program.getClass().getName());
         for (var option : options) {
             cli.addOption(option);
         }
 
         CommandLine parsed = cli.parse(args);
 
-        JsonObject optionMap = new JsonObject();
+        program.optionMap = new JsonObject();
         for (var option : options) {
-            String optionValue = parsed.getOptionValue(option.getLongName());
-            optionMap.put(option.getLongName(), optionValue);
+            Object optionValue = parsed.getOptionValue(option.getName());
+            program.optionMap.put(option.getName(), optionValue);
         }
+        program.run();
+    }
 
-        programVerticle.deployMe(new DeploymentOptions()
-                .setWorker(true)
-                .setConfig(optionMap)
-        );
+    public KeelLogger getLogger() {
+        return logger;
+    }
+
+    public JsonObject config() {
+        return optionMap;
     }
 
     abstract protected KeelLogger prepareLogger();
 
     abstract protected List<Option> defineCLIOptions();
 
-    @Override
-    public final void start() throws Exception {
-        super.start();
-
-        // Keel.registerDeployedKeelVerticle(this);
-
-        setLogger(prepareLogger());
+    public final void run() {
+        this.logger = prepareLogger();
+        AtomicInteger returnCode = new AtomicInteger(0);
         Future.succeededFuture()
                 .compose(v -> execute())
-                .compose(v -> {
+                .onSuccess(v -> {
                     getLogger().notice("DONE");
-                    return Future.succeededFuture();
-                }, throwable -> {
-                    getLogger().exception("FAILED", throwable);
-                    return Future.succeededFuture();
                 })
-                .eventually(v -> undeployMe()
-                        .eventually(vv -> Keel.getVertx().close()));
+                .onFailure(throwable -> {
+                    getLogger().exception("FAILED", throwable);
+                    returnCode.set(generateReturnCode(throwable));
+                })
+                .eventually(v -> Keel.getVertx().close())
+                .onComplete(v -> {
+                    System.exit(returnCode.get());
+                });
     }
 
     /**
@@ -70,9 +78,7 @@ public abstract class KeelProgram extends KeelVerticle {
      */
     abstract protected Future<Void> execute();
 
-    @Override
-    public void stop() throws Exception {
-        super.stop();
-//        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
+    protected int generateReturnCode(Throwable throwable) {
+        return 0;
     }
 }

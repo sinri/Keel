@@ -1,6 +1,7 @@
 package io.github.sinri.keel.verticles;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Verticle;
@@ -12,6 +13,17 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.14
  */
 public interface KeelVerticleInterface extends Verticle {
+    default KeelLogger getLogger() {
+        return KeelLogger.silentLogger();
+    }
+
+    /**
+     * @since 2.4 do not rely on context anymore
+     * @since 2.7 became public
+     */
+    default void setLogger(KeelLogger logger) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * copied from AbstractVerticle

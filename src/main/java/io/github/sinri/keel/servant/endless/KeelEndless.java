@@ -34,6 +34,7 @@ public class KeelEndless extends KeelVerticle {
     /**
      * @since 2.8
      */
+    @Deprecated
     public KeelEndless(Supplier<Future<Void>> supplier) {
         this.restMS = 30 * 1000L;// 30s
         this.supplier = supplier;

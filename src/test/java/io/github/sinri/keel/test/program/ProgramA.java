@@ -38,6 +38,17 @@ public class ProgramA extends KeelProgram {
         String field1 = this.config().getString("field1");
         String field2 = this.config().getString("field2");
         getLogger().info("field1=" + field1 + " field2=" + field2);
-        return Future.succeededFuture();
+        //return Future.succeededFuture();
+        return Future.failedFuture(new Exception("aaa"));
+    }
+
+    @Override
+    protected int generateReturnCode(Throwable throwable) {
+        if (throwable instanceof RuntimeException) {
+            return 1;
+        } else if (throwable instanceof Exception) {
+            return 2;
+        }
+        return super.generateReturnCode(throwable);
     }
 }

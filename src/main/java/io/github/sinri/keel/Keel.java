@@ -3,17 +3,21 @@ package io.github.sinri.keel;
 import io.github.sinri.keel.core.helper.*;
 import io.github.sinri.keel.core.helper.encryption.KeelCryptographyHelper;
 import io.github.sinri.keel.core.helper.encryption.KeelDigestHelper;
+import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.KeelMySQLOptions;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class Keel {
     private static final KeelPropertiesReader propertiesReader = new KeelPropertiesReader();
@@ -78,6 +82,42 @@ public class Keel {
                 .loadForAspect(aspect)
                 .setImplement("print");
         return KeelLogger.createLogger(options);
+    }
+
+    /**
+     * This method to get output logger, with all options could be overwritten.
+     *
+     * @since 2.8.1
+     */
+    public static KeelLogger outputLogger(String aspect, Handler<KeelLoggerOptions> optionsHandler) {
+        KeelLoggerOptions options = new KeelLoggerOptions()
+                .setCompositionStyle(KeelLoggerOptions.CompositionStyle.THREE_LINES)
+                .addIgnorableStackPackage("io.vertx,io.netty,java.lang")
+                .loadForAspect(aspect)
+                .setImplement("print");
+        if (optionsHandler != null) optionsHandler.handle(options);
+        return KeelLogger.createLogger(options);
+    }
+
+    /**
+     * @since 2.8.1
+     */
+    public static KeelLogger outputLogger(Handler<KeelLoggerOptions> optionsHandler) {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        if (stackTrace.length < 3) {
+            return outputLogger("unknown");
+        } else {
+            StackTraceElement st = stackTrace[2];
+            return outputLogger(st.getClassName() + "::" + st.getMethodName(), optionsHandler)
+                    .setCategoryPrefix("{" + st.getFileName() + ":" + st.getLineNumber() + "}");
+        }
+    }
+
+    /**
+     * @since 2.8.1
+     */
+    public static KeelLogger outputLogger() {
+        return outputLogger(keelLoggerOptions -> keelLoggerOptions.setLowestVisibleLogLevel(KeelLogLevel.DEBUG));
     }
 
     public static KeelMySQLKit getMySQLKit(String dataSourceName) {
@@ -159,5 +199,22 @@ public class Keel {
      */
     public static KeelBinaryHelper binaryHelper() {
         return KeelBinaryHelper.getInstance();
+    }
+
+    /**
+     * @since 2.8.1
+     */
+    public static <R> Future<R> executeWithinLock(String lockName, Supplier<Future<R>> supplier) {
+        return executeWithinLock(lockName, 10_000L, supplier);
+    }
+
+    /**
+     * @since 2.8.1
+     */
+    public static <R> Future<R> executeWithinLock(String lockName, long timeout, Supplier<Future<R>> supplier) {
+        return getVertx().sharedData().getLockWithTimeout(lockName, timeout)
+                .compose(lock -> Future.succeededFuture()
+                        .compose(v -> supplier.get())
+                        .onComplete(ar -> lock.release()));
     }
 }

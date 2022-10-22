@@ -1,7 +1,6 @@
 package io.github.sinri.keel.web.service;
 
 import io.github.sinri.keel.Keel;
-import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -9,45 +8,37 @@ import io.vertx.ext.web.RoutingContext;
 /**
  * @since 2.8.1
  */
-public abstract class KeelWebRequestHandler implements Handler<RoutingContext> {
-    private RoutingContext routingContext;
-    private boolean verbose = false;
+public interface KeelWebRequestHandler extends Handler<RoutingContext> {
 
-    public RoutingContext getRoutingContext() {
-        return routingContext;
-    }
 
-    public KeelWebRequestHandler setVerbose(boolean verbose) {
-        this.verbose = verbose;
-        return this;
-    }
+    RoutingContext getRoutingContext();
 
-    @Override
-    public final void handle(RoutingContext routingContext) {
-        this.routingContext = routingContext;
-        Future.succeededFuture()
-                .compose(v -> handleRequest(routingContext))
-                .onSuccess(this::respondOnSuccess)
-                .onFailure(this::respondOnFailure);
-    }
+    void setRoutingContext(RoutingContext routingContext);
 
-    abstract protected Future<Object> handleRequest(RoutingContext routingContext);
+    boolean getVerbose();
 
-    protected void respondOnSuccess(Object data) {
-        routingContext.json(new JsonObject()
+    void setVerbose(boolean verbose);
+
+    /**
+     * If using Future would not be easy, override it.
+     */
+    void handleRequest();
+
+    default void respondOnSuccess(Object data) {
+        getRoutingContext().json(new JsonObject()
                 .put("code", "OK")
                 .put("data", data)
         );
     }
 
-    protected void respondOnFailure(Throwable throwable) {
+    default void respondOnFailure(Throwable throwable) {
         var x = new JsonObject()
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
-        if (verbose) {
+        if (getVerbose()) {
             String error = Keel.stringHelper().renderThrowableChain(throwable);
             x.put("throwable", error);
         }
-        routingContext.json(x);
+        getRoutingContext().json(x);
     }
 }

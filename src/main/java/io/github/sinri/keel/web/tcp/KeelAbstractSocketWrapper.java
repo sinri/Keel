@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.tcp;
 
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.servant.sisiodosi.KeelSisiodosi;
+import io.github.sinri.keel.servant.sisiodosi.KeelSisiodosi1;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
@@ -15,7 +15,7 @@ import java.util.UUID;
 abstract public class KeelAbstractSocketWrapper {
     private final String socketID;
     private final NetSocket socket;
-    private final KeelSisiodosi sisiodosi;
+    private final KeelSisiodosi1 sisiodosi;
     private KeelLogger logger;
 
     public KeelAbstractSocketWrapper(NetSocket socket) {
@@ -27,7 +27,7 @@ abstract public class KeelAbstractSocketWrapper {
         this.socket = socket;
         this.logger = KeelLogger.silentLogger();
         this.logger.setCategoryPrefix(socketID);
-        this.sisiodosi = new KeelSisiodosi(getClass().getName() + "-" + socketID);
+        this.sisiodosi = new KeelSisiodosi1(getClass().getName() + "-" + socketID);
 
         this.socket
                 .handler(buffer -> {

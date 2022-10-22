@@ -2,7 +2,7 @@ package io.github.sinri.keel.core.controlflow;
 
 import io.vertx.core.Future;
 
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
@@ -45,21 +45,40 @@ public class FutureForRange {
         return new FutureForRange(times).run(handleFunction);
     }
 
+    /**
+     * @since 2.8.1 use FutureUntil to avoid Thread Blocking Issue.
+     */
     private Future<Void> run(Function<Integer, Future<Void>> handleFunction) {
-        AtomicReference<Future<Void>> futureAtomicReference = new AtomicReference<>();
-        futureAtomicReference.set(Future.succeededFuture(null));
-        for (Integer t = start; t < end; t += step) {
-            Integer finalT = t;
-            var f = futureAtomicReference.get()
-                    .compose(previous -> {
-                        try {
-                            return handleFunction.apply(finalT);
-                        } catch (Throwable throwable) {
-                            return Future.failedFuture(throwable);
-                        }
-                    });
-            futureAtomicReference.set(f);
-        }
-        return futureAtomicReference.get();
+        AtomicInteger indexRef = new AtomicInteger(start);
+        return FutureUntil3.call(() -> {
+            if (indexRef.get() < end) {
+                return Future.succeededFuture()
+                        .compose(v -> {
+                            return handleFunction.apply(indexRef.get());
+                        })
+                        .compose(v -> {
+                            indexRef.addAndGet(step);
+                            return Future.succeededFuture(false);
+                        });
+            } else {
+                return Future.succeededFuture(true);
+            }
+        });
+
+//        AtomicReference<Future<Void>> futureAtomicReference = new AtomicReference<>();
+//        futureAtomicReference.set(Future.succeededFuture(null));
+//        for (Integer t = start; t < end; t += step) {
+//            Integer finalT = t;
+//            var f = futureAtomicReference.get()
+//                    .compose(previous -> {
+//                        try {
+//                            return handleFunction.apply(finalT);
+//                        } catch (Throwable throwable) {
+//                            return Future.failedFuture(throwable);
+//                        }
+//                    });
+//            futureAtomicReference.set(f);
+//        }
+//        return futureAtomicReference.get();
     }
 }

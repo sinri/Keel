@@ -14,6 +14,9 @@ public abstract class KeelWebRequestPreHandler implements Handler<RoutingContext
         return routingContext;
     }
 
+    /**
+     * If using Future would not be easy, override it.
+     */
     @Override
     public void handle(RoutingContext routingContext) {
         this.routingContext = routingContext;

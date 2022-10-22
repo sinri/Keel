@@ -74,10 +74,6 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
 
             Route route = router.route(apiMeta.routePath());
 
-            if (apiMeta.timeout() > 0) {
-                route.handler(TimeoutHandler.create(apiMeta.timeout(), timeoutStatusCode));
-            }
-
             if (apiMeta.allowMethods() != null) {
                 for (var methodName : apiMeta.allowMethods()) {
                     route.method(HttpMethod.valueOf(methodName));
@@ -88,6 +84,10 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
             }
 
             route.handler(BodyHandler.create(uploadDirectory));
+
+            if (apiMeta.timeout() > 0) {
+                route.handler(TimeoutHandler.create(apiMeta.timeout(), timeoutStatusCode));
+            }
 
             if (!extraPreHandlers.isEmpty()) {
                 extraPreHandlers.forEach(route::handler);
