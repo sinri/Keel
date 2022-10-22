@@ -4,8 +4,8 @@ import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureForRange;
 import io.github.sinri.keel.core.controlflow.FutureSleep;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.servant.sisiodosi.KeelSisiodosi;
-import io.github.sinri.keel.servant.sisiodosi.KeelSisiodosiWithTimer;
+import io.github.sinri.keel.servant.funnel.KeelFunnel;
+import io.github.sinri.keel.servant.funnel.KeelFunnelImpl;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.Future;
 
@@ -19,8 +19,8 @@ public class KeelSisiodosiTest {
 
         KeelLogger logger = Keel.outputLogger();
 
-        KeelSisiodosi.deployOneInstance(
-                new KeelSisiodosiWithTimer.Options()
+        KeelFunnel.deployOneInstance(
+                new KeelFunnelImpl.Options()
         ).onSuccess(
                 sisiodosi -> {
                     sisiodosi.setLogger(logger);

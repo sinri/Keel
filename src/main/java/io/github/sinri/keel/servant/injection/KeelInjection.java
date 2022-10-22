@@ -13,8 +13,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Supplier;
 
 /**
+ * 自从 2.9 与 KeelFunnel 功能重复，准备废弃。
+ *
  * @since 2.8
+ * @deprecated use KeelFunnel
  */
+@Deprecated(since = "2.9")
 public class KeelInjection extends KeelVerticle {
 
     private final Queue<InjectionDrop> queue = new ConcurrentLinkedQueue<>();

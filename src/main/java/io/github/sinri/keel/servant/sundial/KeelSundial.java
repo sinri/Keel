@@ -9,6 +9,7 @@ import java.util.*;
 
 /**
  * 日晷 (CRON TABLE)
+ * 基于CRON的定时任务实现。
  *
  * @since 2.7 rename from KeelServantTimer
  */

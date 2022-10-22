@@ -5,27 +5,39 @@ import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 
 /**
+ * 随时接收参数包，并周期性轮询以供批处理。
+ * Like original Sisiodosi, but implemented batch processing by default.
+ *
  * @since 2.9
  */
 public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticleInterface {
     private final Queue<T> queue;
 
-    private final Function<T, Future<Void>> dripProcessor;
+    private final Function<List<T>, Future<Void>> processor;
+    private int batchSize;
     private long restTimeout;
 
-    public KeelIntravenous(Function<T, Future<Void>> dripProcessor) {
+    public KeelIntravenous(Function<List<T>, Future<Void>> processor) {
         this.queue = new ConcurrentLinkedQueue<>();
-        this.dripProcessor = dripProcessor;
+        this.processor = processor;
         this.restTimeout = 100L;
+        this.batchSize = 1;
     }
 
     public KeelIntravenous<T> setRestTimeout(long restTimeout) {
         this.restTimeout = restTimeout;
+        return this;
+    }
+
+    public KeelIntravenous<T> setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
         return this;
     }
 
@@ -41,8 +53,13 @@ public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticle
 
     private void routine() {
         if (this.queue.size() > 0) {
+            List<T> l = new ArrayList<>();
+            int i = 0;
+            while (!this.queue.isEmpty() && i < batchSize) {
+                l.add(this.queue.poll());
+            }
             Future.succeededFuture()
-                    .compose(v -> this.dripProcessor.apply(this.queue.poll()))
+                    .compose(v -> this.processor.apply(l))
                     .andThen(ar -> Keel.getVertx().setTimer(1L, x -> routine()));
         } else {
             Keel.getVertx().setTimer(restTimeout, x -> routine());

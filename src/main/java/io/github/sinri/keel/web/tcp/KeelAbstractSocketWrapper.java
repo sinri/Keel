@@ -1,8 +1,8 @@
 package io.github.sinri.keel.web.tcp;
 
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.servant.sisiodosi.KeelSisiodosi;
-import io.github.sinri.keel.servant.sisiodosi.KeelSisiodosiWithTimer;
+import io.github.sinri.keel.servant.funnel.KeelFunnel;
+import io.github.sinri.keel.servant.funnel.KeelFunnelImpl;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
@@ -17,7 +17,7 @@ import java.util.UUID;
 abstract public class KeelAbstractSocketWrapper {
     private final String socketID;
     private final NetSocket socket;
-    private final KeelSisiodosi sisiodosi;
+    private final KeelFunnel sisiodosi;
     private KeelLogger logger;
 
     public KeelAbstractSocketWrapper(NetSocket socket) {
@@ -29,7 +29,7 @@ abstract public class KeelAbstractSocketWrapper {
         this.socket = socket;
         this.logger = KeelLogger.silentLogger();
         this.logger.setCategoryPrefix(socketID);
-        this.sisiodosi = KeelSisiodosi.getOneInstanceToDeploy(new KeelSisiodosiWithTimer.Options()
+        this.sisiodosi = KeelFunnel.getOneInstanceToDeploy(new KeelFunnelImpl.Options()
                 .setQueryInterval(10L)
                 .setTimeThreshold(100L)
                 .setSizeThreshold(4)

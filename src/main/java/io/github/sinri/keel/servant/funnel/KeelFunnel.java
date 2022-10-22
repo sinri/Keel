@@ -1,4 +1,4 @@
-package io.github.sinri.keel.servant.sisiodosi;
+package io.github.sinri.keel.servant.funnel;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
@@ -8,21 +8,21 @@ import io.vertx.core.Future;
 import java.util.function.Supplier;
 
 /**
- * ししおどし（鹿威し）とは、田畑を荒らす鳥獣を威嚇し追い払うために設けられる装置類の総称。
+ * 随时接收小任务，并周期性轮询依次执行。
  * 一般在构建新的实例（new）或部署为verticle（deploy）时自动开始。
  * KeelSisiodosi receives tasks (as drips) continually,
  * and holds them for a batch handle job.
  *
- * @since 2.9
+ * @since 2.9 rename from sisiodosi to funnel
  */
-public interface KeelSisiodosi extends KeelVerticleInterface {
-    static KeelSisiodosi getOneInstanceToDeploy(KeelSisiodosiWithTimer.Options options) {
-        return new KeelSisiodosiWithTimer()
+public interface KeelFunnel extends KeelVerticleInterface {
+    static KeelFunnel getOneInstanceToDeploy(KeelFunnelImpl.Options options) {
+        return new KeelFunnelImpl()
                 .setOptions(options);
     }
 
-    static Future<KeelSisiodosi> deployOneInstance(KeelSisiodosiWithTimer.Options options) {
-        KeelSisiodosiWithTimer keelSisiodosiWithTimer = new KeelSisiodosiWithTimer()
+    static Future<KeelFunnel> deployOneInstance(KeelFunnelImpl.Options options) {
+        KeelFunnelImpl keelSisiodosiWithTimer = new KeelFunnelImpl()
                 .setOptions(options);
         return Keel.getVertx().deployVerticle(
                         keelSisiodosiWithTimer,

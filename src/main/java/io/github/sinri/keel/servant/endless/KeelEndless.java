@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 /**
  * 任务定期触发器，隔一段时间调用任务供应商获取任务执行。
+ * 隔一段时间无条件跑一次。
  * Timer Triggered
  * - START
  * - Supplier.get()

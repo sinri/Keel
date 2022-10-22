@@ -8,6 +8,8 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 
 /**
+ * 标准的队列服务实现。
+ *
  * @since 2.1
  */
 public abstract class KeelQueue extends KeelVerticle {
