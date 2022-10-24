@@ -1,8 +1,10 @@
 package io.github.sinri.keel;
 
-import io.github.sinri.keel.core.helper.*;
-import io.github.sinri.keel.core.helper.encryption.KeelCryptographyHelper;
-import io.github.sinri.keel.core.helper.encryption.KeelDigestHelper;
+import io.github.sinri.keel.core.controlflow.FutureForEach;
+import io.github.sinri.keel.core.controlflow.FutureForRange;
+import io.github.sinri.keel.core.controlflow.FutureSleep;
+import io.github.sinri.keel.core.controlflow.FutureUntil;
+import io.github.sinri.keel.core.helper.KeelHelpers;
 import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.logger.KeelLoggerOptions;
@@ -17,6 +19,7 @@ import io.vertx.core.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Keel {
@@ -139,66 +142,10 @@ public class Keel {
     }
 
     /**
-     * @since 2.6
+     * @since 2.9
      */
-    public static KeelStringHelper stringHelper() {
-        return KeelStringHelper.getInstance();
-    }
-
-    /**
-     * @since 2.6
-     */
-    public static KeelJsonHelper jsonHelper() {
-        return KeelJsonHelper.getInstance();
-    }
-
-    /**
-     * @since 2.6
-     */
-    public static KeelFileHelper fileHelper() {
-        return KeelFileHelper.getInstance();
-    }
-
-    /**
-     * @since 2.6
-     */
-    public static KeelReflectionHelper reflectionHelper() {
-        return KeelReflectionHelper.getInstance();
-    }
-
-    /**
-     * @since 2.6
-     */
-    public static KeelDateTimeHelper dateTimeHelper() {
-        return KeelDateTimeHelper.getInstance();
-    }
-
-    /**
-     * @since 2.8
-     */
-    public static KeelNetHelper netHelper() {
-        return KeelNetHelper.getInstance();
-    }
-
-    /**
-     * @since 2.8
-     */
-    public static KeelDigestHelper digestHelper() {
-        return KeelDigestHelper.getInstance();
-    }
-
-    /**
-     * @since 2.8
-     */
-    public static KeelCryptographyHelper cryptographyHelper() {
-        return KeelCryptographyHelper.getInstance();
-    }
-
-    /**
-     * @since 2.8
-     */
-    public static KeelBinaryHelper binaryHelper() {
-        return KeelBinaryHelper.getInstance();
+    public static KeelHelpers helpers() {
+        return KeelHelpers.getInstance();
     }
 
     /**
@@ -216,5 +163,40 @@ public class Keel {
                 .compose(lock -> Future.succeededFuture()
                         .compose(v -> supplier.get())
                         .onComplete(ar -> lock.release()));
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static Future<Void> callFutureUntil(Supplier<Future<Boolean>> singleRecursionForShouldStopSupplier) {
+        return FutureUntil.call(singleRecursionForShouldStopSupplier);
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static <T> Future<Void> callFutureForEach(Iterable<T> collection, Function<T, Future<Void>> itemProcessor) {
+        return FutureForEach.call(collection, itemProcessor);
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static Future<Void> callFutureForRange(FutureForRange.Options options, Function<Integer, Future<Void>> handleFunction) {
+        return FutureForRange.call(options, handleFunction);
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static Future<Void> callFutureForRange(int times, Function<Integer, Future<Void>> handleFunction) {
+        return FutureForRange.call(times, handleFunction);
+    }
+
+    /**
+     * @since 2.9
+     */
+    public static Future<Void> callFutureSleep(long t) {
+        return FutureSleep.call(t);
     }
 }

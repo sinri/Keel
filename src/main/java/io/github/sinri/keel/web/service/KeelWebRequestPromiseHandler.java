@@ -3,6 +3,9 @@ package io.github.sinri.keel.web.service;
 import io.github.sinri.keel.Keel;
 import io.vertx.core.Promise;
 
+/**
+ * @since 2.9
+ */
 public abstract class KeelWebRequestPromiseHandler extends KeelWebRequestHandler {
     private Long timerID;
 

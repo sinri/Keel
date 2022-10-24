@@ -62,7 +62,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
         Set<Class<? extends S>> allClasses = reflections.getSubTypesOf(classOfService);
 
         allClasses.forEach(c -> {
-            ApiMeta apiMeta = Keel.reflectionHelper().getAnnotationOfClass(c, ApiMeta.class);
+            ApiMeta apiMeta = Keel.helpers().reflection().getAnnotationOfClass(c, ApiMeta.class);
             if (apiMeta == null) return;
             S handler;
             try {

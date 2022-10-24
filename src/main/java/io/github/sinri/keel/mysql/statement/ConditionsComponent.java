@@ -82,7 +82,7 @@ public class ConditionsComponent {
     @Override
     public String toString() {
         if (conditions.isEmpty()) return "";
-        return Keel.stringHelper().joinStringArray(conditions, " and ");
+        return Keel.helpers().string().joinStringArray(conditions, " and ");
     }
 
     /**

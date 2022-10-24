@@ -1,4 +1,4 @@
-package io.github.sinri.keel.core.helper.bcrypt;
+package io.github.sinri.keel.core.helper.encryption.bcrypt;
 
 // Copyright (c) 2006 Damien Miller <djm@mindrot.org>
 //

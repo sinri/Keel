@@ -11,58 +11,97 @@ import java.util.function.Function;
  * @since 1.13
  */
 public class FutureForRange {
-    private final Integer start;
-    private final Integer end;
-    private final Integer step;
+    private final Options options;
 
-    private FutureForRange(Integer start, Integer end, Integer step) {
-        this.start = start;
-        this.end = end;
-        this.step = step;
+    private FutureForRange(Options options) {
+        this.options = options;
     }
 
-    private FutureForRange(Integer start, Integer end) {
-        this.start = start;
-        this.end = end;
-        this.step = 1;
+    /**
+     * @since 2.9
+     */
+    public static Future<Void> call(Options options, Function<Integer, Future<Void>> handleFunction) {
+        return new FutureForRange(options).run(handleFunction);
     }
 
-    private FutureForRange(Integer end) {
-        this.start = 0;
-        this.end = end;
-        this.step = 1;
+    /**
+     * @param times since 2.9 changed to int from Integer
+     * @since 2.9
+     */
+    public static Future<Void> call(int times, Function<Integer, Future<Void>> handleFunction) {
+        Options options = new Options().setEnd(times);
+        return new FutureForRange(options).run(handleFunction);
     }
 
-    public static <T> Future<Void> call(Integer start, Integer end, Integer step, Function<Integer, Future<Void>> handleFunction) {
-        return new FutureForRange(start, end, step).run(handleFunction);
+    @Deprecated(since = "2.9")
+    public static Future<Void> call(Integer start, Integer end, Integer step, Function<Integer, Future<Void>> handleFunction) {
+        return new FutureForRange(new Options().setStart(start).setEnd(end).setStep(step)).run(handleFunction);
     }
 
-    public static <T> Future<Void> call(Integer start, Integer end, Function<Integer, Future<Void>> handleFunction) {
-        return new FutureForRange(start, end).run(handleFunction);
-    }
-
-    public static <T> Future<Void> call(Integer times, Function<Integer, Future<Void>> handleFunction) {
-        return new FutureForRange(times).run(handleFunction);
+    @Deprecated(since = "2.9")
+    public static Future<Void> call(Integer start, Integer end, Function<Integer, Future<Void>> handleFunction) {
+        return new FutureForRange(new Options().setStart(start).setEnd(end)).run(handleFunction);
     }
 
     /**
      * @since 2.9 use FutureUntil to avoid Thread Blocking Issue.
      */
     private Future<Void> run(Function<Integer, Future<Void>> handleFunction) {
-        AtomicInteger indexRef = new AtomicInteger(start);
+        AtomicInteger indexRef = new AtomicInteger(options.getStart());
         return FutureUntil.call(() -> {
-            if (indexRef.get() < end) {
+            if (indexRef.get() < options.getEnd()) {
                 return Future.succeededFuture()
                         .compose(v -> {
                             return handleFunction.apply(indexRef.get());
                         })
                         .compose(v -> {
-                            indexRef.addAndGet(step);
+                            indexRef.addAndGet(options.getStep());
                             return Future.succeededFuture(false);
                         });
             } else {
                 return Future.succeededFuture(true);
             }
         });
+    }
+
+    public static class Options {
+        private int start;
+        private int end;
+        private int step;
+
+        public Options() {
+            this.start = 0;
+            this.end = 0;
+            this.step = 1;
+        }
+
+        public int getStart() {
+            return start;
+        }
+
+        public Options setStart(int start) {
+            this.start = start;
+            return this;
+        }
+
+        public int getEnd() {
+            return end;
+        }
+
+        public Options setEnd(int end) {
+            this.end = end;
+            return this;
+        }
+
+        public int getStep() {
+            return step;
+        }
+
+        public Options setStep(int step) {
+            this.step = step;
+            return this;
+        }
+
+
     }
 }

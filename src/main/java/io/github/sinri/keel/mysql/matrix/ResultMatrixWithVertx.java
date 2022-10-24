@@ -104,7 +104,7 @@ class ResultMatrixWithVertx implements ResultMatrix {
      */
     @Override
     public String getOneColumnOfFirstRowAsDateTime(String columnName) throws KeelSQLResultRowIndexError {
-        return Keel.dateTimeHelper().getMySQLFormatLocalDateTimeExpression(getFirstRow().getString(columnName));
+        return Keel.helpers().datetime().getMySQLFormatLocalDateTimeExpression(getFirstRow().getString(columnName));
     }
 
     public String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError {
@@ -130,7 +130,7 @@ class ResultMatrixWithVertx implements ResultMatrix {
     public List<String> getOneColumnAsDateTime(String columnName) {
         List<String> x = new ArrayList<>();
         for (var row : rowList) {
-            x.add(Keel.dateTimeHelper().getMySQLFormatLocalDateTimeExpression(row.getString(columnName)));
+            x.add(Keel.helpers().datetime().getMySQLFormatLocalDateTimeExpression(row.getString(columnName)));
         }
         return x;
     }

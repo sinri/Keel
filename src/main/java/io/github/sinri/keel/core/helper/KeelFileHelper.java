@@ -25,9 +25,9 @@ public class KeelFileHelper {
 
     }
 
-    public static KeelFileHelper getInstance() {
-        return instance;
-    }
+     static KeelFileHelper getInstance() {
+         return instance;
+     }
 
     public byte[] readFileAsByteArray(String filePath, boolean seekInsideJarWhenNotFound) throws IOException {
         try {

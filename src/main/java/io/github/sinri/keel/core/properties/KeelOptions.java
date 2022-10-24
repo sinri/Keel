@@ -24,7 +24,7 @@ abstract public class KeelOptions {
 
 
     public static <T extends KeelOptions> T loadWithYamlFilePath(String yamlFilePath, Class<T> classOfT) throws IOException {
-        byte[] bytes = Keel.fileHelper().readFileAsByteArray(yamlFilePath, true);
+        byte[] bytes = Keel.helpers().file().readFileAsByteArray(yamlFilePath, true);
 
         var mapper = new ObjectMapper(new YAMLFactory());
         mapper.findAndRegisterModules();
@@ -33,7 +33,7 @@ abstract public class KeelOptions {
     }
 
     public static <T extends KeelOptions> T loadWithJsonObjectFilePath(String jsonObjectFilePath, Class<T> classOfT) throws IOException {
-        byte[] bytes = Keel.fileHelper().readFileAsByteArray(jsonObjectFilePath, true);
+        byte[] bytes = Keel.helpers().file().readFileAsByteArray(jsonObjectFilePath, true);
         return loadWithJsonObject(new JsonObject(Buffer.buffer(bytes)), classOfT);
     }
 

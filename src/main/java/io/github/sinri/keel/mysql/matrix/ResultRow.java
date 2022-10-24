@@ -86,7 +86,7 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
 
     @Deprecated(since = "2.8", forRemoval = true)
     default String getFieldAsDateTime(String filed) {
-        return Keel.dateTimeHelper().getMySQLFormatLocalDateTimeExpression(getRow().getString(filed));
+        return Keel.helpers().datetime().getMySQLFormatLocalDateTimeExpression(getRow().getString(filed));
     }
 
     /**

@@ -29,7 +29,7 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
      */
     private String computeRelativeDirPath() {
         StringBuilder relativePath = new StringBuilder(
-                Keel.stringHelper()
+                Keel.helpers().string()
                         .joinStringArray(
                                 options.getAspectComponentList(),
                                 File.separator
@@ -46,7 +46,7 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
                 Matcher matcher = pattern.matcher(part);
                 String parsedPart = matcher.replaceAll(matchResult -> {
                     String format = matchResult.group(1);
-                    return Keel.dateTimeHelper().getCurrentDateExpression(format);
+                    return Keel.helpers().datetime().getCurrentDateExpression(format);
                 });
                 relativePath.append(File.separator).append(parsedPart);
             }
@@ -63,7 +63,7 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
             prefix = options.getSubject();
         }
 
-        String currentDateExpression = Keel.dateTimeHelper().getCurrentDateExpression(this.options.getFileRotateFormat());
+        String currentDateExpression = Keel.helpers().datetime().getCurrentDateExpression(this.options.getFileRotateFormat());
         if (currentDateExpression != null) {
             return prefix + "-" + currentDateExpression + ".log";
         } else {

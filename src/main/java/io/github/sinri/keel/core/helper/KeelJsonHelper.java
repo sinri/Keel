@@ -17,9 +17,9 @@ public class KeelJsonHelper {
 
     }
 
-    public static KeelJsonHelper getInstance() {
-        return instance;
-    }
+     static KeelJsonHelper getInstance() {
+         return instance;
+     }
 
     public JsonObject writeIntoJsonObject(JsonObject jsonObject, String key, Object value) {
         jsonObject.put(String.valueOf(key), value);

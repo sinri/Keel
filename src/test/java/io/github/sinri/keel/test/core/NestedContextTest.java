@@ -33,7 +33,7 @@ public class NestedContextTest {
                         Keel.getVertx().setPeriodic(100L, timerID -> {
                             getLogger().info("in periodic of v1");
                             Set<String> strings = Keel.getVertx().deploymentIDs();
-                            getLogger().info("deploymentIDs: " + Keel.stringHelper().joinStringArray(strings, ";"));
+                            getLogger().info("deploymentIDs: " + Keel.helpers().string().joinStringArray(strings, ";"));
                             if (!strings.contains(v2DeploymentID)) {
                                 getLogger().info("v2 undeployed, ends");
                                 Keel.getVertx().close();

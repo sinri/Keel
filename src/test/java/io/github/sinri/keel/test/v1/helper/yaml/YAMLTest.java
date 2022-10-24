@@ -10,7 +10,7 @@ public class YAMLTest {
     public static void main(String[] args) {
         byte[] bytes = new byte[0];
         try {
-            bytes = Keel.fileHelper().readFileAsByteArray("test.yml", true);
+            bytes = Keel.helpers().file().readFileAsByteArray("test.yml", true);
         } catch (IOException e) {
             e.printStackTrace();
         }

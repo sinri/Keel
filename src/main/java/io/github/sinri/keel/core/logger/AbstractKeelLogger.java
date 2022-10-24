@@ -67,7 +67,7 @@ abstract public class AbstractKeelLogger implements KeelLogger {
             verticleDeploymentInfo = "{" + Keel.getVertx().getOrCreateContext().deploymentID() + "} ";
         }
 
-        String meta = Keel.dateTimeHelper().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " "
+        String meta = Keel.helpers().datetime().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " "
                 + "[" + level.name() + "] "
                 + "<" + subject + "> "
                 + threadInfo
@@ -172,16 +172,16 @@ abstract public class AbstractKeelLogger implements KeelLogger {
                 prefix = msg + " × " + throwable.getClass().getName() + " : " + throwable.getMessage();
             }
             error(prefix, null);
-            text(level, Keel.stringHelper().renderThrowableChain(throwable, options.getIgnorableStackPackageSet()), "");
+            text(level, Keel.helpers().string().renderThrowableChain(throwable, options.getIgnorableStackPackageSet()), "");
         }
     }
 
     @Override
     public void reportCurrentRuntimeCodeLocation(String remark) {
         if (this.isThisLevelVisible(KeelLogLevel.NOTICE)) {
-            String text = Keel.dateTimeHelper().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS")
+            String text = Keel.helpers().datetime().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS")
                     + " [REMARK] " + remark + System.lineSeparator()
-                    + Keel.stringHelper().buildStackChainText(Thread.currentThread().getStackTrace(), options.getIgnorableStackPackageSet());
+                    + Keel.helpers().string().buildStackChainText(Thread.currentThread().getStackTrace(), options.getIgnorableStackPackageSet());
             text(text);
         }
     }
@@ -205,7 +205,7 @@ abstract public class AbstractKeelLogger implements KeelLogger {
     @Override
     public void buffer(KeelLogLevel logLevel, boolean showAscii, Buffer buffer) {
         if (this.isThisLevelVisible(logLevel)) {
-            String hexMatrix = Keel.stringHelper().bufferToHexMatrix(buffer, 32);
+            String hexMatrix = Keel.helpers().string().bufferToHexMatrix(buffer, 32);
             if (showAscii) {
                 hexMatrix += System.lineSeparator() + buffer.toString();
             }

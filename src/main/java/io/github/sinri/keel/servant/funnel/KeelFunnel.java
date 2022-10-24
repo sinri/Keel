@@ -1,67 +1,184 @@
 package io.github.sinri.keel.servant.funnel;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.controlflow.FutureUntil;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 
+import java.util.Date;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 /**
  * 随时接收小任务，并周期性轮询依次执行。
- * 一般在构建新的实例（new）或部署为verticle（deploy）时自动开始。
- * KeelSisiodosi receives tasks (as drips) continually,
- * and holds them for a batch handle job.
+ * 在部署为verticle（deploy）时自动开始。
  *
  * @since 2.9 rename from sisiodosi to funnel
  */
-public interface KeelFunnel extends KeelVerticleInterface {
-    static KeelFunnel getOneInstanceToDeploy(KeelFunnelImpl.Options options) {
-        return new KeelFunnelImpl()
-                .setOptions(options);
+public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterface {
+    private final Queue<Supplier<Future<Object>>> drips = new ConcurrentLinkedQueue<>();
+    private final AtomicLong restingStartTime = new AtomicLong(0);
+
+    private Options options;
+
+    private KeelLogger logger;
+
+    public static KeelFunnel getOneInstanceToDeploy(long interval) {
+        return getOneInstanceToDeploy(new Options().setQueryInterval(interval));
     }
 
-    static Future<KeelFunnel> deployOneInstance(KeelFunnelImpl.Options options) {
-        KeelFunnelImpl keelSisiodosiWithTimer = new KeelFunnelImpl()
-                .setOptions(options);
-        return Keel.getVertx().deployVerticle(
-                        keelSisiodosiWithTimer,
-                        new DeploymentOptions().setWorker(true)
-                )
-                .compose(d -> {
-                    return Future.succeededFuture(keelSisiodosiWithTimer);
+    public static KeelFunnel getOneInstanceToDeploy(KeelFunnel.Options options) {
+        return new KeelFunnel().setOptions(options);
+    }
+
+    public static Future<KeelFunnel> deployOneInstance(long interval) {
+        return deployOneInstance(new Options().setQueryInterval(interval));
+    }
+
+    public static Future<KeelFunnel> deployOneInstance(KeelFunnel.Options options) {
+        KeelFunnel keelFunnel = new KeelFunnel().setOptions(options);
+        DeploymentOptions deploymentOptions = new DeploymentOptions().setWorker(true);
+        return Keel.getVertx().deployVerticle(keelFunnel, deploymentOptions)
+                .compose(d -> Future.succeededFuture(keelFunnel));
+    }
+
+    @Override
+    public KeelLogger getLogger() {
+        return logger;
+    }
+
+//    @Override
+//    public long getTimeThreshold() {
+//        return options.getTimeThreshold();
+//    }
+
+//    @Override
+//    public int getSizeThreshold() {
+//        return options.getSizeThreshold();
+//    }
+
+    @Override
+    public void setLogger(KeelLogger logger) {
+        this.logger = logger;
+    }
+
+    public KeelFunnel setOptions(Options options) {
+        this.options = options;
+        return this;
+    }
+
+    public int getTotalDrips() {
+        return drips.size();
+    }
+
+    public long getQueryInterval() {
+        return options.getQueryInterval();
+    }
+
+    public void drop(Supplier<Future<Object>> drip) {
+        if (this.deploymentID() == null) {
+            throw new RuntimeException("NOT DEPLOYED");
+        }
+        drips.add(drip);
+    }
+
+    private void query() {
+        if (drips.size() > 0) {
+//            if (drips.size() >= getSizeThreshold()) {
+//                getLogger().debug("DRIPS " + drips.size() + " >= Size Threshold " + getSizeThreshold());
+//                pour();
+//                return;
+//            }
+
+//            long restedTime = new Date().getTime() - restingStartTime.get();
+//            if (restedTime > getTimeThreshold()) {
+//                getLogger().debug("RESTED TIME " + restedTime + " >= Time Threshold " + getTimeThreshold() + " while DRIPS " + drips.size());
+//                pour();
+//                return;
+//            }
+
+            pour();
+            return;
+        }
+        // 暇、続きの暇
+        Keel.getVertx().setTimer(getQueryInterval(), timerID -> query());
+    }
+
+    private Future<Boolean> pourOneDrip() {
+        return Future.succeededFuture(drips.poll())
+                .compose(drip -> {
+                    if (drip == null) {
+                        return Future.succeededFuture(true);
+                    } else {
+                        return drip.get()
+                                .compose(v -> {
+                                    getLogger().info("DRIP DONE");
+                                    return Future.succeededFuture(false);
+                                }, throwable -> {
+                                    getLogger().exception("DRIP FAILED", throwable);
+                                    return Future.succeededFuture(false);
+                                });
+                    }
                 });
     }
 
-    /**
-     * @return 鹿威しの中の雫の数
-     */
-    int getTotalDrips();
-
-    /**
-     * @return 暇のうちに、その時間を経て、鹿威しの中身を検査し、条件満たされたら雫を処理し始まる、そうでないと続きの暇。
-     */
-    long getQueryInterval();
-
-    /**
-     * @return 鹿威しの中の雫があるが最低限の数に足りない時、すでにどれほどの暇が過ぎたら雫を処理し始まる。
-     */
-    long getTimeThreshold();
-
-    /**
-     * @return 鹿威しの中の雫が処理を始まるが必要の最低限の数。
-     */
-    int getSizeThreshold();
-
-    /**
-     * @return 一回にともに処理する雫の数
-     */
-    default int getBatchDrips() {
-        return 1;
+    private void pour() {
+        getLogger().debug("POUR START");
+        FutureUntil.call(this::pourOneDrip)
+                .onComplete(poured -> {
+                    getLogger().debug("POUR END");
+                    restingStartTime.set(new Date().getTime());
+                    query();
+                });
     }
 
-    /**
-     * @param drip 雫。それを処理して、一つの予期を返してすら、次の雫に移行するか終わるかが許される。
-     */
-    void drop(Supplier<Future<Object>> drip);
+    @Override
+    public void start() throws Exception {
+        super.start();
+        restingStartTime.set(new Date().getTime());
+        query();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+    }
+
+    public static class Options {
+        private long queryInterval = 100;
+//        private long timeThreshold = 1000;
+//        private int sizeThreshold = 10;
+
+        public long getQueryInterval() {
+            return queryInterval;
+        }
+
+        public Options setQueryInterval(long queryInterval) {
+            this.queryInterval = queryInterval;
+            return this;
+        }
+
+//        public long getTimeThreshold() {
+//            return timeThreshold;
+//        }
+//
+//        public Options setTimeThreshold(long timeThreshold) {
+//            this.timeThreshold = timeThreshold;
+//            return this;
+//        }
+
+//        public int getSizeThreshold() {
+//            return sizeThreshold;
+//        }
+
+//        public Options setSizeThreshold(int sizeThreshold) {
+//            this.sizeThreshold = sizeThreshold;
+//            return this;
+//        }
+    }
 }

@@ -166,7 +166,7 @@ public class KeelPropertiesReader {
         for (var plainKey : plainKeySet) {
             String[] components = plainKey.split("\\.");
             List<Object> keychain = Arrays.asList(components);
-            Keel.jsonHelper().writeIntoJsonObject(jsonObject, keychain, getProperty(plainKey));
+            Keel.helpers().json().writeIntoJsonObject(jsonObject, keychain, getProperty(plainKey));
         }
         return jsonObject;
     }

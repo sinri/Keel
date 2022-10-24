@@ -137,7 +137,7 @@ public class AmongstCondition implements KeelMySQLCondition {
         if (inverseOperator) {
             s += " NOT";
         }
-        s += " " + OP_IN + " (" + Keel.stringHelper().joinStringArray(targetSet, ",") + ")";
+        s += " " + OP_IN + " (" + Keel.helpers().string().joinStringArray(targetSet, ",") + ")";
         return s;
     }
 }

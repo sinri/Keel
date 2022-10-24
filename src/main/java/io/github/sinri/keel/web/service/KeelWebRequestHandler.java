@@ -40,7 +40,7 @@ abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
         if (getVerbose()) {
-            String error = Keel.stringHelper().renderThrowableChain(throwable);
+            String error = Keel.helpers().string().renderThrowableChain(throwable);
             x.put("throwable", error);
         }
         getRoutingContext().json(x);

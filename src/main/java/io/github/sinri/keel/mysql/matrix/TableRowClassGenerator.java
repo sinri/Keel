@@ -116,7 +116,7 @@ public class TableRowClassGenerator {
         return FutureForEach.call(
                 tables,
                 table -> {
-                    String className = Keel.stringHelper().fromUnderScoreCaseToCamelCase(table) + "TableRow";
+                    String className = Keel.helpers().string().fromUnderScoreCaseToCamelCase(table) + "TableRow";
                     String classFile = packagePath + "/" + className + ".java";
                     return this.generateClassCodeForOneTable(schema, table, packageName, className)
                             .compose(code -> {
@@ -158,7 +158,7 @@ public class TableRowClassGenerator {
     }
 
     private String buildFieldGetter(String field, String type, String comment) {
-        String getter = "get" + Keel.stringHelper().fromUnderScoreCaseToCamelCase(field);
+        String getter = "get" + Keel.helpers().string().fromUnderScoreCaseToCamelCase(field);
         String returnType = "Object";
         String readMethod = "readValue";
 
@@ -204,7 +204,7 @@ public class TableRowClassGenerator {
                 String[] enumValueArray = enumValuesString.split("[, ]+");
                 if (enumValueArray.length > 0) {
                     // to build enum
-                    enum_name = Keel.stringHelper().fromUnderScoreCaseToCamelCase(field) + "Enum";
+                    enum_name = Keel.helpers().string().fromUnderScoreCaseToCamelCase(field) + "Enum";
 
                     getter_string
                             .append("\t/**\n")

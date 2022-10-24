@@ -12,9 +12,9 @@ public class KeelNetHelper {
     private KeelNetHelper() {
     }
 
-    public static KeelNetHelper getInstance() {
-        return instance;
-    }
+     static KeelNetHelper getInstance() {
+         return instance;
+     }
 
     public static void main(String[] args) {
         Long x = KeelNetHelper.getInstance().convertIPv4ToNumber("255.255.255.255");

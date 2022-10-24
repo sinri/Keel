@@ -19,7 +19,7 @@ public class LoggerTest1 {
 
         List<String> list = List.of("EEE", "EEEE", "E", "u");
         list.forEach(item -> {
-            Keel.outputLogger("main").info(item + " -> " + Keel.dateTimeHelper().getCurrentDateExpression(item));
+            Keel.outputLogger("main").info(item + " -> " + Keel.helpers().datetime().getCurrentDateExpression(item));
         });
 
         Keel.getVertx().close();

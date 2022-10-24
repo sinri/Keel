@@ -1,4 +1,4 @@
-package io.github.sinri.keel.core.helper.encryption;
+package io.github.sinri.keel.core.helper;
 
 import io.github.sinri.keel.core.helper.encryption.aes.KeelAes;
 
@@ -12,7 +12,7 @@ public class KeelCryptographyHelper {
 
     }
 
-    public static KeelCryptographyHelper getInstance() {
+    static KeelCryptographyHelper getInstance() {
         return instance;
     }
 

@@ -22,17 +22,17 @@ public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticle
 
     private final Function<List<T>, Future<Void>> processor;
     private int batchSize;
-    private long restTimeout;
+    private long interval;
 
     public KeelIntravenous(Function<List<T>, Future<Void>> processor) {
         this.queue = new ConcurrentLinkedQueue<>();
         this.processor = processor;
-        this.restTimeout = 100L;
+        this.interval = 100L;
         this.batchSize = 1;
     }
 
-    public KeelIntravenous<T> setRestTimeout(long restTimeout) {
-        this.restTimeout = restTimeout;
+    public KeelIntravenous<T> setInterval(long interval) {
+        this.interval = interval;
         return this;
     }
 
@@ -62,7 +62,7 @@ public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticle
                     .compose(v -> this.processor.apply(l))
                     .andThen(ar -> Keel.getVertx().setTimer(1L, x -> routine()));
         } else {
-            Keel.getVertx().setTimer(restTimeout, x -> routine());
+            Keel.getVertx().setTimer(interval, x -> routine());
         }
     }
 }

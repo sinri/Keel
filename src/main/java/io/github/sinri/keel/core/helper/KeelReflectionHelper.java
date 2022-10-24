@@ -13,9 +13,9 @@ public class KeelReflectionHelper {
 
     }
 
-    public static KeelReflectionHelper getInstance() {
-        return instance;
-    }
+     static KeelReflectionHelper getInstance() {
+         return instance;
+     }
 
     /**
      * @param <T> class of target annotation

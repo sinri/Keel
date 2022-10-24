@@ -151,22 +151,22 @@ public class SelectStatement extends AbstractReadStatement {
         if (columns.isEmpty()) {
             sql.append("*");
         } else {
-            sql.append(Keel.stringHelper().joinStringArray(columns, ","));
+            sql.append(Keel.helpers().string().joinStringArray(columns, ","));
         }
         if (!tables.isEmpty()) {
-            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("FROM ").append(Keel.stringHelper().joinStringArray(tables, AbstractStatement.SQL_COMPONENT_SEPARATOR));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("FROM ").append(Keel.helpers().string().joinStringArray(tables, AbstractStatement.SQL_COMPONENT_SEPARATOR));
         }
         if (!whereConditionsComponent.isEmpty()) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("WHERE ").append(whereConditionsComponent);
         }
         if (!categories.isEmpty()) {
-            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("GROUP BY ").append(Keel.stringHelper().joinStringArray(categories, ","));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("GROUP BY ").append(Keel.helpers().string().joinStringArray(categories, ","));
         }
         if (!havingConditionsComponent.isEmpty()) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("HAVING ").append(havingConditionsComponent);
         }
         if (!sortRules.isEmpty()) {
-            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("ORDER BY ").append(Keel.stringHelper().joinStringArray(sortRules, ","));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("ORDER BY ").append(Keel.helpers().string().joinStringArray(sortRules, ","));
         }
         if (limit > 0) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("LIMIT ").append(limit).append(" OFFSET ").append(offset);
@@ -227,7 +227,7 @@ public class SelectStatement extends AbstractReadStatement {
             }
             if (!onConditions.isEmpty()) {
                 s += " ON ";
-                s += Keel.stringHelper().joinStringArray(onConditions, " AND ");
+                s += Keel.helpers().string().joinStringArray(onConditions, " AND ");
             }
             return s;
         }

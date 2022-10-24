@@ -18,9 +18,9 @@ public class KeelStringHelper {
 
     }
 
-    public static KeelStringHelper getInstance() {
-        return instance;
-    }
+     static KeelStringHelper getInstance() {
+         return instance;
+     }
 
     /**
      * 给定一个数组x，用separator作为分隔符，将x中的所有元素的字符串化值拼接起来。
@@ -71,7 +71,7 @@ public class KeelStringHelper {
      */
     @Deprecated(since = "2.8")
     public String md5(String raw) {
-        return Keel.digestHelper().md5(raw);
+        return Keel.helpers().digest().md5(raw);
     }
 
     /**
@@ -84,7 +84,7 @@ public class KeelStringHelper {
      */
     @Deprecated(since = "2.8")
     public String MD5(String raw) {
-        return Keel.digestHelper().MD5(raw);
+        return Keel.helpers().digest().MD5(raw);
     }
 
     /**
@@ -98,7 +98,7 @@ public class KeelStringHelper {
      */
     public String bufferToHexMatrix(Buffer buffer, int rowSize) {
         StringBuilder matrix = new StringBuilder();
-        String s = Keel.binaryHelper().encodeHexWithUpperDigits(buffer);
+        String s = Keel.helpers().binary().encodeHexWithUpperDigits(buffer);
         for (int i = 0; i < s.length(); i += 2) {
             matrix.append(s, i, i + 2).append(" ");
             if ((i / 2) % rowSize == rowSize - 1) {
@@ -123,7 +123,7 @@ public class KeelStringHelper {
                 camel.add(part.substring(0, 1).toUpperCase() + part.substring(1));
             }
         }
-        return Keel.stringHelper().joinStringArray(camel, "");
+        return Keel.helpers().string().joinStringArray(camel, "");
     }
 
     /**
@@ -157,7 +157,7 @@ public class KeelStringHelper {
         if (part.length() > 0) {
             parts.add(part.toString());
         }
-        return Keel.stringHelper().joinStringArray(parts, "_");
+        return Keel.helpers().string().joinStringArray(parts, "_");
     }
 
     /**

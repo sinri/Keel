@@ -46,7 +46,7 @@ public class MarkdownPageBuilder implements FastDocsContentResponder {
             href.append(component);
             x.add("<a href='" + href + (component.endsWith(".md") ? "" : "/index.md") + "'>" + component + "</a>");
         }
-        return Keel.stringHelper().joinStringArray(x, "&nbsp;‣&nbsp;");
+        return Keel.helpers().string().joinStringArray(x, "&nbsp;‣&nbsp;");
     }
 
     protected String getFooterDivContent() {

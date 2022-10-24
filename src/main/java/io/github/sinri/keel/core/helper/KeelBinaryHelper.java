@@ -12,7 +12,7 @@ public class KeelBinaryHelper {
 
     }
 
-    public static KeelBinaryHelper getInstance() {
+    static KeelBinaryHelper getInstance() {
         return instance;
     }
 
