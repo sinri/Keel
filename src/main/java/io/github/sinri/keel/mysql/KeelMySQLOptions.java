@@ -35,6 +35,12 @@ public class KeelMySQLOptions extends KeelOptions {
     public int poolIdleTimeout = 0; // sec; 0 -> no timeout
     public boolean allowPublicKeyRetrieval;
     protected String dataSourceName;
+    /**
+     * If you want to connect to Aliyun PolarDB MySQL, must set it to YES(Boolean as true).
+     *
+     * @since 2.9
+     */
+    public boolean tcpKeepAlive;
 
     public KeelMySQLOptions() {
         this.host = "127.0.0.1";
@@ -47,6 +53,7 @@ public class KeelMySQLOptions extends KeelOptions {
         this.allowPublicKeyRetrieval = false;
         this.poolMaxSize = 128;
         this.poolShared = false;
+        this.tcpKeepAlive=false;
     }
 
     public static KeelMySQLOptions generateOptionsForDataSourceWithPropertiesReader(String dataSourceName) {
@@ -73,7 +80,8 @@ public class KeelMySQLOptions extends KeelOptions {
                 .setPassword(password)
                 .setCharset(charset)
                 .setUseAffectedRows(useAffectedRows)
-                .setConnectTimeout(connectionTimeout);
+                .setConnectTimeout(connectionTimeout)
+                .setTcpKeepAlive(tcpKeepAlive);
     }
 
     public PoolOptions buildPoolOptions() {

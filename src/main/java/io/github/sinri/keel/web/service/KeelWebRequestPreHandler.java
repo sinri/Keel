@@ -6,7 +6,9 @@ import io.vertx.ext.web.RoutingContext;
 
 /**
  * @since 2.9
+ *
  */
+@Deprecated(since = "2.9")
 public abstract class KeelWebRequestPreHandler implements Handler<RoutingContext> {
     private RoutingContext routingContext;
     private int statusCode;

@@ -3,7 +3,8 @@ package io.github.sinri.keel.servant.queue;
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureUntil;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticle;
+import io.github.sinri.keel.verticles.KeelVerticleInterface;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 
@@ -12,7 +13,7 @@ import io.vertx.core.Future;
  *
  * @since 2.1
  */
-public abstract class KeelQueue extends KeelVerticle {
+public abstract class KeelQueue extends AbstractVerticle implements KeelVerticleInterface {
 
     /**
      * 部署之前可以与部署之后的日志器不同实例，也可以相同
@@ -45,8 +46,6 @@ public abstract class KeelQueue extends KeelVerticle {
     abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
 
     public void start() {
-//        Keel.registerDeployedKeelVerticle(this);
-
         // 部署之后重新加载一遍
         this.logger = prepareLogger();
         setLogger(this.logger);

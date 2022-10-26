@@ -1,7 +1,8 @@
 package io.github.sinri.keel.web.websockets;
 
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticle;
+import io.github.sinri.keel.verticles.KeelVerticleInterface;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
@@ -15,7 +16,7 @@ import java.lang.reflect.InvocationTargetException;
  * @since 2.2
  * @since 2.7 加入了默认接触部署的逻辑
  */
-abstract public class KeelWebSocketHandler extends KeelVerticle {
+abstract public class KeelWebSocketHandler extends AbstractVerticle implements KeelVerticleInterface {
 
     private final ServerWebSocket webSocket;
 
@@ -123,6 +124,18 @@ abstract public class KeelWebSocketHandler extends KeelVerticle {
     }
 
     abstract protected KeelLogger prepareLogger();
+
+    private KeelLogger logger;
+
+    @Override
+    public KeelLogger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public void setLogger(KeelLogger logger) {
+        this.logger = logger;
+    }
 
     @Override
     public void start() throws Exception {

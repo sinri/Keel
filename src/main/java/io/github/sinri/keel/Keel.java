@@ -120,7 +120,14 @@ public class Keel {
      * @since 2.9
      */
     public static KeelLogger outputLogger() {
-        return outputLogger(keelLoggerOptions -> keelLoggerOptions.setLowestVisibleLogLevel(KeelLogLevel.DEBUG));
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        if (stackTrace.length < 3) {
+            return outputLogger("unknown", keelLoggerOptions -> keelLoggerOptions.setLowestVisibleLogLevel(KeelLogLevel.DEBUG));
+        } else {
+            StackTraceElement st = stackTrace[2];
+            return outputLogger(Keel.class.getName(), keelLoggerOptions -> keelLoggerOptions.setLowestVisibleLogLevel(KeelLogLevel.DEBUG))
+                    .setContentPrefix(st.toString());
+        }
     }
 
     public static KeelMySQLKit getMySQLKit(String dataSourceName) {

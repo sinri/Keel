@@ -28,6 +28,10 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
 
     private KeelLogger logger;
 
+    private KeelFunnel() {
+        this.logger = KeelLogger.silentLogger();
+    }
+
     public static KeelFunnel getOneInstanceToDeploy(long interval) {
         return getOneInstanceToDeploy(new Options().setQueryInterval(interval));
     }
@@ -142,11 +146,6 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
         super.start();
         restingStartTime.set(new Date().getTime());
         query();
-    }
-
-    @Override
-    public void stop() throws Exception {
-        super.stop();
     }
 
     public static class Options {

@@ -27,4 +27,12 @@ public @interface ApiMeta {
      * @since 2.9
      */
     int statusCodeForTimeout() default 509;
+
+    /**
+     * Cross Origin Resource Sharing
+     *
+     * @return "" as NOT ALLOWED, "*" as ALLOW ALL, else as DOMAIN REGEX PATTERN
+     * @since 2.9
+     */
+    String corsOriginPattern() default "";
 }

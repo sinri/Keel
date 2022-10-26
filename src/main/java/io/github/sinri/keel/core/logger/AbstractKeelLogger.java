@@ -9,7 +9,7 @@ import java.util.UUID;
 
 abstract public class AbstractKeelLogger implements KeelLogger {
     private final String uniqueLoggerID;
-    protected KeelLoggerOptions options;
+    protected final KeelLoggerOptions options;
     private String categoryPrefix;
     private String contentPrefix = "";
 

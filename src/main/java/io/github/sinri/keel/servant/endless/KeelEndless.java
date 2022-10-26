@@ -1,7 +1,8 @@
 package io.github.sinri.keel.servant.endless;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.verticles.KeelVerticle;
+import io.github.sinri.keel.verticles.KeelVerticleInterface;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 
 import java.util.function.Supplier;
@@ -19,7 +20,7 @@ import java.util.function.Supplier;
  *
  * @since 2.7
  */
-public class KeelEndless extends KeelVerticle {
+public class KeelEndless extends AbstractVerticle implements KeelVerticleInterface {
     private final long restMS;
     private final Supplier<Future<Void>> supplier;
 

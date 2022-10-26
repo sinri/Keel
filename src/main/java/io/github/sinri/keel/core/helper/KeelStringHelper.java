@@ -62,32 +62,6 @@ public class KeelStringHelper {
     }
 
     /**
-     * 获取raw对应的以数字和小写字母描述的MD5摘要值。
-     *
-     * @param raw raw string
-     * @return md5 with lower digits
-     * @since 1.1
-     * @since 2.8 use digestHelper
-     */
-    @Deprecated(since = "2.8")
-    public String md5(String raw) {
-        return Keel.helpers().digest().md5(raw);
-    }
-
-    /**
-     * 获取raw对应的以数字和大写字母描述的MD5摘要值。
-     *
-     * @param raw raw string
-     * @return MD5 with upper digits
-     * @since 1.1
-     * @since 2.8 use digestHelper
-     */
-    @Deprecated(since = "2.8")
-    public String MD5(String raw) {
-        return Keel.helpers().digest().MD5(raw);
-    }
-
-    /**
      * 获取一个Buffer的十六进制表达，每个字节以两个字符表示（字母大写）。
      * 字节间空格分隔；每行容纳一定量的字节数。
      *

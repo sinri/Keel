@@ -1,13 +1,14 @@
 package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticle;
+import io.github.sinri.keel.verticles.KeelVerticleInterface;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 
 /**
  * @since 2.1
  */
-public abstract class KeelQueueTask extends KeelVerticle {
+public abstract class KeelQueueTask extends AbstractVerticle implements KeelVerticleInterface {
     public KeelQueueTask() {
         super();
     }
@@ -16,7 +17,19 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     abstract public String getTaskCategory();
 
+    private KeelLogger logger;
+
     abstract protected KeelLogger prepareLogger();
+
+    @Override
+    public KeelLogger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public void setLogger(KeelLogger logger) {
+        this.logger = logger;
+    }
 
     /**
      * 被设计在seeker.seek方法中调用
@@ -53,11 +66,5 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     protected void notifyBeforeUndeploy() {
         // do nothing by default
-    }
-
-    @Override
-    public void stop() throws Exception {
-        super.stop();
-//        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
     }
 }
