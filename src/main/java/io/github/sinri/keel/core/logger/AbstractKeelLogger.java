@@ -4,6 +4,7 @@ import io.github.sinri.keel.Keel;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -53,6 +54,48 @@ abstract public class AbstractKeelLogger implements KeelLogger {
     }
 
     protected String createTextFromLog(KeelLogLevel level, String msg, JsonObject context) {
+        switch (this.options.getCompositionStyle()) {
+            case ONE_JSON_OBJECT:
+                return this.createTextFromLogAsOneJsonObject(level, msg, context);
+            case ONE_LINE:
+            case TWO_LINES:
+            case THREE_LINES:
+            default:
+                return this.createTextFromLogAsLines(level, msg, context);
+        }
+    }
+
+    private String createTextFromLogAsOneJsonObject(KeelLogLevel level, String msg, JsonObject context) {
+        Date now = new Date();
+        JsonObject x = new JsonObject();
+        x.put("time", Keel.helpers().datetime().getDateExpression(now, "yyyy-MM-dd HH:mm:ss.SSS"));
+        x.put("timestamp", now.getTime());
+
+        String subject = options.getSubject();
+        x.put("subject", subject);
+
+        if (getCategoryPrefix() != null && !getCategoryPrefix().isEmpty()) {
+            x.put("category", getCategoryPrefix());
+        }
+
+        if (this.options.shouldShowThreadID()) {
+            var threadInfo = Thread.currentThread().getId();
+            x.put("thread_id", threadInfo);
+        }
+        if (this.options.shouldShowVerticleDeploymentID()) {
+            var verticleDeploymentInfo = Keel.getVertx().getOrCreateContext().deploymentID();
+            x.put("verticle", verticleDeploymentInfo);
+        }
+
+        if (this.getContentPrefix().length() > 0) {
+            x.put("prefix", this.getContentPrefix());
+        }
+
+        return x.put("message", msg).put("context", context).toString();
+    }
+
+    private String createTextFromLogAsLines(KeelLogLevel level, String msg, JsonObject context) {
+        String content;
         String subject = options.getSubject();
         if (getCategoryPrefix() != null && !getCategoryPrefix().isEmpty()) {
             subject += ":" + getCategoryPrefix();
@@ -72,8 +115,6 @@ abstract public class AbstractKeelLogger implements KeelLogger {
                 + "<" + subject + "> "
                 + threadInfo
                 + verticleDeploymentInfo;
-
-        String content;
         if (this.options.getCompositionStyle() == KeelLoggerOptions.CompositionStyle.TWO_LINES) {
             content = meta + System.lineSeparator();
             if (this.getContentPrefix().length() > 0) {
@@ -103,7 +144,6 @@ abstract public class AbstractKeelLogger implements KeelLogger {
                 content += " | " + context;
             }
         }
-
         return content;
     }
 
@@ -171,8 +211,13 @@ abstract public class AbstractKeelLogger implements KeelLogger {
             if (msg != null && !msg.isEmpty()) {
                 prefix = msg + " × " + throwable.getClass().getName() + " : " + throwable.getMessage();
             }
-            error(prefix, null);
-            text(level, Keel.helpers().string().renderThrowableChain(throwable, options.getIgnorableStackPackageSet()), "");
+
+            if (this.options.getCompositionStyle() == KeelLoggerOptions.CompositionStyle.ONE_JSON_OBJECT) {
+                error(prefix, Keel.helpers().json().renderThrowableChain(throwable, options.getIgnorableStackPackageSet()));
+            } else {
+                error(prefix, null);
+                text(level, Keel.helpers().string().renderThrowableChain(throwable, options.getIgnorableStackPackageSet()), "");
+            }
         }
     }
 

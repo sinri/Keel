@@ -206,6 +206,7 @@ public class KeelLoggerOptions {
         ONE_LINE, // meta + message + context \n
         TWO_LINES,// meta \n message + context \n
         THREE_LINES,// meta \n message \n context \n
+        ONE_JSON_OBJECT,// {K:V,...}
     }
 
     protected static class KeelLoggerOptionsPOJO extends KeelOptions {

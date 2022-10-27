@@ -6,6 +6,7 @@ import io.vertx.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @since 2.6
@@ -217,4 +218,100 @@ public class KeelJsonHelper {
     public String getJsonForObjectWhoseItemKeysSorted(JsonObject object) {
         return getSortedJsonObject(object).toString();
     }
+
+    /**
+     * @since 2.9
+     */
+    public JsonObject renderThrowableChain(Throwable throwable, Set<String> ignorableStackPackageSet) {
+        if (throwable == null) return null;
+
+        Throwable cause = throwable.getCause();
+        JsonObject x = new JsonObject()
+                .put("class", throwable.getClass().getName())
+                .put("message", throwable.getMessage())
+                .put("stack", buildStackChainText(throwable.getStackTrace(), ignorableStackPackageSet))
+                .put("cause", null);
+
+        JsonObject upper = x;
+        while (cause != null) {
+            JsonObject current = new JsonObject()
+                    .put("class", cause.getClass().getName())
+                    .put("message", cause.getMessage())
+                    .put("stack", buildStackChainText(cause.getStackTrace(), ignorableStackPackageSet))
+                    .put("cause", null);
+            upper.put("cause", current);
+            upper = current;
+
+            cause = cause.getCause();
+        }
+        return x;
+    }
+
+    /**
+     * @since 2.9
+     */
+    public JsonArray buildStackChainText(StackTraceElement[] stackTrace, Set<String> ignorableStackPackageSet) {
+        JsonArray array = new JsonArray();
+        if (stackTrace != null) {
+            String ignoringClassPackage = null;
+            int ignoringCount = 0;
+            for (StackTraceElement stackTranceItem : stackTrace) {
+                String className = stackTranceItem.getClassName();
+                String matchedClassPackage = null;
+                for (var cp : ignorableStackPackageSet) {
+                    if (className.startsWith(cp)) {
+                        matchedClassPackage = cp;
+                        break;
+                    }
+                }
+                if (matchedClassPackage == null) {
+                    if (ignoringCount > 0) {
+                        array.add(new JsonObject()
+                                .put("type", "ignored")
+                                .put("package", ignoringClassPackage)
+                                .put("count", ignoringCount)
+                        );
+
+                        ignoringClassPackage = null;
+                        ignoringCount = 0;
+                    }
+
+                    array.add(new JsonObject()
+                            .put("type", "call")
+                            .put("class", stackTranceItem.getClassName())
+                            .put("method", stackTranceItem.getMethodName())
+                            .put("file", stackTranceItem.getFileName())
+                            .put("line", stackTranceItem.getLineNumber())
+                    );
+                } else {
+                    if (ignoringCount > 0) {
+                        if (ignoringClassPackage.equals(matchedClassPackage)) {
+                            ignoringCount += 1;
+                        } else {
+                            array.add(new JsonObject()
+                                    .put("type", "ignored")
+                                    .put("package", ignoringClassPackage)
+                                    .put("count", ignoringCount)
+                            );
+
+                            ignoringClassPackage = matchedClassPackage;
+                            ignoringCount = 1;
+                        }
+                    } else {
+                        ignoringClassPackage = matchedClassPackage;
+                        ignoringCount = 1;
+                    }
+                }
+            }
+            if (ignoringCount > 0) {
+                array.add(new JsonObject()
+                        .put("type", "ignored")
+                        .put("package", ignoringClassPackage)
+                        .put("count", ignoringCount)
+                );
+            }
+        }
+        return array;
+    }
+
 }

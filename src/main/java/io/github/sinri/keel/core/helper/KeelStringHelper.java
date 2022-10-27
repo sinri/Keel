@@ -18,9 +18,9 @@ public class KeelStringHelper {
 
     }
 
-     static KeelStringHelper getInstance() {
-         return instance;
-     }
+    static KeelStringHelper getInstance() {
+        return instance;
+    }
 
     /**
      * 给定一个数组x，用separator作为分隔符，将x中的所有元素的字符串化值拼接起来。
@@ -208,6 +208,7 @@ public class KeelStringHelper {
         return buildStackChainText(stackTrace, Set.of());
     }
 
+
     /**
      * @since 2.9
      */
@@ -245,4 +246,5 @@ public class KeelStringHelper {
     public String renderThrowableChain(Throwable throwable) {
         return renderThrowableChain(throwable, Set.of());
     }
+
 }
