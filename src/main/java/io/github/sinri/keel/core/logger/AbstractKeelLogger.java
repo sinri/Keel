@@ -19,6 +19,13 @@ abstract public class AbstractKeelLogger implements KeelLogger {
         this.uniqueLoggerID = UUID.randomUUID().toString();
     }
 
+    /**
+     * @since 2.9
+     */
+    public KeelLoggerOptions getOptions() {
+        return this.options;
+    }
+
     public final boolean isThisLevelVisible(KeelLogLevel logLevel) {
         KeelLogLevel lowestVisibleLogLevel = options.getLowestVisibleLogLevel();
         if (lowestVisibleLogLevel == null) {
@@ -27,7 +34,7 @@ abstract public class AbstractKeelLogger implements KeelLogger {
         return logLevel.isEnoughSeriousAs(lowestVisibleLogLevel);
     }
 
-    protected String getCategoryPrefix() {
+    public String getCategoryPrefix() {
         return this.categoryPrefix;
     }
 

@@ -27,7 +27,7 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
      *
      * @return computed Relative Directory Path
      */
-    private String computeRelativeDirPath() {
+    protected static String computeRelativeDirPath(KeelLoggerOptions options) {
         StringBuilder relativePath = new StringBuilder(
                 Keel.helpers().string()
                         .joinStringArray(
@@ -37,8 +37,8 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
         );
 
         Pattern pattern = Pattern.compile("\\{([A-Za-z: _.]+)}");
-        if (this.options.getArchivePath() != null) {
-            String[] parts = this.options.getArchivePath().split("/+");
+        if (options.getArchivePath() != null) {
+            String[] parts = options.getArchivePath().split("/+");
             for (String part : parts) {
                 if (part == null || part.trim().isEmpty()) {
                     continue;
@@ -55,15 +55,15 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
         return relativePath.toString();
     }
 
-    private String computeFileName() {
+    protected static String computeFileName(String subject, String categoryPrefix, String fileRotateFormat) {
         String prefix;
-        if (this.getCategoryPrefix() != null && !this.getCategoryPrefix().isEmpty()) {
-            prefix = this.getCategoryPrefix();
+        if (categoryPrefix != null && !categoryPrefix.isEmpty()) {
+            prefix = categoryPrefix;
         } else {
-            prefix = options.getSubject();
+            prefix = subject;
         }
 
-        String currentDateExpression = Keel.helpers().datetime().getCurrentDateExpression(this.options.getFileRotateFormat());
+        String currentDateExpression = Keel.helpers().datetime().getCurrentDateExpression(fileRotateFormat);
         if (currentDateExpression != null) {
             return prefix + "-" + currentDateExpression + ".log";
         } else {
@@ -94,7 +94,7 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
             }
         }
 
-        File dir = new File(logRootDirectory.getAbsolutePath() + File.separator + computeRelativeDirPath());
+        File dir = new File(logRootDirectory.getAbsolutePath() + File.separator + computeRelativeDirPath(options));
 
         if (!dir.exists()) {
             if (!dir.mkdirs()) {
@@ -102,7 +102,7 @@ abstract public class AbstractKeelFileLogger extends AbstractKeelLogger {
             }
         }
 
-        String realPath = dir.getAbsolutePath() + File.separator + computeFileName();
+        String realPath = dir.getAbsolutePath() + File.separator + computeFileName(options.getSubject(), getCategoryPrefix(), options.getFileRotateFormat());
 
         return new File(realPath);
     }

@@ -3,7 +3,10 @@ package io.github.sinri.keel.servant.intravenous;
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.MessageConsumer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +26,8 @@ public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticle
     private final Function<List<T>, Future<Void>> processor;
     private int batchSize;
     private long interval;
+
+    private MessageConsumer<T> consumer;
 
     public KeelIntravenous(Function<List<T>, Future<Void>> processor) {
         this.queue = new ConcurrentLinkedQueue<>();
@@ -64,5 +69,40 @@ public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticle
         } else {
             Keel.getVertx().setTimer(interval, x -> routine());
         }
+    }
+
+    /**
+     * @param address used in EventBus
+     * @since 2.9
+     */
+    public void registerMessageConsumer(String address) {
+        unregisterMessageConsumer(event -> consumer = Keel.getVertx().eventBus()
+                .consumer(address, message -> drop(message.body())));
+    }
+
+    /**
+     * @since 2.9
+     */
+    public void unregisterMessageConsumer(Handler<AsyncResult<Void>> completionHandler) {
+        if (this.consumer != null) {
+            this.consumer.unregister(completionHandler);
+        } else {
+            Future.succeededFuture((Void) null).onComplete(completionHandler);
+        }
+    }
+
+    /**
+     * @since 2.9
+     */
+    public void unregisterMessageConsumer() {
+        unregisterMessageConsumer(event -> {
+
+        });
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        unregisterMessageConsumer();
     }
 }
