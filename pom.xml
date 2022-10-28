@@ -10,8 +10,8 @@
 
     <groupId>io.github.sinri</groupId>
     <artifactId>Keel</artifactId>
-    <version>2.9-SNAPSHOT</version>
-    <!--    <version>2.9</version>-->
+    <!--    <version>2.9-SNAPSHOT</version>-->
+    <version>2.9</version>
 
     <name>Keel</name>
     <description>
@@ -52,6 +52,7 @@
                 <version>3.8.1</version>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
