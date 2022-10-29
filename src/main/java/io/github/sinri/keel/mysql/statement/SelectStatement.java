@@ -94,7 +94,7 @@ public class SelectStatement extends AbstractReadStatement {
     }
 
     /**
-     * @param function ConditionsComponent -> ConditionsComponent it self
+     * @param function ConditionsComponent → ConditionsComponent it self
      * @return this
      * @since 1.4
      */

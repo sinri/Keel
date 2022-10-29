@@ -80,7 +80,7 @@ public class SimpleResultRow implements ResultRow {
 
     /**
      * @param rows        collection of AbstractTableRow
-     * @param transformer a function, AbstractTableRow->JsonObject
+     * @param transformer a function, AbstractTableRow→JsonObject
      * @return a json array
      * @see ResultRow#batchToJsonArray(Collection, Function)
      * @since 1.13

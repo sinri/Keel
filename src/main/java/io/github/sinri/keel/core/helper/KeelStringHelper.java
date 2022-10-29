@@ -46,7 +46,7 @@ public class KeelStringHelper {
      * @param x         a list
      * @param separator separator
      * @return the joined string
-     * @since 2.0 list -> collection
+     * @since 2.0 list → collection
      */
     public String joinStringArray(Collection<?> x, String separator) {
         StringBuilder result = new StringBuilder();

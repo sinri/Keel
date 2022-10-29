@@ -39,7 +39,7 @@ public class DeleteStatement extends AbstractModifyStatement {
     }
 
     /**
-     * @param function ConditionsComponent -> this
+     * @param function ConditionsComponent → this
      * @return this
      * @since 1.4
      */
