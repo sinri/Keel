@@ -1,6 +1,7 @@
 package io.github.sinri.keel.servant.endless;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -24,14 +25,7 @@ public class KeelEndless extends AbstractVerticle implements KeelVerticleInterfa
     private final long restMS;
     private final Supplier<Future<Void>> supplier;
 
-    /**
-     * @param restMS   干完一组事情后休息的时间长度，单位为 千分之一秒
-     * @param supplier 所谓的干完一组事情
-     */
-    public KeelEndless(long restMS, Supplier<Future<Void>> supplier) {
-        this.restMS = restMS;
-        this.supplier = supplier;
-    }
+    private KeelLogger logger;
 
     private Future<Void> routine() {
         // since 2.8 防止 inner exception 爆破
@@ -53,8 +47,28 @@ public class KeelEndless extends AbstractVerticle implements KeelVerticleInterfa
                 );
     }
 
+    /**
+     * @param restMS   干完一组事情后休息的时间长度，单位为 千分之一秒
+     * @param supplier 所谓的干完一组事情
+     */
+    public KeelEndless(long restMS, Supplier<Future<Void>> supplier) {
+        this.restMS = restMS;
+        this.supplier = supplier;
+        this.setLogger(KeelLogger.silentLogger());
+    }
+
     @Override
-    public void start() throws Exception {
+    public void start() {
         routineWrapper();
+    }
+
+    @Override
+    public KeelLogger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public void setLogger(KeelLogger logger) {
+        this.logger = logger;
     }
 }

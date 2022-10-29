@@ -126,7 +126,7 @@ public class KeelDigestHelper {
      * @since 2.8
      */
     public String hmac_sha1_base64(String raw, String key) {
-        byte[] bytes = new byte[0];
+        byte[] bytes;
         try {
             bytes = compute_hmac_sha1(raw, key);
         } catch (UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeyException e) {

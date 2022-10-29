@@ -23,25 +23,25 @@ public class KeelAesEcbPkcs7Padding extends KeelAesUsingPkcs7Padding {
         super(key);
     }
 
-    public static void main(String[] args) throws Exception {
-        String key = "1234567890123456";// + "X";
-        KeelAesEcbPkcs7Padding aes = new KeelAesEcbPkcs7Padding(key);
-
-        // 加密
-        long lStart = System.currentTimeMillis();
-        String enString = aes.encrypt("abcd中文测试加标点符号！@#￥%……&*（+——）（*&~，。，；,,/;lkk;ki;'[p]./,'\\467646789");
-        System.out.println("加密后的字串是：" + enString);
-
-        long lUseTime = System.currentTimeMillis() - lStart;
-        System.out.println("加密耗时：" + lUseTime + "毫秒");
-
-        // 解密
-        lStart = System.currentTimeMillis();
-        String DeString = aes.decrypt(enString);
-        System.out.println("解密后的字串是：" + DeString);
-        lUseTime = System.currentTimeMillis() - lStart;
-        System.out.println("解密耗时：" + lUseTime + "毫秒");
-    }
+//    public static void main(String[] args) throws Exception {
+//        String key = "1234567890123456";// + "X";
+//        KeelAesEcbPkcs7Padding aes = new KeelAesEcbPkcs7Padding(key);
+//
+//        // 加密
+//        long lStart = System.currentTimeMillis();
+//        String enString = aes.encrypt("abcd中文测试加标点符号！@#￥%……&*（+——）（*&~，。，；,,/;lkk;ki;'[p]./,'\\467646789");
+//        System.out.println("加密后的字串是：" + enString);
+//
+//        long lUseTime = System.currentTimeMillis() - lStart;
+//        System.out.println("加密耗时：" + lUseTime + "毫秒");
+//
+//        // 解密
+//        lStart = System.currentTimeMillis();
+//        String DeString = aes.decrypt(enString);
+//        System.out.println("解密后的字串是：" + DeString);
+//        lUseTime = System.currentTimeMillis() - lStart;
+//        System.out.println("解密耗时：" + lUseTime + "毫秒");
+//    }
 
     @Override
     public SupportedCipherAlgorithm getCipherAlgorithm() {

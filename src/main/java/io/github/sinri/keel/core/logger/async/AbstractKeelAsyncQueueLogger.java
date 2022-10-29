@@ -249,14 +249,12 @@ abstract public class AbstractKeelAsyncQueueLogger<T> implements KeelLogger {
             verticleDeploymentInfo = "{" + Keel.getVertx().getOrCreateContext().deploymentID() + "} ";
         }
 
-        String meta = Keel.helpers().datetime().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " "
+        // as ONE_LINE
+        content = Keel.helpers().datetime().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " "
                 + "[" + level.name() + "] "
                 + "<" + subject + "> "
                 + threadInfo
                 + verticleDeploymentInfo;
-
-        // as ONE_LINE
-        content = meta;
         if (this.getContentPrefix().length() > 0) {
             content += this.getContentPrefix() + " ";
         }

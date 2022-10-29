@@ -31,16 +31,13 @@ public class FutureUntil {
     public static void main(String[] args) {
         Keel.initializeVertx(new VertxOptions());
         AtomicInteger x = new AtomicInteger(0);
-        FutureUntil.call(new Supplier<Future<Boolean>>() {
-                    @Override
-                    public Future<Boolean> get() {
-                        int i = x.incrementAndGet();
-                        Keel.outputLogger().info("i=" + i);
-                        if (x.get() > 5) {
-                            return Future.succeededFuture(true);
-                        } else {
-                            return Future.succeededFuture(false);
-                        }
+        FutureUntil.call(() -> {
+                    int i = x.incrementAndGet();
+                    Keel.outputLogger().info("i=" + i);
+                    if (x.get() > 5) {
+                        return Future.succeededFuture(true);
+                    } else {
+                        return Future.succeededFuture(false);
                     }
                 })
                 .onComplete(ar -> {

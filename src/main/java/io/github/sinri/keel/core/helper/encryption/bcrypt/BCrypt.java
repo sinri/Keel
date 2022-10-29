@@ -527,7 +527,7 @@ public class BCrypt {
         String real_salt;
         byte[] passwordb, saltb, hashed;
         char minor = (char) 0;
-        int rounds, off = 0;
+        int rounds, off;
         StringBuffer rs = new StringBuffer();
 
         if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
@@ -714,7 +714,7 @@ public class BCrypt {
     /**
      * Perform the "enhanced key schedule" step described by
      * Provos and Mazieres in "A Future-Adaptable Password Scheme"
-     * http://www.openbsd.org/papers/bcrypt-paper.ps
+     * <a href="http://www.openbsd.org/papers/bcrypt-paper.ps">...</a>
      *
      * @param data salt information
      * @param key  password information

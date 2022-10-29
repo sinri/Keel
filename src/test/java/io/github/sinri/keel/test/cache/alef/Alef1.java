@@ -2,12 +2,13 @@ package io.github.sinri.keel.test.cache.alef;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticle;
+import io.github.sinri.keel.verticles.KeelVerticleInterface;
+import io.vertx.core.AbstractVerticle;
 
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Alef1 extends KeelVerticle {
+public class Alef1 extends AbstractVerticle implements KeelVerticleInterface {
     private static final String KEY = "k";
 
     public Alef1(KeelLogger logger) {
@@ -38,5 +39,17 @@ public class Alef1 extends KeelVerticle {
                 }
             }
         });
+    }
+
+    private KeelLogger logger;
+
+    @Override
+    public KeelLogger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public void setLogger(KeelLogger logger) {
+        this.logger = logger;
     }
 }
