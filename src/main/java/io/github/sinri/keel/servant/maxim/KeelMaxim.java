@@ -3,6 +3,7 @@ package io.github.sinri.keel.servant.maxim;
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
+import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.AsyncMap;
@@ -93,18 +94,25 @@ public class KeelMaxim {
         });
     }
 
+    private MessageConsumer<JsonObject> consumer;
+
     public void runAsProducer() {
-        MessageConsumer<JsonObject> c = Keel.getVertx().eventBus().consumer(maximName, x -> {
-            getLogger().info("MESSAGE RECEIVED ON " + maximName + ": " + x.toString());
-            MaximBullet maximBullet = new MaximBullet() {
-                @Override
-                public Future<Void> fire() {
-                    return Future.failedFuture(new NullPointerException());
-                }
-            };
-            maximBullet.reloadDataFromJsonObject(x.body());
-            product(maximBullet);
+        this.consumer = Keel.getVertx().eventBus().consumer(maximName, this::handleMessage);
+        this.consumer.exceptionHandler(throwable -> {
+            getLogger().exception("CONSUMER EXCEPTION", throwable);
         });
+    }
+
+    private void handleMessage(Message<JsonObject> message) {
+        getLogger().info("MESSAGE RECEIVED ON " + maximName, message.body());
+        MaximBullet maximBullet = new MaximBullet() {
+            @Override
+            public Future<Void> fire() {
+                return Future.failedFuture(new NullPointerException());
+            }
+        };
+        maximBullet.reloadDataFromJsonObject(message.body());
+        product(maximBullet);
     }
 
     private Future<Void> routine() {
