@@ -1,5 +1,9 @@
 package io.github.sinri.keel;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.config.TcpIpConfig;
 import io.github.sinri.keel.core.controlflow.FutureForEach;
 import io.github.sinri.keel.core.controlflow.FutureForRange;
 import io.github.sinri.keel.core.controlflow.FutureSleep;
@@ -16,8 +20,12 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.spi.cluster.ClusterManager;
+import io.vertx.spi.cluster.hazelcast.ConfigUtil;
+import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -42,6 +50,61 @@ public class Keel {
      */
     public static void initializeVertx(VertxOptions vertxOptions) {
         vertx = Vertx.vertx(vertxOptions);
+    }
+
+    /**
+     * 构建一个简易集群。
+     *
+     * @param clusterName   集群名称
+     * @param publicAddress 公开地址
+     * @param port          监听端口
+     * @param members       集群组内地址成员
+     * @param vertxOptions  Vert.x 参数
+     * @return 未来
+     * @since 2.9.1
+     */
+    public static Future<Void> initializeClusteredVertx(
+            String clusterName,
+            String publicAddress,
+            int port,
+            List<String> members,
+            VertxOptions vertxOptions
+    ) {
+        Config hazelcastConfig = ConfigUtil.loadConfig();
+
+        hazelcastConfig.setClusterName(clusterName);
+        hazelcastConfig.setNetworkConfig(new NetworkConfig()
+                .setPublicAddress(publicAddress)
+                .setPort(port)
+                .setJoin(new JoinConfig()
+                        .setTcpIpConfig(new TcpIpConfig()
+                                        .setEnabled(true)
+                                        .setMembers(members)
+                                //.addMember("127.0.0.1:14001")
+                                //.addMember("127.0.0.1:14002")
+                        )
+                )
+        );
+
+        return initializeClusteredVertx(hazelcastConfig, vertxOptions);
+    }
+
+    /**
+     * 以程序编辑的方式构建一个集群。
+     *
+     * @param hazelcastConfig Hazelcast 配置
+     * @param vertxOptions    Vert.x 选项
+     * @return 未来
+     * @since 2.9
+     */
+    public static Future<Void> initializeClusteredVertx(Config hazelcastConfig, VertxOptions vertxOptions) {
+        ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
+        VertxOptions options = new VertxOptions().setClusterManager(mgr);
+        return Vertx.clusteredVertx(options)
+                .compose(clusteredVertx -> {
+                    vertx = clusteredVertx;
+                    return Future.succeededFuture();
+                });
     }
 
     public static Vertx getVertx() {

@@ -158,6 +158,12 @@
             <version>23.0.0</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-hazelcast</artifactId>
+            <version>4.3.4</version>
+        </dependency>
+
         <!--        <dependency>-->
         <!--            <groupId>org.bouncycastle</groupId>-->
         <!--            <artifactId>bcprov-jdk15on</artifactId>-->

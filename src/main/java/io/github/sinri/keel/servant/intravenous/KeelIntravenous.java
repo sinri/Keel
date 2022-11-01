@@ -1,6 +1,7 @@
 package io.github.sinri.keel.servant.intravenous;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
@@ -104,5 +105,17 @@ public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticle
     public void stop() throws Exception {
         super.stop();
         unregisterMessageConsumer();
+    }
+
+    private KeelLogger logger;
+
+    @Override
+    public KeelLogger getLogger() {
+        return logger;
+    }
+
+    @Override
+    public void setLogger(KeelLogger logger) {
+        this.logger = logger;
     }
 }

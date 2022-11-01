@@ -8,7 +8,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * @since 2.9
+ * @since 2.9.1 fields const
+ */
 public class LogMessage {
+    public static String KeyLogAspect = "log_aspect";
+    public static String KeyLogLevel = "log_level";
+    public static String KeyLogTime = "log_time";
+    public static String KeyLogContent = "log_content";
+    public static String KeyLogContext = "log_context";
+    public static String KeyLogThread = "log_thread";
+    public static String KeyLogVerticle = "log_verticle";
+
     private final long timestamp;
     private final Map<String, String> map;
 
@@ -21,12 +33,15 @@ public class LogMessage {
     ) {
         this.timestamp = timestamp;
         this.map = new HashMap<>();
-        this.map.put("log_aspect", aspect);
-        this.map.put("log_level", logLevel.name());
-        this.map.put("log_time", Keel.helpers().datetime().getDateExpression(new Date(timestamp), "yyyy-MM-dd HH:mm:ss.SSS"));
-        this.map.put("log_content", message);
+        this.map.put(KeyLogAspect, aspect);
+        this.map.put(KeyLogLevel, logLevel.name());
+        this.map.put(KeyLogTime, Keel.helpers().datetime().getDateExpression(new Date(timestamp), "yyyy-MM-dd HH:mm:ss.SSS"));
+        this.map.put(KeyLogContent, message);
         if (context != null) {
-            this.map.put("log_context", context.toString());
+            this.map.put(KeyLogContext, context.toString());
+//            context.forEach(entry -> {
+//                this.map.put(entry.getKey(), String.valueOf(entry.getValue()));
+//            });
         }
     }
 
@@ -36,15 +51,31 @@ public class LogMessage {
     }
 
     public LogMessage setLogThread(long threadID) {
-        return enrich("log_thread", String.valueOf(threadID));
+        return enrich(KeyLogThread, String.valueOf(threadID));
     }
 
     public LogMessage setLogVerticle(String verticle) {
-        return enrich("log_verticle", String.valueOf(verticle));
+        return enrich(KeyLogVerticle, String.valueOf(verticle));
+    }
+
+    /**
+     * @since 2.9.1
+     */
+    public JsonObject getLogContext() {
+        String s = map.get(KeyLogContext);
+        if (s == null) return null;
+        if (Objects.equals("null", s) || s.isEmpty() || s.isBlank()) {
+            return null;
+        }
+        try {
+            return new JsonObject(s);
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     public LogMessage setLogContext(JsonObject context) {
-        return enrich("log_context", context == null ? null : context.toString());
+        return enrich(KeyLogContext, context == null ? null : context.toString());
     }
 
     public long getTimestamp() {
@@ -55,36 +86,35 @@ public class LogMessage {
         return map;
     }
 
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(map.get("log_time"))
-                .append(" [").append(map.get("log_level")).append("]")
-                .append(" <").append(map.get("log_aspect")).append(">");
+        sb.append(map.get(KeyLogTime))
+                .append(" [").append(map.get(KeyLogLevel)).append("]")
+                .append(" <").append(map.get(KeyLogAspect)).append(">");
 
         map.forEach((k, v) -> {
-            if (Objects.equals("log_time", k)) {
+            if (Objects.equals(KeyLogTime, k)) {
                 return;
             }
-            if (Objects.equals("log_aspect", k)) {
+            if (Objects.equals(KeyLogAspect, k)) {
                 return;
             }
-            if (Objects.equals("log_level", k)) {
+            if (Objects.equals(KeyLogLevel, k)) {
                 return;
             }
-            if (Objects.equals("log_content", k)) {
+            if (Objects.equals(KeyLogContent, k)) {
                 return;
             }
-            if (Objects.equals("log_context", k)) {
+            if (Objects.equals(KeyLogContext, k)) {
                 return;
             }
 
             sb.append(" ").append(k).append("=").append(v);
         });
 
-        sb.append(" ").append(map.get("log_content"));
-        String log_context = map.get("log_context");
+        sb.append(" ").append(map.get(KeyLogContent));
+        String log_context = map.get(KeyLogContext);
         if (log_context != null) {
             sb.append(" | ").append(log_context);
         }

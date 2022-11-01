@@ -2,8 +2,10 @@ package io.github.sinri.keel.core.helper;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @since 2.6
@@ -15,9 +17,9 @@ public class KeelDateTimeHelper {
 
     }
 
-     static KeelDateTimeHelper getInstance() {
-         return instance;
-     }
+    static KeelDateTimeHelper getInstance() {
+        return instance;
+    }
 
     /**
      * @param format "yyyyMMdd" or "yyyy-MM-dd HH:mm:ss", etc. if null, return null
@@ -50,5 +52,18 @@ public class KeelDateTimeHelper {
     public String getMySQLFormatLocalDateTimeExpression(String localDateTimeExpression) {
         return LocalDateTime.parse(localDateTimeExpression)
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    /**
+     * @return Date Time in RFC 1123: Mon, 31 Oct 2022 01:18:43 GMT
+     * @since 2.9.1
+     */
+    public String getGMTDateTimeExpression() {
+        DateTimeFormatter gmt = DateTimeFormatter.ofPattern(
+                        "EEE, dd MMM yyyy HH:mm:ss z",
+                        Locale.ENGLISH
+                )
+                .withZone(ZoneId.of("GMT"));
+        return gmt.format(LocalDateTime.now());
     }
 }

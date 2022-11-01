@@ -2,10 +2,13 @@ package io.github.sinri.keel.test.weba;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.controlflow.FutureSleep;
+import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.github.sinri.keel.web.KeelHttpServer;
+import io.github.sinri.keel.web.service.KeelWebRequestFutureHandler;
 import io.github.sinri.keel.web.service.KeelWebRequestPromiseHandler;
+import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
@@ -19,6 +22,13 @@ public class TestWebA2 {
         new KeelHttpServer(new HttpServerOptions().setPort(8822), true)
                 .configureRoutes(router -> {
                     router.get("/:a").handler(new X());
+                    // todo confirm it.
+                    router.get("/y/error").handler(new Y());
+                    router.route().last().failureHandler(ctx -> {
+                        Throwable failure = ctx.failure();
+                        Keel.outputLogger().exception(failure);
+                        ctx.response().setStatusCode(500).setStatusMessage(failure.toString()).end();
+                    });
                 })
                 .listen();
     }
@@ -52,6 +62,24 @@ public class TestWebA2 {
                     }
                 });
             }
+        }
+
+        @Override
+        public KeelLogger logger() {
+            return Keel.outputLogger();
+        }
+    }
+
+    public static class Y extends KeelWebRequestFutureHandler {
+
+        @Override
+        protected Future<Object> handleRequestForFuture() {
+            return Future.failedFuture(new RuntimeException("123"));
+        }
+
+        @Override
+        public KeelLogger logger() {
+            return Keel.outputLogger();
         }
     }
 }
