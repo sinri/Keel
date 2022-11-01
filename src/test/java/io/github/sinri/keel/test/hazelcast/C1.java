@@ -9,9 +9,9 @@ public class C1 {
     static KeelLogger logger;
 
     public static void main(String[] args) {
-        KeelLogger logger = Keel.outputLogger("C1-Maxim");
         Cluster.startCluster(14001)
                 .compose(init -> {
+                    logger = Keel.outputLogger("C1-Maxim");
                     logger.info("14001 GO");
 
                     maximConsumer();
@@ -19,13 +19,12 @@ public class C1 {
                     return Future.succeededFuture();
                 })
                 .onFailure(throwable -> {
-                    logger.exception("!!!", throwable);
+                    Keel.outputLogger().exception("!!!", throwable);
                 });
     }
 
     private static void maximConsumer() {
         KeelMaxim keelMaxim = new KeelMaxim("1400x");
-
         keelMaxim.setLogger(logger);
         keelMaxim.runAsConsumer();
         keelMaxim.runAsProducer();

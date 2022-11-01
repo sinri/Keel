@@ -13,16 +13,17 @@ public class C2 {
     static KeelLogger logger;
 
     public static void main(String[] args) {
-        logger = Keel.outputLogger("C2-Maxim");
+
         Cluster.startCluster(14002)
                 .compose(init -> {
+                    logger = Keel.outputLogger("C2-Maxim");
                     logger.info("14002 GO");
 
                     maximProducer();
                     return Future.succeededFuture();
                 })
                 .onFailure(throwable -> {
-                    logger.exception("!!!", throwable);
+                    Keel.outputLogger().exception("!!!", throwable);
                 });
     }
 

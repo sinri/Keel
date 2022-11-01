@@ -104,6 +104,10 @@ public class KeelMaxim {
     }
 
     private void handleMessage(Message<JsonObject> message) {
+        if (getLogger() == null) {
+            Keel.outputLogger().error("logger is null");
+            return;
+        }
         getLogger().info("MESSAGE RECEIVED ON " + maximName);
         getLogger().info("MESSAGE RECEIVED ON " + maximName, message.body());
         MaximBullet maximBullet = new MaximBullet() {
