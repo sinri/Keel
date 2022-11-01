@@ -104,6 +104,7 @@ public class KeelMaxim {
     }
 
     private void handleMessage(Message<JsonObject> message) {
+        getLogger().info("MESSAGE RECEIVED ON " + maximName);
         getLogger().info("MESSAGE RECEIVED ON " + maximName, message.body());
         MaximBullet maximBullet = new MaximBullet() {
             @Override
