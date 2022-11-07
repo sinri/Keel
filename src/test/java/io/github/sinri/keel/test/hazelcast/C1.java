@@ -2,31 +2,27 @@ package io.github.sinri.keel.test.hazelcast;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.servant.maxim.KeelMaxim;
 import io.vertx.core.Future;
 
 public class C1 {
     static KeelLogger logger;
 
     public static void main(String[] args) {
-        Cluster.startCluster(14001)
+        Cluster.startCluster()
                 .compose(init -> {
                     logger = Keel.outputLogger("C1-Maxim");
                     logger.info("14001 GO");
 
-                    maximConsumer();
+                    Keel.getVertx().eventBus().consumer("1400x")
+                            .handler(message -> {
+                                Object body = message.body();
+                                Keel.outputLogger().info("message received: " + body.toString());
+                            });
 
                     return Future.succeededFuture();
                 })
                 .onFailure(throwable -> {
                     Keel.outputLogger().exception("!!!", throwable);
                 });
-    }
-
-    private static void maximConsumer() {
-        KeelMaxim keelMaxim = new KeelMaxim("1400x");
-        keelMaxim.setLogger(logger);
-        keelMaxim.runAsConsumer();
-        keelMaxim.runAsProducer();
     }
 }

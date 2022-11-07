@@ -1,9 +1,6 @@
 package io.github.sinri.keel;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.config.JoinConfig;
-import com.hazelcast.config.NetworkConfig;
-import com.hazelcast.config.TcpIpConfig;
+import com.hazelcast.config.*;
 import io.github.sinri.keel.core.controlflow.FutureForEach;
 import io.github.sinri.keel.core.controlflow.FutureForRange;
 import io.github.sinri.keel.core.controlflow.FutureSleep;
@@ -48,59 +45,68 @@ public class Keel {
      * @param vertxOptions VertxOptions
      * @see <a href="https://vertx.io/docs/apidocs/io/vertx/core/VertxOptions.html">Class VertxOptions</a>
      */
+    @Deprecated(since = "2.9.1")
     public static void initializeVertx(VertxOptions vertxOptions) {
-        vertx = Vertx.vertx(vertxOptions);
+        initializeStandaloneVertx(vertxOptions);
     }
 
     /**
-     * 构建一个简易集群。
+     * @since 2.9.1
+     */
+    public static Future<Void> initializeStandaloneVertx(VertxOptions vertxOptions) {
+        vertx = Vertx.vertx(vertxOptions);
+        return Future.succeededFuture();
+    }
+
+    /**
+     * 构建一个简易集群 for SAE on Aliyun.
      *
-     * @param clusterName   集群名称
-     * @param publicAddress 公开地址
-     * @param port          监听端口
-     * @param members       集群组内地址成员
-     * @param vertxOptions  Vert.x 参数
+     * @param clusterName  集群名称
+     * @param members      集群组内地址成员
+     * @param vertxOptions Vert.x 参数
      * @return 未来
      * @since 2.9.1
      */
     public static Future<Void> initializeClusteredVertx(
             String clusterName,
-            String publicAddress,
-            int port,
             List<String> members,
             VertxOptions vertxOptions
     ) {
-        Config hazelcastConfig = ConfigUtil.loadConfig();
+        TcpIpConfig tcpIpConfig = new TcpIpConfig()
+                .setEnabled(true)
+                .setConnectionTimeoutSeconds(1);
+        members.forEach(tcpIpConfig::addMember);
 
-        hazelcastConfig.setClusterName(clusterName);
-        hazelcastConfig.setNetworkConfig(new NetworkConfig()
-                .setPublicAddress(publicAddress)
-                .setPort(port)
-                .setJoin(new JoinConfig()
-                        .setTcpIpConfig(new TcpIpConfig()
-                                        .setEnabled(true)
-                                        .setMembers(members)
-                                //.addMember("127.0.0.1:14001")
-                                //.addMember("127.0.0.1:14002")
-                        )
-                )
-        );
+        JoinConfig joinConfig = new JoinConfig()
+                .setMulticastConfig(new MulticastConfig().setEnabled(false))
+                .setTcpIpConfig(tcpIpConfig);
 
-        return initializeClusteredVertx(hazelcastConfig, vertxOptions);
+        NetworkConfig networkConfig = new NetworkConfig()
+                .setJoin(joinConfig)
+                .setOutboundPorts(List.of(0));
+
+        Config hazelcastConfig = ConfigUtil.loadConfig()
+                .setClusterName(clusterName)
+                .setNetworkConfig(networkConfig);
+
+        ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
+        vertxOptions.setClusterManager(mgr);
+
+        return initializeClusteredVertx(vertxOptions);
     }
 
     /**
      * 以程序编辑的方式构建一个集群。
      *
-     * @param hazelcastConfig Hazelcast 配置
-     * @param vertxOptions    Vert.x 选项
+     * @param vertxOptions Vert.x 选项
      * @return 未来
      * @since 2.9
      */
-    public static Future<Void> initializeClusteredVertx(Config hazelcastConfig, VertxOptions vertxOptions) {
-        ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
-        VertxOptions options = new VertxOptions().setClusterManager(mgr);
-        return Vertx.clusteredVertx(options)
+    public static Future<Void> initializeClusteredVertx(VertxOptions vertxOptions) {
+        // Config hazelcastConfig;// Hazelcast 配置
+        //ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
+        //VertxOptions options = new VertxOptions().setClusterManager(mgr);
+        return Vertx.clusteredVertx(vertxOptions)
                 .compose(clusteredVertx -> {
                     vertx = clusteredVertx;
                     return Future.succeededFuture();
@@ -112,17 +118,6 @@ public class Keel {
             throw new RuntimeException("The shared vertx instance was not initialized. Run `Keel.initializeVertx()` first!");
         }
         return vertx;
-    }
-
-    /**
-     * @since 2.1
-     * @deprecated since 2.3
-     */
-    @Deprecated(since = "2.3", forRemoval = true)
-    public static void closeVertx() {
-        if (vertx != null) {
-            vertx.close();
-        }
     }
 
     public static EventBus getEventBus() {

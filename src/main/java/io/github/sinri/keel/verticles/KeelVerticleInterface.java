@@ -45,28 +45,32 @@ public interface KeelVerticleInterface extends Verticle {
     /**
      * @since 2.8
      */
+    @Deprecated(since = "2.9.1")
     default Future<String> deployMe(@NotNull Vertx vertx, @NotNull DeploymentOptions deploymentOptions) {
-        return vertx.deployVerticle(this, deploymentOptions);
+        return vertx.deployVerticle(this, deploymentOptions)
+                .onFailure(throwable -> Keel.outputLogger().exception(throwable));
     }
 
     /**
      * @since 2.8
      */
     default Future<String> deployMe(DeploymentOptions deploymentOptions) {
-        return deployMe(Keel.getVertx(), deploymentOptions);
+        return Keel.getVertx().deployVerticle(this, deploymentOptions)
+                .onFailure(throwable -> Keel.outputLogger().exception(throwable));
     }
 
     /**
      * @since 2.8
      */
     default Future<String> deployMe() {
-        return deployMe(Keel.getVertx(), new DeploymentOptions());
+        return deployMe(new DeploymentOptions());
     }
 
     /**
      * @since 2.8 add default implementation
      */
     default Future<Void> undeployMe() {
-        return getVertx().undeploy(deploymentID());
+        return getVertx().undeploy(deploymentID())
+                .onFailure(throwable -> Keel.outputLogger().exception(throwable));
     }
 }
