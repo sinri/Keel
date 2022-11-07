@@ -40,6 +40,10 @@ public class TestBullet extends Bullet {
     @Override
     protected Future<Void> fire() {
         long i = random.nextInt(10_000);
-        return Keel.callFutureSleep(i);
+        Keel.outputLogger("Bullet").info("FIRING " + this.param);
+        return Keel.callFutureSleep(i)
+                .onSuccess(slept -> {
+                    Keel.outputLogger("Bullet").info("FIRED " + this.param);
+                });
     }
 }
