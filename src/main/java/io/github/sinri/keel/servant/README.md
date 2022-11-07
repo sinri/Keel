@@ -1,5 +1,7 @@
 # Servant in Keel
 
+FOR STANDALONE VERTX
+
 ## Endless 任务永动机
 
 根据**单一周期**触发**同一**任务。

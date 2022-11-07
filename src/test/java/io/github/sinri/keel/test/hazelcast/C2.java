@@ -2,10 +2,8 @@ package io.github.sinri.keel.test.hazelcast;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.test.hazelcast.maxim.TestMaxim;
 import io.vertx.core.Future;
-import io.vertx.core.eventbus.Message;
-
-import java.util.Date;
 
 public class C2 {
     static KeelLogger logger;
@@ -18,15 +16,17 @@ public class C2 {
                     logger.info("14002 GO");
 
                     //Keel.getVertx().eventBus().send("1400x", new Date().getTime());
-                    Keel.getVertx().eventBus().request("1400x", new Date().getTime(), messageAsyncResult -> {
-                        if (messageAsyncResult.failed()) {
-                            Keel.outputLogger().exception(messageAsyncResult.cause());
-                        } else {
-                            Message<Object> result = messageAsyncResult.result();
-                            Object body = result.body();
-                            Keel.outputLogger().info("REPLIED: " + body);
-                        }
-                    });
+//                    Keel.getVertx().eventBus().request("1400x", new Date().getTime(), messageAsyncResult -> {
+//                        if (messageAsyncResult.failed()) {
+//                            Keel.outputLogger().exception(messageAsyncResult.cause());
+//                        } else {
+//                            Message<Object> result = messageAsyncResult.result();
+//                            Object body = result.body();
+//                            Keel.outputLogger().info("REPLIED: " + body);
+//                        }
+//                    });
+
+                    TestMaxim.startOnClusterNode();
 
                     return Future.succeededFuture();
                 })
