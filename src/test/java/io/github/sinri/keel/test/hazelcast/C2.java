@@ -2,11 +2,10 @@ package io.github.sinri.keel.test.hazelcast;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.servant.endless.KeelEndless;
 import io.vertx.core.Future;
+import io.vertx.core.eventbus.Message;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Supplier;
+import java.util.Date;
 
 public class C2 {
     static KeelLogger logger;
@@ -18,7 +17,17 @@ public class C2 {
                     logger = Keel.outputLogger("C2-Maxim");
                     logger.info("14002 GO");
 
-                    maximProducer();
+                    //Keel.getVertx().eventBus().send("1400x", new Date().getTime());
+                    Keel.getVertx().eventBus().request("1400x", new Date().getTime(), messageAsyncResult -> {
+                        if (messageAsyncResult.failed()) {
+                            Keel.outputLogger().exception(messageAsyncResult.cause());
+                        } else {
+                            Message<Object> result = messageAsyncResult.result();
+                            Object body = result.body();
+                            Keel.outputLogger().info("REPLIED: " + body);
+                        }
+                    });
+
                     return Future.succeededFuture();
                 })
                 .onFailure(throwable -> {
@@ -26,18 +35,18 @@ public class C2 {
                 });
     }
 
-    private static void maximProducer() {
-        //KeelMaxim keelMaxim = new KeelMaxim("1400x");
-        //keelMaxim.setLogger(logger);
-        //keelMaxim.runAsProducer();
-
-        AtomicInteger i = new AtomicInteger(0);
-        new KeelEndless(1000L, new Supplier<Future<Void>>() {
-            @Override
-            public Future<Void> get() {
-                Keel.getVertx().eventBus().send("1400x", Keel.helpers().datetime().getGMTDateTimeExpression());
-                return Keel.callFutureSleep(100L);
-            }
-        }).start();
-    }
+//    private static void maximProducer() {
+//        //KeelMaxim keelMaxim = new KeelMaxim("1400x");
+//        //keelMaxim.setLogger(logger);
+//        //keelMaxim.runAsProducer();
+//
+//        AtomicInteger i = new AtomicInteger(0);
+//        new KeelEndless(1000L, new Supplier<Future<Void>>() {
+//            @Override
+//            public Future<Void> get() {
+//                Keel.getVertx().eventBus().send("1400x", Keel.helpers().datetime().getGMTDateTimeExpression());
+//                return Keel.callFutureSleep(100L);
+//            }
+//        }).start();
+//    }
 }
