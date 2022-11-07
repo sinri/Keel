@@ -44,6 +44,22 @@ abstract public class Bullet {
                                     })
                                     .compose(v -> {
                                         return fire();
+                                    })
+                                    .eventually(v -> {
+                                        if (exclusiveLockSet() != null && !exclusiveLockSet().isEmpty()) {
+                                            return Keel.callFutureForEach(exclusiveLockSet(), exclusiveLock -> {
+                                                String exclusiveLockName = "KeelMaxim-Bullet-Exclusive-Lock-" + exclusiveLock;
+                                                return Keel.getVertx().sharedData().getCounter(exclusiveLockName)
+                                                        .compose(counter -> {
+                                                            return counter.decrementAndGet()
+                                                                    .compose(x -> {
+                                                                        return Future.succeededFuture();
+                                                                    });
+                                                        });
+                                            });
+                                        } else {
+                                            return Future.succeededFuture();
+                                        }
                                     });
                         })
                         .andThen(firedAR -> {
