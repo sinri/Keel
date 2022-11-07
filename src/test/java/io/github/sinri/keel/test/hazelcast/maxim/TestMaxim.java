@@ -36,6 +36,7 @@ public class TestMaxim {
                                     return Future.succeededFuture(bullet);
                                 });
                     }
-                });
+                })
+                .fire();
     }
 }

@@ -42,12 +42,13 @@ public class KeelMaxim {
         return this;
     }
 
-    private void start() {
+    public void fire() {
         AtomicInteger barrelUsed = new AtomicInteger(0);
 
         Keel.callFutureUntil(() -> Future.succeededFuture()
                 .compose(v -> {
                     if (barrelUsed.get() >= barrels) {
+                        getLogger().debug("BARREL FULL");
                         return Keel.callFutureSleep(restInterval);
                     }
                     return load().compose(bullet -> {
@@ -60,14 +61,16 @@ public class KeelMaxim {
 
                                 promise.future().andThen(firedAR -> {
                                     if (firedAR.failed()) {
-                                        getLogger().exception(firedAR.cause());
+                                        getLogger().exception("BULLET FIRED ERROR", firedAR.cause());
+                                    } else {
+                                        getLogger().info("BULLET FIRED DONE");
                                     }
                                     barrelUsed.decrementAndGet();
                                 });
 
                                 return Future.succeededFuture();
                             }, throwable -> {
-                                getLogger().exception(throwable);
+                                getLogger().exception("FAILED TO LOAD BULLET", throwable);
                                 return Future.succeededFuture();
                             })
                             .compose(over -> {
