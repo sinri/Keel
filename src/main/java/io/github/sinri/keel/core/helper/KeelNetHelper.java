@@ -12,9 +12,9 @@ public class KeelNetHelper {
     private KeelNetHelper() {
     }
 
-     static KeelNetHelper getInstance() {
-         return instance;
-     }
+    static KeelNetHelper getInstance() {
+        return instance;
+    }
 
     public static void main(String[] args) {
         Long x = KeelNetHelper.getInstance().convertIPv4ToNumber("255.255.255.255");
@@ -62,5 +62,45 @@ public class KeelNetHelper {
 
     public byte[] convertIPv4ToAddressBytes(String ipv4) {
         return convertIPv4ToAddressBytes(this.convertIPv4ToNumber(ipv4));
+    }
+
+    /**
+     * @return like "127.0.0.1"; If the local host name could not be resolved into an address, null.
+     * @since 2.9.1
+     */
+    public String getLocalHostAddress() {
+        try {
+            InetAddress localHost = InetAddress.getLocalHost();
+            return localHost.getHostAddress();
+        } catch (UnknownHostException e) {
+            return null;
+        }
+
+    }
+
+    /**
+     * @return like "SinriMacInLeqee.local"; If the local host name could not be resolved into an address, null.
+     * @since 2.9.1
+     */
+    public String getLocalHostName() {
+        try {
+            InetAddress localHost = InetAddress.getLocalHost();
+            return localHost.getHostName();
+        } catch (UnknownHostException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @return like "localhost"; If the local host name could not be resolved into an address, null.
+     * @since 2.9.1
+     */
+    public String getLocalHostCanonicalName() {
+        try {
+            InetAddress localHost = InetAddress.getLocalHost();
+            return localHost.getCanonicalHostName();
+        } catch (UnknownHostException e) {
+            return null;
+        }
     }
 }

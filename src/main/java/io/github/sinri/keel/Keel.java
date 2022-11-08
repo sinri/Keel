@@ -83,6 +83,9 @@ public class Keel {
 
         NetworkConfig networkConfig = new NetworkConfig()
                 .setJoin(joinConfig)
+                .setPort(5701)
+                .setPortCount(1)
+                .setPortAutoIncrement(false)
                 .setOutboundPorts(List.of(0));
 
         Config hazelcastConfig = ConfigUtil.loadConfig()

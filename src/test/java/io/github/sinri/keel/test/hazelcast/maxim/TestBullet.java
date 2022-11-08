@@ -2,6 +2,7 @@ package io.github.sinri.keel.test.hazelcast.maxim;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.maids.maxim.Bullet;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 
 import java.util.HashSet;
@@ -38,12 +39,18 @@ public class TestBullet extends Bullet {
     }
 
     @Override
-    protected Future<Void> fire() {
+    protected Future<Object> fire() {
         long i = random.nextInt(10_000);
         Keel.outputLogger("Bullet").info("FIRING " + this.param);
         return Keel.callFutureSleep(i)
-                .onSuccess(slept -> {
+                .map(slept -> {
                     Keel.outputLogger("Bullet").info("FIRED " + this.param);
+                    return Future.succeededFuture();
                 });
+    }
+
+    @Override
+    protected Future<Void> ejectShell(AsyncResult<Object> fired) {
+        return Future.succeededFuture();
     }
 }
