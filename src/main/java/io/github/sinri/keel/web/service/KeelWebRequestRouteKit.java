@@ -27,20 +27,18 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
     private final List<SecurityPolicyHandler> securityPolicyHandlers = new ArrayList<>();
     private final List<ProtocolUpgradeHandler> protocolUpgradeHandlers = new ArrayList<>();
     private final List<MultiTenantHandler> multiTenantHandlers = new ArrayList<>();
+    /**
+     * Tells who the user is
+     */
     private final List<AuthenticationHandler> authenticationHandlers = new ArrayList<>();
     private final List<InputTrustHandler> inputTrustHandlers = new ArrayList<>();
+    /**
+     * Tells what the user is allowed to do
+     */
     private final List<AuthorizationHandler> authorizationHandlers = new ArrayList<>();
     private final List<Handler<RoutingContext>> userHandlers = new ArrayList<>();
     private String uploadDirectory = BodyHandler.DEFAULT_UPLOADS_DIRECTORY;
     private String virtualHost = null;
-    /**
-     * Cross Origin Resource Sharing
-     * If null: use ApiMate Definition
-     * If "": do not allow CORS;
-     * If "*": allow all (*)
-     * Else: as a Regex Pattern (DOMAIN)
-     */
-    private String corsOriginPattern = null;
 
     public KeelWebRequestRouteKit(Class<S> classOfService) {
         this.classOfService = classOfService;
@@ -111,11 +109,6 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
         return this;
     }
 
-    public KeelWebRequestRouteKit<S> setCorsOriginPattern(String corsOriginPattern) {
-        this.corsOriginPattern = corsOriginPattern;
-        return this;
-    }
-
     /**
      * Load all classes inside the given package, and filter out those with ApiMeta, to build routes for them.
      *
@@ -177,20 +170,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
 
         //    SECURITY_POLICY,
         // SecurityPolicyHandler
-        // CORS: Cross Origin Resource Sharing
-        String cors;
-        if (this.corsOriginPattern == null) {
-            cors = apiMeta.corsOriginPattern();
-        } else {
-            cors = this.corsOriginPattern;
-        }
-        if (cors != null && !Objects.equals(cors, "")) {
-            if (Objects.equals(cors, "*")) {
-                route.handler(CorsHandler.create());
-            } else {
-                route.handler(CorsHandler.create(cors));
-            }
-        }
+        // CorsHandler: Cross Origin Resource Sharing
         this.securityPolicyHandlers.forEach(route::handler);
 
         //    PROTOCOL_UPGRADE,

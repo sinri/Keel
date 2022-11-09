@@ -21,11 +21,6 @@ abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
         this.routingContext = routingContext;
     }
 
-    @Deprecated(since = "2.9.1", forRemoval = true)
-    public boolean getVerbose() {
-        return isVerbose();
-    }
-
     /**
      * @since 2.9.1
      */
