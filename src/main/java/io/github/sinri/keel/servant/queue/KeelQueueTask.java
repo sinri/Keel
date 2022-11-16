@@ -32,7 +32,7 @@ public abstract class KeelQueueTask extends AbstractVerticle implements KeelVert
     }
 
     /**
-     * 被设计在seeker.seek方法中调用
+     * 被设计在 seeker.get 方法中调用
      */
     public Future<Void> lockTaskBeforeDeployment() {
         // 如果需要就重载此方法

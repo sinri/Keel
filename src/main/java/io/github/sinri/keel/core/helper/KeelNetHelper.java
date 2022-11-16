@@ -1,7 +1,12 @@
 package io.github.sinri.keel.core.helper;
 
+import io.vertx.core.json.JsonArray;
+import io.vertx.ext.web.RoutingContext;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @since 2.8
@@ -102,5 +107,28 @@ public class KeelNetHelper {
         } catch (UnknownHostException e) {
             return null;
         }
+    }
+
+    /**
+     * @return List of Client IP, combined with X-Forwarded-For and remote address.
+     * @since 2.9.2
+     */
+    public List<String> parseWebClientIPChain(RoutingContext ctx) {
+        // X-Forwarded-For
+        JsonArray clientIPChain = new JsonArray();
+        String xForwardedFor = ctx.request().getHeader("X-Forwarded-For");
+        if (xForwardedFor != null) {
+            String[] split = xForwardedFor.split("[ ,]+");
+            for (var item : split) {
+                clientIPChain.add(item);
+            }
+        }
+        clientIPChain.add(ctx.request().remoteAddress().hostAddress());
+
+        List<String> list = new ArrayList<>();
+        clientIPChain.forEach(item -> {
+            list.add(item.toString());
+        });
+        return list;
     }
 }

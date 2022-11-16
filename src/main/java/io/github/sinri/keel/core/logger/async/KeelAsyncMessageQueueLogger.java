@@ -30,7 +30,13 @@ public class KeelAsyncMessageQueueLogger extends AbstractKeelAsyncQueueLogger<Lo
 
     @Override
     protected LogMessage createLogObject(KeelLogLevel logLevel, String msg, JsonObject context) {
-        LogMessage logMessage = new LogMessage(new Date().getTime(), logLevel, this.options.getAspect(), msg, context);
+        String contentPrefix = getContentPrefix();
+        if (contentPrefix == null || contentPrefix.isEmpty()) {
+            contentPrefix = "";
+        } else {
+            contentPrefix = contentPrefix + " ";
+        }
+        LogMessage logMessage = new LogMessage(new Date().getTime(), logLevel, this.options.getAspect(), contentPrefix + msg, getCategoryPrefix(), context);
         if (this.options.shouldShowThreadID()) {
             logMessage.setLogThread(Thread.currentThread().getId());
         }

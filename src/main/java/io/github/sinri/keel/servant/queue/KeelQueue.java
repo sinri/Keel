@@ -27,6 +27,14 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
         this.logger = prepareLogger();
     }
 
+    /**
+     * @since 2.9.2
+     */
+    @Override
+    public void setLogger(KeelLogger logger) {
+        this.logger = logger;
+    }
+
     public QueueStatus getQueueStatus() {
         return queueStatus;
     }

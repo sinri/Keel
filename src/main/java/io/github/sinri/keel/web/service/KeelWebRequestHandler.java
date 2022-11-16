@@ -17,10 +17,6 @@ abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
         return routingContext;
     }
 
-    public void setRoutingContext(RoutingContext routingContext) {
-        this.routingContext = routingContext;
-    }
-
     /**
      * @since 2.9.1
      */
@@ -41,7 +37,19 @@ abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
         if (this.isVerbose()) {
             logger().info("RESPOND SUCCESS", resp);
         }
-        getRoutingContext().json(resp);
+        try {
+            getRoutingContext().json(resp);
+        } catch (Throwable throwable) {
+            logger().exception(throwable);
+            logger().error("RoutingContext has been dealt by others", new JsonObject()
+                    .put("response", new JsonObject()
+                            .put("code", getRoutingContext().response().getStatusCode())
+                            .put("message", getRoutingContext().response().getStatusMessage())
+                            .put("ended", getRoutingContext().response().ended())
+                            .put("closed", getRoutingContext().response().closed())
+                    )
+            );
+        }
     }
 
     protected void respondOnFailure(Throwable throwable) {
@@ -55,12 +63,23 @@ abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
         } else {
             logger().error("RESPOND FAILURE: " + throwable);
         }
-
-        getRoutingContext().json(x);
+        try {
+            getRoutingContext().json(x);
+        } catch (Throwable throwable2) {
+            logger().exception(throwable2);
+            logger().error("RoutingContext has been dealt by others", new JsonObject()
+                    .put("response", new JsonObject()
+                            .put("code", getRoutingContext().response().getStatusCode())
+                            .put("message", getRoutingContext().response().getStatusMessage())
+                            .put("ended", getRoutingContext().response().ended())
+                            .put("closed", getRoutingContext().response().closed())
+                    )
+            );
+        }
     }
 
     public final void handle(RoutingContext routingContext) {
-        setRoutingContext(routingContext);
+        this.routingContext = routingContext;
         handleRequest();
     }
 

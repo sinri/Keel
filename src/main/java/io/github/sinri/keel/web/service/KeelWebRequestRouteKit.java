@@ -39,10 +39,22 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
     private final List<Handler<RoutingContext>> userHandlers = new ArrayList<>();
     private String uploadDirectory = BodyHandler.DEFAULT_UPLOADS_DIRECTORY;
     private String virtualHost = null;
+    /**
+     * @since 2.9.2
+     */
+    private Handler<RoutingContext> failureHandler = null;
 
     public KeelWebRequestRouteKit(Class<S> classOfService) {
         this.classOfService = classOfService;
         router = Router.router(Keel.getVertx());
+    }
+
+    /**
+     * @since 2.9.2
+     */
+    public KeelWebRequestRouteKit<S> setFailureHandler(Handler<RoutingContext> failureHandler) {
+        this.failureHandler = failureHandler;
+        return this;
     }
 
     public KeelWebRequestRouteKit(Class<S> classOfService, Router router) {
@@ -113,8 +125,9 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
      * Load all classes inside the given package, and filter out those with ApiMeta, to build routes for them.
      *
      * @param packageName such as "com.leqee.spore.service"
+     * @since 2.9.2 return void
      */
-    public KeelWebRequestRouteKit<S> loadPackage(String packageName) {
+    public void loadPackage(String packageName) {
         Reflections reflections = new Reflections(packageName);
         Set<Class<? extends S>> allClasses = reflections.getSubTypesOf(classOfService);
 
@@ -123,16 +136,15 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
         } catch (Exception e) {
             Keel.outputLogger().exception("KeelWebRequestRouteKit::loadPackage THROWS", e);
         }
-
-        return this;
     }
 
     /**
      * @since 2.9
+     * @since 2.9.2 return void
      */
-    public KeelWebRequestRouteKit<S> loadClass(Class<? extends S> c) {
+    public void loadClass(Class<? extends S> c) {
         ApiMeta apiMeta = Keel.helpers().reflection().getAnnotationOfClass(c, ApiMeta.class);
-        if (apiMeta == null) return this;
+        if (apiMeta == null) return;
 
         Keel.outputLogger().debug("KeelWebRequestRouteKit Loading " + c.getName());
 
@@ -142,7 +154,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
             Keel.outputLogger().exception("HANDLER REFLECTION EXCEPTION", e);
-            return this;
+            return;
         }
 
         Route route = router.route(apiMeta.routePath());
@@ -161,6 +173,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
 
         // === HANDLERS WEIGHT IN ORDER ===
         // PLATFORM
+        route.handler(new KeelPlatformHandler());
         if (apiMeta.timeout() > 0) {
             // PlatformHandler
             route.handler(TimeoutHandler.create(apiMeta.timeout(), apiMeta.statusCodeForTimeout()));
@@ -192,7 +205,11 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
 
         // finally!
         route.handler(handler);
-        return this;
+
+        // failure handler since 2.9.2
+        if (failureHandler != null) {
+            route.failureHandler(failureHandler);
+        }
     }
 
     public Router getRouter() {

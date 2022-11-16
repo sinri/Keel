@@ -11,6 +11,7 @@ import java.util.Objects;
 /**
  * @since 2.9
  * @since 2.9.1 fields const
+ * @since 2.9.2 add category
  */
 public class LogMessage {
     public static String KeyLogAspect = "log_aspect";
@@ -20,6 +21,7 @@ public class LogMessage {
     public static String KeyLogContext = "log_context";
     public static String KeyLogThread = "log_thread";
     public static String KeyLogVerticle = "log_verticle";
+    public static String KeyLogCategory = "log_category";
 
     private final long timestamp;
     private final Map<String, String> map;
@@ -29,6 +31,7 @@ public class LogMessage {
             KeelLogLevel logLevel,
             String aspect,
             String message,
+            String category,
             JsonObject context
     ) {
         this.timestamp = timestamp;
@@ -37,6 +40,7 @@ public class LogMessage {
         this.map.put(KeyLogLevel, logLevel.name());
         this.map.put(KeyLogTime, Keel.helpers().datetime().getDateExpression(new Date(timestamp), "yyyy-MM-dd HH:mm:ss.SSS"));
         this.map.put(KeyLogContent, message);
+        this.map.put(KeyLogCategory, Objects.requireNonNullElse(category, ""));
         if (context != null) {
             this.map.put(KeyLogContext, context.toString());
 //            context.forEach(entry -> {
