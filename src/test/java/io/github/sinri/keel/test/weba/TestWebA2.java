@@ -12,6 +12,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.RoutingContext;
 
 import java.util.Objects;
 
@@ -41,8 +42,8 @@ public class TestWebA2 {
         }
 
         @Override
-        protected void handleRequestForFuture(Promise<Object> promise) {
-            String a = getRoutingContext().pathParam("a");
+        protected void handleRequestForFuture(RoutingContext routingContext, Promise<Object> promise) {
+            String a = routingContext.pathParam("a");
             JsonObject jsonObject = new JsonObject()
                     .put("a", a)
                     .put("now", KeelMySQLKit.nowAsMySQLDatetime());
@@ -65,7 +66,7 @@ public class TestWebA2 {
         }
 
         @Override
-        public KeelLogger logger() {
+        public KeelLogger createLogger(RoutingContext routingContext) {
             return Keel.outputLogger();
         }
     }
@@ -73,12 +74,12 @@ public class TestWebA2 {
     public static class Y extends KeelWebRequestFutureHandler {
 
         @Override
-        protected Future<Object> handleRequestForFuture() {
+        protected Future<Object> handleRequestForFuture(RoutingContext routingContext) {
             return Future.failedFuture(new RuntimeException("123"));
         }
 
         @Override
-        public KeelLogger logger() {
+        public KeelLogger createLogger(RoutingContext routingContext) {
             return Keel.outputLogger();
         }
     }

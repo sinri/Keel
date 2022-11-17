@@ -1,4 +1,4 @@
-package io.github.sinri.keel.web.service;
+package io.github.sinri.keel.web.handler;
 
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;

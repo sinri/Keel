@@ -1,6 +1,7 @@
 package io.github.sinri.keel.web.service;
 
 import io.vertx.core.Future;
+import io.vertx.ext.web.RoutingContext;
 
 /**
  * @since 2.9
@@ -8,13 +9,18 @@ import io.vertx.core.Future;
 public abstract class KeelWebRequestFutureHandler extends KeelWebRequestHandler {
 
 
-    abstract protected Future<Object> handleRequestForFuture();
+    abstract protected Future<Object> handleRequestForFuture(RoutingContext routingContext);
 
     @Override
-    public final void handleRequest() {
+    public final void handleRequest(RoutingContext routingContext) {
         Future.succeededFuture()
-                .compose(v -> handleRequestForFuture())
-                .onSuccess(this::respondOnSuccess)
-                .onFailure(this::respondOnFailure);
+                .compose(v -> handleRequestForFuture(routingContext))
+                .andThen(ar -> {
+                    if (ar.failed()) {
+                        this.respondOnFailure(routingContext, ar.cause());
+                    } else {
+                        this.respondOnSuccess(routingContext, ar.result());
+                    }
+                });
     }
 }

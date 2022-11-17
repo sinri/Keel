@@ -1,4 +1,4 @@
-package io.github.sinri.keel.web.service;
+package io.github.sinri.keel.web.receptionist;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.web.ApiMeta;
@@ -11,20 +11,21 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.*;
 import org.reflections.Reflections;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * @param <S>
- * @since 2.9
+ * @param <R> class of a subclass of KeelWebReceptionist
+ * @since 2.9.2
  */
-public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
+public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
     private final Router router;
-    private final Class<S> classOfService;
+    private final Class<R> classOfReceptionist;
     private final List<PlatformHandler> platformHandlers = new ArrayList<>();
+
     private final List<SecurityPolicyHandler> securityPolicyHandlers = new ArrayList<>();
     private final List<ProtocolUpgradeHandler> protocolUpgradeHandlers = new ArrayList<>();
     private final List<MultiTenantHandler> multiTenantHandlers = new ArrayList<>();
@@ -45,115 +46,32 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
      */
     private Handler<RoutingContext> failureHandler = null;
 
-    public KeelWebRequestRouteKit(Class<S> classOfService) {
-        this.classOfService = classOfService;
-        router = Router.router(Keel.getVertx());
-    }
-
-    /**
-     * @since 2.9.2
-     */
-    public KeelWebRequestRouteKit<S> setFailureHandler(Handler<RoutingContext> failureHandler) {
-        this.failureHandler = failureHandler;
-        return this;
-    }
-
-    public KeelWebRequestRouteKit(Class<S> classOfService, Router router) {
-        this.classOfService = classOfService;
+    public KeelWebReceptionistKit(Class<R> classOfReceptionist, Router router) {
+        this.classOfReceptionist = classOfReceptionist;
         this.router = router;
     }
 
-    public KeelWebRequestRouteKit<S> addPlatformHandler(PlatformHandler handler) {
-        this.platformHandlers.add(handler);
-        return this;
-    }
-
-    public KeelWebRequestRouteKit<S> addSecurityPolicyHandler(SecurityPolicyHandler handler) {
-        this.securityPolicyHandlers.add(handler);
-        return this;
-    }
-
-    public KeelWebRequestRouteKit<S> addProtocolUpgradeHandler(ProtocolUpgradeHandler handler) {
-        this.protocolUpgradeHandlers.add(handler);
-        return this;
-    }
-
-    public KeelWebRequestRouteKit<S> addMultiTenantHandler(MultiTenantHandler handler) {
-        this.multiTenantHandlers.add(handler);
-        return this;
-    }
-
-    /**
-     * 追加一个认证校验器
-     */
-    public KeelWebRequestRouteKit<S> addAuthenticationHandler(AuthenticationHandler handler) {
-        this.authenticationHandlers.add(handler);
-        return this;
-    }
-
-    public KeelWebRequestRouteKit<S> addInputTrustHandler(InputTrustHandler handler) {
-        this.inputTrustHandlers.add(handler);
-        return this;
-    }
-
-    /**
-     * 追加一个授权校验器
-     */
-    public KeelWebRequestRouteKit<S> addAuthorizationHandlers(AuthorizationHandler handler) {
-        this.authorizationHandlers.add(handler);
-        return this;
-    }
-
-    public KeelWebRequestRouteKit<S> addUserHandler(Handler<RoutingContext> handler) {
-        this.userHandlers.add(handler);
-        return this;
-    }
-
-    public KeelWebRequestRouteKit<S> setUploadDirectory(String uploadDirectory) {
-        this.uploadDirectory = uploadDirectory;
-        return this;
-    }
-
-    /**
-     * @since 2.9
-     */
-    public KeelWebRequestRouteKit<S> setVirtualHost(String virtualHost) {
-        this.virtualHost = virtualHost;
-        return this;
-    }
-
-    /**
-     * Load all classes inside the given package, and filter out those with ApiMeta, to build routes for them.
-     *
-     * @param packageName such as "com.leqee.spore.service"
-     * @since 2.9.2 return void
-     */
     public void loadPackage(String packageName) {
         Reflections reflections = new Reflections(packageName);
-        Set<Class<? extends S>> allClasses = reflections.getSubTypesOf(classOfService);
+        Set<Class<? extends R>> allClasses = reflections.getSubTypesOf(classOfReceptionist);
 
         try {
             allClasses.forEach(this::loadClass);
         } catch (Exception e) {
-            Keel.outputLogger().exception("KeelWebRequestRouteKit::loadPackage THROWS", e);
+            Keel.outputLogger().exception(getClass().getName() + "::loadPackage THROWS", e);
         }
     }
 
-    /**
-     * @since 2.9
-     * @since 2.9.2 return void
-     */
-    public void loadClass(Class<? extends S> c) {
+    public void loadClass(Class<? extends R> c) {
         ApiMeta apiMeta = Keel.helpers().reflection().getAnnotationOfClass(c, ApiMeta.class);
         if (apiMeta == null) return;
 
-        Keel.outputLogger().debug("KeelWebRequestRouteKit Loading " + c.getName());
+        Keel.outputLogger().debug(getClass().getName() + " Loading " + c.getName());
 
-        S handler;
+        Constructor<? extends R> receptionistConstructor;
         try {
-            handler = c.getConstructor().newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
+            receptionistConstructor = c.getConstructor(RoutingContext.class);
+        } catch (NoSuchMethodException e) {
             Keel.outputLogger().exception("HANDLER REFLECTION EXCEPTION", e);
             return;
         }
@@ -205,7 +123,14 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
         userHandlers.forEach(route::handler);
 
         // finally!
-        route.handler(handler);
+        route.handler(routingContext -> {
+            try {
+                R receptionist = receptionistConstructor.newInstance(routingContext);
+                receptionist.handle();
+            } catch (Throwable e) {
+                routingContext.fail(e);
+            }
+        });
 
         // failure handler since 2.9.2
         if (failureHandler != null) {
@@ -213,7 +138,72 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
         }
     }
 
-    public Router getRouter() {
-        return router;
+    /**
+     * @since 2.9.2
+     */
+    public KeelWebReceptionistKit<R> setFailureHandler(Handler<RoutingContext> failureHandler) {
+        this.failureHandler = failureHandler;
+        return this;
     }
+
+
+    public KeelWebReceptionistKit<R> addPlatformHandler(PlatformHandler handler) {
+        this.platformHandlers.add(handler);
+        return this;
+    }
+
+    public KeelWebReceptionistKit<R> addSecurityPolicyHandler(SecurityPolicyHandler handler) {
+        this.securityPolicyHandlers.add(handler);
+        return this;
+    }
+
+    public KeelWebReceptionistKit<R> addProtocolUpgradeHandler(ProtocolUpgradeHandler handler) {
+        this.protocolUpgradeHandlers.add(handler);
+        return this;
+    }
+
+    public KeelWebReceptionistKit<R> addMultiTenantHandler(MultiTenantHandler handler) {
+        this.multiTenantHandlers.add(handler);
+        return this;
+    }
+
+    /**
+     * 追加一个认证校验器
+     */
+    public KeelWebReceptionistKit<R> addAuthenticationHandler(AuthenticationHandler handler) {
+        this.authenticationHandlers.add(handler);
+        return this;
+    }
+
+    public KeelWebReceptionistKit<R> addInputTrustHandler(InputTrustHandler handler) {
+        this.inputTrustHandlers.add(handler);
+        return this;
+    }
+
+    /**
+     * 追加一个授权校验器
+     */
+    public KeelWebReceptionistKit<R> addAuthorizationHandlers(AuthorizationHandler handler) {
+        this.authorizationHandlers.add(handler);
+        return this;
+    }
+
+    public KeelWebReceptionistKit<R> addUserHandler(Handler<RoutingContext> handler) {
+        this.userHandlers.add(handler);
+        return this;
+    }
+
+    public KeelWebReceptionistKit<R> setUploadDirectory(String uploadDirectory) {
+        this.uploadDirectory = uploadDirectory;
+        return this;
+    }
+
+    /**
+     * @since 2.9
+     */
+    public KeelWebReceptionistKit<R> setVirtualHost(String virtualHost) {
+        this.virtualHost = virtualHost;
+        return this;
+    }
+
 }

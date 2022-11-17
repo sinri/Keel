@@ -7,15 +7,13 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 /**
+ * 这个类是个针对某一类RoutingContext的handler，而不是针对某一个RoutingContext的handler！！！
+ *
  * @since 2.9
+ * @since 2.9.2 Remove Property `RoutingContext`.
  */
 abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
-    private RoutingContext routingContext;
     private boolean verbose = false;
-
-    public RoutingContext getRoutingContext() {
-        return routingContext;
-    }
 
     /**
      * @since 2.9.1
@@ -28,60 +26,71 @@ abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
         this.verbose = verbose;
     }
 
-    abstract public KeelLogger logger();
+    /**
+     * @since 2.9.2
+     */
+    public KeelLogger createLogger() {
+        return createLogger(null);
+    }
 
-    protected void respondOnSuccess(Object data) {
+    /**
+     * @since 2.9.2
+     */
+    abstract public KeelLogger createLogger(RoutingContext routingContext);
+
+    protected void respondOnSuccess(RoutingContext routingContext, Object data) {
+        KeelLogger logger = createLogger(routingContext);
         JsonObject resp = new JsonObject()
                 .put("code", "OK")
                 .put("data", data);
         if (this.isVerbose()) {
-            logger().info("RESPOND SUCCESS", resp);
+            logger.info("RESPOND SUCCESS", resp);
         }
         try {
-            getRoutingContext().json(resp);
+            routingContext.json(resp);
         } catch (Throwable throwable) {
-            logger().exception(throwable);
-            logger().error("RoutingContext has been dealt by others", new JsonObject()
+            logger.exception(throwable);
+            logger.error("RoutingContext has been dealt by others", new JsonObject()
                     .put("response", new JsonObject()
-                            .put("code", getRoutingContext().response().getStatusCode())
-                            .put("message", getRoutingContext().response().getStatusMessage())
-                            .put("ended", getRoutingContext().response().ended())
-                            .put("closed", getRoutingContext().response().closed())
+                            .put("code", routingContext.response().getStatusCode())
+                            .put("message", routingContext.response().getStatusMessage())
+                            .put("ended", routingContext.response().ended())
+                            .put("closed", routingContext.response().closed())
                     )
             );
         }
     }
 
-    protected void respondOnFailure(Throwable throwable) {
+    protected void respondOnFailure(RoutingContext routingContext, Throwable throwable) {
+        KeelLogger logger = createLogger(routingContext);
         var x = new JsonObject()
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
         if (isVerbose()) {
             String error = Keel.helpers().string().renderThrowableChain(throwable);
             x.put("throwable", error);
-            logger().exception("RESPOND FAILURE", throwable);
+            logger.exception("RESPOND FAILURE", throwable);
         } else {
-            logger().error("RESPOND FAILURE: " + throwable);
+            logger.error("RESPOND FAILURE: " + throwable);
         }
         try {
-            getRoutingContext().json(x);
+            routingContext.json(x);
         } catch (Throwable throwable2) {
-            logger().exception(throwable2);
-            logger().error("RoutingContext has been dealt by others", new JsonObject()
+            logger.exception(throwable2);
+            logger.error("RoutingContext has been dealt by others", new JsonObject()
                     .put("response", new JsonObject()
-                            .put("code", getRoutingContext().response().getStatusCode())
-                            .put("message", getRoutingContext().response().getStatusMessage())
-                            .put("ended", getRoutingContext().response().ended())
-                            .put("closed", getRoutingContext().response().closed())
+                            .put("code", routingContext.response().getStatusCode())
+                            .put("message", routingContext.response().getStatusMessage())
+                            .put("ended", routingContext.response().ended())
+                            .put("closed", routingContext.response().closed())
                     )
             );
         }
     }
 
     public final void handle(RoutingContext routingContext) {
-        this.routingContext = routingContext;
-        handleRequest();
+        handleRequest(routingContext);
     }
 
-    abstract protected void handleRequest();
+    abstract protected void handleRequest(RoutingContext routingContext);
 }

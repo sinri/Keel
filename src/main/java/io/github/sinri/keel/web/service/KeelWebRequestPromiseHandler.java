@@ -1,7 +1,9 @@
 package io.github.sinri.keel.web.service;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.controlflow.PromiseTimeout;
 import io.vertx.core.Promise;
+import io.vertx.ext.web.RoutingContext;
 
 /**
  * @since 2.9
@@ -16,33 +18,32 @@ public abstract class KeelWebRequestPromiseHandler extends KeelWebRequestHandler
     /**
      * @param promise build response for this request
      */
-    abstract protected void handleRequestForFuture(Promise<Object> promise);
+    abstract protected void handleRequestForFuture(RoutingContext routingContext, Promise<Object> promise);
 
     @Override
-    public final void handleRequest() {
+    public final void handleRequest(RoutingContext routingContext) {
         Promise<Object> respPromise = Promise.promise();
         timerID = Keel.getVertx().setTimer(timeout(), v -> {
             timerID = null;
-            respPromise.tryFail(new Timeout(timeout()));
+            respPromise.tryFail(new PromiseTimeout(timeout()));
         });
-        handleRequestForFuture(respPromise);
+        handleRequestForFuture(routingContext, respPromise);
         respPromise.future()
-                .onSuccess(this::respondOnSuccess)
-                .onFailure(this::respondOnFailure);
+                .andThen(ar -> {
+                    if (ar.failed()) {
+                        this.respondOnFailure(routingContext, ar.cause());
+                    } else {
+                        this.respondOnSuccess(routingContext, ar.result());
+                    }
+                });
     }
 
     @Override
-    protected void respondOnFailure(Throwable throwable) {
-        if (throwable instanceof Timeout) {
-            getRoutingContext().fail(504, throwable);
+    protected void respondOnFailure(RoutingContext routingContext, Throwable throwable) {
+        if (throwable instanceof PromiseTimeout) {
+            routingContext.fail(504, throwable);
         } else {
-            super.respondOnFailure(throwable);
-        }
-    }
-
-    public static class Timeout extends Exception {
-        public Timeout(long t) {
-            super("WAITED " + t + " ms");
+            super.respondOnFailure(routingContext, throwable);
         }
     }
 }

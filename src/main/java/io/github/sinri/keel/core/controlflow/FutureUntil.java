@@ -3,9 +3,7 @@ package io.github.sinri.keel.core.controlflow;
 import io.github.sinri.keel.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-import io.vertx.core.VertxOptions;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 /**
@@ -22,31 +20,9 @@ public class FutureUntil {
     }
 
     public static Future<Void> call(Supplier<Future<Boolean>> singleRecursionForShouldStopSupplier) {
-        //Queue<Promise<Boolean>> futures=new ConcurrentLinkedQueue<>();
         Promise<Void> promise = Promise.promise();
         new FutureUntil(singleRecursionForShouldStopSupplier).routine(promise);
         return promise.future();
-    }
-
-    public static void main(String[] args) {
-        Keel.initializeVertx(new VertxOptions());
-        AtomicInteger x = new AtomicInteger(0);
-        FutureUntil.call(() -> {
-                    int i = x.incrementAndGet();
-                    Keel.outputLogger().info("i=" + i);
-                    if (x.get() > 5) {
-                        return Future.succeededFuture(true);
-                    } else {
-                        return Future.succeededFuture(false);
-                    }
-                })
-                .onComplete(ar -> {
-                    if (ar.succeeded()) {
-                        Keel.outputLogger().info("done r: " + ar.result());
-                    } else {
-                        Keel.outputLogger().exception(ar.cause());
-                    }
-                });
     }
 
     private void routine(Promise<Void> finalPromise) {
