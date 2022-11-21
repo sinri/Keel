@@ -12,7 +12,7 @@ public class HourglassTest {
         //keelPureHourglass.setLogger(Keel.outputLogger());
         keelPureHourglass.setInterval(60_000L).setHandler(now -> {
             String dateExpression = Keel.helpers().datetime().getDateExpression(new Date(now), "yyyy-MM-dd HH:mm");
-            keelPureHourglass.getLogger().info("RUN " + dateExpression + " triggered : " + now);
+            Keel.outputLogger("hourglass").info("RUN " + dateExpression + " triggered : " + now);
         });
         Keel.getVertx().deployVerticle(keelPureHourglass, new DeploymentOptions().setWorker(true));
     }

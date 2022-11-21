@@ -55,7 +55,7 @@ abstract class KeelHourglassImpl extends AbstractVerticle implements KeelHourgla
                     Lock lock = lockAR.result();
                     getLogger().info("LOCK ACQUIRED FOR " + timestamp + " i.e. " + x);
                     regularHandler().handle(timestamp);
-                    Keel.getVertx().setTimer(interval() - 1, timerID -> {
+                    Keel.getVertx().setTimer(interval(), timerID -> {
                         lock.release();
                         getLogger().info("LOCK RELEASED FOR " + timestamp + " i.e. " + x);
                     });
