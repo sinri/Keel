@@ -41,7 +41,7 @@ abstract class KeelHourglassImpl extends AbstractVerticle implements KeelHourgla
             getLogger().debug(hourglassName() + " TRIGGERED FOR " + timestamp);
 
             long x = timestamp / interval();
-            Keel.getVertx().sharedData().getLockWithTimeout(eventBusAddress() + "@" + x, 10_000L, lockAR -> {
+            Keel.getVertx().sharedData().getLockWithTimeout(eventBusAddress() + "@" + x, Math.min(3_000L, interval() - 1), lockAR -> {
                 if (lockAR.failed()) {
                     getLogger().warning("LOCK ACQUIRE FAILED FOR " + timestamp + " i.e. " + x);
                 } else {
