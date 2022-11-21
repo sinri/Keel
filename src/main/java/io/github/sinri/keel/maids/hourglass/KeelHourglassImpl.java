@@ -15,7 +15,7 @@ abstract class KeelHourglassImpl extends AbstractVerticle implements KeelHourgla
     private final String hourglassName;
 
     public KeelHourglassImpl(String hourglassName) {
-        this.logger = Keel.outputLogger(hourglassName);
+        this.logger = KeelLogger.silentLogger();//Keel.outputLogger(hourglassName);
         this.hourglassName = hourglassName;
     }
 

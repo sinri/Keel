@@ -32,6 +32,7 @@ public class KeelDateTimeHelper {
     }
 
     /**
+     * @param format for example: yyyy-MM-ddTHH:mm:ss
      * @since 2.6
      */
     public String getDateExpression(Date date, String format) {
