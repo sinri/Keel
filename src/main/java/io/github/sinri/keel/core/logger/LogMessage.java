@@ -12,6 +12,7 @@ import java.util.Objects;
  * @since 2.9
  * @since 2.9.1 fields const
  * @since 2.9.2 add category
+ * @since 2.9.3 add log_cluster_node_id and log_cluster_node_address
  */
 public class LogMessage {
     public static String KeyLogAspect = "log_aspect";
@@ -22,6 +23,8 @@ public class LogMessage {
     public static String KeyLogThread = "log_thread";
     public static String KeyLogVerticle = "log_verticle";
     public static String KeyLogCategory = "log_category";
+    public static String KeyLogClusterNodeId = "log_cluster_node_id";
+    public static String KeyLogClusterNodeAddress = "log_cluster_node_address";
 
     private final long timestamp;
     private final Map<String, String> map;
@@ -46,6 +49,14 @@ public class LogMessage {
 //            context.forEach(entry -> {
 //                this.map.put(entry.getKey(), String.valueOf(entry.getValue()));
 //            });
+        }
+
+        // cluster node
+        String vertxNodeNetAddress = Keel.getVertxNodeNetAddress();
+        String vertxNodeID = Keel.getVertxNodeID();
+        if (Keel.getVertxNodeNetAddress() != null && vertxNodeID != null) {
+            this.map.put(KeyLogClusterNodeId, vertxNodeID);
+            this.map.put(KeyLogClusterNodeAddress, vertxNodeNetAddress);
         }
     }
 

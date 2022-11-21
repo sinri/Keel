@@ -12,8 +12,11 @@ public class Cluster {
         return Keel.initializeClusteredVertx(
                 "h1",
                 List.of(
-                        "172.20.12.66", "172.20.12.170"
+                        "127.0.0.1"
+//                        "172.20.12.66", "172.20.12.170"
                 ),
+                5701,
+                2,
                 new VertxOptions()
         );
     }

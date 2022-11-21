@@ -18,6 +18,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.spi.cluster.ClusterManager;
+import io.vertx.core.spi.cluster.NodeInfo;
 import io.vertx.spi.cluster.hazelcast.ConfigUtil;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
@@ -32,6 +33,7 @@ public class Keel {
     private static final Map<String, KeelMySQLKit> mysqlKitMap = new HashMap<>();
 
     private static Vertx vertx;
+    private static ClusterManager clusterManager;
 
     public static void loadPropertiesFromFile(String propertiesFileName) {
         propertiesReader.appendPropertiesFromFile(propertiesFileName);
@@ -63,6 +65,8 @@ public class Keel {
      *
      * @param clusterName  集群名称
      * @param members      集群组内地址成员
+     * @param port         起始端口
+     * @param portCount    递增尝试端口数量
      * @param vertxOptions Vert.x 参数
      * @return 未来
      * @since 2.9.1
@@ -70,6 +74,7 @@ public class Keel {
     public static Future<Void> initializeClusteredVertx(
             String clusterName,
             List<String> members,
+            int port, int portCount,
             VertxOptions vertxOptions
     ) {
         TcpIpConfig tcpIpConfig = new TcpIpConfig()
@@ -83,19 +88,36 @@ public class Keel {
 
         NetworkConfig networkConfig = new NetworkConfig()
                 .setJoin(joinConfig)
-                .setPort(5701)
-                .setPortCount(1)
-                .setPortAutoIncrement(false)
+                .setPort(port)
+                .setPortCount(portCount)
+                .setPortAutoIncrement(portCount > 1)
                 .setOutboundPorts(List.of(0));
 
         Config hazelcastConfig = ConfigUtil.loadConfig()
                 .setClusterName(clusterName)
                 .setNetworkConfig(networkConfig);
 
-        ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
-        vertxOptions.setClusterManager(mgr);
+        clusterManager = new HazelcastClusterManager(hazelcastConfig);
+        vertxOptions.setClusterManager(clusterManager);
 
         return initializeClusteredVertx(vertxOptions);
+    }
+
+    /**
+     * 构建一个简易集群 for SAE on Aliyun.
+     *
+     * @param clusterName  集群名称
+     * @param members      集群组内地址成员
+     * @param vertxOptions Vert.x 参数
+     * @return 未来
+     * @since 2.9.1
+     */
+    public static Future<Void> initializeClusteredVertx(
+            String clusterName,
+            List<String> members,
+            VertxOptions vertxOptions
+    ) {
+        return initializeClusteredVertx(clusterName, members, 5701, 1, vertxOptions);
     }
 
     /**
@@ -109,6 +131,7 @@ public class Keel {
         // Config hazelcastConfig;// Hazelcast 配置
         //ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
         //VertxOptions options = new VertxOptions().setClusterManager(mgr);
+        clusterManager = vertxOptions.getClusterManager();
         return Vertx.clusteredVertx(vertxOptions)
                 .compose(clusteredVertx -> {
                     vertx = clusteredVertx;
@@ -121,6 +144,21 @@ public class Keel {
             throw new RuntimeException("The shared vertx instance was not initialized. Run `Keel.initializeVertx()` first!");
         }
         return vertx;
+    }
+
+    public static ClusterManager getVertxClusterManager() {
+        return clusterManager;
+    }
+
+    public static String getVertxNodeNetAddress() {
+        if (vertx == null) return null;
+        NodeInfo nodeInfo = clusterManager.getNodeInfo();
+        return nodeInfo.host() + ":" + nodeInfo.port();
+    }
+
+    public static String getVertxNodeID() {
+        if (vertx == null) return null;
+        return clusterManager.getNodeId();
     }
 
     public static EventBus getEventBus() {
@@ -181,12 +219,18 @@ public class Keel {
      * @since 2.9
      */
     public static KeelLogger outputLogger() {
+        String clusterNode = "";
+        if (vertx != null && vertx.isClustered()) {
+//            clusterNode = getVertxNodeID()+"|";
+            clusterNode = getVertxNodeNetAddress() + "|";
+        }
+
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         if (stackTrace.length < 3) {
-            return outputLogger("unknown", keelLoggerOptions -> keelLoggerOptions.setLowestVisibleLogLevel(KeelLogLevel.DEBUG));
+            return outputLogger(clusterNode + "unknown", keelLoggerOptions -> keelLoggerOptions.setLowestVisibleLogLevel(KeelLogLevel.DEBUG));
         } else {
             StackTraceElement st = stackTrace[2];
-            return outputLogger(Keel.class.getName(), keelLoggerOptions -> keelLoggerOptions.setLowestVisibleLogLevel(KeelLogLevel.DEBUG))
+            return outputLogger(clusterNode + st.getClassName(), keelLoggerOptions -> keelLoggerOptions.setLowestVisibleLogLevel(KeelLogLevel.DEBUG))
                     .setContentPrefix(st.toString());
         }
     }

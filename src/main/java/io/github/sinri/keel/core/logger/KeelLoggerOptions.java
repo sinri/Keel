@@ -281,7 +281,6 @@ public class KeelLoggerOptions {
          * @see KeelLoggerOptions#matchIgnorableStackPackage(String)
          */
         public String ignorableStackPackages;
-
         public KeelLoggerOptionsPOJO() {
             this.dir = null;
             this.level = KeelLogLevel.INFO.name();

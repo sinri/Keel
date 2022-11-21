@@ -94,6 +94,15 @@ abstract public class AbstractKeelLogger implements KeelLogger {
             x.put("verticle", verticleDeploymentInfo);
         }
 
+        // cluster node
+        String vertxNodeNetAddress = Keel.getVertxNodeNetAddress();
+        String vertxNodeID = Keel.getVertxNodeID();
+        if (Keel.getVertxNodeNetAddress() != null && vertxNodeID != null) {
+            x.put("clustered_node", new JsonObject()
+                    .put("node_id", vertxNodeID)
+                    .put("node_net_address", vertxNodeNetAddress));
+        }
+
         if (this.getContentPrefix().length() > 0) {
             x.put("prefix", this.getContentPrefix());
         }
@@ -117,9 +126,18 @@ abstract public class AbstractKeelLogger implements KeelLogger {
             verticleDeploymentInfo = "{" + Keel.getVertx().getOrCreateContext().deploymentID() + "} ";
         }
 
+        // cluster node
+        String vertxNodeNetAddress = Keel.getVertxNodeNetAddress();
+        String vertxNodeID = Keel.getVertxNodeID();
+        String nodeInfo = "";
+        if (Keel.getVertxNodeNetAddress() != null && vertxNodeID != null) {
+            nodeInfo = "{" + vertxNodeID + "@" + vertxNodeNetAddress + "} ";
+        }
+
         String meta = Keel.helpers().datetime().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss.SSS") + " "
                 + "[" + level.name() + "] "
                 + "<" + subject + "> "
+                + nodeInfo
                 + threadInfo
                 + verticleDeploymentInfo;
         if (this.options.getCompositionStyle() == KeelLoggerOptions.CompositionStyle.TWO_LINES) {
