@@ -19,8 +19,8 @@ public class KeelCronHourglass extends KeelHourglassImpl {
 
     private final Handler<Long> handler;
 
-    public KeelCronHourglass() {
-        super();
+    public KeelCronHourglass(String hourglassName) {
+        super(hourglassName);
         this.handler = now -> {
             Calendar calendar = new Calendar
                     .Builder()

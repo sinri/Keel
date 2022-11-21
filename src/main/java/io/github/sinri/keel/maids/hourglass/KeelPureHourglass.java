@@ -12,8 +12,8 @@ public class KeelPureHourglass extends KeelHourglassImpl {
     private Handler<Long> handler;
     private long interval = 60_000L;
 
-    public KeelPureHourglass() {
-
+    public KeelPureHourglass(String hourglassName) {
+        super(hourglassName);
         this.handler = event -> {
             getLogger().warning("EMPTY HANDLER");
         };

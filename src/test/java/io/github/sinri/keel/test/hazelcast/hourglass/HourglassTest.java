@@ -6,7 +6,7 @@ import io.vertx.core.DeploymentOptions;
 
 public class HourglassTest {
     public static void testPure() {
-        KeelPureHourglass keelPureHourglass = new KeelPureHourglass();
+        KeelPureHourglass keelPureHourglass = new KeelPureHourglass(HourglassTest.class.getSimpleName());
         keelPureHourglass.setLogger(Keel.outputLogger());
         keelPureHourglass.setInterval(5000L).setHandler(now -> {
             keelPureHourglass.getLogger().info("RUN, NOW: " + now);

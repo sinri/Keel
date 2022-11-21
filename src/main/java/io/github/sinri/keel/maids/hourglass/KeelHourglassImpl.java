@@ -12,9 +12,16 @@ import io.vertx.core.shareddata.Lock;
 abstract class KeelHourglassImpl extends AbstractVerticle implements KeelHourglass {
     private KeelLogger logger;
     private MessageConsumer<Long> consumer;
+    private final String hourglassName;
 
-    public KeelHourglassImpl() {
-        this.logger = Keel.outputLogger();
+    public KeelHourglassImpl(String hourglassName) {
+        this.logger = Keel.outputLogger(hourglassName);
+        this.hourglassName = hourglassName;
+    }
+
+    @Override
+    public String hourglassName() {
+        return this.hourglassName;
     }
 
     @Override
