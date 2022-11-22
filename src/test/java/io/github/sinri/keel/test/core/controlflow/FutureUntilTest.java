@@ -10,31 +10,33 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class FutureUntilTest {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v0 -> {
+            KeelLogger logger = Keel.outputLogger("FutureUntilTest");
 
-        KeelLogger logger = Keel.outputLogger("FutureUntilTest");
+            AtomicInteger atomicInteger = new AtomicInteger(0);
 
-        AtomicInteger atomicInteger = new AtomicInteger(0);
+            FutureUntil.call(() -> {
+                        int i = atomicInteger.incrementAndGet();
+                        logger.info("FutureUntil calling, i=" + atomicInteger.get());
+                        if (i == 5) {
+                            return Future.failedFuture("GIVE ME FIVE");
+                            // throw new RuntimeException("GIVE ME FIVE");
+                            // return Future.succeededFuture(true);
+                        }
+                        return Future.succeededFuture(false);
+                    })
+                    .onSuccess(v -> {
+                        logger.info("FutureUntil called, i=" + atomicInteger.get());
+                    })
+                    .onFailure(throwable -> {
+                        logger.exception("STOPPED WITH ERROR", throwable);
 
-        FutureUntil.call(() -> {
-                    int i = atomicInteger.incrementAndGet();
-                    logger.info("FutureUntil calling, i=" + atomicInteger.get());
-                    if (i == 5) {
-                        return Future.failedFuture("GIVE ME FIVE");
-                        // throw new RuntimeException("GIVE ME FIVE");
-                        // return Future.succeededFuture(true);
-                    }
-                    return Future.succeededFuture(false);
-                })
-                .onSuccess(v -> {
-                    logger.info("FutureUntil called, i=" + atomicInteger.get());
-                })
-                .onFailure(throwable -> {
-                    logger.exception("STOPPED WITH ERROR", throwable);
+                    })
+                    .eventually(v -> {
+                        return Keel.getVertx().close();
+                    });
+        });
 
-                })
-                .eventually(v -> {
-                    return Keel.getVertx().close();
-                });
+
     }
 }

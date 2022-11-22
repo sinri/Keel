@@ -31,11 +31,11 @@ public class EndlessTest {
     }
 
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
-
-        new KeelEndless(
-                1000L,
-                EndlessTest::blockMode
-        ).deployMe();
+        SharedTestBootstrap.initialize(v -> {
+            new KeelEndless(
+                    1000L,
+                    EndlessTest::blockMode
+            ).deployMe();
+        });
     }
 }

@@ -18,20 +18,22 @@ import java.util.Objects;
 
 public class TestWebA2 {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v0 -> {
+            new KeelHttpServer(new HttpServerOptions().setPort(8822), true)
+                    .configureRoutes(router -> {
+                        router.get("/:a").handler(new X());
+                        // todo confirm it.
+                        router.get("/y/error").handler(new Y());
+                        router.route().last().failureHandler(ctx -> {
+                            Throwable failure = ctx.failure();
+                            Keel.outputLogger().exception(failure);
+                            ctx.response().setStatusCode(500).setStatusMessage(failure.toString()).end();
+                        });
+                    })
+                    .listen();
+        });
 
-        new KeelHttpServer(new HttpServerOptions().setPort(8822), true)
-                .configureRoutes(router -> {
-                    router.get("/:a").handler(new X());
-                    // todo confirm it.
-                    router.get("/y/error").handler(new Y());
-                    router.route().last().failureHandler(ctx -> {
-                        Throwable failure = ctx.failure();
-                        Keel.outputLogger().exception(failure);
-                        ctx.response().setStatusCode(500).setStatusMessage(failure.toString()).end();
-                    });
-                })
-                .listen();
+
     }
 
     public static class X extends KeelWebRequestPromiseHandler {

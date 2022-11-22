@@ -7,30 +7,32 @@ import io.vertx.core.json.JsonObject;
 
 public class JsonBoxTest {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v -> {
+            Box1 box1 = new Box1(
+                    new JsonObject()
+                            .put("string_value_1", "A")
+                            .put("long_value_2", 123458724)
+                            .put("float_value_3", 123.556f)
+                            .put("boolean_value_4", false)
+                            .put("json_object_5", new JsonObject()
+                                    .put("a", "123")
+                                    .put("b", 34)
+                            )
+                            .put("json_array_6", new JsonArray()
+                                    .add(124235)
+                            )
+            );
+            System.out.println(box1.getStringValue1());
+            System.out.println(box1.getLongValue2());
+            System.out.println(box1.getFloatValue3());
+            System.out.println(box1.getBooleanValue4());
+            System.out.println(box1.getNestedStringA());
+            System.out.println(box1.getJsonArray6());
+            System.out.println(box1.getNestedIntegerB());
+            System.out.println(box1.getBox2().getB());
+        });
 
-        Box1 box1 = new Box1(
-                new JsonObject()
-                        .put("string_value_1", "A")
-                        .put("long_value_2", 123458724)
-                        .put("float_value_3", 123.556f)
-                        .put("boolean_value_4", false)
-                        .put("json_object_5", new JsonObject()
-                                .put("a", "123")
-                                .put("b", 34)
-                        )
-                        .put("json_array_6", new JsonArray()
-                                .add(124235)
-                        )
-        );
-        System.out.println(box1.getStringValue1());
-        System.out.println(box1.getLongValue2());
-        System.out.println(box1.getFloatValue3());
-        System.out.println(box1.getBooleanValue4());
-        System.out.println(box1.getNestedStringA());
-        System.out.println(box1.getJsonArray6());
-        System.out.println(box1.getNestedIntegerB());
-        System.out.println(box1.getBox2().getB());
+
     }
 
     public static class Box1 implements JsonifiableEntity<Box1> {

@@ -10,35 +10,27 @@ import java.util.HashMap;
 
 public class InsertConflictTest {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v0 -> {
+            WriteIntoStatement writeIntoStatement = new WriteIntoStatement()
+                    .intoTable("java_test_for_sinri")
+                    .macroWriteOneRowWithMap(new HashMap<String, Object>() {{
+                        put("name", "b");
+                        put("value", 1.2);
+                        put("status", "213");
+                        put("record_time", KeelMySQLKit.nowAsMySQLDatetime());
+                    }});
+            SharedTestBootstrap.getMySQLKit()
+                    .withConnection(writeIntoStatement::executeForAffectedRows)
+                    .compose(afx -> {
+                        System.out.println("AFX " + afx);
+                        return Future.succeededFuture();
+                    })
+                    .onFailure(throwable -> {
+                        System.out.println("FAILED: " + throwable.getMessage() + " / " + throwable.getClass());
+                    })
+                    .eventually(v -> Keel.getVertx().close());
+        });
 
-        WriteIntoStatement writeIntoStatement = new WriteIntoStatement()
-                .intoTable("java_test_for_sinri")
-                .macroWriteOneRowWithMap(new HashMap<String, Object>() {{
-                    put("name", "b");
-                    put("value", 1.2);
-                    put("status", "213");
-                    put("record_time", KeelMySQLKit.nowAsMySQLDatetime());
-                }});
-//        SharedTestBootstrap.getMySQLKit().getPool()
-//                .withConnection(writeIntoStatement::executeForLastInsertedID)
-//                .compose(lastInsertedID->{
-//                    System.out.println("lastInsertedID "+lastInsertedID);
-//                    return Future.succeededFuture();
-//                })
-//                .onFailure(throwable -> {
-//                    System.out.println("FAILED: "+throwable.getMessage()+" / "+ throwable.getClass());
-//                })
-//                .eventually(v->Keel.getVertx().close());
-        SharedTestBootstrap.getMySQLKit()
-                .withConnection(writeIntoStatement::executeForAffectedRows)
-                .compose(afx -> {
-                    System.out.println("AFX " + afx);
-                    return Future.succeededFuture();
-                })
-                .onFailure(throwable -> {
-                    System.out.println("FAILED: " + throwable.getMessage() + " / " + throwable.getClass());
-                })
-                .eventually(v -> Keel.getVertx().close());
+
     }
 }

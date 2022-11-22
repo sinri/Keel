@@ -7,45 +7,32 @@ import io.github.sinri.keel.test.SharedTestBootstrap;
 
 public class TableRowGenerateTest {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v0 -> {
+            KeelLogger logger = Keel.outputLogger("main");
 
-        KeelLogger logger = Keel.outputLogger("main");
-
-        SharedTestBootstrap.getMySQLKit()
-                .withConnection(sqlConnection -> {
-                    return new TableRowClassGenerator(sqlConnection)
+            SharedTestBootstrap.getMySQLKit()
+                    .withConnection(sqlConnection -> {
+                        return new TableRowClassGenerator(sqlConnection)
 //                            .forSchema("docker_test")
-                            .setRewrite(true)
-                            .setSupportLooseEnum(true)
-                            .generate(
-                                    "io.github.sinri.keel.test.mysql.ag",
-                                    "/Users/leqee/code/Keel/src/test/java/io/github/sinri/keel/test/mysql/ag"
-                            );
-                })
-                .onSuccess(v -> {
-                    logger.info("classes generated");
-                })
-//                .compose(v -> {
-//                    return SharedTestBootstrap.getMySQLKit().getPool().withConnection(sqlConnection -> {
-//                        return queryWithTestRecordId(sqlConnection, 1)
-//                                .compose(javaTestForSinriTableRow -> {
-//                                    String fDate = javaTestForSinriTableRow.getFDate();
-//                                    String fTime = javaTestForSinriTableRow.getFTime();
-//                                    String fTimestamp = javaTestForSinriTableRow.getFTimestamp();
-//
-//                                    logger.info("date: " + fDate + " as " + fDate.getClass());
-//                                    logger.info("time: " + fTime + " as " + fTime.getClass());
-//                                    logger.info("timestamp: " + fTimestamp + " as " + fTimestamp.getClass());
-//                                    return Future.succeededFuture();
-//                                });
-//                    });
-//                })
-                .onFailure(throwable -> {
-                    logger.exception(throwable);
-                })
-                .eventually(v -> {
-                    return Keel.getVertx().close();
-                });
+                                .setRewrite(true)
+                                .setSupportLooseEnum(true)
+                                .generate(
+                                        "io.github.sinri.keel.test.mysql.ag",
+                                        "/Users/leqee/code/Keel/src/test/java/io/github/sinri/keel/test/mysql/ag"
+                                );
+                    })
+                    .onSuccess(v -> {
+                        logger.info("classes generated");
+                    })
+                    .onFailure(throwable -> {
+                        logger.exception(throwable);
+                    })
+                    .eventually(v -> {
+                        return Keel.getVertx().close();
+                    });
+        });
+
+
     }
 
 //    public static Future<JavaTestForSinriTableRow> queryWithTestRecordId(SqlConnection sqlConnection, long test_record_id) {

@@ -12,10 +12,12 @@ import java.util.List;
 
 public class ProgramA extends KeelProgram {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v -> {
+            ProgramA programA = new ProgramA();
+            KeelProgram.runProgramAndExit(programA, List.of(args));
+        });
 
-        ProgramA programA = new ProgramA();
-        KeelProgram.runProgramAndExit(programA, List.of(args));
+
     }
 
     @Override

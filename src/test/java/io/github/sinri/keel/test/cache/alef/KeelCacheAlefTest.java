@@ -9,9 +9,7 @@ public class KeelCacheAlefTest {
     public static final KeelCacheAlef<String, Long> alef = new KeelCacheAlef<>();
 
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
-
-        test1();
+        SharedTestBootstrap.initialize(v -> test1());
     }
 
     private static void test1() {

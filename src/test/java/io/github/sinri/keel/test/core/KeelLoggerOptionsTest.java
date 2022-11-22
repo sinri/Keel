@@ -10,28 +10,29 @@ import java.util.Set;
 
 public class KeelLoggerOptionsTest {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v -> {
+            JsonObject jsonObject = Keel.getPropertiesReader().toJsonObject();
+            System.out.println(jsonObject.encodePrettily());
 
-        JsonObject jsonObject = Keel.getPropertiesReader().toJsonObject();
-        System.out.println(jsonObject.encodePrettily());
+            Set<String> aspects = Set.of(
+                    "y",
+                    "x",
+                    "x/a",
+                    "x/b",
+                    "x/a/a",
+                    "x/a/b",
+                    "x/a/b/c"
+            );
 
-        Set<String> aspects = Set.of(
-                "y",
-                "x",
-                "x/a",
-                "x/b",
-                "x/a/a",
-                "x/a/b",
-                "x/a/b/c"
-        );
+            for (var aspect : aspects) {
 
-        for (var aspect : aspects) {
+                KeelLogLevel lowestLevel = new KeelLoggerOptions().loadForAspect("aspect").getLowestVisibleLogLevel();
+                System.out.println(aspect + " -> " + lowestLevel);
+            }
 
-            KeelLogLevel lowestLevel = new KeelLoggerOptions().loadForAspect("aspect").getLowestVisibleLogLevel();
-            System.out.println(aspect + " -> " + lowestLevel);
-        }
+            Keel.getVertx().close();
+        });
 
-        Keel.getVertx().close();
 
     }
 }

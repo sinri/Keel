@@ -151,13 +151,13 @@ public class Keel {
     }
 
     public static String getVertxNodeNetAddress() {
-        if (vertx == null) return null;
+        if (vertx == null || clusterManager == null) return null;
         NodeInfo nodeInfo = clusterManager.getNodeInfo();
         return nodeInfo.host() + ":" + nodeInfo.port();
     }
 
     public static String getVertxNodeID() {
-        if (vertx == null) return null;
+        if (vertx == null || clusterManager == null) return null;
         return clusterManager.getNodeId();
     }
 

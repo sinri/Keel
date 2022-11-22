@@ -17,10 +17,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class KeelCronHourglass extends KeelHourglassImpl {
     private final Map<String, List<Handler<Long>>> cronJobMap = new ConcurrentHashMap<>();
 
+    private Handler<Void> autoUpdateCronTabHandler;
     private final Handler<Long> handler;
 
     public KeelCronHourglass(String hourglassName) {
         super(hourglassName);
+        this.autoUpdateCronTabHandler = null;
         this.handler = now -> {
             Calendar calendar = new Calendar
                     .Builder()
@@ -30,6 +32,11 @@ public class KeelCronHourglass extends KeelHourglassImpl {
             List<Handler<Long>> cronJobs = getCronJobsWhenTriggered(calendar);
             cronJobs.forEach(cronJob -> cronJob.handle(now));
         };
+    }
+
+    public KeelCronHourglass setAutoUpdateCronTabHandler(Handler<Void> autoUpdateCronTabHandler) {
+        this.autoUpdateCronTabHandler = autoUpdateCronTabHandler;
+        return this;
     }
 
     public KeelHourglass updateCronJobs(KeelCronExpression keelCronExpression, List<Handler<Long>> cronJobList) {
@@ -59,5 +66,11 @@ public class KeelCronHourglass extends KeelHourglassImpl {
     @Override
     public Handler<Long> regularHandler() {
         return handler;
+    }
+
+    @Override
+    public void start() throws Exception {
+        autoUpdateCronTabHandler.handle(null);
+        super.start();
     }
 }

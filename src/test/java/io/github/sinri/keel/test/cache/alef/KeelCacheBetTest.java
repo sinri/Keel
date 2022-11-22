@@ -9,9 +9,7 @@ public class KeelCacheBetTest {
     public static KeelCacheBet<String, Long> bet = new KeelCacheBet<>();
 
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
-
-        test1();
+        SharedTestBootstrap.initialize(v -> test1());
     }
 
     private static void test1() {

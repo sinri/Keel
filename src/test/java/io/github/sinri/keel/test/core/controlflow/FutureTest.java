@@ -7,35 +7,35 @@ import io.vertx.core.Future;
 
 public class FutureTest {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
-        KeelLogger logger = Keel.outputLogger("FutureTest");
-        Future
-                .succeededFuture()
-                .compose(v -> {
-                    return Future.failedFuture("0");
-                })
-                .compose(
-                        v -> {
-                            return Future.succeededFuture()
-                                    .compose(vv -> {
-                                        return Future.failedFuture("1");
-                                    });
-                        },
-                        throwable -> {
-                            logger.exception("compose 2nd param", throwable);
-                            return Future.succeededFuture(false);
-                        }
-                )
-                .onFailure(throwable -> {
-                    logger.exception("on failure", throwable);
-                })
-                .onSuccess(b -> {
-                    logger.info("on success " + b);
-                })
-                .eventually(v -> {
-                    logger.info("FIN");
-                    return Keel.getVertx().close();
-                });
+        SharedTestBootstrap.initialize(v0 -> {
+            KeelLogger logger = Keel.outputLogger("FutureTest");
+            Future
+                    .succeededFuture()
+                    .compose(v -> {
+                        return Future.failedFuture("0");
+                    })
+                    .compose(
+                            v -> {
+                                return Future.succeededFuture()
+                                        .compose(vv -> {
+                                            return Future.failedFuture("1");
+                                        });
+                            },
+                            throwable -> {
+                                logger.exception("compose 2nd param", throwable);
+                                return Future.succeededFuture(false);
+                            }
+                    )
+                    .onFailure(throwable -> {
+                        logger.exception("on failure", throwable);
+                    })
+                    .onSuccess(b -> {
+                        logger.info("on success " + b);
+                    })
+                    .eventually(v -> {
+                        logger.info("FIN");
+                        return Keel.getVertx().close();
+                    });
         /*
         上面的实验可以得出结论：
         FutureInstance.compose(a,b)
@@ -45,5 +45,7 @@ public class FutureTest {
             // a
         })
          */
+        });
+
     }
 }

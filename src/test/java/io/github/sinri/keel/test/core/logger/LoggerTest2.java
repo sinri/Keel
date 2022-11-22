@@ -6,14 +6,16 @@ import io.github.sinri.keel.test.SharedTestBootstrap;
 
 public class LoggerTest2 {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v -> {
+            KeelLoggerOptions keelLoggerOptions = new KeelLoggerOptions();
 
-        KeelLoggerOptions keelLoggerOptions = new KeelLoggerOptions();
+            logs(KeelLogger.createLogger(new KeelLoggerOptions().loadForAspect(LoggerTest2.class.getName())));
+            logs(KeelLogger.silentLogger());
+            keelLoggerOptions.setImplement("print");
+            logs(KeelLogger.createLogger(keelLoggerOptions));
+        });
 
-        logs(KeelLogger.createLogger(new KeelLoggerOptions().loadForAspect(LoggerTest2.class.getName())));
-        logs(KeelLogger.silentLogger());
-        keelLoggerOptions.setImplement("print");
-        logs(KeelLogger.createLogger(keelLoggerOptions));
+
     }
 
     private static void logs(KeelLogger logger) {

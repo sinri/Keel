@@ -11,19 +11,20 @@ import java.util.List;
 
 public class Web2Client {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v0 -> {
+            List<Future> list = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                Future<Void> future = call(i);
+                list.add(future);
+            }
 
-        List<Future> list = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            Future<Void> future = call(i);
-            list.add(future);
-        }
+            CompositeFuture.join(list)
+                    .eventually(v -> {
+                        return Keel.getVertx().close();
+                    })
+            ;
 
-        CompositeFuture.join(list)
-                .eventually(v -> {
-                    return Keel.getVertx().close();
-                })
-        ;
+        });
 
 
     }

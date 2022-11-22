@@ -14,36 +14,35 @@ public class KeelSisiodosiTest {
 //    static KeelSisiodosi keelSisiodosi;
 
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v0 -> {
+            KeelLogger logger = Keel.outputLogger();
 
-        KeelLogger logger = Keel.outputLogger();
-
-        KeelFunnel.deployOneInstance(
-                new KeelFunnel.Options()
-        ).onSuccess(
-                sisiodosi -> {
-                    sisiodosi.setLogger(logger);
-                    FutureForRange.call(100, i -> {
-                                int finalI = i;
-                                sisiodosi.drop(() -> {
-                                    logger.info("DRIP HANDLED " + finalI);
-                                    return Future.succeededFuture();
+            KeelFunnel.deployOneInstance(
+                    new KeelFunnel.Options()
+            ).onSuccess(
+                    sisiodosi -> {
+                        sisiodosi.setLogger(logger);
+                        FutureForRange.call(100, i -> {
+                                    int finalI = i;
+                                    sisiodosi.drop(() -> {
+                                        logger.info("DRIP HANDLED " + finalI);
+                                        return Future.succeededFuture();
+                                    });
+                                    int i1 = new Random().nextInt(300);
+                                    logger.info("DRIPPED " + finalI + " and then sleep " + (long) i1);
+                                    return FutureSleep.call(i1);
+                                })
+                                .onFailure(throwable -> {
+                                    logger.exception("RANGE ERROR", throwable);
+                                })
+                                .onComplete(v -> {
+                                    Keel.getVertx().setTimer(60_000L, timerID -> {
+                                        Keel.getVertx().close();
+                                    });
                                 });
-                                int i1 = new Random().nextInt(300);
-                                logger.info("DRIPPED " + finalI + " and then sleep " + (long) i1);
-                                return FutureSleep.call(i1);
-                            })
-                            .onFailure(throwable -> {
-                                logger.exception("RANGE ERROR", throwable);
-                            })
-                            .onComplete(v -> {
-                                Keel.getVertx().setTimer(60_000L, timerID -> {
-                                    Keel.getVertx().close();
-                                });
-                            });
-                }
-        );
-
+                    }
+            );
+        });
 
     }
 }

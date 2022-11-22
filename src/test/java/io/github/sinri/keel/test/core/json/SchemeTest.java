@@ -8,9 +8,7 @@ import io.vertx.core.json.JsonObject;
 
 public class SchemeTest {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
-
-        test_o_1();
+        SharedTestBootstrap.initialize(v -> test_o_1());
     }
 
     private static void test_o_1() {

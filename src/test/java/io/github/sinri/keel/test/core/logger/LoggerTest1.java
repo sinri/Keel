@@ -8,20 +8,22 @@ import java.util.List;
 
 public class LoggerTest1 {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v -> {
+            String a = Keel.getPropertiesReader().getProperty("LoggerTest1.a");
+            Keel.outputLogger("main").info("a", new JsonObject().put("a", a));
+            String b = Keel.getPropertiesReader().getProperty("LoggerTest1.b");
+            Keel.outputLogger("main").info("b", new JsonObject().put("b", b));
+            String c = Keel.getPropertiesReader().getProperty("LoggerTest1.c");
+            Keel.outputLogger("main").info("c", new JsonObject().put("c", c));
 
-        String a = Keel.getPropertiesReader().getProperty("LoggerTest1.a");
-        Keel.outputLogger("main").info("a", new JsonObject().put("a", a));
-        String b = Keel.getPropertiesReader().getProperty("LoggerTest1.b");
-        Keel.outputLogger("main").info("b", new JsonObject().put("b", b));
-        String c = Keel.getPropertiesReader().getProperty("LoggerTest1.c");
-        Keel.outputLogger("main").info("c", new JsonObject().put("c", c));
+            List<String> list = List.of("EEE", "EEEE", "E", "u");
+            list.forEach(item -> {
+                Keel.outputLogger("main").info(item + " -> " + Keel.helpers().datetime().getCurrentDateExpression(item));
+            });
 
-        List<String> list = List.of("EEE", "EEEE", "E", "u");
-        list.forEach(item -> {
-            Keel.outputLogger("main").info(item + " -> " + Keel.helpers().datetime().getCurrentDateExpression(item));
+            Keel.getVertx().close();
         });
 
-        Keel.getVertx().close();
+
     }
 }

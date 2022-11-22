@@ -7,23 +7,25 @@ import io.vertx.core.json.JsonObject;
 
 public class JsonifiableExtTest {
     public static void main(String[] args) {
-        SharedTestBootstrap.initialize();
+        SharedTestBootstrap.initialize(v -> {
+            J1 j1 = new J1()
+                    .setA("aaaa")
+                    .setB(new JsonObject()
+                            .put("aaaa", "bbbbb")
+                    );
+            System.out.println(j1);
 
-        J1 j1 = new J1()
-                .setA("aaaa")
-                .setB(new JsonObject()
-                        .put("aaaa", "bbbbb")
-                );
-        System.out.println(j1);
+            j1.forEach(entry -> {
+                System.out.println(entry.getKey() + " -> " + entry.getValue());
+            });
 
-        j1.forEach(entry -> {
-            System.out.println(entry.getKey() + " -> " + entry.getValue());
+            Keel.getVertx().eventBus().consumer("consumer", message -> {
+                System.out.println("consumer received message: " + message.body() + " C: " + ((J1) message.body()).getC());
+            });
+            Keel.getVertx().eventBus().publish("consumer", j1);
+
         });
 
-        Keel.getVertx().eventBus().consumer("consumer", message -> {
-            System.out.println("consumer received message: " + message.body() + " C: " + ((J1) message.body()).getC());
-        });
-        Keel.getVertx().eventBus().publish("consumer", j1);
 
     }
 
