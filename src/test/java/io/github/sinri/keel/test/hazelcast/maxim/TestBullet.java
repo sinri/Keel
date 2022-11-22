@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.hazelcast.maxim;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.maids.maxim.Bullet;
+import io.github.sinri.keel.maids.gatling.Bullet;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 

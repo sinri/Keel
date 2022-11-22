@@ -1,4 +1,4 @@
-package io.github.sinri.keel.maids.maxim;
+package io.github.sinri.keel.maids.gatling;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
