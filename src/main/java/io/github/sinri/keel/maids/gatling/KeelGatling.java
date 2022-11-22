@@ -9,6 +9,7 @@ import io.vertx.core.shareddata.Counter;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 
 /**
  * Gatling Gun with multi barrels, for parallel tasks in clustered vertx runtime.
@@ -17,14 +18,16 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 2.9.3 change to VERTICLE
  */
 public class KeelGatling extends AbstractVerticle implements KeelVerticleInterface {
-    private final KeelGatlingOptions options;
+    private final Options options;
     private final AtomicInteger barrelUsed = new AtomicInteger(0);
 
-    private KeelGatling(KeelGatlingOptions options) {
+    private KeelGatling(Options options) {
         this.options = options;
     }
 
-    public static Future<String> deploy(KeelGatlingOptions options) {
+    public static Future<String> deploy(String gatlingName, Handler<Options> optionHandler) {
+        Options options = new Options(gatlingName);
+        optionHandler.handle(options);
         KeelGatling keelGatling = new KeelGatling(options);
         return Keel.getVertx().deployVerticle(keelGatling, new DeploymentOptions().setWorker(true));
     }
@@ -152,5 +155,90 @@ public class KeelGatling extends AbstractVerticle implements KeelVerticleInterfa
                 );
 
         promise.future().andThen(handler);
+    }
+
+    public static class Options {
+        private final String gatlingName;
+        private int barrels;
+        private int averageRestInterval;
+        private Supplier<Future<Bullet>> bulletLoader;
+        private KeelLogger logger;
+
+        public Options(String gatlingName) {
+            this.gatlingName = gatlingName;
+            this.barrels = 1;
+            this.averageRestInterval = 1000;
+            this.bulletLoader = () -> Future.succeededFuture(null);
+            this.logger = KeelLogger.silentLogger();
+        }
+
+        /**
+         * @return 加特林机枪名称（集群中各节点之间的识别同一组加特林机枪类的实例用）
+         */
+        public String getGatlingName() {
+            return gatlingName;
+        }
+
+        /**
+         * @return 枪管数量（并发任务数）
+         */
+        public int getBarrels() {
+            return barrels;
+        }
+
+        /**
+         * @param barrels 枪管数量（并发任务数）
+         */
+        public Options setBarrels(int barrels) {
+            this.barrels = barrels;
+            return this;
+        }
+
+        /**
+         * @return 弹带更换平均等待时长（没有新任务时的休眠期，单位0.001秒）
+         */
+        public int getAverageRestInterval() {
+            return averageRestInterval;
+        }
+
+        /**
+         * @param averageRestInterval 弹带更换平均等待时长（没有新任务时的休眠期，单位0.001秒）
+         */
+        public Options setAverageRestInterval(int averageRestInterval) {
+            this.averageRestInterval = averageRestInterval;
+            return this;
+        }
+
+        /**
+         * @return 供弹器（新任务生成器）
+         */
+        public Supplier<Future<Bullet>> getBulletLoader() {
+            return bulletLoader;
+        }
+
+        /**
+         * @param bulletLoader 供弹器（新任务生成器）
+         */
+        public Options setBulletLoader(Supplier<Future<Bullet>> bulletLoader) {
+            this.bulletLoader = bulletLoader;
+            return this;
+        }
+
+        /**
+         * @return 日志记录仪
+         */
+        public KeelLogger getLogger() {
+            return logger;
+        }
+
+        /**
+         * @param logger 日志记录仪
+         */
+        public Options setLogger(KeelLogger logger) {
+            this.logger = logger;
+            return this;
+        }
+
+
     }
 }

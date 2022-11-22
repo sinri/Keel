@@ -1,4 +1,4 @@
-package io.github.sinri.keel.test.hazelcast.maxim;
+package io.github.sinri.keel.test.hazelcast.gatling;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.maids.gatling.Bullet;

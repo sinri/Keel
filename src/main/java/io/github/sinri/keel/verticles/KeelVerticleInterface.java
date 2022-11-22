@@ -13,13 +13,21 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.14
  */
 public interface KeelVerticleInterface extends Verticle {
-    KeelLogger getLogger();
+    /**
+     * @since 2.9.3 become optional with silent logger
+     */
+    default KeelLogger getLogger() {
+        return KeelLogger.silentLogger();
+    }
 
     /**
      * @since 2.4 do not rely on context anymore
      * @since 2.7 became public
+     * @since 2.9.3 become optional with nothing to do
      */
-    void setLogger(KeelLogger logger);
+    default void setLogger(KeelLogger logger) {
+        // do nothing
+    }
 
     /**
      * copied from AbstractVerticle

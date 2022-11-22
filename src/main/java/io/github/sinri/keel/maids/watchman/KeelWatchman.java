@@ -1,4 +1,4 @@
-package io.github.sinri.keel.maids.hourglass;
+package io.github.sinri.keel.maids.watchman;
 
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.Handler;
@@ -10,9 +10,9 @@ import io.vertx.core.Handler;
  *
  * @since 2.9.3
  */
-public interface KeelHourglass extends KeelVerticleInterface {
+public interface KeelWatchman extends KeelVerticleInterface {
 
-    String hourglassName();
+    String watchmanName();
 
     long interval();
 

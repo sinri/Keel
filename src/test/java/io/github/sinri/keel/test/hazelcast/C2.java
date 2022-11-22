@@ -2,8 +2,7 @@ package io.github.sinri.keel.test.hazelcast;
 
 import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.test.hazelcast.hourglass.HourglassTest;
-import io.github.sinri.keel.test.hazelcast.maxim.TestGatling;
+import io.github.sinri.keel.test.hazelcast.watch.WatchTest;
 import io.vertx.core.Future;
 
 public class C2 {
@@ -27,8 +26,9 @@ public class C2 {
 //                        }
 //                    });
 
-                    TestGatling.startOnClusterNode();
-                    HourglassTest.testPure();
+//                    TestGatling.startOnClusterNode();
+//                    WatchTest.testPure();
+                    WatchTest.testCron();
 
                     return Future.succeededFuture();
                 })
