@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 /**
  * 随时接收小任务，并周期性轮询依次执行。
  * 在部署为verticle（deploy）时自动开始。
+ * <p>
+ * 仅用于单节点模式。
  *
  * @since 2.9 rename from sisiodosi to funnel
  */

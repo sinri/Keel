@@ -1,5 +1,6 @@
 package io.github.sinri.keel.servant.sundial;
 
+import io.github.sinri.keel.core.KeelCronExpression;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.Future;
 
@@ -12,6 +13,7 @@ import java.util.function.Function;
  * @since 2.3 fix async wait bug
  * @since 2.7 rename from KeelServantTimerWorker
  */
+@Deprecated(since = "2.9.3")
 public class KeelSundialWorkerImpl implements KeelSundialWorker {
     private final String name;
     private final String rawCronExpression;

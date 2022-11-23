@@ -19,6 +19,8 @@ import java.util.function.Supplier;
  * <p>
  * 使用deploy开启，使用undeploy撤销。
  *
+ * 仅用于单节点模式。
+ *
  * @since 2.7
  */
 public class KeelEndless extends AbstractVerticle implements KeelVerticleInterface {

@@ -10,6 +10,8 @@ import io.vertx.core.Future;
 
 /**
  * 标准的队列服务实现。
+ * <p>
+ * 仅用于单节点模式。
  *
  * @since 2.1
  */

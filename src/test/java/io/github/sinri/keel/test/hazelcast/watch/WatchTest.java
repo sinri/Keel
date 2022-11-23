@@ -1,13 +1,12 @@
 package io.github.sinri.keel.test.hazelcast.watch;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.KeelCronExpression;
 import io.github.sinri.keel.maids.watchman.KeelCronWatchman;
 import io.github.sinri.keel.maids.watchman.KeelPureWatchman;
 import io.github.sinri.keel.maids.watchman.KeelWatchmanEventHandler;
-import io.github.sinri.keel.servant.sundial.KeelCronExpression;
 
 import java.util.Date;
-import java.util.List;
 
 public class WatchTest {
     public static void testPure() {
@@ -29,10 +28,10 @@ public class WatchTest {
 
     public static void testCron() {
         KeelCronWatchman.deploy("WatchCronTest", asyncMapName -> {
-                    return KeelCronWatchman.updateCronTabToAsyncMap(
+                    return KeelCronWatchman.addCronJobToAsyncMap(
                             asyncMapName,
                             new KeelCronExpression("* * * * *"),
-                            List.of(CronEventHandler.class)
+                            CronEventHandler.class
                     );
                 })
                 .andThen(ar -> {

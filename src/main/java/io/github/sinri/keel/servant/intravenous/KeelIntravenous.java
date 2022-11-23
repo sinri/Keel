@@ -18,6 +18,8 @@ import java.util.function.Function;
 /**
  * 随时接收参数包，并周期性轮询以供批处理。
  * Like original Sisiodosi, but implemented batch processing by default.
+ * <p>
+ * 设计为单节点模式下使用，但可经扩展用于集群模式。
  *
  * @since 2.9
  */

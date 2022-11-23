@@ -7,6 +7,7 @@ import java.util.Calendar;
 /**
  * @since 2.8
  */
+@Deprecated(since = "2.9.3")
 public interface KeelSundialWorkerCore {
     /**
      * @param calendar 触发的日历时间

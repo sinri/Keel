@@ -1,5 +1,6 @@
 package io.github.sinri.keel.servant.sundial;
 
+import io.github.sinri.keel.core.KeelCronExpression;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -13,6 +14,7 @@ import java.util.function.Function;
  *
  * @since 2.7
  */
+@Deprecated(since = "2.9.3")
 public interface KeelSundialWorker extends KeelSundialWorkerCore {
     @Deprecated(since = "2.8")
     static KeelSundialWorker build(

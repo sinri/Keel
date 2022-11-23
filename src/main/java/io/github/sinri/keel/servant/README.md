@@ -45,3 +45,5 @@ FOR STANDALONE VERTX
 ## Sundial
 
 定时任务。
+
+自2.9.3起标记废弃，可转用watchman。

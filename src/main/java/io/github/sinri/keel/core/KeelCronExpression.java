@@ -1,9 +1,12 @@
-package io.github.sinri.keel.servant.sundial;
+package io.github.sinri.keel.core;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * since 2.9.3 moved from io.github.sinri.keel.servant.sundial to here.
+ */
 public class KeelCronExpression {
     final Set<Integer> minuteOptions = new HashSet<>();
     final Set<Integer> hourOptions = new HashSet<>();
