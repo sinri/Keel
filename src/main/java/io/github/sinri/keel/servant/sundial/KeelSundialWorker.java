@@ -14,7 +14,6 @@ import java.util.function.Function;
  *
  * @since 2.7
  */
-@Deprecated(since = "2.9.3")
 public interface KeelSundialWorker extends KeelSundialWorkerCore {
     @Deprecated(since = "2.8")
     static KeelSundialWorker build(

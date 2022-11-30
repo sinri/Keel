@@ -3,7 +3,6 @@ package io.github.sinri.keel.servant.sundial;
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
-@Deprecated(since = "2.9.3")
 public class KeelSundialWorkerMeta extends SimpleJsonifiableEntity {
     public KeelSundialWorkerMeta(String name, String cronExpression, int parallelLimit) {
         this.reloadDataFromJsonObject(new JsonObject()

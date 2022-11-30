@@ -1,5 +1,6 @@
 package io.github.sinri.keel.core.controlflow;
 
+import io.github.sinri.keel.Keel;
 import io.vertx.core.Future;
 
 import java.util.Iterator;
@@ -25,18 +26,28 @@ public class FutureForEach<T> {
 
     private Future<Void> process(Iterable<T> collection) {
         Iterator<T> iterator = collection.iterator();
-        return FutureUntil.call(() -> Future.succeededFuture()
-                .compose(v -> {
-                    if (iterator.hasNext()) {
-                        T next = iterator.next();
-                        return asyncItemProcessFunction.apply(next);
-                    } else {
-                        return Future.succeededFuture();
-                    }
-                })
-                .compose(v -> {
-                    return Future.succeededFuture(!iterator.hasNext());
-                }));
+        return Keel.callFutureRepeat(routineResult -> {
+            if (iterator.hasNext()) {
+                T next = iterator.next();
+                return asyncItemProcessFunction.apply(next);
+            } else {
+                routineResult.stop();
+                return Future.succeededFuture();
+            }
+        });
+
+//        return FutureUntil.call(() -> Future.succeededFuture()
+//                .compose(v -> {
+//                    if (iterator.hasNext()) {
+//                        T next = iterator.next();
+//                        return asyncItemProcessFunction.apply(next);
+//                    } else {
+//                        return Future.succeededFuture();
+//                    }
+//                })
+//                .compose(v -> {
+//                    return Future.succeededFuture(!iterator.hasNext());
+//                }));
     }
 
     @Deprecated

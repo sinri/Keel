@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.funnel;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureUntil;
+import io.github.sinri.keel.core.controlflow.FutureRepeat;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
@@ -58,16 +58,6 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
         return logger;
     }
 
-//    @Override
-//    public long getTimeThreshold() {
-//        return options.getTimeThreshold();
-//    }
-
-//    @Override
-//    public int getSizeThreshold() {
-//        return options.getSizeThreshold();
-//    }
-
     @Override
     public void setLogger(KeelLogger logger) {
         this.logger = logger;
@@ -95,19 +85,6 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
 
     private void query() {
         if (drips.size() > 0) {
-//            if (drips.size() >= getSizeThreshold()) {
-//                getLogger().debug("DRIPS " + drips.size() + " >= Size Threshold " + getSizeThreshold());
-//                pour();
-//                return;
-//            }
-
-//            long restedTime = new Date().getTime() - restingStartTime.get();
-//            if (restedTime > getTimeThreshold()) {
-//                getLogger().debug("RESTED TIME " + restedTime + " >= Time Threshold " + getTimeThreshold() + " while DRIPS " + drips.size());
-//                pour();
-//                return;
-//            }
-
             pour();
             return;
         }
@@ -115,19 +92,20 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
         Keel.getVertx().setTimer(getQueryInterval(), timerID -> query());
     }
 
-    private Future<Boolean> pourOneDrip() {
+    private Future<Void> pourOneDrip(FutureRepeat.RoutineResult routineResult) {
         return Future.succeededFuture(drips.poll())
                 .compose(drip -> {
                     if (drip == null) {
-                        return Future.succeededFuture(true);
+                        routineResult.stop();
+                        return Future.succeededFuture();
                     } else {
                         return drip.get()
                                 .compose(v -> {
                                     getLogger().info("DRIP DONE");
-                                    return Future.succeededFuture(false);
+                                    return Future.succeededFuture();
                                 }, throwable -> {
                                     getLogger().exception("DRIP FAILED", throwable);
-                                    return Future.succeededFuture(false);
+                                    return Future.succeededFuture();
                                 });
                     }
                 });
@@ -135,7 +113,8 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
 
     private void pour() {
         getLogger().debug("POUR START");
-        FutureUntil.call(this::pourOneDrip)
+
+        Keel.callFutureRepeat(this::pourOneDrip)
                 .onComplete(poured -> {
                     getLogger().debug("POUR END");
                     restingStartTime.set(new Date().getTime());

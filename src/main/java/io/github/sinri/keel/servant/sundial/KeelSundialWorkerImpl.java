@@ -13,7 +13,6 @@ import java.util.function.Function;
  * @since 2.3 fix async wait bug
  * @since 2.7 rename from KeelServantTimerWorker
  */
-@Deprecated(since = "2.9.3")
 public class KeelSundialWorkerImpl implements KeelSundialWorker {
     private final String name;
     private final String rawCronExpression;

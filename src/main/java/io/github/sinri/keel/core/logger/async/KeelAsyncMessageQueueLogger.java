@@ -9,6 +9,9 @@ import io.vertx.core.json.JsonObject;
 import java.util.Date;
 
 /**
+ * 将日志内容组装成 LogMessage 后加入指定队列。
+ * *
+ *
  * @since 2.9
  */
 public class KeelAsyncMessageQueueLogger extends AbstractKeelAsyncQueueLogger<LogMessage> {

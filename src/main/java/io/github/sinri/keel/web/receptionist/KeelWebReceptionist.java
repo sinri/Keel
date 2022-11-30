@@ -27,6 +27,10 @@ public abstract class KeelWebReceptionist {
 
     abstract protected KeelLogger createLogger();
 
+    public KeelLogger getLogger() {
+        return logger;
+    }
+
     abstract public void handle();
 
     private void respondWithJsonObject(JsonObject resp) {

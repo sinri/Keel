@@ -1,5 +1,6 @@
 package io.github.sinri.keel.core.controlflow;
 
+import io.github.sinri.keel.Keel;
 import io.vertx.core.Future;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -48,20 +49,34 @@ public class FutureForRange {
      */
     private Future<Void> run(Function<Integer, Future<Void>> handleFunction) {
         AtomicInteger indexRef = new AtomicInteger(options.getStart());
-        return FutureUntil.call(() -> {
+
+        return Keel.callFutureRepeat(routineResult -> {
             if (indexRef.get() < options.getEnd()) {
-                return Future.succeededFuture()
-                        .compose(v -> {
-                            return handleFunction.apply(indexRef.get());
-                        })
+                return handleFunction.apply(indexRef.get())
                         .compose(v -> {
                             indexRef.addAndGet(options.getStep());
-                            return Future.succeededFuture(false);
+                            return Future.succeededFuture();
                         });
             } else {
-                return Future.succeededFuture(true);
+                routineResult.stop();
+                return Future.succeededFuture();
             }
         });
+
+//        return FutureUntil.call(() -> {
+//            if (indexRef.get() < options.getEnd()) {
+//                return Future.succeededFuture()
+//                        .compose(v -> {
+//                            return handleFunction.apply(indexRef.get());
+//                        })
+//                        .compose(v -> {
+//                            indexRef.addAndGet(options.getStep());
+//                            return Future.succeededFuture(false);
+//                        });
+//            } else {
+//                return Future.succeededFuture(true);
+//            }
+//        });
     }
 
     public static class Options {

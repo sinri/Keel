@@ -16,9 +16,7 @@ import java.util.function.Supplier;
  * - Supplier.get()
  * - Set Next Timer
  * - END
- * <p>
  * 使用deploy开启，使用undeploy撤销。
- *
  * 仅用于单节点模式。
  *
  * @since 2.7

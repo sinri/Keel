@@ -14,7 +14,6 @@ import java.util.*;
  * @since 2.7 rename from KeelServantTimer
  * @since 2.9.3 建议使用KeelWatchman系列实现
  */
-@Deprecated(since = "2.9.3")
 public class KeelSundial {
     private final KeelLogger logger;
     private final Map<String, KeelSundialWorker> registeredWorkers = new HashMap<>();

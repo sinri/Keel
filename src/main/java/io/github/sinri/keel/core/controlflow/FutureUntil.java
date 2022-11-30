@@ -9,9 +9,12 @@ import java.util.function.Supplier;
 /**
  * Repeat execute a functional block and get a future for boolean to decide whether stop or not.
  *
+ * @see FutureRepeat
  * @since 2.8 Future Recursion Implementation
  * @since 2.9 changed to use Promise to avoid Thread Blocking Issue
+ * @since 2.9.3 因为循环体里的未来返回值语义并不明确……所以……换用 io.github.sinri.keel.core.controlflow.FutureRepeat 吧。
  */
+@Deprecated(since = "2.9.3")
 public class FutureUntil {
     private final Supplier<Future<Boolean>> singleRecursionForShouldStopSupplier;
 

@@ -1,5 +1,10 @@
 package io.github.sinri.keel.core.logger;
 
+import io.github.sinri.keel.core.logger.async.KeelAsyncMessageQueueLogger;
+import io.github.sinri.keel.core.logger.async.KeelAsyncQueueLoggerOptions;
+import io.github.sinri.keel.core.logger.async.KeelAsyncSimpleQueueLogger;
+import io.github.sinri.keel.core.logger.async.adapter.StdoutAdapter;
+import io.github.sinri.keel.core.logger.async.adapter.aliyun.sls.AliyunSLSAdapter;
 import io.github.sinri.keel.core.logger.impl.KeelPrintLogger;
 import io.github.sinri.keel.core.logger.impl.KeelSilentLogger;
 import io.github.sinri.keel.core.logger.impl.KeelSyncFileLogger;
@@ -15,6 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 public interface KeelLogger {
     /**
      * Create an instance of KeelLogger according to given KeelLoggerOptions.
+     *
+     * @since Option for Sync
      */
     static KeelLogger createLogger(@Nonnull KeelLoggerOptions keelLoggerOptions) {
         if (keelLoggerOptions.getImplement() == null || keelLoggerOptions.getImplement().isEmpty()) {
@@ -23,9 +30,6 @@ public interface KeelLogger {
         if (keelLoggerOptions.getImplement().equals("sync")) {
             return new KeelSyncFileLogger(keelLoggerOptions);
         }
-//        if (keelLoggerOptions.implement.equals("async")) {
-//            return new KeelAsyncFileLogger(keelLoggerOptions);
-//        }
         if (keelLoggerOptions.getImplement().equals("silent")) {
             return silentLogger();
         }
@@ -43,6 +47,19 @@ public interface KeelLogger {
             e.printStackTrace();
             // deal with printLogger()
             return new KeelPrintLogger(keelLoggerOptions);
+        }
+    }
+
+    /**
+     * @param options Option for Async
+     * @since 2.9.3
+     */
+    static KeelLogger createLogger(KeelAsyncQueueLoggerOptions options) {
+        if (options.getImplement().equals("async-aliyun-sls")) {
+            AliyunSLSAdapter aliyunSLSAdapter = AliyunSLSAdapter.getInstanceForTopic(options.getTopic());
+            return new KeelAsyncMessageQueueLogger(options, aliyunSLSAdapter);
+        } else {
+            return new KeelAsyncSimpleQueueLogger(options, new StdoutAdapter<>());
         }
     }
 

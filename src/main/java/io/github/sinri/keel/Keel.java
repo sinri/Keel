@@ -1,10 +1,7 @@
 package io.github.sinri.keel;
 
 import com.hazelcast.config.*;
-import io.github.sinri.keel.core.controlflow.FutureForEach;
-import io.github.sinri.keel.core.controlflow.FutureForRange;
-import io.github.sinri.keel.core.controlflow.FutureSleep;
-import io.github.sinri.keel.core.controlflow.FutureUntil;
+import io.github.sinri.keel.core.controlflow.*;
 import io.github.sinri.keel.core.helper.KeelHelpers;
 import io.github.sinri.keel.core.logger.KeelLogLevel;
 import io.github.sinri.keel.core.logger.KeelLogger;
@@ -280,8 +277,16 @@ public class Keel {
     /**
      * @since 2.9
      */
+    @Deprecated(since = "2.9.3")
     public static Future<Void> callFutureUntil(Supplier<Future<Boolean>> singleRecursionForShouldStopSupplier) {
         return FutureUntil.call(singleRecursionForShouldStopSupplier);
+    }
+
+    /**
+     * @since 2.9.3
+     */
+    public static Future<Void> callFutureRepeat(Function<FutureRepeat.RoutineResult, Future<Void>> routineResultFutureFunction) {
+        return FutureRepeat.call(routineResultFutureFunction);
     }
 
     /**

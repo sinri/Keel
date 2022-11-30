@@ -9,15 +9,28 @@ import java.util.Set;
  * @since 2.9
  */
 public class KeelAsyncQueueLoggerOptions {
+    /**
+     * @since 2.9.3
+     */
+    private String implement;
     private KeelLogLevel lowestVisibleLogLevel;
     private Set<String> ignorableStackPackageSet;
     private String aspect;
+    /**
+     * Aliyun SLS 中的概念，比 aspect 更高级的分组概念。
+     *
+     * @since 2.9.3
+     */
+    private String topic;
 
     private boolean useTee;
     private boolean showThreadID;
     private boolean showVerticleDeploymentID;
 
     public KeelAsyncQueueLoggerOptions() {
+        this.implement = "";
+        this.topic = "";
+
         this.lowestVisibleLogLevel = KeelLogLevel.INFO;
         this.aspect = "default";
         this.useTee = false;
@@ -28,6 +41,38 @@ public class KeelAsyncQueueLoggerOptions {
         this.ignorableStackPackageSet.add("io.vertx");
         this.ignorableStackPackageSet.add("io.netty");
         this.ignorableStackPackageSet.add("java.lang");
+    }
+
+    /**
+     * @return "" or SPI class name
+     * @since 2.9.3
+     */
+    public String getImplement() {
+        return implement;
+    }
+
+    /**
+     * @param implement "" or SPI class name
+     * @since 2.9.3
+     */
+    public KeelAsyncQueueLoggerOptions setImplement(String implement) {
+        this.implement = implement;
+        return this;
+    }
+
+    /**
+     * @since 2.9.3
+     */
+    public String getTopic() {
+        return topic;
+    }
+
+    /**
+     * @since 2.9.3
+     */
+    public KeelAsyncQueueLoggerOptions setTopic(String topic) {
+        this.topic = topic;
+        return this;
     }
 
     public String getAspect() {

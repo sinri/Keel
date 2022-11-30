@@ -1,5 +1,8 @@
 package io.github.sinri.keel.core.helper;
 
+/**
+ * @since 2.9
+ */
 public class KeelHelpers {
     private static final KeelHelpers instance;
 
@@ -16,6 +19,7 @@ public class KeelHelpers {
     private final KeelStringHelper stringHelper;
     private final KeelCryptographyHelper cryptographyHelper;
     private final KeelDigestHelper digestHelper;
+    private final KeelRuntimeHelper runtimeHelper;
 
     private KeelHelpers() {
         this.binaryHelper = KeelBinaryHelper.getInstance();
@@ -27,6 +31,7 @@ public class KeelHelpers {
         this.stringHelper = KeelStringHelper.getInstance();
         this.cryptographyHelper = KeelCryptographyHelper.getInstance();
         this.digestHelper = KeelDigestHelper.getInstance();
+        this.runtimeHelper = KeelRuntimeHelper.getInstance();
     }
 
     public static KeelHelpers getInstance() {
@@ -67,5 +72,12 @@ public class KeelHelpers {
 
     public KeelDigestHelper digest() {
         return digestHelper;
+    }
+
+    /**
+     * @since 2.9.3
+     */
+    public KeelRuntimeHelper runtime() {
+        return runtimeHelper;
     }
 }

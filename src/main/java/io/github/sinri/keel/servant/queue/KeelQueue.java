@@ -1,7 +1,6 @@
 package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureUntil;
 import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
@@ -116,7 +115,8 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
 
     private Future<Void> whenSignalRunCame(KeelQueueNextTaskSeeker nextTaskSeeker) {
         this.queueStatus = QueueStatus.RUNNING;
-        return FutureUntil.call(() -> {
+
+        return Keel.callFutureRepeat(routineResult -> {
                     return Future.succeededFuture()
                             .compose(v -> nextTaskSeeker.get())
                             .compose(task -> {
@@ -124,7 +124,8 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
                                     // 队列里已经空了，不必再找
                                     getLogger().debug("No more task todo");
                                     // 通知 FutureUntil 结束
-                                    return Future.succeededFuture(true);
+                                    routineResult.stop();
+                                    return Future.succeededFuture();
                                 } else {
                                     // 队列里找出来一个task, deploy it (至于能不能跑起来有没有锁就不管了)
                                     getLogger().info("To run task: " + task.getTaskReference());
@@ -135,12 +136,12 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
                                                     deploymentID -> {
                                                         getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);
                                                         // 通知 FutureUntil 继续下一轮
-                                                        return Future.succeededFuture(false);
+                                                        return Future.succeededFuture();
                                                     },
                                                     throwable -> {
                                                         getLogger().exception("CANNOT DEPLOY TASK [" + task.getTaskReference() + "] VERTICLE", throwable);
                                                         // 通知 FutureUntil 继续下一轮
-                                                        return Future.succeededFuture(false);
+                                                        return Future.succeededFuture();
                                                     }
                                             );
                                 }
