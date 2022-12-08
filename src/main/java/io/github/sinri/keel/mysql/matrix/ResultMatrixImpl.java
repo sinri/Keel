@@ -16,11 +16,11 @@ import java.util.List;
 /**
  * @since 1.8
  */
-class ResultMatrixWithVertx implements ResultMatrix {
+class ResultMatrixImpl implements ResultMatrix {
     private final RowSet<Row> rowSet;
     private final List<Row> rowList = new ArrayList<>();
 
-    public ResultMatrixWithVertx(RowSet<Row> rowSet) {
+    public ResultMatrixImpl(RowSet<Row> rowSet) {
         this.rowSet = rowSet;
         for (var row : rowSet) {
             rowList.add(row);

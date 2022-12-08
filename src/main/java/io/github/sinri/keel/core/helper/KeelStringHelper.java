@@ -1,12 +1,10 @@
 package io.github.sinri.keel.core.helper;
 
 import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.core.helper.encryption.base32.Base32;
 import io.vertx.core.buffer.Buffer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @since 2.6
@@ -247,4 +245,45 @@ public class KeelStringHelper {
         return renderThrowableChain(throwable, Set.of());
     }
 
+    /**
+     * @since 2.9.4
+     */
+    public byte[] encodeWithBase64ToBytes(String s) {
+        return Keel.helpers().binary().encodeWithBase64(s.getBytes());
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public String encodeWithBase64(String s) {
+        return new String(encodeWithBase64ToBytes(s));
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public byte[] decodeWithBase64ToBytes(String s) {
+        return Base64.getDecoder().decode(s);
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public String encodeWithBase32(String s) {
+        return Base32.encode(s.getBytes());
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public byte[] decodeWithBase32ToBytes(String s) {
+        return Base32.decode(s);
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public String decodeWithBase32(String s) {
+        return new String(decodeWithBase32ToBytes(s));
+    }
 }
