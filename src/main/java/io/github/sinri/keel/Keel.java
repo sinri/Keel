@@ -43,17 +43,17 @@ public class Keel {
     /**
      * @param vertxOptions VertxOptions
      * @see <a href="https://vertx.io/docs/apidocs/io/vertx/core/VertxOptions.html">Class VertxOptions</a>
+     * @since 2.9.4 针对 2.9.1 的错误弃用进行光复
      */
-    @Deprecated(since = "2.9.1")
     public static void initializeVertx(VertxOptions vertxOptions) {
-        initializeStandaloneVertx(vertxOptions);
+        vertx = Vertx.vertx(vertxOptions);
     }
 
     /**
      * @since 2.9.1
      */
     public static Future<Void> initializeStandaloneVertx(VertxOptions vertxOptions) {
-        vertx = Vertx.vertx(vertxOptions);
+        initializeVertx(vertxOptions);
         return Future.succeededFuture();
     }
 

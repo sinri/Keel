@@ -1,6 +1,9 @@
 package io.github.sinri.keel.core.helper;
 
+import io.github.sinri.keel.core.helper.encryption.base32.Base32;
 import io.vertx.core.buffer.Buffer;
+
+import java.util.Base64;
 
 public class KeelBinaryHelper {
     final static char[] HEX_DIGITS_LOWER = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -83,5 +86,54 @@ public class KeelBinaryHelper {
      */
     public String encodeHexWithUpperDigits(Buffer buffer, int since, int length) {
         return encodeHexWithDigits(HEX_DIGITS_UPPER, buffer, since, length);
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public byte[] decodeWithBase64(byte[] bytes) {
+        return Base64.getDecoder().decode(bytes);
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public byte[] encodeWithBase64(byte[] bytes) {
+        return Base64.getEncoder().encode(bytes);
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public String encodeWithBase64ToString(byte[] bytes) {
+        return new String(encodeWithBase64(bytes));
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public byte[] encodeWithBase32(byte[] bytes) {
+        return encodeWithBase32ToString(bytes).getBytes();
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public String encodeWithBase32ToString(byte[] bytes) {
+        return Base32.encode(bytes);
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public byte[] decodeWithBase32(byte[] bytes) {
+        return Base32.decode(new String(bytes));
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public String decodeWithBase32ToString(byte[] bytes) {
+        return new String(decodeWithBase32(bytes));
     }
 }
