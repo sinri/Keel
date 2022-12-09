@@ -15,6 +15,8 @@ abstract public class KeelAuthenticationHandler implements AuthenticationHandler
 
     @Override
     public void handle(RoutingContext routingContext) {
+        // BEFORE ASYNC PAUSE
+        routingContext.request().pause();
         Future.succeededFuture()
                 .compose(v -> handleRequest(routingContext))
                 .andThen(ar -> {
@@ -30,7 +32,11 @@ abstract public class KeelAuthenticationHandler implements AuthenticationHandler
                     }
 
                     routingContext.setUser(authenticateResult.authenticatedUser());
-
+                })
+                .andThen(ar -> {
+                    // RESUME
+                    routingContext.request().resume();
+                    // NEXT
                     routingContext.next();
                 });
     }

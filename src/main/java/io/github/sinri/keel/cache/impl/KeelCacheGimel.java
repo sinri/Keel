@@ -3,11 +3,9 @@ package io.github.sinri.keel.cache.impl;
 import io.github.sinri.keel.cache.KeelAsyncEverlastingCacheInterface;
 import io.vertx.core.Future;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
@@ -19,7 +17,7 @@ import java.util.function.BooleanSupplier;
  */
 public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<K, V> {
     private final Lock lock;
-    private Map<K, V> map;
+    private final Map<K, V> map;
     private long lockWaitMs = 100;
 
     public KeelCacheGimel() {
@@ -80,13 +78,18 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
     }
 
     @Override
-    public V read(K k, V v) {
-        var x = map.get(k);
-        if (x != null) {
-            return x;
-        } else {
-            return v;
-        }
+    public Future<V> read(K k, V v) {
+        AtomicReference<V> vRef = new AtomicReference<>();
+        return actionInLock(() -> {
+            var x = map.get(k);
+            if (x != null) {
+                vRef.set(x);
+            } else {
+                vRef.set(v);
+            }
+            return true;
+        })
+                .compose(unlocked -> Future.succeededFuture(vRef.get()));
     }
 
     @Override
@@ -113,10 +116,20 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
         });
     }
 
+    /**
+     * @param newEntries new map of entries
+     * @since 2.9.4 no longer implemented by replace map
+     */
     @Override
     public Future<Void> replaceAll(Map<K, V> newEntries) {
         return actionInLock(() -> {
-            map = new HashMap<>(newEntries);
+            Set<K> ks = newEntries.keySet();
+            map.putAll(newEntries);
+            map.keySet().forEach(k -> {
+                if (!ks.contains(k)) {
+                    map.remove(k);
+                }
+            });
             return true;
         });
     }

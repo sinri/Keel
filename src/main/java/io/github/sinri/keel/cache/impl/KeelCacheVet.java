@@ -2,10 +2,7 @@ package io.github.sinri.keel.cache.impl;
 
 import io.github.sinri.keel.cache.KeelEverlastingCacheInterface;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -14,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
     private final Lock lock;
-    private Map<K, V> map;
+    private final Map<K, V> map;
 
     public KeelCacheVet() {
         lock = new ReentrantLock();
@@ -44,7 +41,14 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
 
     @Override
     public V read(K k, V v) {
-        return map.getOrDefault(k, v);
+        lock.lock();
+        V r;
+        try {
+            r = map.getOrDefault(k, v);
+        } finally {
+            lock.unlock();
+        }
+        return r;
     }
 
     @Override
@@ -61,7 +65,7 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
     public void remove(Collection<K> keys) {
         lock.lock();
         try {
-            keys.forEach(key -> map.remove(key));
+            keys.forEach(map::remove);
         } finally {
             lock.unlock();
         }
@@ -77,11 +81,21 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
         }
     }
 
+    /**
+     * @param newEntries new map of entries
+     * @since 2.9.4 no longer implemented by replace map
+     */
     @Override
     public void replaceAll(Map<K, V> newEntries) {
         lock.lock();
         try {
-            map = new HashMap<>(newEntries);
+            Set<K> ks = newEntries.keySet();
+            map.putAll(newEntries);
+            map.keySet().forEach(k -> {
+                if (!ks.contains(k)) {
+                    map.remove(k);
+                }
+            });
         } finally {
             lock.unlock();
         }
