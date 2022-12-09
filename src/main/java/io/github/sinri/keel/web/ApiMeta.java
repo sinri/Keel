@@ -35,4 +35,13 @@ public @interface ApiMeta {
      * @since 2.9
      */
     String corsOriginPattern() default "";
+
+    /**
+     * 访问本接口需要的权限。
+     * i.e. Any privileges authorized.
+     *
+     * @return 如果empty则不需要验证权限；如果有多项，则任一项满足即可。
+     * @since 2.9.4
+     */
+    String[] privileges() default {};
 }

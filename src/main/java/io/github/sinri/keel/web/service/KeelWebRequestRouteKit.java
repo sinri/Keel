@@ -99,7 +99,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
     /**
      * 追加一个授权校验器
      */
-    public KeelWebRequestRouteKit<S> addAuthorizationHandlers(AuthorizationHandler handler) {
+    public KeelWebRequestRouteKit<S> addAuthorizationHandler(AuthorizationHandler handler) {
         this.authorizationHandlers.add(handler);
         return this;
     }
@@ -174,7 +174,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
 
         // === HANDLERS WEIGHT IN ORDER ===
         // PLATFORM
-        route.handler(new KeelPlatformHandler());
+        route.handler(new KeelPlatformHandler(apiMeta.privileges()));
         if (apiMeta.timeout() > 0) {
             // PlatformHandler
             route.handler(TimeoutHandler.create(apiMeta.timeout(), apiMeta.statusCodeForTimeout()));

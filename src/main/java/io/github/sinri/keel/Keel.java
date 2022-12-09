@@ -41,6 +41,8 @@ public class Keel {
     }
 
     /**
+     * 同步启动一个非集群模式的Vertx实例。
+     *
      * @param vertxOptions VertxOptions
      * @see <a href="https://vertx.io/docs/apidocs/io/vertx/core/VertxOptions.html">Class VertxOptions</a>
      * @since 2.9.4 针对 2.9.1 的错误弃用进行光复
@@ -50,11 +52,34 @@ public class Keel {
     }
 
     /**
-     * @since 2.9.1
+     * 异步启动一个Vertx实例，可以为集群模式或非集群模式。
+     *
+     * @param vertxOptions 如果使用集群模式则必须配置好ClusterManager。
+     * @param isClustered  是否使用集群模式
+     * @since 2.9.4
      */
+    public static Future<Void> initializeVertx(VertxOptions vertxOptions, boolean isClustered) {
+        if (isClustered) {
+            clusterManager = vertxOptions.getClusterManager();
+            return Vertx.clusteredVertx(vertxOptions)
+                    .compose(x -> {
+                        vertx = x;
+                        return Future.succeededFuture();
+                    });
+        } else {
+            vertx = Vertx.vertx(vertxOptions);
+            return Future.succeededFuture();
+        }
+    }
+
+    /**
+     * @see Keel#initializeVertx(VertxOptions, boolean)
+     * @since 2.9.1
+     * @since 2.9.4 use initializeVertx
+     */
+    @Deprecated(since = "2.9.4", forRemoval = true)
     public static Future<Void> initializeStandaloneVertx(VertxOptions vertxOptions) {
-        initializeVertx(vertxOptions);
-        return Future.succeededFuture();
+        return initializeVertx(vertxOptions, false);
     }
 
     /**
@@ -68,7 +93,7 @@ public class Keel {
      * @return 未来
      * @since 2.9.1
      */
-    public static Future<Void> initializeClusteredVertx(
+    public static Future<Void> initializeVertxForSAECluster(
             String clusterName,
             List<String> members,
             int port, int portCount,
@@ -97,7 +122,7 @@ public class Keel {
         clusterManager = new HazelcastClusterManager(hazelcastConfig);
         vertxOptions.setClusterManager(clusterManager);
 
-        return initializeClusteredVertx(vertxOptions);
+        return initializeVertx(vertxOptions, true);
     }
 
     /**
@@ -107,14 +132,17 @@ public class Keel {
      * @param members      集群组内地址成员
      * @param vertxOptions Vert.x 参数
      * @return 未来
+     * @sice 2.9.4 use initializeVertx
+     * @see Keel#initializeVertx(VertxOptions, boolean)
      * @since 2.9.1
      */
+    @Deprecated(since = "2.9.4", forRemoval = true)
     public static Future<Void> initializeClusteredVertx(
             String clusterName,
             List<String> members,
             VertxOptions vertxOptions
     ) {
-        return initializeClusteredVertx(clusterName, members, 5701, 1, vertxOptions);
+        return initializeVertxForSAECluster(clusterName, members, 5701, 1, vertxOptions);
     }
 
     /**
@@ -122,18 +150,12 @@ public class Keel {
      *
      * @param vertxOptions Vert.x 选项
      * @return 未来
+     * @sice 2.9.4 use initializeVertx
      * @since 2.9
      */
+    @Deprecated(since = "2.9.4", forRemoval = true)
     public static Future<Void> initializeClusteredVertx(VertxOptions vertxOptions) {
-        // Config hazelcastConfig;// Hazelcast 配置
-        //ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
-        //VertxOptions options = new VertxOptions().setClusterManager(mgr);
-        clusterManager = vertxOptions.getClusterManager();
-        return Vertx.clusteredVertx(vertxOptions)
-                .compose(clusteredVertx -> {
-                    vertx = clusteredVertx;
-                    return Future.succeededFuture();
-                });
+        return initializeVertx(vertxOptions, true);
     }
 
     public static Vertx getVertx() {
@@ -277,7 +299,7 @@ public class Keel {
     /**
      * @since 2.9
      */
-    @Deprecated(since = "2.9.3")
+    @Deprecated(since = "2.9.3", forRemoval = true)
     public static Future<Void> callFutureUntil(Supplier<Future<Boolean>> singleRecursionForShouldStopSupplier) {
         return FutureUntil.call(singleRecursionForShouldStopSupplier);
     }

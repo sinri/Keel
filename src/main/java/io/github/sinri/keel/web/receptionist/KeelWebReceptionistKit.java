@@ -92,7 +92,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
 
         // === HANDLERS WEIGHT IN ORDER ===
         // PLATFORM
-        route.handler(new KeelPlatformHandler());
+        route.handler(new KeelPlatformHandler(apiMeta.privileges()));
         if (apiMeta.timeout() > 0) {
             // PlatformHandler
             route.handler(TimeoutHandler.create(apiMeta.timeout(), apiMeta.statusCodeForTimeout()));
@@ -183,7 +183,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
     /**
      * 追加一个授权校验器
      */
-    public KeelWebReceptionistKit<R> addAuthorizationHandlers(AuthorizationHandler handler) {
+    public KeelWebReceptionistKit<R> addAuthorizationHandler(AuthorizationHandler handler) {
         this.authorizationHandlers.add(handler);
         return this;
     }

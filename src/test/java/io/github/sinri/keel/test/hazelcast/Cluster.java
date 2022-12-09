@@ -13,7 +13,7 @@ public class Cluster {
     }
 
     public static Future<Void> startClusterOffice() {
-        return Keel.initializeClusteredVertx(
+        return Keel.initializeVertxForSAECluster(
                 "office",
                 List.of(
                         "172.20.12.66", "172.20.12.170"
@@ -25,7 +25,7 @@ public class Cluster {
     }
 
     public static Future<Void> startClusterLocal() {
-        return Keel.initializeClusteredVertx(
+        return Keel.initializeVertxForSAECluster(
                 "local",
                 List.of("127.0.0.1"),
                 5701,

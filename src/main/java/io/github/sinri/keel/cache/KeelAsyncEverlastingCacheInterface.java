@@ -29,8 +29,9 @@ public interface KeelAsyncEverlastingCacheInterface<K, V> {
 
     /**
      * @return cache value or null when not-existed
+     * @since 2.9.4 return Future<V>
      */
-    default V read(K k) {
+    default Future<V> read(K k) {
         return read(k, null);
     }
 
@@ -38,8 +39,9 @@ public interface KeelAsyncEverlastingCacheInterface<K, V> {
      * @param k key
      * @param v default value for the situation that key not existed
      * @return @return cache value or default when not-existed
+     * @since 2.9.4 return Future<V>
      */
-    V read(K k, V v);
+    Future<V> read(K k, V v);
 
     /**
      * Remove the cached item with key.
