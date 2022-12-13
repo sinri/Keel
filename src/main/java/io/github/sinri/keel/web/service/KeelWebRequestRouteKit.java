@@ -174,7 +174,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
 
         // === HANDLERS WEIGHT IN ORDER ===
         // PLATFORM
-        route.handler(new KeelPlatformHandler());
+        route.handler(new KeelPlatformHandler(apiMeta.privileges()));
         if (apiMeta.timeout() > 0) {
             // PlatformHandler
             route.handler(TimeoutHandler.create(apiMeta.timeout(), apiMeta.statusCodeForTimeout()));
