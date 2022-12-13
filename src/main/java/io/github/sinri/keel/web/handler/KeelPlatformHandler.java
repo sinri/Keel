@@ -6,7 +6,8 @@ import io.vertx.core.shareddata.Counter;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.PlatformHandler;
 
-import java.util.*;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * @since 2.9.2
@@ -15,16 +16,6 @@ public class KeelPlatformHandler implements PlatformHandler {
     public final static String KEEL_REQUEST_ID = "KEEL_REQUEST_ID"; // -> String
     public final static String KEEL_REQUEST_START_TIME = "KEEL_REQUEST_START_TIME"; // -> long * 0.001 second
     public final static String KEEL_REQUEST_CLIENT_IP_CHAIN = "KEEL_REQUEST_CLIENT_IP_CHAIN"; // -> List<String of IP>
-
-    public final static String KEEL_PRIVILEGE_SET_IN_API_META = "KEEL_PRIVILEGE_SET_IN_API_META";// -> Set<String of Privilege>
-    private final Set<String> privilegeSetForAuthorization;
-
-    public KeelPlatformHandler(String[] privilegeSetForAuthorization) {
-        this.privilegeSetForAuthorization = new HashSet<>();
-        if (privilegeSetForAuthorization != null) {
-            this.privilegeSetForAuthorization.addAll(Arrays.asList(privilegeSetForAuthorization));
-        }
-    }
 
     @Override
     public void handle(RoutingContext routingContext) {

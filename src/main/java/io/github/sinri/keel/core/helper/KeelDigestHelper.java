@@ -1,7 +1,6 @@
 package io.github.sinri.keel.core.helper;
 
 import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.helper.encryption.bcrypt.BCrypt;
 
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -161,17 +160,13 @@ public class KeelDigestHelper {
         return Keel.helpers().binary().encodeHexWithUpperDigits(bytes);
     }
 
-    /**
-     * @since 2.8
-     */
+    @Deprecated(since = "2.9.4")
     public String php_password_hash(String password) {
-        return BCrypt.hashpw(password);
+        return Keel.helpers().authentication().php_password_hash(password);
     }
 
-    /**
-     * @since 2.8
-     */
+    @Deprecated(since = "2.9.4")
     public boolean php_password_verify(String password, String hash) {
-        return BCrypt.checkpw(password, hash);
+        return Keel.helpers().authentication().php_password_verify(password, hash);
     }
 }

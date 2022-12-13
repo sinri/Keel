@@ -92,7 +92,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
 
         // === HANDLERS WEIGHT IN ORDER ===
         // PLATFORM
-        route.handler(new KeelPlatformHandler(apiMeta.privileges()));
+        route.handler(new KeelPlatformHandler());
         if (apiMeta.timeout() > 0) {
             // PlatformHandler
             route.handler(TimeoutHandler.create(apiMeta.timeout(), apiMeta.statusCodeForTimeout()));
@@ -126,6 +126,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         route.handler(routingContext -> {
             try {
                 R receptionist = receptionistConstructor.newInstance(routingContext);
+                receptionist.setApiMeta(apiMeta);
                 receptionist.handle();
             } catch (Throwable e) {
                 routingContext.fail(e);

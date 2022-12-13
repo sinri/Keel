@@ -14,7 +14,7 @@ public class Web2Server {
             new KeelHttpServer(new HttpServerOptions().setPort(8099), true)
                     .configureRoutes(router -> {
                         new KeelWebRequestRouteKit<>(Service.class, router)
-                                .addPlatformHandler(new KeelPlatformHandler(null))
+                                .addPlatformHandler(new KeelPlatformHandler())
                                 .addAuthorizationHandler(AuthorizationHandler.create(
                                         PermissionBasedAuthorization.create("Permission")
                                 ))

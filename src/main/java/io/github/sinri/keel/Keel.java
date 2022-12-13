@@ -9,10 +9,7 @@ import io.github.sinri.keel.core.logger.KeelLoggerOptions;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.KeelMySQLOptions;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.spi.cluster.NodeInfo;
@@ -337,5 +334,22 @@ public class Keel {
      */
     public static Future<Void> callFutureSleep(long t) {
         return FutureSleep.call(t);
+    }
+
+    /**
+     * @param gracefulHandler
+     * @since 2.9.4
+     */
+    public static void gracefullyClose(Handler<Promise<Object>> gracefulHandler) {
+        Promise<Object> promise = Promise.promise();
+        gracefulHandler.handle(promise);
+        promise.future().onComplete(ar -> {
+            if (ar.failed()) {
+                Keel.outputLogger().exception("Keel.gracefullyClose ERROR, CLOSE ANYWAY", ar.cause());
+            } else {
+                Keel.outputLogger().notice("Keel.gracefullyClose READY TO CLOSE");
+            }
+            Keel.getVertx().close();
+        });
     }
 }

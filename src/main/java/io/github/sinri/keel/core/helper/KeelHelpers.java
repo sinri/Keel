@@ -20,6 +20,7 @@ public class KeelHelpers {
     private final KeelCryptographyHelper cryptographyHelper;
     private final KeelDigestHelper digestHelper;
     private final KeelRuntimeHelper runtimeHelper;
+    private final KeelAuthenticationHelper authenticationHelper;
 
     private KeelHelpers() {
         this.binaryHelper = KeelBinaryHelper.getInstance();
@@ -32,6 +33,7 @@ public class KeelHelpers {
         this.cryptographyHelper = KeelCryptographyHelper.getInstance();
         this.digestHelper = KeelDigestHelper.getInstance();
         this.runtimeHelper = KeelRuntimeHelper.getInstance();
+        this.authenticationHelper = KeelAuthenticationHelper.getInstance();
     }
 
     public static KeelHelpers getInstance() {
@@ -79,5 +81,12 @@ public class KeelHelpers {
      */
     public KeelRuntimeHelper runtime() {
         return runtimeHelper;
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    public KeelAuthenticationHelper authentication() {
+        return authenticationHelper;
     }
 }

@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.lab.authenticator;
 
-import io.github.sinri.keel.test.lab.authenticator.googleauth.GoogleAuthenticator;
-import io.github.sinri.keel.test.lab.authenticator.googleauth.GoogleAuthenticatorConfig;
+import io.github.sinri.keel.core.helper.authenticator.googleauth.GoogleAuthenticator;
+import io.github.sinri.keel.core.helper.authenticator.googleauth.GoogleAuthenticatorConfig;
 
 public class GATest3 {
     public static void main(String[] args) {
