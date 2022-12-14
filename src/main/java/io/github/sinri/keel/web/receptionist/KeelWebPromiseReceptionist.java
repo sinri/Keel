@@ -7,7 +7,9 @@ import io.vertx.ext.web.RoutingContext;
 
 /**
  * @since 2.9.2
+ * @since 2.9.4 Deprecated since it is implementable by KeelWebFutureReceptionist.
  */
+@Deprecated(since = "2.9.4")
 public abstract class KeelWebPromiseReceptionist extends KeelWebFutureReceptionist {
 
     private long maxPromiseWaitTime = 10_000L;

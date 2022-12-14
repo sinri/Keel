@@ -129,8 +129,8 @@ public class Keel {
      * @param members      集群组内地址成员
      * @param vertxOptions Vert.x 参数
      * @return 未来
-     * @sice 2.9.4 use initializeVertx
      * @see Keel#initializeVertx(VertxOptions, boolean)
+     * @since 2.9.4 use initializeVertx
      * @since 2.9.1
      */
     @Deprecated(since = "2.9.4", forRemoval = true)
@@ -147,7 +147,7 @@ public class Keel {
      *
      * @param vertxOptions Vert.x 选项
      * @return 未来
-     * @sice 2.9.4 use initializeVertx
+     * @since 2.9.4 use initializeVertx
      * @since 2.9
      */
     @Deprecated(since = "2.9.4", forRemoval = true)

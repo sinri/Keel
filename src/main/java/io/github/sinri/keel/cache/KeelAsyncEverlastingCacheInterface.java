@@ -29,7 +29,7 @@ public interface KeelAsyncEverlastingCacheInterface<K, V> {
 
     /**
      * @return cache value or null when not-existed
-     * @since 2.9.4 return Future<V>
+     * @since 2.9.4 return Future
      */
     default Future<V> read(K k) {
         return read(k, null);
@@ -39,7 +39,7 @@ public interface KeelAsyncEverlastingCacheInterface<K, V> {
      * @param k key
      * @param v default value for the situation that key not existed
      * @return @return cache value or default when not-existed
-     * @since 2.9.4 return Future<V>
+     * @since 2.9.4 return Future
      */
     Future<V> read(K k, V v);
 

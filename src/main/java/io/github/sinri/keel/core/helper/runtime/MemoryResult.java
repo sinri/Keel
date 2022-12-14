@@ -51,7 +51,7 @@ public class MemoryResult implements RuntimeStatResult<MemoryResult> {
     }
 
     public double getMemoryUsage() {
-        return 1.0 * getAvailableByte() / getTotalByte();
+        return 1.0 - 1.0 * getAvailableByte() / getTotalByte();
     }
 
     public String getMemoryUsagePercent() {

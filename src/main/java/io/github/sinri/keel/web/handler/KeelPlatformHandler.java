@@ -29,7 +29,7 @@ public class KeelPlatformHandler implements PlatformHandler {
                     return Future.succeededFuture(new Random().nextLong() * -1);
                 })
                 .compose(id -> {
-                    routingContext.put(KEEL_REQUEST_ID, Keel.helpers().net().getLocalHostAddress() + "[" + id + "]" + UUID.randomUUID());
+                    routingContext.put(KEEL_REQUEST_ID, Keel.helpers().net().getLocalHostAddress() + "-" + id + "-" + UUID.randomUUID());
 
                     routingContext.put(KEEL_REQUEST_START_TIME, System.currentTimeMillis());
                     routingContext.put(KEEL_REQUEST_CLIENT_IP_CHAIN, Keel.helpers().net().parseWebClientIPChain(routingContext));

@@ -16,6 +16,7 @@ import java.util.ServiceLoader;
  *
  * @since 2.9.3
  */
+@Deprecated(since = "2.9.4")
 public interface AliyunSLSAdapter extends AsyncLoggingServiceAdapter<LogMessage> {
     String IMPLEMENT = "async-aliyun-sls";
     Map<String, AliyunSLSAdapter> map = new HashMap<>();
