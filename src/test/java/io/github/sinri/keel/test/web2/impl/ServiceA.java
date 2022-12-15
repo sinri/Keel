@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.web2.impl;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.test.web2.Service;
 import io.github.sinri.keel.web.ApiMeta;
 import io.github.sinri.keel.web.handler.KeelPlatformHandler;

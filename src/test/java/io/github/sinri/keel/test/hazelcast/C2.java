@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.hazelcast;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.lagecy.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.test.hazelcast.watch.WatchTest;
 import io.vertx.core.Future;
 

@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -99,7 +99,7 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
                 .eventually(v -> {
                     long waitingMs = nextTaskSeeker.waitingMs();
                     getLogger().debug("set timer for next routine after " + waitingMs + " ms");
-                    Keel.getVertx().setTimer(waitingMs, timerID -> routine());
+                    Keel.vertx().setTimer(waitingMs, timerID -> routine());
                     return Future.succeededFuture();
                 })
         ;
@@ -116,7 +116,7 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
     private Future<Void> whenSignalRunCame(KeelQueueNextTaskSeeker nextTaskSeeker) {
         this.queueStatus = QueueStatus.RUNNING;
 
-        return Keel.callFutureRepeat(routineResult -> {
+        return Keel.getInstance().repeatedlyCall(routineResult -> {
                     return Future.succeededFuture()
                             .compose(v -> nextTaskSeeker.get())
                             .compose(task -> {

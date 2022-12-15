@@ -1,6 +1,6 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;

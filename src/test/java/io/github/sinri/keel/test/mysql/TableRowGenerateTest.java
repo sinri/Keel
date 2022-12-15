@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.mysql;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.lagecy.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.mysql.matrix.TableRowClassGenerator;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 

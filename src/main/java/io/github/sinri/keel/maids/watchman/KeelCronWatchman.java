@@ -1,7 +1,7 @@
 package io.github.sinri.keel.maids.watchman;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelCronExpression;
+import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -40,12 +40,12 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
 
     public static Future<String> deploy(String watchmanName, Function<String, Future<Void>> cronTabUpdateStartup) {
         KeelCronWatchman keelCronWatchman = new KeelCronWatchman(watchmanName, cronTabUpdateStartup);
-        return Keel.getVertx().deployVerticle(keelCronWatchman, new DeploymentOptions()
+        return Keel.vertx().deployVerticle(keelCronWatchman, new DeploymentOptions()
                 .setWorker(true));
     }
 
     private static Future<Void> operateCronTab(String asyncMapName, Supplier<Future<Void>> supplier) {
-        return Keel.getVertx().sharedData().getLock(asyncMapName)
+        return Keel.vertx().sharedData().getLock(asyncMapName)
                 .compose(lock -> supplier.get()
                         .andThen(ar -> lock.release()));
     }
@@ -63,7 +63,7 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
             String keelCronExpression,
             String eventHandlerClassName
     ) {
-        return operateCronTab(asyncMapName, () -> Keel.getVertx().sharedData().getAsyncMap(asyncMapName)
+        return operateCronTab(asyncMapName, () -> Keel.vertx().sharedData().getAsyncMap(asyncMapName)
                 .compose(asyncMap -> asyncMap.put(
                         keelCronExpression + "@" + eventHandlerClassName,
                         new JsonObject()
@@ -81,7 +81,7 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
                     .put("cron", cronExpression)
                     .put("handler", classItem));
         }));
-        return operateCronTab(asyncMapName, () -> Keel.getVertx().sharedData().getAsyncMap(asyncMapName)
+        return operateCronTab(asyncMapName, () -> Keel.vertx().sharedData().getAsyncMap(asyncMapName)
                 .compose(asyncMap -> {
                     return asyncMap.keys()
                             .compose(oldKeys -> {
@@ -94,11 +94,11 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
                                 toAddHashSet.removeAll(oldKeys);
 
                                 return CompositeFuture.all(
-                                        Keel.callFutureForEach(
+                                        Keel.getInstance().iterativelyCall(
                                                 toDeleteHashSet,
                                                 hash -> asyncMap.remove(String.valueOf(hash))
                                                         .compose(v -> Future.succeededFuture())),
-                                        Keel.callFutureForEach(
+                                        Keel.getInstance().iterativelyCall(
                                                 toAddHashSet,
                                                 hash -> asyncMap.put(hash, hashMap.get(hash))
                                                         .compose(v -> Future.succeededFuture()))
@@ -128,7 +128,7 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
     public static Future<Void> removeCronJobFromAsyncMap(String asyncMapName, String hash) {
         return operateCronTab(
                 asyncMapName,
-                () -> Keel.getVertx().sharedData().getAsyncMap(asyncMapName)
+                () -> Keel.vertx().sharedData().getAsyncMap(asyncMapName)
                         .compose(asyncMap -> asyncMap.remove(hash)
                                 .compose(v -> Future.succeededFuture()))
         );
@@ -137,12 +137,12 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
     public static Future<Void> removeAllCronJobsFromAsyncMap(String asyncMapName) {
         return operateCronTab(
                 asyncMapName,
-                () -> Keel.getVertx().sharedData().getAsyncMap(asyncMapName)
+                () -> Keel.vertx().sharedData().getAsyncMap(asyncMapName)
                         .compose(AsyncMap::clear));
     }
 
     public static Future<Map<String, List<String>>> getAllCronJobsFromAsyncMap(String asyncMapName) {
-        return Keel.getVertx().sharedData().getAsyncMap(asyncMapName)
+        return Keel.vertx().sharedData().getAsyncMap(asyncMapName)
                 .compose(AsyncMap::entries)
                 .compose(entries -> {
                     Map<String, List<String>> map = new HashMap<>();
@@ -162,7 +162,7 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
             Calendar calendar
     ) {
         List<KeelWatchmanEventHandler> list = new ArrayList<>();
-        return Keel.getVertx().sharedData().getAsyncMap(asyncMapName)
+        return Keel.vertx().sharedData().getAsyncMap(asyncMapName)
                 .compose(AsyncMap::entries)
                 .compose(entries -> {
                     entries.forEach((k, v) -> {
@@ -177,7 +177,8 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
                                         list.add(eventHandler);
                                     }
                                 } catch (Throwable e) {
-                                    Keel.outputLogger().exception(e);
+                                    //Keel.outputLogger().exception(e);
+                                    System.out.println("EXCEPTION: " + e);
                                 }
                             });
                         }

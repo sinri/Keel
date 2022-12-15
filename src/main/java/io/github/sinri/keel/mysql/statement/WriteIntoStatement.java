@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -256,7 +256,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             sql += schema + ".";
         }
         sql += table;
-        sql += " (" + Keel.helpers().string().joinStringArray(columns, ",") + ")";
+        sql += " (" + Keel.getInstance().stringHelper().joinStringArray(columns, ",") + ")";
         if (sourceTableName != null) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "TABLE " + sourceTableName;
         } else if (sourceSelectSQL != null) {
@@ -265,15 +265,15 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "VALUES" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             for (List<String> row : batchValues) {
-                items.add("(" + Keel.helpers().string().joinStringArray(row, ",") + ")");
+                items.add("(" + Keel.getInstance().stringHelper().joinStringArray(row, ",") + ")");
             }
-            sql += Keel.helpers().string().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
+            sql += Keel.getInstance().stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         if (!onDuplicateKeyUpdateAssignmentMap.isEmpty()) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ON DUPLICATE KEY UPDATE" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             onDuplicateKeyUpdateAssignmentMap.forEach((key, value) -> items.add(key + " = " + value));
-            sql += Keel.helpers().string().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
+            sql += Keel.getInstance().stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         if (!getRemarkAsComment().isEmpty()) {
             sql += "\n-- " + getRemarkAsComment() + "\n";

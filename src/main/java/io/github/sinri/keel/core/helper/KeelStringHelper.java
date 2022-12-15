@@ -1,7 +1,7 @@
 package io.github.sinri.keel.core.helper;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.helper.encryption.base32.Base32;
+import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.buffer.Buffer;
 
 import java.util.*;
@@ -70,7 +70,7 @@ public class KeelStringHelper {
      */
     public String bufferToHexMatrix(Buffer buffer, int rowSize) {
         StringBuilder matrix = new StringBuilder();
-        String s = Keel.helpers().binary().encodeHexWithUpperDigits(buffer);
+        String s = Keel.getInstance().binaryHelper().encodeHexWithUpperDigits(buffer);
         for (int i = 0; i < s.length(); i += 2) {
             matrix.append(s, i, i + 2).append(" ");
             if ((i / 2) % rowSize == rowSize - 1) {
@@ -95,7 +95,7 @@ public class KeelStringHelper {
                 camel.add(part.substring(0, 1).toUpperCase() + part.substring(1));
             }
         }
-        return Keel.helpers().string().joinStringArray(camel, "");
+        return Keel.getInstance().stringHelper().joinStringArray(camel, "");
     }
 
     /**
@@ -129,7 +129,7 @@ public class KeelStringHelper {
         if (part.length() > 0) {
             parts.add(part.toString());
         }
-        return Keel.helpers().string().joinStringArray(parts, "_");
+        return Keel.getInstance().stringHelper().joinStringArray(parts, "_");
     }
 
     /**
@@ -249,7 +249,7 @@ public class KeelStringHelper {
      * @since 2.9.4
      */
     public byte[] encodeWithBase64ToBytes(String s) {
-        return Keel.helpers().binary().encodeWithBase64(s.getBytes());
+        return Keel.getInstance().binaryHelper().encodeWithBase64(s.getBytes());
     }
 
     /**

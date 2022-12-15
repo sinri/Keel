@@ -33,7 +33,7 @@ package io.github.sinri.keel.core.helper.authenticator.googleauth;
 //import org.apache.commons.codec.binary.Base32;
 //import org.apache.commons.codec.binary.Base64;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.facade.Keel;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -349,14 +349,14 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator {
         // Decoding the secret key to get its raw byte representation.
         switch (config.getKeyRepresentation()) {
             case BASE32:
-                return Keel.helpers().string().decodeWithBase32ToBytes(secret.toUpperCase());
+                return Keel.getInstance().stringHelper().decodeWithBase32ToBytes(secret.toUpperCase());
 
 //                Base32 codec32 = new Base32();
             // See: https://issues.apache.org/jira/browse/CODEC-234
             // Commons Codec Base32::decode does not support lowercase letters.
 //                return codec32.decode(secret.toUpperCase());
             case BASE64:
-                return Keel.helpers().string().decodeWithBase32ToBytes(secret);
+                return Keel.getInstance().stringHelper().decodeWithBase32ToBytes(secret);
 
 //                Base64 codec64 = new Base64();
 //                return codec64.decode(secret);
@@ -520,10 +520,10 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator {
     private String calculateSecretKey(byte[] secretKey) {
         switch (config.getKeyRepresentation()) {
             case BASE32:
-                return Keel.helpers().binary().encodeWithBase32ToString(secretKey);
+                return Keel.getInstance().binaryHelper().encodeWithBase32ToString(secretKey);
 //                return new Base32().encodeToString(secretKey);
             case BASE64:
-                return Keel.helpers().binary().encodeWithBase64ToString(secretKey);
+                return Keel.getInstance().binaryHelper().encodeWithBase64ToString(secretKey);
 //                return new Base64().encodeToString(secretKey);
             default:
                 throw new IllegalArgumentException("Unknown key representation type.");

@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.endless;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -40,11 +40,10 @@ public class KeelEndless extends AbstractVerticle implements KeelVerticleInterfa
      * @since 2.8 如果alive显示false，则不再策划下一波触发
      */
     private void routineWrapper() {
-        Keel.getVertx()
-                .setTimer(
-                        restMS,
-                        currentTimerID -> routine().onComplete(done -> routineWrapper())
-                );
+        Keel.vertx().setTimer(
+                restMS,
+                currentTimerID -> routine().onComplete(done -> routineWrapper())
+        );
     }
 
     /**

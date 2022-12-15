@@ -1,8 +1,8 @@
 package io.github.sinri.keel.test.cache.alef;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.cache.impl.KeelCacheBet;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.lagecy.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 
 public class KeelCacheBetTest {

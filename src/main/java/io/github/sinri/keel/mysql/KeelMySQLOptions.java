@@ -1,12 +1,12 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.properties.KeelOptions;
 import io.vertx.core.net.ClientOptionsBase;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
 public class KeelMySQLOptions extends KeelOptions {
+    // TODO use KeelConfiguration
     public String host;
     public int port;
     public String username;

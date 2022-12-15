@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.service;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.lagecy.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;

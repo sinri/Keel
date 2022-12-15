@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.tcp;
 
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.servant.funnel.KeelFunnel;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;

@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.sundial;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.Counter;
 
@@ -78,7 +78,7 @@ public class KeelSundial {
         if (byMinuteTimerID != null) {
             throw new RuntimeException("stop the existed first!");
         }
-        byMinuteTimerID = Keel.getVertx().setPeriodic(60 * 1000, id -> {
+        byMinuteTimerID = Keel.vertx().setPeriodic(60 * 1000, id -> {
             Calendar calendar = Calendar.getInstance();
 
             registeredWorkers.keySet().forEach(workerName -> {
@@ -91,7 +91,7 @@ public class KeelSundial {
 
                     int parallelLimit = worker.getParallelLimit();
                     if (parallelLimit > 0) {
-                        Keel.getVertx().sharedData().getCounter(
+                        Keel.vertx().sharedData().getCounter(
                                 "KeelSundial-" + workerName,
                                 counterAsyncResult -> {
                                     if (counterAsyncResult.failed()) {
@@ -139,7 +139,7 @@ public class KeelSundial {
      */
     public void stop() {
         if (byMinuteTimerID != null) {
-            boolean done = Keel.getVertx().cancelTimer(byMinuteTimerID);
+            boolean done = Keel.vertx().cancelTimer(byMinuteTimerID);
             getLogger().info("stopped timer " + byMinuteTimerID, new JsonObject().put("done", done));
             byMinuteTimerID = null;
         }

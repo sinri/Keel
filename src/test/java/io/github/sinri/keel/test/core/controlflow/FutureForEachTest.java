@@ -1,8 +1,8 @@
 package io.github.sinri.keel.test.core.controlflow;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureForEach;
-import io.github.sinri.keel.core.controlflow.FutureSleep;
+import io.github.sinri.keel.facade.async.FutureForEach;
+import io.github.sinri.keel.facade.async.FutureSleep;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 
 import java.util.ArrayList;

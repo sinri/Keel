@@ -3,6 +3,7 @@ package io.github.sinri.keel.core.helper;
 /**
  * @since 2.9
  */
+@Deprecated(since = "3.0.0")
 public class KeelHelpers {
     private static final KeelHelpers instance;
 

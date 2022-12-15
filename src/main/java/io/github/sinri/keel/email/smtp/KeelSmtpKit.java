@@ -1,12 +1,14 @@
 package io.github.sinri.keel.email.smtp;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.properties.KeelPropertiesReader;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.KeelConfiguration;
 import io.vertx.core.Future;
-import io.vertx.ext.mail.*;
+import io.vertx.ext.mail.MailClient;
+import io.vertx.ext.mail.MailConfig;
+import io.vertx.ext.mail.MailMessage;
+import io.vertx.ext.mail.MailResult;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @since 1.10
@@ -20,92 +22,31 @@ public class KeelSmtpKit {
         this.smtpName = smtpName;
         this.mailConfig = buildMailConfig(smtpName);
         if (shared) {
-            this.mailClient = MailClient.createShared(Keel.getVertx(), this.mailConfig, smtpName);
+            this.mailClient = MailClient.createShared(Keel.vertx(), this.mailConfig, smtpName);
         } else {
-            this.mailClient = MailClient.create(Keel.getVertx(), this.mailConfig);
+            this.mailClient = MailClient.create(Keel.vertx(), this.mailConfig);
         }
     }
 
     public KeelSmtpKit(String smtpName) {
         this.smtpName = smtpName;
         this.mailConfig = buildMailConfig(smtpName);
-        this.mailClient = MailClient.create(Keel.getVertx(), this.mailConfig);
+        this.mailClient = MailClient.create(Keel.vertx(), this.mailConfig);
     }
 
     public KeelSmtpKit() {
-        this.smtpName = Keel.getPropertiesReader().getProperty("email.smtp.default_smtp_name");
+        this.smtpName = Keel.configuration().readString("email", "smtp", "default_smtp_name");
         this.mailConfig = buildMailConfig(smtpName);
-        this.mailClient = MailClient.create(Keel.getVertx(), this.mailConfig);
+        this.mailClient = MailClient.create(Keel.vertx(), this.mailConfig);
     }
 
     private static MailConfig buildMailConfig(String smtpName) {
-        KeelPropertiesReader propertiesReader = Keel.getPropertiesReader();
-        String prefix = "email.smtp." + smtpName;
-
-        MailConfig mailConfig = new MailConfig();
-
-        KeelPropertiesReader filtered = propertiesReader.filter(prefix);
-        for (var key : filtered.getPlainKeySet()) {
-            var value = filtered.getProperty(key);
-            switch (key) {
-                case "hostname":
-                    mailConfig.setHostname(value);
-                    break;
-                case "port":
-                    mailConfig.setPort(Integer.parseInt(value));
-                    break;
-                case "startTLS":
-                    mailConfig.setStarttls(StartTLSOptions.valueOf(value));
-                    break;
-                case "login":
-                    mailConfig.setLogin(LoginOption.valueOf(value));
-                    break;
-                case "username":
-                    mailConfig.setUsername(value);
-                    break;
-                case "password":
-                    mailConfig.setPassword(value);
-                    break;
-                case "ssl":
-                    mailConfig.setSsl("ON".equalsIgnoreCase(value));
-                    break;
-                case "authMethods":
-                    mailConfig.setAuthMethods(value);
-                    break;
-                case "keepAlive":
-                    mailConfig.setKeepAlive("ON".equalsIgnoreCase(value));
-                    break;
-                case "maxPoolSize":
-                    mailConfig.setMaxPoolSize(Integer.parseInt(value));
-                    break;
-                case "trustAll":
-                    mailConfig.setTrustAll("ON".equalsIgnoreCase(value));
-                    break;
-                case "allowRcptErrors":
-                    mailConfig.setAllowRcptErrors("ON".equalsIgnoreCase(value));
-                    break;
-                case "userAgent":
-                    mailConfig.setUserAgent(value);
-                    break;
-                case "multiPartOnly":
-                    mailConfig.setMultiPartOnly("ON".equalsIgnoreCase(value));
-                    break;
-                case "poolCleanerPeriod":
-                    mailConfig.setPoolCleanerPeriod(Integer.parseInt(value));
-                    break;
-                case "poolCleanerPeriodUnit":
-                    mailConfig.setPoolCleanerPeriodUnit(TimeUnit.valueOf(value));
-                    break;
-                case "keepAliveTimeout":
-                    mailConfig.setKeepAliveTimeout(Integer.parseInt(value));
-                    break;
-                case "keepAliveTimeoutUnit":
-                    mailConfig.setKeepAliveTimeoutUnit(TimeUnit.valueOf(value));
-                    break;
-            }
+        KeelConfiguration smtpConfiguration = Keel.configuration().extract("email", "smtp", smtpName);
+        if (smtpConfiguration != null) {
+            return new MailConfig(smtpConfiguration.toJsonObject());
+        } else {
+            return new MailConfig();
         }
-
-        return mailConfig;
     }
 
     public String getSmtpName() {
@@ -119,7 +60,7 @@ public class KeelSmtpKit {
     public void close() {
         if (null != mailClient) {
             mailClient.close();
-            Keel.outputLogger("smtp").notice("KeelSmtpKit closed client " + this.smtpName);
+            System.out.println("KeelSmtpKit closed client " + this.smtpName);
         }
     }
 

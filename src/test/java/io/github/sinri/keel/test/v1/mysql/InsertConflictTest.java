@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.v1.mysql;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.github.sinri.keel.mysql.statement.WriteIntoStatement;
 import io.github.sinri.keel.test.SharedTestBootstrap;

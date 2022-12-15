@@ -15,9 +15,9 @@ public class KeelBinaryHelper {
 
     }
 
-    static KeelBinaryHelper getInstance() {
-        return instance;
-    }
+     static KeelBinaryHelper getInstance() {
+         return instance;
+     }
 
     private String encodeHexWithDigits(final char[] HEX_DIGITS, Buffer buffer, int since, int length) {
         StringBuilder hex = new StringBuilder();

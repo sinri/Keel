@@ -1,7 +1,7 @@
 package io.github.sinri.keel.maids.watchman;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
@@ -41,7 +41,7 @@ abstract class KeelWatchmanImpl extends AbstractVerticle implements KeelWatchman
 
     @Override
     public void start() {
-        this.consumer = Keel.getVertx().eventBus().consumer(eventBusAddress());
+        this.consumer = Keel.vertx().eventBus().consumer(eventBusAddress());
         this.consumer.handler(this::consumeHandleMassage);
         this.consumer.exceptionHandler(throwable -> getLogger()
                 .exception(watchmanName() + " ERROR", throwable));
@@ -55,9 +55,9 @@ abstract class KeelWatchmanImpl extends AbstractVerticle implements KeelWatchman
         } catch (Exception ignore) {
             // 拟合不了拉倒
         }
-        Keel.getVertx().setPeriodic(
+        Keel.vertx().setPeriodic(
                 interval(),
-                timerID -> Keel.getVertx().eventBus()
+                timerID -> Keel.vertx().eventBus()
                         .send(eventBusAddress(), System.currentTimeMillis()));
     }
 
@@ -66,14 +66,14 @@ abstract class KeelWatchmanImpl extends AbstractVerticle implements KeelWatchman
         getLogger().debug(watchmanName() + " TRIGGERED FOR " + timestamp);
 
         long x = timestamp / interval();
-        Keel.getVertx().sharedData().getLockWithTimeout(eventBusAddress() + "@" + x, Math.min(3_000L, interval() - 1), lockAR -> {
+        Keel.vertx().sharedData().getLockWithTimeout(eventBusAddress() + "@" + x, Math.min(3_000L, interval() - 1), lockAR -> {
             if (lockAR.failed()) {
                 getLogger().warning("LOCK ACQUIRE FAILED FOR " + timestamp + " i.e. " + x);
             } else {
                 Lock lock = lockAR.result();
                 getLogger().info("LOCK ACQUIRED FOR " + timestamp + " i.e. " + x);
                 regularHandler().handle(timestamp);
-                Keel.getVertx().setTimer(interval(), timerID -> {
+                Keel.vertx().setTimer(interval(), timerID -> {
                     lock.release();
                     getLogger().info("LOCK RELEASED FOR " + timestamp + " i.e. " + x);
                 });

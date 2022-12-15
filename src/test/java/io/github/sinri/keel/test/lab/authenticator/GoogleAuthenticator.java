@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.lab.authenticator;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

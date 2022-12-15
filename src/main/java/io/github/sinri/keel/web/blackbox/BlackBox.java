@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.blackbox;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.lagecy.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.web.blackbox.html.HTMLElement;
 import io.github.sinri.keel.web.blackbox.html.HTMLTagElement;
 import io.vertx.core.Future;

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.condition;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLQuoter;
 import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
 
@@ -137,7 +137,7 @@ public class AmongstCondition implements KeelMySQLCondition {
         if (inverseOperator) {
             s += " NOT";
         }
-        s += " " + OP_IN + " (" + Keel.helpers().string().joinStringArray(targetSet, ",") + ")";
+        s += " " + OP_IN + " (" + Keel.getInstance().stringHelper().joinStringArray(targetSet, ",") + ")";
         return s;
     }
 }

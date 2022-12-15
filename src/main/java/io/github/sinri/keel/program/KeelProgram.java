@@ -1,7 +1,7 @@
 package io.github.sinri.keel.program;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.vertx.core.Future;
 import io.vertx.core.cli.CLI;
 import io.vertx.core.cli.CommandLine;
@@ -65,7 +65,9 @@ public abstract class KeelProgram {
                     getLogger().exception("FAILED", throwable);
                     returnCode.set(generateReturnCode(throwable));
                 })
-                .eventually(v -> Keel.getVertx().close())
+                .eventually(v -> Keel.gracefullyClose(promise -> {
+                    // do nothing
+                }))
                 .onComplete(v -> {
                     System.exit(returnCode.get());
                 });

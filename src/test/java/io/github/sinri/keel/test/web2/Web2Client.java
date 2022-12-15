@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.web2;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;

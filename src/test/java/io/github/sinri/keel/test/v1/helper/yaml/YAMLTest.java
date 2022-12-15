@@ -2,7 +2,7 @@ package io.github.sinri.keel.test.v1.helper.yaml;
 
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 
 import java.io.IOException;
 

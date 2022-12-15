@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.fastdocs;
 
-import io.github.sinri.keel.core.logger.KeelLogger;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.web.fastdocs.page.CataloguePageBuilder;
 import io.github.sinri.keel.web.fastdocs.page.MarkdownCssBuilder;
 import io.github.sinri.keel.web.fastdocs.page.MarkdownPageBuilder;

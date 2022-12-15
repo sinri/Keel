@@ -1,7 +1,7 @@
 package io.github.sinri.keel.verticles;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Verticle;
@@ -63,7 +63,7 @@ public interface KeelVerticleInterface extends Verticle {
      * @since 2.8
      */
     default Future<String> deployMe(DeploymentOptions deploymentOptions) {
-        return Keel.getVertx().deployVerticle(this, deploymentOptions)
+        return Keel.vertx().deployVerticle(this, deploymentOptions)
                 .onFailure(throwable -> Keel.outputLogger().exception(throwable));
     }
 

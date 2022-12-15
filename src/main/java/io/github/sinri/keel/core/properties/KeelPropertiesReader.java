@@ -1,6 +1,6 @@
 package io.github.sinri.keel.core.properties;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.vertx.core.json.JsonObject;
 
 import java.io.File;

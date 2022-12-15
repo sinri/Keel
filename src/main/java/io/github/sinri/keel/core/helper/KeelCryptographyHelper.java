@@ -12,9 +12,9 @@ public class KeelCryptographyHelper {
 
     }
 
-    static KeelCryptographyHelper getInstance() {
-        return instance;
-    }
+     static KeelCryptographyHelper getInstance() {
+         return instance;
+     }
 
     public KeelAes aes(KeelAes.SupportedCipherAlgorithm cipherAlgorithm, String key) {
         return KeelAes.create(cipherAlgorithm, key);

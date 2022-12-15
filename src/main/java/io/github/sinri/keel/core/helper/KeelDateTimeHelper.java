@@ -17,9 +17,9 @@ public class KeelDateTimeHelper {
 
     }
 
-    static KeelDateTimeHelper getInstance() {
-        return instance;
-    }
+     static KeelDateTimeHelper getInstance() {
+         return instance;
+     }
 
     /**
      * @param format "yyyyMMdd" or "yyyy-MM-dd HH:mm:ss", etc. if null, return null

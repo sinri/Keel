@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.hazelcast;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.VertxOptions;
 

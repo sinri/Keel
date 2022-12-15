@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.fastdocs.page;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
+import io.github.sinri.keel.lagecy.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;

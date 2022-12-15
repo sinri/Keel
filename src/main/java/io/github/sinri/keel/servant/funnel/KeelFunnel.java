@@ -1,8 +1,8 @@
 package io.github.sinri.keel.servant.funnel;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureRepeat;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.async.FutureRepeat;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.verticles.KeelVerticleInterface;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -49,7 +49,7 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
     public static Future<KeelFunnel> deployOneInstance(KeelFunnel.Options options) {
         KeelFunnel keelFunnel = new KeelFunnel().setOptions(options);
         DeploymentOptions deploymentOptions = new DeploymentOptions().setWorker(true);
-        return Keel.getVertx().deployVerticle(keelFunnel, deploymentOptions)
+        return Keel.vertx().deployVerticle(keelFunnel, deploymentOptions)
                 .compose(d -> Future.succeededFuture(keelFunnel));
     }
 
@@ -89,7 +89,7 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
             return;
         }
         // 暇、続きの暇
-        Keel.getVertx().setTimer(getQueryInterval(), timerID -> query());
+        Keel.vertx().setTimer(getQueryInterval(), timerID -> query());
     }
 
     private Future<Void> pourOneDrip(FutureRepeat.RoutineResult routineResult) {
@@ -114,7 +114,7 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
     private void pour() {
         getLogger().debug("POUR START");
 
-        Keel.callFutureRepeat(this::pourOneDrip)
+        Keel.getInstance().repeatedlyCall(this::pourOneDrip)
                 .onComplete(poured -> {
                     getLogger().debug("POUR END");
                     restingStartTime.set(new Date().getTime());

@@ -1,6 +1,5 @@
 package io.github.sinri.keel.core.helper;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.properties.KeelPropertiesReader;
 
 import java.io.IOException;
@@ -58,7 +57,7 @@ public class KeelFileHelper {
      * @return the URL of target file; if not there, null return.
      */
     public URL getUrlOfFileInJar(String filePath) {
-        return Keel.class.getClassLoader().getResource(filePath);
+        return KeelFileHelper.class.getClassLoader().getResource(filePath);
     }
 
     /**

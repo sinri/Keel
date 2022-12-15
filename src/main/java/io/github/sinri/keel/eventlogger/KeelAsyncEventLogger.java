@@ -1,7 +1,7 @@
 package io.github.sinri.keel.eventlogger;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.async.AsyncLoggingServiceAdapter;
+import io.github.sinri.keel.eventlogger.adapter.KeelEventLoggerAdapter;
+import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 
 import java.util.ArrayList;
@@ -13,12 +13,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 2.9.4 实验性设计
  */
 public class KeelAsyncEventLogger implements KeelEventLogger {
-    private final AsyncLoggingServiceAdapter<KeelEventLog> adapter;
+    private final KeelEventLoggerAdapter adapter;
     private final Queue<KeelEventLog> queue;
     private final int bufferSize = 1000;
     private boolean toClose = false;
+    private final Keel keel;
 
-    public KeelAsyncEventLogger(AsyncLoggingServiceAdapter<KeelEventLog> adapter) {
+    public KeelAsyncEventLogger(Keel keel, KeelEventLoggerAdapter adapter) {
+        this.keel = keel;
         this.queue = new ConcurrentLinkedQueue<>();
         this.adapter = adapter;
 
@@ -26,10 +28,10 @@ public class KeelAsyncEventLogger implements KeelEventLogger {
     }
 
     protected void start() {
-        Keel.callFutureRepeat(routineResult -> {
+        keel.repeatedlyCall(routineResult -> {
             return Future.succeededFuture()
                     .compose(v -> {
-                        return Keel.getVertx().executeBlocking(promise -> {
+                        return keel.getVertx().executeBlocking(promise -> {
                             List<KeelEventLog> buffer = new ArrayList<>();
                             for (int i = 0; i < bufferSize; i++) {
                                 KeelEventLog eventLog = this.queue.poll();
@@ -49,7 +51,7 @@ public class KeelAsyncEventLogger implements KeelEventLogger {
                         });
                     })
                     .recover(throwable -> {
-                        return Keel.callFutureSleep(1000L)
+                        return keel.sleep(1000L)
                                 .compose(v -> {
                                     return Future.succeededFuture();
                                 });
@@ -61,7 +63,7 @@ public class KeelAsyncEventLogger implements KeelEventLogger {
         });
     }
 
-    public AsyncLoggingServiceAdapter<KeelEventLog> getAdapter() {
+    public KeelEventLoggerAdapter getAdapter() {
         return adapter;
     }
 

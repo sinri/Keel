@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.v1.helper;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 
 public class Md5Test {
     public static void main(String[] args) {

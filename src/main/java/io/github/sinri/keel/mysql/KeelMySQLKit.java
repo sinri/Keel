@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
@@ -24,7 +24,7 @@ public class KeelMySQLKit {
         this.options = options;
         // Keel.outputLogger(getClass().getName()).info("useAffectedRows: " + options.useAffectedRows);
         pool = MySQLPool.pool(
-                Keel.getVertx(),
+                Keel.vertx(),
                 options.buildMySQLConnectOptions(),
                 options.buildPoolOptions()
         );

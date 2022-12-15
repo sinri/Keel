@@ -1,6 +1,6 @@
 package io.github.sinri.keel.core.json.scheme;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 
 import java.util.ArrayList;
 import java.util.List;

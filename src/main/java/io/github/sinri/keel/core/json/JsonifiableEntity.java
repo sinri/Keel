@@ -330,13 +330,20 @@ public interface JsonifiableEntity<E> extends ClusterSerializable, Iterable<Map.
      */
     default <B extends JsonifiableEntity<?>> B readJsonifiableEntity(Class<B> bClass, String... args) {
         JsonObject jsonObject = readJsonObject(args);
+        if (jsonObject == null) return null;
+        try {
+            var x = bClass.getConstructor().newInstance();
+            x.reloadDataFromJsonObject(jsonObject);
+            return x;
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException ignored) {
+        }
         try {
             return bClass.getConstructor(JsonObject.class).newInstance(jsonObject);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException e) {
-            //e.printStackTrace();
-            return null;
+                 NoSuchMethodException ignored) {
         }
+        return null;
     }
 
     /**

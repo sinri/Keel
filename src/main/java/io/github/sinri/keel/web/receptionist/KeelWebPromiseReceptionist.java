@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.receptionist;
 
-import io.github.sinri.keel.core.controlflow.PromiseTimeout;
+import io.github.sinri.keel.facade.async.PromiseTimeout;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.ext.web.RoutingContext;

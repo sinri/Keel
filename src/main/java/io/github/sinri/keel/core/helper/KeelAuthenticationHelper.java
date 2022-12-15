@@ -15,9 +15,9 @@ public class KeelAuthenticationHelper {
 
     }
 
-    static KeelAuthenticationHelper getInstance() {
-        return instance;
-    }
+     static KeelAuthenticationHelper getInstance() {
+         return instance;
+     }
 
     /**
      * @since 2.8

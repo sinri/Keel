@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.fastdocs.page;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.markdown.KeelMarkdownKit;
 import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;

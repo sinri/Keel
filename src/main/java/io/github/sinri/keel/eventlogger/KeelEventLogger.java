@@ -1,6 +1,6 @@
 package io.github.sinri.keel.eventlogger;
 
-import io.github.sinri.keel.core.logger.KeelLogLevel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogLevel;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 

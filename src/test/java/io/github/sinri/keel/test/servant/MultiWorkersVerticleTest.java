@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.servant;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;

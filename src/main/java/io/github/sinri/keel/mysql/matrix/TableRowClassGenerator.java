@@ -1,7 +1,6 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureForEach;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -113,28 +112,28 @@ public class TableRowClassGenerator {
     }
 
     private Future<Void> generateForTables(String packageName, String packagePath, Collection<String> tables) {
-        return FutureForEach.call(
+        return Keel.getInstance().iterativelyCall(
                 tables,
                 table -> {
-                    String className = Keel.helpers().string().fromUnderScoreCaseToCamelCase(table) + "TableRow";
+                    String className = Keel.getInstance().stringHelper().fromUnderScoreCaseToCamelCase(table) + "TableRow";
                     String classFile = packagePath + "/" + className + ".java";
                     return this.generateClassCodeForOneTable(schema, table, packageName, className)
                             .compose(code -> {
                                 if (this.rewrite) {
-                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
+                                    return Keel.vertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                                 } else {
-                                    return Keel.getVertx().fileSystem().exists(classFile)
+                                    return Keel.vertx().fileSystem().exists(classFile)
                                             .compose(existed -> {
                                                 if (existed) {
-                                                    return Keel.getVertx().fileSystem().readFile(classFile)
+                                                    return Keel.vertx().fileSystem().readFile(classFile)
                                                             .compose(existedContentBuffer -> {
-                                                                return Keel.getVertx().fileSystem().writeFile(
+                                                                return Keel.vertx().fileSystem().writeFile(
                                                                         classFile,
                                                                         existedContentBuffer.appendString("\n\n").appendString(code)
                                                                 );
                                                             });
                                                 } else {
-                                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
+                                                    return Keel.vertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                                                 }
                                             });
                                 }
@@ -158,7 +157,7 @@ public class TableRowClassGenerator {
     }
 
     private String buildFieldGetter(String field, String type, String comment) {
-        String getter = "get" + Keel.helpers().string().fromUnderScoreCaseToCamelCase(field);
+        String getter = "get" + Keel.getInstance().stringHelper().fromUnderScoreCaseToCamelCase(field);
         String returnType = "Object";
         String readMethod = "readValue";
 
@@ -204,7 +203,7 @@ public class TableRowClassGenerator {
                 String[] enumValueArray = enumValuesString.split("[, ]+");
                 if (enumValueArray.length > 0) {
                     // to build enum
-                    enum_name = Keel.helpers().string().fromUnderScoreCaseToCamelCase(field) + "Enum";
+                    enum_name = Keel.getInstance().stringHelper().fromUnderScoreCaseToCamelCase(field) + "Enum";
 
                     getter_string
                             .append("\t/**\n")

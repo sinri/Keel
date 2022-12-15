@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.service;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.PromiseTimeout;
+import io.github.sinri.keel.facade.async.PromiseTimeout;
+import io.github.sinri.keel.lagecy.Keel;
 import io.vertx.core.Promise;
 import io.vertx.ext.web.RoutingContext;
 

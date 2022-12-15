@@ -1,8 +1,8 @@
 package io.github.sinri.keel.eventlogger;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
-import io.github.sinri.keel.core.logger.KeelLogLevel;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogLevel;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -27,11 +27,11 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
                 .put(RESERVED_KEY_TOPIC, "")
                 .put(RESERVED_KEY_EVENT, null);
         try {
-            if (Keel.getVertx().isClustered()) {
+            if (Keel.vertx().isClustered()) {
 //                jsonObject.put("use_cluster", "YES");
                 jsonObject
-                        .put(RESERVED_KEY_CLUSTER_NODE_ID, Keel.getVertxNodeID())
-                        .put(RESERVED_KEY_CLUSTER_NODE_ADDRESS, Keel.getVertxNodeNetAddress());
+                        .put(RESERVED_KEY_CLUSTER_NODE_ID, Keel.getInstance().getVertxNodeID())
+                        .put(RESERVED_KEY_CLUSTER_NODE_ADDRESS, Keel.getInstance().getVertxNodeNetAddress());
             } else {
 //                jsonObject.put("use_cluster", "NO");
             }

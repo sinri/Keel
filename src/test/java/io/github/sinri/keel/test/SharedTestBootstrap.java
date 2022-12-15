@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.mysql.KeelMySQLKit;
 import io.vertx.core.Handler;
 import io.vertx.core.VertxOptions;

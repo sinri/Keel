@@ -1,10 +1,10 @@
 package io.github.sinri.keel.core.helper;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.helper.runtime.CPUTimeResult;
 import io.github.sinri.keel.core.helper.runtime.GCStatResult;
 import io.github.sinri.keel.core.helper.runtime.MemoryResult;
 import io.github.sinri.keel.core.helper.runtime.MonitorSnapshot;
+import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import oshi.SystemInfo;
@@ -47,10 +47,11 @@ public class KeelRuntimeHelper {
                     gcStat.addGCTimeAsOld(gc.getCollectionTime());
                 }
             } else {
-                Keel.outputLogger().warning("Found Unknown GarbageCollectorMXBean Name", new JsonObject()
+                System.out.println("Found Unknown GarbageCollectorMXBean Name"
+                        + new JsonObject()
                         .put("class", gc.getClass().getName())
                         .put("name", gc.getName())
-                        .put("memoryPoolNames", Keel.helpers().string().joinStringArray(gc.getMemoryPoolNames(), ","))
+                        .put("memoryPoolNames", Keel.getInstance().stringHelper().joinStringArray(gc.getMemoryPoolNames(), ","))
                         .put("objectName", gc.getObjectName())
                         .put("collectionCount", gc.getCollectionCount())
                         .put("collectionTime", gc.getCollectionTime())
@@ -97,7 +98,7 @@ public class KeelRuntimeHelper {
      * @since 2.9.4
      */
     public void monitor(long interval, Handler<MonitorSnapshot> handler) {
-        Keel.getVertx().setPeriodic(interval, timer -> {
+        Keel.vertx().setPeriodic(interval, timer -> {
             MonitorSnapshot monitorSnapshot = new MonitorSnapshot();
 
             GCStatResult gcSnapshot = getGCSnapshot();

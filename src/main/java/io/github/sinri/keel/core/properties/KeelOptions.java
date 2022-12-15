@@ -2,7 +2,7 @@ package io.github.sinri.keel.core.properties;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 

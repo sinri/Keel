@@ -1,9 +1,9 @@
 package io.github.sinri.keel.test.servant;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureForRange;
-import io.github.sinri.keel.core.controlflow.FutureSleep;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.async.FutureForRange;
+import io.github.sinri.keel.facade.async.FutureSleep;
+import io.github.sinri.keel.lagecy.Keel;
+import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
 import io.github.sinri.keel.servant.funnel.KeelFunnel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.vertx.core.Future;

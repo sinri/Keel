@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.hazelcast.watch;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.KeelCronExpression;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.maids.watchman.KeelCronWatchman;
 import io.github.sinri.keel.maids.watchman.KeelPureWatchman;
 import io.github.sinri.keel.maids.watchman.KeelWatchmanEventHandler;

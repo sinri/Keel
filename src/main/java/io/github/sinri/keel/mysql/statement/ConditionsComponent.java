@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.mysql.condition.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -82,7 +82,7 @@ public class ConditionsComponent {
     @Override
     public String toString() {
         if (conditions.isEmpty()) return "";
-        return Keel.helpers().string().joinStringArray(conditions, " and ");
+        return Keel.getInstance().stringHelper().joinStringArray(conditions, " and ");
     }
 
     /**

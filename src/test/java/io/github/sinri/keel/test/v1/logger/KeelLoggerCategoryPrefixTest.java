@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.v1.logger;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 
 public class KeelLoggerCategoryPrefixTest {

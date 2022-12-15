@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.cache.alef;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.cache.KeelCacheInterface;
+import io.github.sinri.keel.lagecy.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 
 public class AlefLongKeyTest {
