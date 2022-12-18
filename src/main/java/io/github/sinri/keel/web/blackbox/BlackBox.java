@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.blackbox;
 
-import io.github.sinri.keel.lagecy.Keel;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.blackbox.html.HTMLElement;
 import io.github.sinri.keel.web.blackbox.html.HTMLTagElement;
 import io.vertx.core.Future;
@@ -17,14 +17,18 @@ import java.util.Date;
  * @since 2.2
  */
 public class BlackBox {
+    private final Keel keel;
     private final String routeRootPath;
     private final String logDirPath;
+    private final KeelEventLogger logger;
 
     /**
      * @param routeRootPath start with '/', such as '/blackbox'
      * @param logDirPath    path such as '/var/log/xxx'
      */
-    public BlackBox(String routeRootPath, String logDirPath) {
+    public BlackBox(Keel keel, String routeRootPath, String logDirPath) {
+        this.keel = keel;
+        this.logger = this.keel.createOutputEventLogger("blackbox");
         this.routeRootPath = routeRootPath;
         this.logDirPath = logDirPath;
     }
@@ -35,7 +39,7 @@ public class BlackBox {
      * @param router main router
      */
     public void registerToRoute(Router router) {
-        KeelLogger logger = Keel.outputLogger("blackbox");
+
         router.get(this.routeRootPath + "/*")
                 .failureHandler(routingContext -> {
                     logger.error("failure handler");
@@ -68,7 +72,7 @@ public class BlackBox {
     }
 
     private void handleDir(RoutingContext routingContext, File dir) {
-        Keel.getVertx().fileSystem().readDir(dir.getAbsolutePath())
+        keel.fileSystem().readDir(dir.getAbsolutePath())
                 .compose(children -> {
                     String relativeDirPath = dir.getAbsolutePath().substring(this.logDirPath.length());
 

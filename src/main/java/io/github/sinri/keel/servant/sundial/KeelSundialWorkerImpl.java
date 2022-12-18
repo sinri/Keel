@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.sundial;
 
 import io.github.sinri.keel.core.KeelCronExpression;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
 
 import java.util.Calendar;
@@ -17,7 +17,7 @@ public class KeelSundialWorkerImpl implements KeelSundialWorker {
     private final String name;
     private final String rawCronExpression;
     private final KeelCronExpression cronExpression;
-    private final KeelLogger logger;
+    private final KeelEventLogger logger;
     private final int parallelLimit;
     private final Function<Calendar, Future<Void>> workFunction;
 
@@ -26,7 +26,7 @@ public class KeelSundialWorkerImpl implements KeelSundialWorker {
             String rawCronExpression,
             Function<Calendar, Future<Void>> workFunction,
             int parallelLimit,
-            KeelLogger logger
+            KeelEventLogger logger
     ) {
         this.name = name;
         this.rawCronExpression = rawCronExpression;
@@ -61,7 +61,7 @@ public class KeelSundialWorkerImpl implements KeelSundialWorker {
     }
 
     @Override
-    public KeelLogger getLogger() {
+    public KeelEventLogger getLogger() {
         return logger;
     }
 

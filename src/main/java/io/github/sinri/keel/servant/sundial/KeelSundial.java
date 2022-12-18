@@ -1,8 +1,7 @@
 package io.github.sinri.keel.servant.sundial;
 
 import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
-import io.vertx.core.json.JsonObject;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.shareddata.Counter;
 
 import java.util.*;
@@ -15,18 +14,20 @@ import java.util.*;
  * @since 2.9.3 建议使用KeelWatchman系列实现
  */
 public class KeelSundial {
-    private final KeelLogger logger;
+    private final KeelEventLogger logger;
     private final Map<String, KeelSundialWorker> registeredWorkers = new HashMap<>();
     private Long byMinuteTimerID = null;
+    private final Keel keel;
 
-    public KeelSundial(KeelLogger logger) {
+    public KeelSundial(Keel keel, KeelEventLogger logger) {
+        this.keel = keel;
         this.logger = logger;
 
         // by default starts
         start();
     }
 
-    public KeelLogger getLogger() {
+    public KeelEventLogger getLogger() {
         return logger;
     }
 
@@ -44,7 +45,10 @@ public class KeelSundial {
 
     public KeelSundial registerWorker(KeelSundialWorker worker) {
         registeredWorkers.put(worker.getName(), worker);
-        getLogger().info("registered worker to sundial", worker.getMeta().toJsonObject());
+        getLogger().info(eventLog -> {
+            eventLog.message("registered worker to sundial")
+                    .put("worker", worker.getMeta().toJsonObject());
+        });
         return this;
     }
 
@@ -78,7 +82,7 @@ public class KeelSundial {
         if (byMinuteTimerID != null) {
             throw new RuntimeException("stop the existed first!");
         }
-        byMinuteTimerID = Keel.vertx().setPeriodic(60 * 1000, id -> {
+        byMinuteTimerID = keel.setPeriodic(60 * 1000, id -> {
             Calendar calendar = Calendar.getInstance();
 
             registeredWorkers.keySet().forEach(workerName -> {
@@ -91,11 +95,14 @@ public class KeelSundial {
 
                     int parallelLimit = worker.getParallelLimit();
                     if (parallelLimit > 0) {
-                        Keel.vertx().sharedData().getCounter(
+                        keel.sharedData().getCounter(
                                 "KeelSundial-" + workerName,
                                 counterAsyncResult -> {
                                     if (counterAsyncResult.failed()) {
-                                        this.logger.exception("getWorkerParallelCounter for " + workerName + " failed", counterAsyncResult.cause());
+                                        this.logger.exception(
+                                                counterAsyncResult.cause(),
+                                                "getWorkerParallelCounter for " + workerName + " failed"
+                                        );
                                         return;
                                     }
 
@@ -103,7 +110,10 @@ public class KeelSundial {
 
                                     counter.get(currentAsyncResult -> {
                                         if (currentAsyncResult.failed()) {
-                                            this.logger.exception("Counter for " + workerName + " get current value failed", currentAsyncResult.cause());
+                                            this.logger.exception(
+                                                    currentAsyncResult.cause(),
+                                                    "Counter for " + workerName + " get current value failed"
+                                            );
                                             return;
                                         }
 
@@ -127,7 +137,7 @@ public class KeelSundial {
                         worker.work(calendar);
                     }
                 } catch (Throwable throwable) {
-                    getLogger().exception("KeelSundial Periodic Inside Exception", throwable);
+                    getLogger().exception(throwable, "KeelSundial Periodic Inside Exception");
                 }
             });
         });
@@ -139,8 +149,12 @@ public class KeelSundial {
      */
     public void stop() {
         if (byMinuteTimerID != null) {
-            boolean done = Keel.vertx().cancelTimer(byMinuteTimerID);
-            getLogger().info("stopped timer " + byMinuteTimerID, new JsonObject().put("done", done));
+            boolean done = keel.cancelTimer(byMinuteTimerID);
+            if (done) {
+                getLogger().info("stopped timer " + byMinuteTimerID);
+            } else {
+                getLogger().warning("failed to stop timer " + byMinuteTimerID);
+            }
             byMinuteTimerID = null;
         }
     }

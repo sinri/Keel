@@ -1,14 +1,14 @@
 package io.github.sinri.keel.mysql.condition;
 
-import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.mysql.KeelMySQLQuoter;
+import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.mysql.Quoter;
 import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class AmongstCondition implements KeelMySQLCondition {
+public class AmongstCondition implements MySQLCondition {
     public static final String OP_IN = "IN";
     protected final List<String> targetSet;
     protected String element;
@@ -57,12 +57,12 @@ public class AmongstCondition implements KeelMySQLCondition {
     }
 
     public AmongstCondition elementAsValue(String element) {
-        this.element = new KeelMySQLQuoter(element).toString();
+        this.element = new Quoter(element).toString();
         return this;
     }
 
     public AmongstCondition elementAsValue(Number element) {
-        this.element = new KeelMySQLQuoter(element).toString();
+        this.element = new Quoter(element).toString();
         return this;
     }
 
@@ -90,25 +90,25 @@ public class AmongstCondition implements KeelMySQLCondition {
 
     public AmongstCondition amongstValueList(Collection<?> targetSet) {
         for (Object next : targetSet) {
-            this.targetSet.add(new KeelMySQLQuoter(String.valueOf(next)).toString());
+            this.targetSet.add(new Quoter(String.valueOf(next)).toString());
         }
         return this;
     }
 
     public AmongstCondition amongstValueArray(Object[] targetSet) {
         for (Object next : targetSet) {
-            this.targetSet.add(new KeelMySQLQuoter(String.valueOf(next)).toString());
+            this.targetSet.add(new Quoter(String.valueOf(next)).toString());
         }
         return this;
     }
 
     public AmongstCondition amongstValue(String value) {
-        this.targetSet.add(new KeelMySQLQuoter(value).toString());
+        this.targetSet.add(new Quoter(value).toString());
         return this;
     }
 
     public AmongstCondition amongstValue(Number value) {
-        this.targetSet.add(new KeelMySQLQuoter(value).toString());
+        this.targetSet.add(new Quoter(value).toString());
         return this;
     }
 
@@ -137,7 +137,7 @@ public class AmongstCondition implements KeelMySQLCondition {
         if (inverseOperator) {
             s += " NOT";
         }
-        s += " " + OP_IN + " (" + Keel.getInstance().stringHelper().joinStringArray(targetSet, ",") + ")";
+        s += " " + OP_IN + " (" + KeelHelpers.getInstance().stringHelper().joinStringArray(targetSet, ",") + ")";
         return s;
     }
 }

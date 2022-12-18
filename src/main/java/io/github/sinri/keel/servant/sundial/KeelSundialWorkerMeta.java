@@ -3,6 +3,8 @@ package io.github.sinri.keel.servant.sundial;
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Objects;
+
 public class KeelSundialWorkerMeta extends SimpleJsonifiableEntity {
     public KeelSundialWorkerMeta(String name, String cronExpression, int parallelLimit) {
         this.reloadDataFromJsonObject(new JsonObject()
@@ -17,7 +19,7 @@ public class KeelSundialWorkerMeta extends SimpleJsonifiableEntity {
     }
 
     public int getParallelLimit() {
-        return readInteger("parallel_limit");
+        return Objects.requireNonNullElse(readInteger("parallel_limit"), 1);
     }
 
     public String getRawCronExpression() {

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.maids.watchman;
 
-import io.github.sinri.keel.verticles.KeelVerticleInterface;
+import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Handler;
 
 /**
@@ -10,7 +10,7 @@ import io.vertx.core.Handler;
  *
  * @since 2.9.3
  */
-public interface KeelWatchman extends KeelVerticleInterface {
+public interface KeelWatchman extends KeelVerticle {
 
     String watchmanName();
 

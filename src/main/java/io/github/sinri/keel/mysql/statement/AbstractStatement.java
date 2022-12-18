@@ -1,9 +1,8 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
 import java.util.UUID;
@@ -12,7 +11,7 @@ import java.util.UUID;
  * @since 1.7
  */
 abstract public class AbstractStatement {
-    protected static KeelLogger sqlAuditLogger = KeelLogger.silentLogger();
+    protected static KeelEventLogger sqlAuditLogger = KeelEventLogger.silentLogger();
     protected static String SQL_COMPONENT_SEPARATOR = " ";//"\n";
     protected final String statement_uuid;
     private String remarkAsComment = "";
@@ -21,11 +20,11 @@ abstract public class AbstractStatement {
         this.statement_uuid = UUID.randomUUID().toString();
     }
 
-    public static KeelLogger getSqlAuditLogger() {
+    public static KeelEventLogger getSqlAuditLogger() {
         return sqlAuditLogger;
     }
 
-    public static void setSqlAuditLogger(KeelLogger sqlAuditLogger) {
+    public static void setSqlAuditLogger(KeelEventLogger sqlAuditLogger) {
         AbstractStatement.sqlAuditLogger = sqlAuditLogger;
     }
 
@@ -68,21 +67,20 @@ abstract public class AbstractStatement {
                     .compose(
                             rows -> {
                                 ResultMatrix resultMatrix = ResultMatrix.create(rows);
-                                getSqlAuditLogger().info(statement_uuid + " done", new JsonObject()
-                                        .put("TotalAffectedRows", resultMatrix.getTotalAffectedRows())
-                                        .put("TotalFetchedRows", resultMatrix.getTotalFetchedRows())
+                                getSqlAuditLogger().info(
+                                        event -> event.message(statement_uuid + " done")
+                                                .put("TotalAffectedRows", resultMatrix.getTotalAffectedRows())
+                                                .put("TotalFetchedRows", resultMatrix.getTotalFetchedRows())
                                 );
                                 return Future.succeededFuture(resultMatrix);
                             },
                             throwable -> {
-                                getSqlAuditLogger().error(statement_uuid + " execute failed");
-                                getSqlAuditLogger().exception(statement_uuid, throwable);
+                                getSqlAuditLogger().exception(throwable, statement_uuid + " execute failed");
                                 return Future.failedFuture(throwable);
                             }
                     );
         } catch (Throwable throwable) {
-            getSqlAuditLogger().error(statement_uuid + " exception");
-            getSqlAuditLogger().exception(statement_uuid, throwable);
+            getSqlAuditLogger().exception(throwable, statement_uuid + " exception");
             return Future.failedFuture(throwable);
         }
     }

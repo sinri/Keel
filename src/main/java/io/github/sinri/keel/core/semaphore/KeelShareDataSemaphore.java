@@ -1,9 +1,8 @@
 package io.github.sinri.keel.core.semaphore;
 
-import io.github.sinri.keel.lagecy.Keel;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.Counter;
 
 import java.util.function.Function;
@@ -15,22 +14,26 @@ public class KeelShareDataSemaphore {
     final private String name;
     final private int permits;
 
-    private final KeelLogger logger;
+    private final KeelEventLogger logger;
 
-    public KeelShareDataSemaphore(String name, int permits) {
+    private final Keel keel;
+
+    public KeelShareDataSemaphore(Keel keel, String name, int permits) {
+        this.keel = keel;
         this.name = name;
         this.permits = permits;
-        this.logger = KeelLogger.silentLogger();
+        this.logger = KeelEventLogger.silentLogger();
     }
 
-    public KeelShareDataSemaphore(String name, int permits, KeelLogger logger) {
+    public KeelShareDataSemaphore(Keel keel, String name, int permits, KeelEventLogger logger) {
+        this.keel = keel;
         this.name = name;
         this.permits = permits;
         this.logger = logger;
     }
 
     protected Future<Counter> getCounter() {
-        return Keel.getVertx().sharedData().getCounter(name);
+        return this.keel.sharedData().getCounter(name);
     }
 
     public Future<Boolean> isNowAvailable() {
@@ -66,7 +69,11 @@ public class KeelShareDataSemaphore {
         return getCounter()
                 .compose(Counter::incrementAndGet)
                 .compose(current -> {
-                    logger.debug(getClass() + " acquire, current " + current, new JsonObject().put("runnable", current <= permits));
+                    logger.debug(eventLog -> {
+                        eventLog.message(getClass() + " acquire")
+                                .put("current", current)
+                                .put("runnable", current <= permits);
+                    });
                     if (current <= permits) {
                         return Future.succeededFuture(true);
                     } else {

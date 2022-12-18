@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web.service;
 
+import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;
 
@@ -8,6 +9,10 @@ import io.vertx.ext.web.RoutingContext;
  */
 public abstract class KeelWebRequestFutureHandler extends KeelWebRequestHandler {
 
+
+    public KeelWebRequestFutureHandler(Keel keel) {
+        super(keel);
+    }
 
     abstract protected Future<Object> handleRequestForFuture(RoutingContext routingContext);
 

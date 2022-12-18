@@ -1,30 +1,46 @@
 package io.github.sinri.keel.facade.interfaces;
 
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
+import io.vertx.core.*;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.file.FileSystem;
 import io.vertx.core.shareddata.SharedData;
-import io.vertx.core.spi.cluster.ClusterManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public interface TraitForVertx {
     @NotNull Vertx getVertx();
 
-    @Nullable
-    ClusterManager getClusterManager();
+    boolean isVertxInitialized();
 
-    default @Nonnull EventBus eventBus() {
+
+    @Nonnull
+    default EventBus eventBus() {
         return getVertx().eventBus();
     }
 
-    default @Nonnull SharedData sharedData() {
+    @Nonnull
+    default SharedData sharedData() {
         return getVertx().sharedData();
     }
 
+    default long setTimer(long delay, Handler<Long> handler) {
+        return getVertx().setTimer(delay, handler);
+    }
+
+    default long setPeriodic(long delay, Handler<Long> handler) {
+        return setPeriodic(delay, delay, handler);
+    }
+
+    default long setPeriodic(long initialDelay, long delay, Handler<Long> handler) {
+        return setPeriodic(initialDelay, delay, handler);
+    }
+
+
+    default boolean cancelTimer(long id) {
+        return getVertx().cancelTimer(id);
+    }
 
     /**
      * @since 2.9
@@ -43,5 +59,38 @@ public interface TraitForVertx {
                         .onComplete(ar -> lock.release()));
     }
 
+    Future<Void> initializeVertx(VertxOptions vertxOptions);
 
+    default Future<Void> initializeVertx(Handler<VertxOptions> vertxOptionsHandler) {
+        VertxOptions vertxOptions = new VertxOptions();
+        vertxOptionsHandler.handle(vertxOptions);
+        return initializeVertx(vertxOptions);
+    }
+
+    /**
+     * @param gracefulHandler what to do before close vertx
+     * @since 2.9.4
+     */
+    default void gracefullyClose(Handler<Promise<Object>> gracefulHandler, Handler<AsyncResult<Void>> vertxCloseHandler) {
+        Promise<Object> promise = Promise.promise();
+        gracefulHandler.handle(promise);
+        promise.future().onComplete(ar -> {
+            if (ar.failed()) {
+                // todo Keel.outputLogger().exception("Keel.gracefullyClose ERROR, CLOSE ANYWAY", ar.cause());
+            } else {
+                // todo Keel.outputLogger().notice("Keel.gracefullyClose READY TO CLOSE");
+            }
+            getVertx().close(vertxCloseHandler);
+        });
+    }
+
+    default Future<Void> gracefullyClose(Handler<Promise<Object>> gracefulHandler) {
+        Promise<Void> vertxClosed = Promise.promise();
+        gracefullyClose(gracefulHandler, vertxClosed);
+        return vertxClosed.future();
+    }
+
+    default FileSystem fileSystem() {
+        return getVertx().fileSystem();
+    }
 }

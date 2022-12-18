@@ -1,8 +1,8 @@
 package io.github.sinri.keel.mysql.condition;
 
-import io.github.sinri.keel.mysql.KeelMySQLQuoter;
+import io.github.sinri.keel.mysql.Quoter;
 
-public class CompareCondition implements KeelMySQLCondition {
+public class CompareCondition implements MySQLCondition {
     public static final String OP_EQ = "=";
     public static final String OP_NEQ = "<>";
     public static final String OP_NULL_SAFE_EQ = "<=>";
@@ -68,7 +68,7 @@ public class CompareCondition implements KeelMySQLCondition {
     }
 
     public CompareCondition compareValue(Object leftSide) {
-        this.leftSide = String.valueOf(new KeelMySQLQuoter(String.valueOf(leftSide)));
+        this.leftSide = String.valueOf(new Quoter(String.valueOf(leftSide)));
         return this;
     }
 
@@ -106,7 +106,7 @@ public class CompareCondition implements KeelMySQLCondition {
     }
 
     public CompareCondition againstValue(Object rightSide) {
-        this.rightSide = String.valueOf(new KeelMySQLQuoter(String.valueOf(rightSide)));
+        this.rightSide = String.valueOf(new Quoter(String.valueOf(rightSide)));
         return this;
     }
 
@@ -136,21 +136,21 @@ public class CompareCondition implements KeelMySQLCondition {
 
     public CompareCondition contains(String rightSide) {
         this.operator = OP_LIKE;
-        String x = KeelMySQLQuoter.escapeStringWithWildcards(rightSide);
+        String x = Quoter.escapeStringWithWildcards(rightSide);
         this.rightSide = "'%" + x + "%'";
         return this;
     }
 
     public CompareCondition hasPrefix(String rightSide) {
         this.operator = "like";
-        String x = KeelMySQLQuoter.escapeStringWithWildcards(rightSide);
+        String x = Quoter.escapeStringWithWildcards(rightSide);
         this.rightSide = "'" + x + "%'";
         return this;
     }
 
     public CompareCondition hasSuffix(String rightSide) {
         this.operator = "like";
-        String x = KeelMySQLQuoter.escapeStringWithWildcards(rightSide);
+        String x = Quoter.escapeStringWithWildcards(rightSide);
         this.rightSide = "'%" + x + "'";
         return this;
     }

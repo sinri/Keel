@@ -1,14 +1,13 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticleInterface;
-import io.vertx.core.AbstractVerticle;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 
 /**
  * @since 2.1
  */
-public abstract class KeelQueueTask extends AbstractVerticle implements KeelVerticleInterface {
+public abstract class KeelQueueTask extends KeelVerticleBase {
     public KeelQueueTask() {
         super();
     }
@@ -17,19 +16,9 @@ public abstract class KeelQueueTask extends AbstractVerticle implements KeelVert
 
     abstract public String getTaskCategory();
 
-    private KeelLogger logger;
 
-    abstract protected KeelLogger prepareLogger();
+    abstract protected KeelEventLogger prepareLogger();
 
-    @Override
-    public KeelLogger getLogger() {
-        return logger;
-    }
-
-    @Override
-    public void setLogger(KeelLogger logger) {
-        this.logger = logger;
-    }
 
     /**
      * 被设计在 seeker.get 方法中调用
@@ -48,7 +37,7 @@ public abstract class KeelQueueTask extends AbstractVerticle implements KeelVert
         Future.succeededFuture()
                 .compose(v -> run())
                 .recover(throwable -> {
-                    getLogger().exception("KeelQueueTask Caught throwable from Method run", throwable);
+                    getLogger().exception(throwable, "KeelQueueTask Caught throwable from Method run");
                     return Future.succeededFuture();
                 })
                 .eventually(v -> {

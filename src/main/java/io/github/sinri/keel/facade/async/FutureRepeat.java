@@ -1,6 +1,5 @@
 package io.github.sinri.keel.facade.async;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
@@ -11,16 +10,18 @@ import java.util.function.Function;
  * @since 2.9.3
  */
 public class FutureRepeat {
+    private final TraitForVertxAsync keel;
     private final Function<RoutineResult, Future<Void>> routineFunction;
 
-    private FutureRepeat(Function<RoutineResult, Future<Void>> routineFunction) {
+    private FutureRepeat(TraitForVertxAsync keel, Function<RoutineResult, Future<Void>> routineFunction) {
+        this.keel = keel;
         this.routineFunction = routineFunction;
     }
 
-    static Future<Void> call(Function<RoutineResult, Future<Void>> routineFunction) {
+    static Future<Void> call(TraitForVertxAsync keel, Function<RoutineResult, Future<Void>> routineFunction) {
         Promise<Void> promise = Promise.promise();
         RoutineResult routineResult = new RoutineResult(false);
-        new FutureRepeat(routineFunction).routine(routineResult, promise);
+        new FutureRepeat(keel, routineFunction).routine(routineResult, promise);
         return promise.future();
     }
 
@@ -32,7 +33,7 @@ public class FutureRepeat {
                         if (routineResult.isToStop()) {
                             finalPromise.complete();
                         } else {
-                            Keel.getInstance().getVertx().setTimer(1L, x -> routine(routineResult, finalPromise));
+                            keel.setTimer(1L, x -> routine(routineResult, finalPromise));
                         }
                     } else {
                         finalPromise.fail(shouldStopAR.cause());

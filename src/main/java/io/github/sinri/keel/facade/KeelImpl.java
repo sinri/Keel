@@ -1,75 +1,69 @@
 package io.github.sinri.keel.facade;
 
-import io.github.sinri.keel.mysql.KeelMySQLKitProvider;
-import io.vertx.core.*;
+import io.github.sinri.keel.facade.interfaces.TraitForClusteredVertx;
+import io.github.sinri.keel.facade.interfaces.TraitForVertx;
+import io.github.sinri.keel.logger.event.KeelEventLogCenter;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.event.KeelSyncEventLogCenter;
+import io.github.sinri.keel.logger.event.adapter.OutputAdapter;
+import io.github.sinri.keel.mysql.KeelMySQLConfigure;
+import io.github.sinri.keel.mysql.MySQLDataSource;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.core.VertxOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
-class KeelImpl implements Keel {
-    private final static KeelMySQLKitProvider mySQLKitProvider = new KeelMySQLKitProvider();
-    private static final KeelConfiguration configuration = new KeelConfigurationImpl();
-    private static KeelImpl instance;
-    private final @Nonnull Vertx vertx;
-    private final @Nullable ClusterManager clusterManager;
-
-    private KeelImpl(@Nonnull Vertx vertx, @Nullable ClusterManager clusterManager) {
-        this.vertx = vertx;
-        this.clusterManager = clusterManager;
+class KeelImpl implements Keel, TraitForVertx, TraitForClusteredVertx {
+    private final KeelConfiguration configuration;
+    private final KeelEventLogCenter outputEventLogCenter;
+    private final KeelEventLogger instantEventLogger;
+    private final Map<String, MySQLDataSource> mysqlKitMap = new ConcurrentHashMap<>();
+    private @Nullable Vertx vertx;
+    private @Nullable ClusterManager clusterManager;
+    public KeelImpl() {
+        this.configuration = new KeelConfigurationImpl();
+        this.outputEventLogCenter = new KeelSyncEventLogCenter(this, OutputAdapter.getInstance());
+        this.instantEventLogger = outputEventLogCenter.createLogger("INSTANT");
     }
 
-    public KeelImpl(Vertx vertx) {
-        this(vertx, null);
-    }
-
-    public static KeelConfiguration getConfiguration() {
+    public KeelConfiguration getConfiguration() {
         return configuration;
     }
 
-    public static KeelImpl getInstance() {
-        return instance;
+    @Override
+    public KeelEventLogger getInstantEventLogger() {
+        return this.instantEventLogger;
     }
 
-    /**
-     * 同步启动一个非集群模式的Vertx实例。
-     *
-     * @param vertxOptions VertxOptions
-     * @see <a href="https://vertx.io/docs/apidocs/io/vertx/core/VertxOptions.html">Class VertxOptions</a>
-     * @since 2.9.4 针对 2.9.1 的错误弃用进行光复
-     */
-    public static void initialize(VertxOptions vertxOptions) {
-        var vertx = Vertx.vertx(vertxOptions);
-        instance = new KeelImpl(vertx);
+    @Override
+    public KeelEventLogger createOutputEventLogger(String topic) {
+        return this.outputEventLogCenter.createLogger(topic);
     }
 
-    /**
-     * 异步启动一个Vertx实例，可以为集群模式或非集群模式。
-     *
-     * @param vertxOptions 如果使用集群模式则必须配置好ClusterManager。
-     * @param isClustered  是否使用集群模式
-     * @since 2.9.4
-     */
-    public static Future<Void> initialize(VertxOptions vertxOptions, boolean isClustered) {
+    public Future<Void> initializeVertx(VertxOptions vertxOptions) {
+        boolean isClustered = (vertxOptions.getClusterManager() != null);
+        clusterManager = vertxOptions.getClusterManager();
         if (isClustered) {
             return Vertx.clusteredVertx(vertxOptions)
-                    .compose(vertx -> {
-                        instance = new KeelImpl(vertx, vertxOptions.getClusterManager());
+                    .compose(vertxGenerated -> {
+                        vertx = vertxGenerated;
                         return Future.succeededFuture();
                     });
         } else {
-            initialize(vertxOptions);
+            vertx = Vertx.vertx(vertxOptions);
             return Future.succeededFuture();
         }
     }
 
-    @Override
-    public KeelMySQLKitProvider providerForMySQL() {
-        return mySQLKitProvider;
-    }
-
     public @NotNull Vertx getVertx() {
+        Objects.requireNonNull(vertx);
         return vertx;
     }
 
@@ -77,20 +71,34 @@ class KeelImpl implements Keel {
         return clusterManager;
     }
 
-    /**
-     * @param gracefulHandler what to do before close vertx
-     * @since 2.9.4
-     */
-    public void gracefullyClose(Handler<Promise<Object>> gracefulHandler, Handler<AsyncResult<Void>> vertxCloseHandler) {
-        Promise<Object> promise = Promise.promise();
-        gracefulHandler.handle(promise);
-        promise.future().onComplete(ar -> {
-            if (ar.failed()) {
-                // todo Keel.outputLogger().exception("Keel.gracefullyClose ERROR, CLOSE ANYWAY", ar.cause());
-            } else {
-                // todo Keel.outputLogger().notice("Keel.gracefullyClose READY TO CLOSE");
-            }
-            getVertx().close(vertxCloseHandler);
-        });
+    @Override
+    public boolean isVertxInitialized() {
+        return vertx != null;
+    }
+
+    @Override
+    public boolean isRunningInVertxCluster() {
+        return clusterManager != null;
+    }
+
+    public Future<Void> initializeMySQLDataSource(@Nonnull String dataSourceName) {
+        if (!mysqlKitMap.containsKey(dataSourceName)) {
+            KeelConfiguration configuration = getConfiguration().extract("mysql", dataSourceName);
+            Objects.requireNonNull(configuration);
+            KeelMySQLConfigure mySQLConfigure = new KeelMySQLConfigure(dataSourceName, configuration);
+            MySQLDataSource mySQLDataSource = new MySQLDataSource(this, mySQLConfigure);
+            mysqlKitMap.put(dataSourceName, mySQLDataSource);
+        }
+        return Future.succeededFuture();
+    }
+
+    public MySQLDataSource getMySQLDataSource(@Nonnull String dataSourceName) {
+        return mysqlKitMap.get(dataSourceName);
+    }
+
+    @NotNull
+    @Override
+    public String defaultMySQLDataSourceName() {
+        return Objects.requireNonNullElse(getConfiguration().readString("mysql", "default_data_source_name"), "default");
     }
 }

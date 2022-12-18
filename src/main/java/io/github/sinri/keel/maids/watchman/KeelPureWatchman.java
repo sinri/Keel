@@ -14,16 +14,16 @@ public class KeelPureWatchman extends KeelWatchmanImpl {
 
     private final Options options;
 
-    protected KeelPureWatchman(String watchmanName, Options options) {
-        super(watchmanName);
+    protected KeelPureWatchman(Keel keel, String watchmanName, Options options) {
+        super(keel, watchmanName);
         this.options = options;
     }
 
-    public static Future<String> deploy(String watchmanName, Handler<Options> optionsHandler) {
+    public static Future<String> deploy(Keel keel, String watchmanName, Handler<Options> optionsHandler) {
         Options options = new Options();
         optionsHandler.handle(options);
-        KeelPureWatchman keelPureWatchman = new KeelPureWatchman(watchmanName, options);
-        return Keel.vertx().deployVerticle(keelPureWatchman, new DeploymentOptions()
+        KeelPureWatchman keelPureWatchman = new KeelPureWatchman(keel, watchmanName, options);
+        return keel.deployKeelVerticle(keelPureWatchman, new DeploymentOptions()
                 .setWorker(true)
         );
     }

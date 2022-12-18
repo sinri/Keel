@@ -14,34 +14,38 @@ import java.util.List;
  * @since 1.10
  */
 public class KeelSmtpKit {
+    private final Keel keel;
     private final String smtpName;
     private final MailConfig mailConfig;
     private final MailClient mailClient;
 
-    public KeelSmtpKit(String smtpName, boolean shared) {
+    public KeelSmtpKit(Keel keel, String smtpName, boolean shared) {
+        this.keel = keel;
         this.smtpName = smtpName;
-        this.mailConfig = buildMailConfig(smtpName);
+        this.mailConfig = buildMailConfig(keel.getConfiguration(), smtpName);
         if (shared) {
-            this.mailClient = MailClient.createShared(Keel.vertx(), this.mailConfig, smtpName);
+            this.mailClient = MailClient.createShared(keel.getVertx(), this.mailConfig, smtpName);
         } else {
-            this.mailClient = MailClient.create(Keel.vertx(), this.mailConfig);
+            this.mailClient = MailClient.create(keel.getVertx(), this.mailConfig);
         }
     }
 
-    public KeelSmtpKit(String smtpName) {
+    public KeelSmtpKit(Keel keel, String smtpName) {
+        this.keel = keel;
         this.smtpName = smtpName;
-        this.mailConfig = buildMailConfig(smtpName);
-        this.mailClient = MailClient.create(Keel.vertx(), this.mailConfig);
+        this.mailConfig = buildMailConfig(keel.getConfiguration(), smtpName);
+        this.mailClient = MailClient.create(keel.getVertx(), this.mailConfig);
     }
 
-    public KeelSmtpKit() {
-        this.smtpName = Keel.configuration().readString("email", "smtp", "default_smtp_name");
-        this.mailConfig = buildMailConfig(smtpName);
-        this.mailClient = MailClient.create(Keel.vertx(), this.mailConfig);
+    public KeelSmtpKit(Keel keel) {
+        this.keel = keel;
+        this.smtpName = keel.getConfiguration().readString("email", "smtp", "default_smtp_name");
+        this.mailConfig = buildMailConfig(keel.getConfiguration(), smtpName);
+        this.mailClient = MailClient.create(keel.getVertx(), this.mailConfig);
     }
 
-    private static MailConfig buildMailConfig(String smtpName) {
-        KeelConfiguration smtpConfiguration = Keel.configuration().extract("email", "smtp", smtpName);
+    private static MailConfig buildMailConfig(KeelConfiguration keelConfiguration, String smtpName) {
+        KeelConfiguration smtpConfiguration = keelConfiguration.extract("email", "smtp", smtpName);
         if (smtpConfiguration != null) {
             return new MailConfig(smtpConfiguration.toJsonObject());
         } else {

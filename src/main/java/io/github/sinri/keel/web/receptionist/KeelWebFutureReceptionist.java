@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web.receptionist;
 
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.web.ApiMeta;
 import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;
@@ -15,8 +16,8 @@ import java.util.Set;
  */
 abstract public class KeelWebFutureReceptionist extends KeelWebReceptionist {
 
-    public KeelWebFutureReceptionist(RoutingContext routingContext) {
-        super(routingContext);
+    public KeelWebFutureReceptionist(Keel keel, RoutingContext routingContext) {
+        super(keel, routingContext);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package io.github.sinri.keel.facade;
 
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import java.util.Properties;
@@ -32,12 +33,12 @@ public class KeelConfigurationImpl implements KeelConfiguration {
 
 
     @Override
-    public JsonObject toJsonObject() {
+    public @NotNull JsonObject toJsonObject() {
         return this.data;
     }
 
     @Override
-    public KeelConfiguration reloadDataFromJsonObject(JsonObject data) {
+    public @NotNull KeelConfiguration reloadDataFromJsonObject(JsonObject data) {
         this.data = data;
         return this;
     }

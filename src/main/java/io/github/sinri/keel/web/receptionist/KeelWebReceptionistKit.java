@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.receptionist;
 
-import io.github.sinri.keel.lagecy.Keel;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.web.ApiMeta;
 import io.github.sinri.keel.web.handler.KeelPlatformHandler;
 import io.vertx.core.Handler;
@@ -45,8 +45,10 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
      * @since 2.9.2
      */
     private Handler<RoutingContext> failureHandler = null;
+    private final Keel keel;
 
-    public KeelWebReceptionistKit(Class<R> classOfReceptionist, Router router) {
+    public KeelWebReceptionistKit(Keel keel, Class<R> classOfReceptionist, Router router) {
+        this.keel = keel;
         this.classOfReceptionist = classOfReceptionist;
         this.router = router;
     }
@@ -58,21 +60,21 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         try {
             allClasses.forEach(this::loadClass);
         } catch (Exception e) {
-            Keel.outputLogger().exception(getClass().getName() + "::loadPackage THROWS", e);
+            this.keel.getInstantEventLogger().exception(e, getClass().getName() + "::loadPackage THROWS");
         }
     }
 
     public void loadClass(Class<? extends R> c) {
-        ApiMeta apiMeta = Keel.helpers().reflection().getAnnotationOfClass(c, ApiMeta.class);
+        ApiMeta apiMeta = keel.reflectionHelper().getAnnotationOfClass(c, ApiMeta.class);
         if (apiMeta == null) return;
 
-        Keel.outputLogger().debug(getClass().getName() + " Loading " + c.getName());
+        keel.getInstantEventLogger().debug(getClass().getName() + " Loading " + c.getName());
 
         Constructor<? extends R> receptionistConstructor;
         try {
             receptionistConstructor = c.getConstructor(RoutingContext.class);
         } catch (NoSuchMethodException e) {
-            Keel.outputLogger().exception("HANDLER REFLECTION EXCEPTION", e);
+            keel.getInstantEventLogger().exception(e, "HANDLER REFLECTION EXCEPTION");
             return;
         }
 
@@ -92,7 +94,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
 
         // === HANDLERS WEIGHT IN ORDER ===
         // PLATFORM
-        route.handler(new KeelPlatformHandler());
+        route.handler(new KeelPlatformHandler(this.keel));
         if (apiMeta.timeout() > 0) {
             // PlatformHandler
             route.handler(TimeoutHandler.create(apiMeta.timeout(), apiMeta.statusCodeForTimeout()));

@@ -1,8 +1,7 @@
 package io.github.sinri.keel.maids.gatling;
 
 import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticleInterface;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
 import io.vertx.core.shareddata.Counter;
 
@@ -17,7 +16,7 @@ import java.util.function.Supplier;
  * @since 2.9.1
  * @since 2.9.3 change to VERTICLE
  */
-public class KeelGatling extends AbstractVerticle implements KeelVerticleInterface {
+public class KeelGatling extends KeelVerticleBase {
     private final Options options;
     private final AtomicInteger barrelUsed = new AtomicInteger(0);
 
@@ -25,32 +24,24 @@ public class KeelGatling extends AbstractVerticle implements KeelVerticleInterfa
         this.options = options;
     }
 
-    public static Future<String> deploy(String gatlingName, Handler<Options> optionHandler) {
+    public static Future<String> deploy(Keel keel, String gatlingName, Handler<Options> optionHandler) {
         Options options = new Options(gatlingName);
         optionHandler.handle(options);
         KeelGatling keelGatling = new KeelGatling(options);
-        return Keel.vertx().deployVerticle(keelGatling, new DeploymentOptions().setWorker(true));
-    }
-
-    public KeelLogger getLogger() {
-        return options.getLogger();
-    }
-
-    public void setLogger(KeelLogger logger) {
-        this.options.setLogger(logger);
+        return keel.deployKeelVerticle(keelGatling, new DeploymentOptions().setWorker(true));
     }
 
     protected Future<Void> rest() {
         int actualRestInterval = new Random().nextInt(
                 Math.toIntExact(options.getAverageRestInterval() / 2)
         ) + options.getAverageRestInterval();
-        return Keel.getInstance().sleep(actualRestInterval);
+        return getKeel().sleep(actualRestInterval);
     }
 
     @Override
     public void start() throws Exception {
         barrelUsed.set(0);
-        Keel.getInstance().repeatedlyCall(routineResult -> {
+        getKeel().repeatedlyCall(routineResult -> {
             return fireOnce();
         });
         //Keel.callFutureUntil(() -> fireOnce().compose(v -> Future.succeededFuture(false)));
@@ -72,17 +63,17 @@ public class KeelGatling extends AbstractVerticle implements KeelVerticleInterfa
 
                     fireBullet(bullet, firedAR -> {
                         if (firedAR.failed()) {
-                            getLogger().exception("BULLET FIRED ERROR", firedAR.cause());
+                            getLogger().exception(firedAR.cause(), "BULLET FIRED ERROR");
                         } else {
                             getLogger().info("BULLET FIRED DONE");
                         }
                         barrelUsed.decrementAndGet();
                     });
 
-                    return Keel.getInstance().sleep(10L);
+                    return getKeel().sleep(10L);
                 })
                 .recover(throwable -> {
-                    getLogger().exception("FAILED TO LOAD BULLET", throwable);
+                    getLogger().exception(throwable, "FAILED TO LOAD BULLET");
                     return rest();
                 });
     }
@@ -93,7 +84,7 @@ public class KeelGatling extends AbstractVerticle implements KeelVerticleInterfa
      * @return Future of a runnable bullet, or null.
      */
     private Future<Bullet> loadOneBullet() {
-        return Keel.vertx().sharedData()
+        return getKeel().sharedData()
                 .getLock("KeelGatling-" + this.options.getGatlingName() + "-Load")
                 .compose(lock -> this.options.getBulletLoader().get().andThen(ar -> lock.release()));
     }
@@ -101,11 +92,11 @@ public class KeelGatling extends AbstractVerticle implements KeelVerticleInterfa
     protected Future<Void> requireExclusiveLocksOfBullet(Bullet bullet) {
         if (bullet.exclusiveLockSet() != null && !bullet.exclusiveLockSet().isEmpty()) {
             AtomicBoolean blocked = new AtomicBoolean(false);
-            return Keel.getInstance().iterativelyCall(
+            return getKeel().iterativelyCall(
                             bullet.exclusiveLockSet(),
                             exclusiveLock -> {
                                 String exclusiveLockName = "KeelGatling-Bullet-Exclusive-Lock-" + exclusiveLock;
-                                return Keel.vertx().sharedData()
+                                return getKeel().sharedData()
                                         .getCounter(exclusiveLockName)
                                         .compose(Counter::incrementAndGet)
                                         .compose(increased -> {
@@ -129,9 +120,9 @@ public class KeelGatling extends AbstractVerticle implements KeelVerticleInterfa
 
     protected Future<Void> releaseExclusiveLocksOfBullet(Bullet bullet) {
         if (bullet.exclusiveLockSet() != null && !bullet.exclusiveLockSet().isEmpty()) {
-            return Keel.getInstance().iterativelyCall(bullet.exclusiveLockSet(), exclusiveLock -> {
+            return getKeel().iterativelyCall(bullet.exclusiveLockSet(), exclusiveLock -> {
                 String exclusiveLockName = "KeelGatling-Bullet-Exclusive-Lock-" + exclusiveLock;
-                return Keel.vertx().sharedData().getCounter(exclusiveLockName)
+                return getKeel().sharedData().getCounter(exclusiveLockName)
                         .compose(counter -> counter.decrementAndGet()
                                 .compose(x -> Future.succeededFuture()));
             });
@@ -165,14 +156,14 @@ public class KeelGatling extends AbstractVerticle implements KeelVerticleInterfa
         private int barrels;
         private int averageRestInterval;
         private Supplier<Future<Bullet>> bulletLoader;
-        private KeelLogger logger;
+//        private KeelEventLogger logger;
 
         public Options(String gatlingName) {
             this.gatlingName = gatlingName;
             this.barrels = 1;
             this.averageRestInterval = 1000;
             this.bulletLoader = () -> Future.succeededFuture(null);
-            this.logger = KeelLogger.silentLogger();
+//            this.logger = KeelEventLogger.silentLogger();
         }
 
         /**
@@ -227,20 +218,20 @@ public class KeelGatling extends AbstractVerticle implements KeelVerticleInterfa
             return this;
         }
 
-        /**
-         * @return 日志记录仪
-         */
-        public KeelLogger getLogger() {
-            return logger;
-        }
-
-        /**
-         * @param logger 日志记录仪
-         */
-        public Options setLogger(KeelLogger logger) {
-            this.logger = logger;
-            return this;
-        }
+//        /**
+//         * @return 日志记录仪
+//         */
+//        public KeelEventLogger getLogger() {
+//            return logger;
+//        }
+//
+//        /**
+//         * @param logger 日志记录仪
+//         */
+//        public Options setLogger(KeelEventLogger logger) {
+//            this.logger = logger;
+//            return this;
+//        }
 
 
     }

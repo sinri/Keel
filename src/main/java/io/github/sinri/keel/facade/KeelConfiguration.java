@@ -1,11 +1,11 @@
 package io.github.sinri.keel.facade;
 
 import io.github.sinri.keel.core.json.JsonifiableEntity;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -42,12 +42,13 @@ public interface KeelConfiguration extends JsonifiableEntity<KeelConfiguration> 
         for (var plainKey : plainKeySet) {
             String[] components = plainKey.split("\\.");
             List<Object> keychain = Arrays.asList(components);
-            Keel.getInstance().jsonHelper()
+            KeelHelpers.getInstance().jsonHelper()
                     .writeIntoJsonObject(jsonObject, keychain, properties.getProperty(plainKey));
         }
         return jsonObject;
     }
 
+    @Deprecated
     static void main(String[] args) {
         KeelConfiguration a = KeelConfiguration.createFromJsonObject(new JsonObject()
                 .put("a", "b")
@@ -81,7 +82,7 @@ public interface KeelConfiguration extends JsonifiableEntity<KeelConfiguration> 
         Properties properties = new Properties();
         try {
             // here, the file named as `propertiesFileName` should be put along with JAR
-            properties.load(new FileReader(new File(propertiesFileName)));
+            properties.load(new FileReader(propertiesFileName));
         } catch (IOException e) {
             System.err.println("Cannot find the file config.properties. Use the embedded one.");
             try {

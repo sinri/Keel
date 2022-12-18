@@ -1,9 +1,8 @@
 package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticleInterface;
-import io.vertx.core.AbstractVerticle;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 
@@ -14,26 +13,16 @@ import io.vertx.core.Future;
  *
  * @since 2.1
  */
-public abstract class KeelQueue extends AbstractVerticle implements KeelVerticleInterface {
+public abstract class KeelQueue extends KeelVerticleBase {
 
-    /**
-     * 部署之前可以与部署之后的日志器不同实例，也可以相同
-     */
-    private KeelLogger logger;
+    private final Keel keel;
     private QueueStatus queueStatus = QueueStatus.INIT;
 
-    public KeelQueue() {
+    public KeelQueue(Keel keel) {
         super();
+        this.keel = keel;
 
-        this.logger = prepareLogger();
-    }
-
-    /**
-     * @since 2.9.2
-     */
-    @Override
-    public void setLogger(KeelLogger logger) {
-        this.logger = logger;
+        setLogger(prepareLogger());
     }
 
     public QueueStatus getQueueStatus() {
@@ -45,26 +34,21 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
         return this;
     }
 
-    abstract protected KeelLogger prepareLogger();
+    abstract protected KeelEventLogger prepareLogger();
 
-    @Override
-    public KeelLogger getLogger() {
-        return logger;
-    }
 
     abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
 
     public void start() {
         // 部署之后重新加载一遍
-        this.logger = prepareLogger();
-        setLogger(this.logger);
+        setLogger(prepareLogger());
 
         this.queueStatus = QueueStatus.RUNNING;
 
         try {
             routine();
         } catch (Exception e) {
-            getLogger().exception("Exception in routine", e);
+            getLogger().exception(e, "Exception in routine");
             undeployMe();
         }
     }
@@ -99,7 +83,7 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
                 .eventually(v -> {
                     long waitingMs = nextTaskSeeker.waitingMs();
                     getLogger().debug("set timer for next routine after " + waitingMs + " ms");
-                    Keel.vertx().setTimer(waitingMs, timerID -> routine());
+                    keel.setTimer(waitingMs, timerID -> routine());
                     return Future.succeededFuture();
                 })
         ;
@@ -116,7 +100,7 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
     private Future<Void> whenSignalRunCame(KeelQueueNextTaskSeeker nextTaskSeeker) {
         this.queueStatus = QueueStatus.RUNNING;
 
-        return Keel.getInstance().repeatedlyCall(routineResult -> {
+        return keel.repeatedlyCall(routineResult -> {
                     return Future.succeededFuture()
                             .compose(v -> nextTaskSeeker.get())
                             .compose(task -> {
@@ -131,7 +115,7 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
                                     getLogger().info("To run task: " + task.getTaskReference());
                                     getLogger().info("Trusted that task is already locked by seeker: " + task.getTaskReference());
                                     return Future.succeededFuture()
-                                            .compose(v -> task.deployMe(new DeploymentOptions().setWorker(true)))
+                                            .compose(v -> task.deployMe(keel, new DeploymentOptions().setWorker(true)))
                                             .compose(
                                                     deploymentID -> {
                                                         getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);
@@ -139,7 +123,7 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
                                                         return Future.succeededFuture();
                                                     },
                                                     throwable -> {
-                                                        getLogger().exception("CANNOT DEPLOY TASK [" + task.getTaskReference() + "] VERTICLE", throwable);
+                                                        getLogger().exception(throwable, "CANNOT DEPLOY TASK [" + task.getTaskReference() + "] VERTICLE");
                                                         // 通知 FutureUntil 继续下一轮
                                                         return Future.succeededFuture();
                                                     }
@@ -148,7 +132,7 @@ public abstract class KeelQueue extends AbstractVerticle implements KeelVerticle
                             });
                 })
                 .recover(throwable -> {
-                    getLogger().exception("KeelQueue 递归找活干里出现了奇怪的故障", throwable);
+                    getLogger().exception(throwable, "KeelQueue 递归找活干里出现了奇怪的故障");
                     return Future.succeededFuture();
                 });
     }

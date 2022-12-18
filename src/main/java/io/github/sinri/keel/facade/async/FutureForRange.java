@@ -1,6 +1,5 @@
 package io.github.sinri.keel.facade.async;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -12,26 +11,28 @@ import java.util.function.Function;
  * @since 1.13
  */
 public class FutureForRange {
+    private final TraitForVertxAsync keel;
     private final Options options;
 
-    private FutureForRange(Options options) {
+    private FutureForRange(TraitForVertxAsync keel, Options options) {
+        this.keel = keel;
         this.options = options;
     }
 
     /**
      * @since 2.9
      */
-    static Future<Void> call(Options options, Function<Integer, Future<Void>> handleFunction) {
-        return new FutureForRange(options).run(handleFunction);
+    static Future<Void> call(TraitForVertxAsync keel, Options options, Function<Integer, Future<Void>> handleFunction) {
+        return new FutureForRange(keel, options).run(handleFunction);
     }
 
     /**
      * @param times since 2.9 changed to int from Integer
      * @since 2.9
      */
-    static Future<Void> call(int times, Function<Integer, Future<Void>> handleFunction) {
+    static Future<Void> call(TraitForVertxAsync keel, int times, Function<Integer, Future<Void>> handleFunction) {
         Options options = new Options().setEnd(times);
-        return new FutureForRange(options).run(handleFunction);
+        return new FutureForRange(keel, options).run(handleFunction);
     }
 
     /**
@@ -40,7 +41,7 @@ public class FutureForRange {
     private Future<Void> run(Function<Integer, Future<Void>> handleFunction) {
         AtomicInteger indexRef = new AtomicInteger(options.getStart());
 
-        return Keel.getInstance().repeatedlyCall(routineResult -> {
+        return keel.repeatedlyCall(routineResult -> {
             if (indexRef.get() < options.getEnd()) {
                 return handleFunction.apply(indexRef.get())
                         .compose(v -> {

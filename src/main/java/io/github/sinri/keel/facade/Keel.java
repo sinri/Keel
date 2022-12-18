@@ -1,98 +1,75 @@
 package io.github.sinri.keel.facade;
 
-import io.github.sinri.keel.core.helper.TraitForHelpers;
 import io.github.sinri.keel.facade.async.TraitForVertxAsync;
 import io.github.sinri.keel.facade.interfaces.TraitForClusteredVertx;
 import io.github.sinri.keel.facade.interfaces.TraitForVertx;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
-import io.github.sinri.keel.mysql.KeelMySQLKitProvider;
-import io.vertx.core.*;
+import io.github.sinri.keel.helper.TraitForHelpers;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.mysql.MySQLDataSourceProvider;
+import io.github.sinri.keel.verticles.KeelVerticle;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Verticle;
 
-import java.util.List;
+import javax.annotation.Nonnull;
+import java.lang.reflect.InvocationTargetException;
+import java.util.function.Supplier;
 
-public interface Keel extends TraitForVertx, TraitForClusteredVertx, TraitForVertxAsync, TraitForHelpers {
+public interface Keel extends TraitForVertx, TraitForClusteredVertx, TraitForVertxAsync, TraitForHelpers, MySQLDataSourceProvider {
 
-    static void configureWithPropertiesFile(String propertiesFile) {
-        KeelImpl.getConfiguration().loadPropertiesFile(propertiesFile);
-    }
+    //Keel instance = new KeelImpl();
 
-    static KeelConfiguration configuration() {
-        return KeelImpl.getConfiguration();
-    }
-
-    static Keel getInstance() {
-        return KeelImpl.getInstance();
-    }
-
-    static Vertx vertx() {
-        return KeelImpl.getInstance().getVertx();
-    }
+//    static Keel getInstance() {
+//        return instance;
+//    }
 
     /**
-     * 同步启动一个非集群模式的Vertx实例。
+     * In the beginning ...
      *
-     * @param vertxOptions VertxOptions
-     * @see <a href="https://vertx.io/docs/apidocs/io/vertx/core/VertxOptions.html">Class VertxOptions</a>
-     * @since 2.9.4 针对 2.9.1 的错误弃用进行光复
+     * @param handler the entire lifecycle of your app.
      */
-    static void initialize(VertxOptions vertxOptions) {
-        KeelImpl.initialize(vertxOptions);
+    static void genesis(Handler<Keel> handler) {
+        Keel instance = new KeelImpl();
+        handler.handle(instance);
     }
 
-    /**
-     * 异步启动一个Vertx实例，可以为集群模式或非集群模式。
-     *
-     * @param vertxOptions 如果使用集群模式则必须配置好ClusterManager。
-     * @param isClustered  是否使用集群模式
-     * @since 2.9.4
-     */
-    static Future<Void> initialize(VertxOptions vertxOptions, boolean isClustered) {
-        return KeelImpl.initialize(vertxOptions, isClustered);
+    KeelConfiguration getConfiguration();
+
+    default Future<Void> loadConfigureWithPropertiesFile(String propertiesFile) {
+        getConfiguration().loadPropertiesFile(propertiesFile);
+        return Future.succeededFuture();
     }
 
-    /**
-     * 构建一个简易集群。
-     * 可以直接用于 SAE on Aliyun.
-     *
-     * @param clusterName  集群名称
-     * @param members      集群组内地址成员
-     * @param port         起始端口
-     * @param portCount    递增尝试端口数量
-     * @param vertxOptions Vert.x 参数
-     * @return 未来
-     * @since 2.9.1
-     */
-    static Future<Void> initialize(
-            String clusterName,
-            List<String> members,
-            int port, int portCount,
-            VertxOptions vertxOptions
-    ) {
-        var clusterManager = TraitForClusteredVertx.createClusterManagerForSAE(clusterName, members, port, portCount);
-        vertxOptions.setClusterManager(clusterManager);
-        return Keel.initialize(vertxOptions, true);
+    default Future<String> deployKeelVerticle(@Nonnull KeelVerticle keelVerticle, DeploymentOptions deploymentOptions) {
+        // single instance
+        keelVerticle.setKeel(this);
+        return getVertx().deployVerticle(keelVerticle, deploymentOptions);
     }
 
-
-    static void gracefullyClose(Handler<Promise<Object>> gracefulHandler, Handler<AsyncResult<Void>> vertxCloseHandler) {
-        KeelImpl.getInstance().gracefullyClose(gracefulHandler, vertxCloseHandler);
+    default Future<String> deployKeelVerticle(Class<? extends KeelVerticle> keelVerticleClass, DeploymentOptions deploymentOptions) {
+        return getVertx().deployVerticle(() -> {
+            try {
+                KeelVerticle keelVerticle = keelVerticleClass.getConstructor().newInstance();
+                keelVerticle.setKeel(this);
+                return keelVerticle;
+            } catch (InvocationTargetException | InstantiationException | IllegalAccessException |
+                     NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }, deploymentOptions);
     }
 
-    static Future<Void> gracefullyClose(Handler<Promise<Object>> gracefulHandler) {
-        Promise<Void> vertxClosed = Promise.promise();
-        KeelImpl.getInstance().gracefullyClose(gracefulHandler, vertxClosed);
-        return vertxClosed.future();
+    default Future<String> deployKeelVerticle(Supplier<KeelVerticle> keelVerticleSupplier, DeploymentOptions deploymentOptions) {
+        Supplier<Verticle> verticleSupplier = () -> {
+            KeelVerticle keelVerticle = keelVerticleSupplier.get();
+            keelVerticle.setKeel(this);
+            return keelVerticle;
+        };
+        return getVertx().deployVerticle(verticleSupplier, deploymentOptions);
     }
 
-    /**
-     * @since 2.9
-     */
-    @Deprecated(since = "3.0.0")
-    static KeelLogger outputLogger() {
-        // todo
-        throw new RuntimeException("TODO");
-    }
+    KeelEventLogger getInstantEventLogger();
 
-    KeelMySQLKitProvider providerForMySQL();
-
+    KeelEventLogger createOutputEventLogger(String topic);
 }

@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.service;
 
-import io.github.sinri.keel.lagecy.Keel;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -13,71 +13,61 @@ import io.vertx.ext.web.RoutingContext;
  * @since 2.9.2 Remove Property `RoutingContext`.
  */
 abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
-    private boolean verbose = false;
 
-    /**
-     * @since 2.9.1
-     */
-    public boolean isVerbose() {
-        return verbose;
+    private final Keel keel;
+
+    public KeelWebRequestHandler(Keel keel) {
+        this.keel = keel;
     }
 
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
-    /**
-     * @since 2.9.2
-     */
-    public KeelLogger createLogger() {
-        return createLogger(null);
+    public Keel getKeel() {
+        return keel;
     }
 
     /**
      * @since 2.9.2
      */
-    abstract public KeelLogger createLogger(RoutingContext routingContext);
+    abstract public KeelEventLogger createLogger(RoutingContext routingContext);
 
     protected void respondOnSuccess(RoutingContext routingContext, Object data) {
-        KeelLogger logger = createLogger(routingContext);
+        KeelEventLogger logger = createLogger(routingContext);
         JsonObject resp = new JsonObject()
                 .put("code", "OK")
                 .put("data", data);
-        if (this.isVerbose()) {
-            logger.info("RESPOND SUCCESS", resp);
-        }
+        logger.info(eventLog -> eventLog
+                .message("RESPOND SUCCESS")
+                .put("response", resp));
+
         try {
             routingContext.json(resp);
         } catch (Throwable throwable) {
-            logger.exception(throwable);
-            logger.error("RoutingContext has been dealt by others", new JsonObject()
+            logger.exception(throwable, eventLog -> eventLog
+                    .message("RoutingContext has been dealt by others")
                     .put("response", new JsonObject()
                             .put("code", routingContext.response().getStatusCode())
                             .put("message", routingContext.response().getStatusMessage())
                             .put("ended", routingContext.response().ended())
-                            .put("closed", routingContext.response().closed())
-                    )
+                            .put("closed", routingContext.response().closed()))
             );
         }
     }
 
     protected void respondOnFailure(RoutingContext routingContext, Throwable throwable) {
-        KeelLogger logger = createLogger(routingContext);
+        KeelEventLogger logger = createLogger(routingContext);
         var x = new JsonObject()
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
-        if (isVerbose()) {
-            String error = Keel.helpers().string().renderThrowableChain(throwable);
-            x.put("throwable", error);
-            logger.exception("RESPOND FAILURE", throwable);
-        } else {
-            logger.error("RESPOND FAILURE: " + throwable);
-        }
+        String error = keel.stringHelper().renderThrowableChain(throwable);
+        x.put("throwable", error);
+        logger.error(eventLog -> eventLog
+                .message("RESPOND FAILURE")
+                .put("response", x)
+        );
         try {
             routingContext.json(x);
         } catch (Throwable throwable2) {
-            logger.exception(throwable2);
-            logger.error("RoutingContext has been dealt by others", new JsonObject()
+            logger.exception(throwable2, eventLog -> eventLog
+                    .message("RoutingContext has been dealt by others")
                     .put("response", new JsonObject()
                             .put("code", routingContext.response().getStatusCode())
                             .put("message", routingContext.response().getStatusMessage())

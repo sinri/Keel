@@ -1,7 +1,7 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.mysql.KeelMySQLQuoter;
+import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.mysql.Quoter;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -67,7 +67,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
                 if (item == null) {
                     t.add("NULL");
                 } else {
-                    t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
+                    t.add(new Quoter(String.valueOf(item)).toString());
                 }
             }
             this.batchValues.add(t);
@@ -81,7 +81,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             if (item == null) {
                 t.add("NULL");
             } else {
-                t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
+                t.add(new Quoter(String.valueOf(item)).toString());
             }
         }
         this.batchValues.add(t);
@@ -102,7 +102,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             if (entry.getValue() == null) {
                 dataRow.add("NULL");
             } else {
-                dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+                dataRow.add(new Quoter(entry.getValue().toString()).toString());
             }
         });
         this.batchValues.add(dataRow);
@@ -123,7 +123,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             if (value == null) {
                 dataRow.add("NULL");
             } else {
-                dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+                dataRow.add(new Quoter(String.valueOf(value)).toString());
             }
         });
         this.batchValues.add(dataRow);
@@ -148,7 +148,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
                     if (entry.getValue() == null) {
                         dataRow.add("NULL");
                     } else {
-                        dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+                        dataRow.add(new Quoter(entry.getValue().toString()).toString());
                     }
                 });
                 isFirstRow.set(false);
@@ -176,7 +176,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
                 if (value == null) {
                     dataRow.add("NULL");
                 } else {
-                    dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+                    dataRow.add(new Quoter(String.valueOf(value)).toString());
                 }
             });
             this.batchValues.add(dataRow);
@@ -256,7 +256,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             sql += schema + ".";
         }
         sql += table;
-        sql += " (" + Keel.getInstance().stringHelper().joinStringArray(columns, ",") + ")";
+        sql += " (" + KeelHelpers.getInstance().stringHelper().joinStringArray(columns, ",") + ")";
         if (sourceTableName != null) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "TABLE " + sourceTableName;
         } else if (sourceSelectSQL != null) {
@@ -265,15 +265,15 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "VALUES" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             for (List<String> row : batchValues) {
-                items.add("(" + Keel.getInstance().stringHelper().joinStringArray(row, ",") + ")");
+                items.add("(" + KeelHelpers.getInstance().stringHelper().joinStringArray(row, ",") + ")");
             }
-            sql += Keel.getInstance().stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
+            sql += KeelHelpers.getInstance().stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         if (!onDuplicateKeyUpdateAssignmentMap.isEmpty()) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ON DUPLICATE KEY UPDATE" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             onDuplicateKeyUpdateAssignmentMap.forEach((key, value) -> items.add(key + " = " + value));
-            sql += Keel.getInstance().stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
+            sql += KeelHelpers.getInstance().stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         if (!getRemarkAsComment().isEmpty()) {
             sql += "\n-- " + getRemarkAsComment() + "\n";

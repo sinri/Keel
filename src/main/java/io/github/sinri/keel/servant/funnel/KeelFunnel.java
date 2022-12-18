@@ -2,9 +2,8 @@ package io.github.sinri.keel.servant.funnel;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.FutureRepeat;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticleInterface;
-import io.vertx.core.AbstractVerticle;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 
@@ -22,16 +21,16 @@ import java.util.function.Supplier;
  *
  * @since 2.9 rename from sisiodosi to funnel
  */
-public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterface {
+public class KeelFunnel extends KeelVerticleBase {
     private final Queue<Supplier<Future<Object>>> drips = new ConcurrentLinkedQueue<>();
     private final AtomicLong restingStartTime = new AtomicLong(0);
 
     private Options options;
 
-    private KeelLogger logger;
+    private final KeelEventLogger logger;
 
     private KeelFunnel() {
-        this.logger = KeelLogger.silentLogger();
+        this.logger = KeelEventLogger.silentLogger();
     }
 
     public static KeelFunnel getOneInstanceToDeploy(long interval) {
@@ -42,25 +41,15 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
         return new KeelFunnel().setOptions(options);
     }
 
-    public static Future<KeelFunnel> deployOneInstance(long interval) {
-        return deployOneInstance(new Options().setQueryInterval(interval));
+    public static Future<KeelFunnel> deployOneInstance(Keel keel, long interval) {
+        return deployOneInstance(keel, new Options().setQueryInterval(interval));
     }
 
-    public static Future<KeelFunnel> deployOneInstance(KeelFunnel.Options options) {
+    public static Future<KeelFunnel> deployOneInstance(Keel keel, KeelFunnel.Options options) {
         KeelFunnel keelFunnel = new KeelFunnel().setOptions(options);
         DeploymentOptions deploymentOptions = new DeploymentOptions().setWorker(true);
-        return Keel.vertx().deployVerticle(keelFunnel, deploymentOptions)
+        return keel.deployKeelVerticle(keelFunnel, deploymentOptions)
                 .compose(d -> Future.succeededFuture(keelFunnel));
-    }
-
-    @Override
-    public KeelLogger getLogger() {
-        return logger;
-    }
-
-    @Override
-    public void setLogger(KeelLogger logger) {
-        this.logger = logger;
     }
 
     public KeelFunnel setOptions(Options options) {
@@ -89,7 +78,7 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
             return;
         }
         // 暇、続きの暇
-        Keel.vertx().setTimer(getQueryInterval(), timerID -> query());
+        getKeel().setTimer(getQueryInterval(), timerID -> query());
     }
 
     private Future<Void> pourOneDrip(FutureRepeat.RoutineResult routineResult) {
@@ -104,7 +93,7 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
                                     getLogger().info("DRIP DONE");
                                     return Future.succeededFuture();
                                 }, throwable -> {
-                                    getLogger().exception("DRIP FAILED", throwable);
+                                    getLogger().exception(throwable, "DRIP FAILED");
                                     return Future.succeededFuture();
                                 });
                     }
@@ -114,7 +103,7 @@ public class KeelFunnel extends AbstractVerticle implements KeelVerticleInterfac
     private void pour() {
         getLogger().debug("POUR START");
 
-        Keel.getInstance().repeatedlyCall(this::pourOneDrip)
+        getKeel().repeatedlyCall(this::pourOneDrip)
                 .onComplete(poured -> {
                     getLogger().debug("POUR END");
                     restingStartTime.set(new Date().getTime());

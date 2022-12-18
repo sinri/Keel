@@ -1,7 +1,7 @@
 package io.github.sinri.keel.mysql.statement;
 
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +50,7 @@ public class UnionStatement extends AbstractReadStatement {
     }
 
     public String toString() {
-        return Keel.getInstance().stringHelper().joinStringArray(selections, " ") + (
+        return KeelHelpers.getInstance().stringHelper().joinStringArray(selections, " ") + (
                 getRemarkAsComment().isEmpty() ? "" : ("\n-- " + getRemarkAsComment())
         );
     }

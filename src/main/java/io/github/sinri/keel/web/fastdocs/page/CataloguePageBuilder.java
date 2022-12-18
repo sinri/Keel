@@ -1,7 +1,6 @@
 package io.github.sinri.keel.web.fastdocs.page;
 
-import io.github.sinri.keel.core.properties.KeelPropertiesReader;
-import io.github.sinri.keel.lagecy.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -26,7 +25,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
     public CataloguePageBuilder(PageBuilderOptions options) {
         this.options = options;
 
-        URL x = KeelPropertiesReader.class.getClassLoader().getResource(this.options.rootMarkdownFilePath);
+        URL x = getClass().getClassLoader().getResource(this.options.rootMarkdownFilePath);
         if (x == null) {
             throw new IllegalArgumentException("rootMarkdownFilePath is not available in File System");
         }
@@ -216,14 +215,14 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         tree.href = options.rootURLPath + "index.md";
         tree.level = 0;
         tree.name = options.subjectOfDocuments;
-        List<JarEntry> jarEntries = Keel.helpers().file().traversalInJar(options.rootMarkdownFilePath);
+        List<JarEntry> jarEntries = KeelHelpers.getInstance().fileHelper().traversalInJar(options.rootMarkdownFilePath);
         for (var jarEntry : jarEntries) {
             TreeNode child = buildTreeNodeInJar(jarEntry);
             if (child != null) {
                 tree.addChild(child);
             }
         }
-        options.logger.debug("TREE", tree.toJsonObject());
+        options.logger.debug(eventLog -> eventLog.put("TREE", tree.toJsonObject()));
         return tree;
     }
 
@@ -236,7 +235,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
             treeNode.level = Path.of(treeNode.href).getNameCount() - 1;
             treeNode.href = (options.rootURLPath + treeNode.href).replaceAll("/+", "/");
 
-            List<JarEntry> jarEntries = Keel.helpers().file().traversalInJar(jarEntry.getName());
+            List<JarEntry> jarEntries = KeelHelpers.getInstance().fileHelper().traversalInJar(jarEntry.getName());
             for (var childJarEntry : jarEntries) {
                 var x = buildTreeNodeInJar(childJarEntry);
                 if (x != null) treeNode.addChild(x);
@@ -279,7 +278,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
             }
         }
 
-        options.logger.debug("TREE", tree.toJsonObject());
+        options.logger.debug(eventLog -> eventLog.put("TREE", tree.toJsonObject()));
         return tree;
     }
 

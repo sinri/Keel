@@ -1,9 +1,6 @@
 package io.github.sinri.keel.servant.intravenous;
 
-import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticleInterface;
-import io.vertx.core.AbstractVerticle;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -23,7 +20,7 @@ import java.util.function.Function;
  *
  * @since 2.9
  */
-public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticleInterface {
+public class KeelIntravenous<T> extends KeelVerticleBase {
     private final Queue<T> queue;
 
     private final Function<List<T>, Future<Void>> processor;
@@ -68,9 +65,9 @@ public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticle
             }
             Future.succeededFuture()
                     .compose(v -> this.processor.apply(l))
-                    .andThen(ar -> Keel.vertx().setTimer(1L, x -> routine()));
+                    .andThen(ar -> getKeel().setTimer(1L, x -> routine()));
         } else {
-            Keel.vertx().setTimer(interval, x -> routine());
+            getKeel().setTimer(interval, x -> routine());
         }
     }
 
@@ -79,7 +76,7 @@ public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticle
      * @since 2.9
      */
     public void registerMessageConsumer(String address) {
-        unregisterMessageConsumer(event -> consumer = Keel.vertx().eventBus()
+        unregisterMessageConsumer(event -> consumer = getKeel().eventBus()
                 .consumer(address, message -> drop(message.body())));
     }
 
@@ -109,15 +106,4 @@ public class KeelIntravenous<T> extends AbstractVerticle implements KeelVerticle
         unregisterMessageConsumer();
     }
 
-    private KeelLogger logger;
-
-    @Override
-    public KeelLogger getLogger() {
-        return logger;
-    }
-
-    @Override
-    public void setLogger(KeelLogger logger) {
-        this.logger = logger;
-    }
 }

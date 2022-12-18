@@ -1,9 +1,7 @@
 package io.github.sinri.keel.servant.endless;
 
-import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticleInterface;
-import io.vertx.core.AbstractVerticle;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 
 import java.util.function.Supplier;
@@ -21,11 +19,9 @@ import java.util.function.Supplier;
  *
  * @since 2.7
  */
-public class KeelEndless extends AbstractVerticle implements KeelVerticleInterface {
+public class KeelEndless extends KeelVerticleBase {
     private final long restMS;
     private final Supplier<Future<Void>> supplier;
-
-    private KeelLogger logger;
 
     private Future<Void> routine() {
         // since 2.8 防止 inner exception 爆破
@@ -37,37 +33,27 @@ public class KeelEndless extends AbstractVerticle implements KeelVerticleInterfa
     }
 
     /**
-     * @since 2.8 如果alive显示false，则不再策划下一波触发
-     */
-    private void routineWrapper() {
-        Keel.vertx().setTimer(
-                restMS,
-                currentTimerID -> routine().onComplete(done -> routineWrapper())
-        );
-    }
-
-    /**
      * @param restMS   干完一组事情后休息的时间长度，单位为 千分之一秒
      * @param supplier 所谓的干完一组事情
      */
     public KeelEndless(long restMS, Supplier<Future<Void>> supplier) {
         this.restMS = restMS;
         this.supplier = supplier;
-        this.setLogger(KeelLogger.silentLogger());
+        this.setLogger(KeelEventLogger.silentLogger());
+    }
+
+    /**
+     * @since 2.8 如果alive显示false，则不再策划下一波触发
+     */
+    private void routineWrapper() {
+        getKeel().setTimer(
+                restMS,
+                currentTimerID -> routine().onComplete(done -> routineWrapper())
+        );
     }
 
     @Override
     public void start() {
         routineWrapper();
-    }
-
-    @Override
-    public KeelLogger getLogger() {
-        return logger;
-    }
-
-    @Override
-    public void setLogger(KeelLogger logger) {
-        this.logger = logger;
     }
 }

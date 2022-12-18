@@ -1,5 +1,6 @@
 package io.github.sinri.keel.facade.async;
 
+import io.github.sinri.keel.facade.interfaces.TraitForVertx;
 import io.vertx.core.Future;
 
 import java.util.function.Function;
@@ -7,13 +8,13 @@ import java.util.function.Function;
 /**
  * @since 3.0.0
  */
-public interface TraitForVertxAsync {
+public interface TraitForVertxAsync extends TraitForVertx {
     /**
      * @since 2.9.3 callFutureRepeat
      * @since 3.0.0 repeatedlyCall
      */
     default Future<Void> repeatedlyCall(Function<FutureRepeat.RoutineResult, Future<Void>> routineResultFutureFunction) {
-        return FutureRepeat.call(routineResultFutureFunction);
+        return FutureRepeat.call(this, routineResultFutureFunction);
     }
 
     /**
@@ -21,7 +22,7 @@ public interface TraitForVertxAsync {
      * @since 3.0.0 iterativelyCall
      */
     default <T> Future<Void> iterativelyCall(Iterable<T> collection, Function<T, Future<Void>> itemProcessor) {
-        return FutureForEach.call(collection, itemProcessor);
+        return FutureForEach.call(this, collection, itemProcessor);
     }
 
     /**
@@ -29,7 +30,7 @@ public interface TraitForVertxAsync {
      * @since 3.0.0 stepwiseCall
      */
     default Future<Void> stepwiseCall(FutureForRange.Options options, Function<Integer, Future<Void>> handleFunction) {
-        return FutureForRange.call(options, handleFunction);
+        return FutureForRange.call(this, options, handleFunction);
     }
 
     /**
@@ -37,7 +38,7 @@ public interface TraitForVertxAsync {
      * @since 3.0.0 stepwiseCall
      */
     default Future<Void> stepwiseCall(int times, Function<Integer, Future<Void>> handleFunction) {
-        return FutureForRange.call(times, handleFunction);
+        return FutureForRange.call(this, times, handleFunction);
     }
 
     /**
@@ -45,7 +46,7 @@ public interface TraitForVertxAsync {
      * @since 3.0.0 sleep
      */
     default Future<Void> sleep(long t) {
-        return FutureSleep.call(t);
+        return FutureSleep.call(this, t);
     }
 
     default <T> Future<Void> parallelForAllSuccess(Iterable<T> collection, Function<T, Future<Void>> itemProcessor) {

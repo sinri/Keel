@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.receptionist;
 
-import io.github.sinri.keel.lagecy.Keel;
-import io.github.sinri.keel.lagecy.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.ApiMeta;
 import io.github.sinri.keel.web.handler.KeelPlatformHandler;
 import io.vertx.core.json.JsonObject;
@@ -14,21 +14,27 @@ import java.util.List;
  * @since 2.9.2
  */
 public abstract class KeelWebReceptionist {
+    private final Keel keel;
     private final RoutingContext routingContext;
-    private final KeelLogger logger;
+    private final KeelEventLogger logger;
 
-    public KeelWebReceptionist(RoutingContext routingContext) {
+    public KeelWebReceptionist(Keel keel, RoutingContext routingContext) {
+        this.keel = keel;
         this.routingContext = routingContext;
         this.logger = createLogger();
+    }
+
+    public Keel getKeel() {
+        return keel;
     }
 
     protected RoutingContext getRoutingContext() {
         return routingContext;
     }
 
-    abstract protected KeelLogger createLogger();
+    abstract protected KeelEventLogger createLogger();
 
-    public KeelLogger getLogger() {
+    public KeelEventLogger getLogger() {
         return logger;
     }
 
@@ -38,8 +44,8 @@ public abstract class KeelWebReceptionist {
         try {
             routingContext.json(resp);
         } catch (Throwable throwable) {
-            logger.exception(throwable);
-            logger.error("RoutingContext has been dealt by others", new JsonObject()
+            logger.exception(throwable, event -> event
+                    .message("RoutingContext has been dealt by others")
                     .put("response", new JsonObject()
                             .put("code", routingContext.response().getStatusCode())
                             .put("message", routingContext.response().getStatusMessage())
@@ -54,7 +60,9 @@ public abstract class KeelWebReceptionist {
         JsonObject resp = new JsonObject()
                 .put("code", "OK")
                 .put("data", data);
-        logger.info("RESPOND SUCCESS", resp);
+        logger.info(event -> event
+                .message("RESPOND SUCCESS")
+                .put("response", resp));
         respondWithJsonObject(resp);
     }
 
@@ -62,9 +70,9 @@ public abstract class KeelWebReceptionist {
         var resp = new JsonObject()
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
-        String error = Keel.helpers().string().renderThrowableChain(throwable);
+        String error = keel.stringHelper().renderThrowableChain(throwable);
         resp.put("throwable", error);
-        logger.exception("RESPOND FAILURE", throwable);
+        logger.exception(throwable, "RESPOND FAILURE");
         respondWithJsonObject(resp);
     }
 
