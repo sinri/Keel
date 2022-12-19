@@ -124,7 +124,22 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
 
     @Override
     public String toString() {
-        // todo
-        return super.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.jsonObject.getString(RESERVED_KEY_TIMESTAMP))
+                .append(" [").append(this.jsonObject.getString(RESERVED_KEY_LEVEL)).append("]");
+        JsonObject context = new JsonObject();
+        for (var k : this.jsonObject.fieldNames()) {
+            if (Objects.equals(k, RESERVED_KEY_TIMESTAMP)) break;
+            if (Objects.equals(k, RESERVED_KEY_LEVEL)) break;
+            if (Objects.equals(k, RESERVED_KEY_EVENT)) break;
+            context.put(k, this.jsonObject.getValue(k));
+        }
+        sb.append(" ").append(context);
+
+        JsonObject event = this.jsonObject.getJsonObject(RESERVED_KEY_EVENT);
+        for (var k : event.fieldNames()) {
+            sb.append("\n").append(k).append(": ").append(event.getValue(k));
+        }
+        return sb.toString();
     }
 }

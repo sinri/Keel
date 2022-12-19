@@ -1,6 +1,5 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
@@ -15,15 +14,7 @@ import io.vertx.core.Future;
  */
 public abstract class KeelQueue extends KeelVerticleBase {
 
-    private final Keel keel;
     private QueueStatus queueStatus = QueueStatus.INIT;
-
-    public KeelQueue(Keel keel) {
-        super();
-        this.keel = keel;
-
-        setLogger(prepareLogger());
-    }
 
     public QueueStatus getQueueStatus() {
         return queueStatus;
@@ -83,7 +74,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
                 .eventually(v -> {
                     long waitingMs = nextTaskSeeker.waitingMs();
                     getLogger().debug("set timer for next routine after " + waitingMs + " ms");
-                    keel.setTimer(waitingMs, timerID -> routine());
+                    getKeel().setTimer(waitingMs, timerID -> routine());
                     return Future.succeededFuture();
                 })
         ;
@@ -100,7 +91,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
     private Future<Void> whenSignalRunCame(KeelQueueNextTaskSeeker nextTaskSeeker) {
         this.queueStatus = QueueStatus.RUNNING;
 
-        return keel.repeatedlyCall(routineResult -> {
+        return getKeel().repeatedlyCall(routineResult -> {
                     return Future.succeededFuture()
                             .compose(v -> nextTaskSeeker.get())
                             .compose(task -> {
@@ -115,7 +106,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
                                     getLogger().info("To run task: " + task.getTaskReference());
                                     getLogger().info("Trusted that task is already locked by seeker: " + task.getTaskReference());
                                     return Future.succeededFuture()
-                                            .compose(v -> task.deployMe(keel, new DeploymentOptions().setWorker(true)))
+                                            .compose(v -> task.deployMe(getKeel(), new DeploymentOptions().setWorker(true)))
                                             .compose(
                                                     deploymentID -> {
                                                         getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);

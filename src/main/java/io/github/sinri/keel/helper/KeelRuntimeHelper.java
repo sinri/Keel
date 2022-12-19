@@ -3,9 +3,6 @@ package io.github.sinri.keel.helper;
 import io.github.sinri.keel.helper.runtime.CPUTimeResult;
 import io.github.sinri.keel.helper.runtime.GCStatResult;
 import io.github.sinri.keel.helper.runtime.MemoryResult;
-import io.github.sinri.keel.helper.runtime.MonitorSnapshot;
-import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -14,7 +11,6 @@ import oshi.hardware.GlobalMemory;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @since 2.9.3
@@ -29,9 +25,6 @@ public class KeelRuntimeHelper {
     static KeelRuntimeHelper getInstance() {
         return instance;
     }
-
-    private final AtomicReference<GCStatResult> lastGCRef = new AtomicReference<>();
-    private final AtomicReference<CPUTimeResult> lastCPUTimeRef = new AtomicReference<>();
 
     public GCStatResult getGCSnapshot() {
         GCStatResult gcStat = new GCStatResult();
@@ -94,36 +87,4 @@ public class KeelRuntimeHelper {
                 .setAvailableByte(availableByte);
     }
 
-    /**
-     * @since 2.9.4
-     */
-    public void monitor(Vertx vertx, long interval, Handler<MonitorSnapshot> handler) {
-        vertx.setPeriodic(interval, timer -> {
-            MonitorSnapshot monitorSnapshot = new MonitorSnapshot();
-
-            GCStatResult gcSnapshot = getGCSnapshot();
-            CPUTimeResult cpuTimeSnapshot = getCPUTimeSnapshot();
-            MemoryResult memorySnapshot = getMemorySnapshot();
-
-            GCStatResult lastGC = this.lastGCRef.get();
-            if (lastGC == null) {
-                lastGCRef.set(gcSnapshot);
-            } else {
-                GCStatResult gcDiff = gcSnapshot.since(lastGC);
-                monitorSnapshot.setGCStat(gcDiff);
-            }
-
-            CPUTimeResult lastCpuTime = this.lastCPUTimeRef.get();
-            if (lastCpuTime == null) {
-                lastCPUTimeRef.set(cpuTimeSnapshot);
-            } else {
-                CPUTimeResult cpuTimeDiff = cpuTimeSnapshot.since(lastCpuTime);
-                monitorSnapshot.setCPUTime(cpuTimeDiff);
-            }
-
-            monitorSnapshot.setMemory(memorySnapshot);
-
-            handler.handle(monitorSnapshot);
-        });
-    }
 }

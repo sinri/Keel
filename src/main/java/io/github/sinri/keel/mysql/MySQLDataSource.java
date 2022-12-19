@@ -17,12 +17,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 public class MySQLDataSource {
-    private final Keel keel;
+//    private final Keel keel;
     private final MySQLPool pool;
     private final KeelMySQLConfigure configure;
 
     public MySQLDataSource(Keel keel, KeelMySQLConfigure configure) {
-        this.keel = keel;
+//        this.keel = keel;
         this.configure = configure;
         pool = MySQLPool.pool(
                 keel.getVertx(),

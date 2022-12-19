@@ -10,15 +10,15 @@ import java.util.function.Function;
  * @since 2.9.3
  */
 public class FutureRepeat {
-    private final TraitForVertxAsync keel;
+    private final KeelTraitForVertxAsync keel;
     private final Function<RoutineResult, Future<Void>> routineFunction;
 
-    private FutureRepeat(TraitForVertxAsync keel, Function<RoutineResult, Future<Void>> routineFunction) {
+    private FutureRepeat(KeelTraitForVertxAsync keel, Function<RoutineResult, Future<Void>> routineFunction) {
         this.keel = keel;
         this.routineFunction = routineFunction;
     }
 
-    static Future<Void> call(TraitForVertxAsync keel, Function<RoutineResult, Future<Void>> routineFunction) {
+    static Future<Void> call(KeelTraitForVertxAsync keel, Function<RoutineResult, Future<Void>> routineFunction) {
         Promise<Void> promise = Promise.promise();
         RoutineResult routineResult = new RoutineResult(false);
         new FutureRepeat(keel, routineFunction).routine(routineResult, promise);

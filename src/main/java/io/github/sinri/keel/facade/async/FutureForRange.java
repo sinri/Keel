@@ -11,10 +11,10 @@ import java.util.function.Function;
  * @since 1.13
  */
 public class FutureForRange {
-    private final TraitForVertxAsync keel;
+    private final KeelTraitForVertxAsync keel;
     private final Options options;
 
-    private FutureForRange(TraitForVertxAsync keel, Options options) {
+    private FutureForRange(KeelTraitForVertxAsync keel, Options options) {
         this.keel = keel;
         this.options = options;
     }
@@ -22,7 +22,7 @@ public class FutureForRange {
     /**
      * @since 2.9
      */
-    static Future<Void> call(TraitForVertxAsync keel, Options options, Function<Integer, Future<Void>> handleFunction) {
+    static Future<Void> call(KeelTraitForVertxAsync keel, Options options, Function<Integer, Future<Void>> handleFunction) {
         return new FutureForRange(keel, options).run(handleFunction);
     }
 
@@ -30,7 +30,7 @@ public class FutureForRange {
      * @param times since 2.9 changed to int from Integer
      * @since 2.9
      */
-    static Future<Void> call(TraitForVertxAsync keel, int times, Function<Integer, Future<Void>> handleFunction) {
+    static Future<Void> call(KeelTraitForVertxAsync keel, int times, Function<Integer, Future<Void>> handleFunction) {
         Options options = new Options().setEnd(times);
         return new FutureForRange(keel, options).run(handleFunction);
     }

@@ -2,6 +2,8 @@ package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.KeelLogLevel;
+import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
+import io.github.sinri.keel.logger.event.logger.KeelSilentEventLogger;
 import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
@@ -12,22 +14,11 @@ import java.util.function.Supplier;
  */
 public interface KeelEventLogger {
     static KeelEventLogger silentLogger() {
-        return new KeelEventLogger() {
-            @Override
-            public Supplier<KeelEventLogCenter> getEventLogCenterSupplier() {
-                return KeelSilentEventLogCenter::getInstance;
-            }
+        return KeelSilentEventLogger.getInstance();
+    }
 
-            @Override
-            public String getPresetTopic() {
-                return null;
-            }
-
-            @Override
-            public Keel getKeel() {
-                return null;
-            }
-        };
+    static KeelEventLogger outputLogger() {
+        return KeelOutputEventLogger.getInstance();
     }
 
     Supplier<KeelEventLogCenter> getEventLogCenterSupplier();
@@ -44,7 +35,9 @@ public interface KeelEventLogger {
 
     default void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
         KeelEventLog eventLog = new KeelEventLog();
-        eventLog.injectContext(getKeel());
+        if (getKeel() != null) {
+            eventLog.injectContext(getKeel());
+        }
         eventLogHandler.handle(eventLog);
         getEventLogCenterSupplier().get().log(eventLog);
     }

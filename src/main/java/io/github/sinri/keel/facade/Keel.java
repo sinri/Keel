@@ -1,22 +1,22 @@
 package io.github.sinri.keel.facade;
 
-import io.github.sinri.keel.facade.async.TraitForVertxAsync;
-import io.github.sinri.keel.facade.interfaces.TraitForClusteredVertx;
-import io.github.sinri.keel.facade.interfaces.TraitForVertx;
+import io.github.sinri.keel.facade.async.KeelTraitForVertxAsync;
+import io.github.sinri.keel.facade.interfaces.KeelTraitForClusteredVertx;
+import io.github.sinri.keel.facade.interfaces.KeelTraitForVertx;
 import io.github.sinri.keel.helper.TraitForHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.mysql.MySQLDataSourceProvider;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Verticle;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
-public interface Keel extends TraitForVertx, TraitForClusteredVertx, TraitForVertxAsync, TraitForHelpers, MySQLDataSourceProvider {
+public interface Keel extends KeelTraitForVertx, KeelTraitForClusteredVertx, KeelTraitForVertxAsync, TraitForHelpers, MySQLDataSourceProvider {
 
     //Keel instance = new KeelImpl();
 
@@ -26,12 +26,16 @@ public interface Keel extends TraitForVertx, TraitForClusteredVertx, TraitForVer
 
     /**
      * In the beginning ...
-     *
-     * @param handler the entire lifecycle of your app.
      */
-    static void genesis(Handler<Keel> handler) {
-        Keel instance = new KeelImpl();
-        handler.handle(instance);
+    static Future<Keel> genesis(Function<Keel, Future<Void>> initializer) {
+        Keel keel = new KeelImpl();
+        return initializer.apply(keel)
+                .compose(v -> {
+                    if (!keel.isVertxInitialized()) {
+                        throw new NullPointerException("KEEL NOT INITIALIZED");
+                    }
+                    return Future.succeededFuture(keel);
+                });
     }
 
     KeelConfiguration getConfiguration();

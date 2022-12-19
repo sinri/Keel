@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
@@ -26,6 +25,7 @@ public class FutureForEachParallel {
                     .compose(v -> itemProcessor.apply(item));
             futures.add(future);
         });
+        if (futures.isEmpty()) return Future.succeededFuture();
         return CompositeFuture.all(futures)
                 .compose(compositeFuture -> Future.succeededFuture());
     }
@@ -37,6 +37,7 @@ public class FutureForEachParallel {
                     .compose(v -> itemProcessor.apply(item));
             futures.add(future);
         });
+        if (futures.isEmpty()) return Future.succeededFuture();
         return CompositeFuture.any(futures)
                 .compose(compositeFuture -> Future.succeededFuture());
     }
@@ -48,7 +49,7 @@ public class FutureForEachParallel {
                     .compose(v -> itemProcessor.apply(item));
             futures.add(future);
         });
-        AtomicReference<FailedInParallel> failed = new AtomicReference<>();
+        if (futures.isEmpty()) return Future.succeededFuture();
         return CompositeFuture.join(futures)
                 .compose(compositeFuture -> Future.succeededFuture());
     }
@@ -82,6 +83,7 @@ public class FutureForEachParallel {
             futures.add(f);
         });
 
+        if (futures.isEmpty()) return Future.succeededFuture(parallelResult);
         // result
         return CompositeFuture.all(futures)
                 .compose(c -> Future.succeededFuture(parallelResult));

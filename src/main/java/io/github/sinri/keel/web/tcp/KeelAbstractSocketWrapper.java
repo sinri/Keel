@@ -1,6 +1,7 @@
 package io.github.sinri.keel.web.tcp;
 
 import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.servant.funnel.KeelFunnel;
 import io.vertx.core.DeploymentOptions;
@@ -38,7 +39,7 @@ abstract public class KeelAbstractSocketWrapper {
                 .handler(buffer -> {
                     getLogger().info(eventLog -> eventLog
                             .message("READ BUFFER " + buffer.length() + " BYTES")
-                            .put("buffer", keel.binaryHelper().encodeHexWithUpperDigits(buffer))
+                            .put("buffer", KeelHelpers.getInstance().binaryHelper().encodeHexWithUpperDigits(buffer))
                     );
                     this.funnel.drop(() -> whenBufferComes(buffer)
                             .compose(v -> Future.succeededFuture()));
@@ -76,6 +77,10 @@ abstract public class KeelAbstractSocketWrapper {
                     getLogger().exception(throwable, "socket exception");
                     whenExceptionOccurred(throwable);
                 });
+    }
+
+    public Keel getKeel() {
+        return keel;
     }
 
     public KeelEventLogger getLogger() {

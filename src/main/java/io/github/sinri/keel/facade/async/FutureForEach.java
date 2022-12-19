@@ -12,15 +12,15 @@ import java.util.function.Function;
  * @since 1.13
  */
 public class FutureForEach<T> {
-    private final TraitForVertxAsync keel;
+    private final KeelTraitForVertxAsync keel;
     private final Function<T, Future<Void>> asyncItemProcessFunction;
 
-    private FutureForEach(TraitForVertxAsync keel, Function<T, Future<Void>> itemProcessor) {
+    private FutureForEach(KeelTraitForVertxAsync keel, Function<T, Future<Void>> itemProcessor) {
         this.keel = keel;
         this.asyncItemProcessFunction = itemProcessor;
     }
 
-    static <T> Future<Void> call(TraitForVertxAsync keel, Iterable<T> collection, Function<T, Future<Void>> itemProcessor) {
+    static <T> Future<Void> call(KeelTraitForVertxAsync keel, Iterable<T> collection, Function<T, Future<Void>> itemProcessor) {
         return new FutureForEach<T>(keel, itemProcessor).process(collection);
     }
 

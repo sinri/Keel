@@ -10,7 +10,7 @@ import io.vertx.core.Promise;
  * @since 2.9
  */
 public class FutureSleep {
-    static Future<Void> call(TraitForVertxAsync keel, long time) {
+    static Future<Void> call(KeelTraitForVertxAsync keel, long time) {
         Promise<Void> promise = Promise.promise();
         if (time < 1) time = 1;
         keel.getVertx().setTimer(time, x -> promise.complete());

@@ -40,7 +40,9 @@ public class OutputAdapter implements KeelEventLoggerAdapter {
 
     @Override
     public Future<Void> dealWithLogs(List<KeelEventLog> buffer) {
-        buffer.forEach(eventLog -> System.out.println(eventLog.toString()));
+        buffer.forEach(eventLog -> {
+            System.out.println(eventLog.toString());
+        });
         return Future.succeededFuture();
     }
 

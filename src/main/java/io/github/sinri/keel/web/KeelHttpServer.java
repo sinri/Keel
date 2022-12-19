@@ -1,56 +1,40 @@
 package io.github.sinri.keel.web;
 
-import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 
-public class KeelHttpServer {
-    private final Keel keel;
-    protected final HttpServer server;
-    protected final Router router;
-    protected final Boolean closeVertXWhenTerminated;
-    protected KeelEventLogger logger;
+abstract public class KeelHttpServer extends KeelVerticleBase {
+    public static final String CONFIG_HTTP_SERVER_PORT = "http_server_port";
 
     protected Handler<Promise<Object>> gracefulCloseHandler;
+    public static final String CONFIG_HTTP_SERVER_OPTIONS = "http_server_options";
+    public static final String CONFIG_IS_MAIN_SERVICE = "is_main_service";
+    protected HttpServer server;
 
-    public KeelHttpServer(
-            Keel keel,
-            HttpServerOptions options,
-            Boolean closeVertXWhenTerminated
-    ) {
-        this.keel = keel;
-        server = keel.getVertx().createHttpServer(options);
-        router = Router.router(keel.getVertx());
-        logger = keel.createOutputEventLogger(getClass().getName());
-        this.closeVertXWhenTerminated = closeVertXWhenTerminated;
-        this.gracefulCloseHandler = Promise::complete;
+    protected int getHttpServerPort() {
+        return this.config().getInteger(CONFIG_HTTP_SERVER_PORT, 8080);
     }
 
-    public KeelEventLogger getLogger() {
-        return logger;
+    protected HttpServerOptions getHttpServerOptions() {
+        JsonObject httpServerOptions = this.config().getJsonObject(CONFIG_HTTP_SERVER_OPTIONS);
+        if (httpServerOptions == null) {
+            return new HttpServerOptions()
+                    .setPort(getHttpServerPort());
+        } else {
+            return new HttpServerOptions(httpServerOptions);
+        }
     }
 
-    public void setLogger(KeelEventLogger logger) {
-        this.logger = logger;
+    protected boolean isMainService() {
+        return this.config().getBoolean(CONFIG_IS_MAIN_SERVICE, true);
     }
 
-    public Router getRouter() {
-        return router;
-    }
-
-    /**
-     * 给你一个router去安装routes吧！
-     *
-     * @since 2.8
-     */
-    public KeelHttpServer configureRoutes(Handler<Router> routeConfigureHandler) {
-        routeConfigureHandler.handle(getRouter());
-        return this;
-    }
+    protected abstract void configureRoutes(Router router);
 
 //    /**
 //     * @since 2.4
@@ -65,7 +49,15 @@ public class KeelHttpServer {
         return this;
     }
 
-    public void listen() {
+    @Override
+    public void start() throws Exception {
+        setLogger(getKeel().createOutputEventLogger(getClass().getName()));
+
+        this.server = getKeel().getVertx().createHttpServer(getHttpServerOptions());
+
+        Router router = Router.router(getKeel().getVertx());
+        this.configureRoutes(router);
+
         server.requestHandler(router)
                 .exceptionHandler(throwable -> {
                     getLogger().exception(throwable, "KeelHttpServer Exception");
@@ -73,33 +65,31 @@ public class KeelHttpServer {
                 .listen(httpServerAsyncResult -> {
                     if (httpServerAsyncResult.succeeded()) {
                         HttpServer httpServer = httpServerAsyncResult.result();
-                        logger.info("HTTP Server Established, Actual Port: " + httpServer.actualPort());
+                        getLogger().info("HTTP Server Established, Actual Port: " + httpServer.actualPort());
+
+                        this.getKeel().addClosePrepareHandler(this::terminate);
                     } else {
                         Throwable throwable = httpServerAsyncResult.cause();
-                        logger.exception(throwable, "Listen failed");
+                        getLogger().exception(throwable, "Listen failed");
 
-                        if (closeVertXWhenTerminated) {
-                            this.keel.gracefullyClose(gracefulCloseHandler)
-                                    .onSuccess(v -> logger.info("VertX Instance Closed"))
-                                    .onFailure(vertxCloseFailed -> logger.error("VertX Instance Closing Failure: " + vertxCloseFailed.getMessage()));
+                        if (this.isMainService()) {
+                            this.getKeel().gracefullyClose();
                         }
                     }
                 })
         ;
     }
 
-    public void terminate() {
+    public void terminate(Promise<Void> promise) {
         server.close(ar -> {
             if (ar.succeeded()) {
-                logger.info("HTTP Server Closed");
+                getLogger().info("HTTP Server Closed");
             } else {
-                logger.error("HTTP Server Closing Failure: " + ar.cause().getMessage());
+                getLogger().error("HTTP Server Closing Failure: " + ar.cause().getMessage());
             }
 
-            if (closeVertXWhenTerminated) {
-                this.keel.gracefullyClose(gracefulCloseHandler)
-                        .onSuccess(v -> logger.info("VertX Instance Closed"))
-                        .onFailure(vertxCloseFailed -> logger.error("VertX Instance Closing Failure: " + vertxCloseFailed.getMessage()));
+            if (this.isMainService()) {
+                this.getKeel().gracefullyClose();
             }
         });
     }

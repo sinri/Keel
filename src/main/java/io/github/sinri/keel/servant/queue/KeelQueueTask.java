@@ -8,9 +8,6 @@ import io.vertx.core.Future;
  * @since 2.1
  */
 public abstract class KeelQueueTask extends KeelVerticleBase {
-    public KeelQueueTask() {
-        super();
-    }
 
     abstract public String getTaskReference();
 
@@ -30,8 +27,6 @@ public abstract class KeelQueueTask extends KeelVerticleBase {
 
     // as verticle
     public final void start() {
-//        Keel.registerDeployedKeelVerticle(this);
-
         setLogger(prepareLogger());
         notifyAfterDeployed();
         Future.succeededFuture()
