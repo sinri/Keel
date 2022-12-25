@@ -28,7 +28,7 @@ public final class SilentAdapter implements KeelEventLoggerAdapter {
     }
 
     @Override
-    public void setKeel(Keel keel) {
+    public void initialize(Keel keel) {
 
     }
 

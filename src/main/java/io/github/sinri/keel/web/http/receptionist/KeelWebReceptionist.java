@@ -2,7 +2,6 @@ package io.github.sinri.keel.web.http.receptionist;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.web.ApiMeta;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
@@ -92,25 +91,5 @@ public abstract class KeelWebReceptionist {
 
     public User readRequestUser() {
         return routingContext.user();
-    }
-
-    /**
-     * @since 2.9.4
-     */
-    private ApiMeta apiMeta;
-
-    /**
-     * @since 2.9.4
-     */
-    public ApiMeta getApiMeta() {
-        return apiMeta;
-    }
-
-    /**
-     * @since 2.9.4
-     */
-    KeelWebReceptionist setApiMeta(ApiMeta apiMeta) {
-        this.apiMeta = apiMeta;
-        return this;
     }
 }

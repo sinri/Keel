@@ -3,6 +3,7 @@ package io.github.sinri.keel.mysql.statement;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.Quoter;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WriteIntoStatement extends AbstractModifyStatement {
@@ -89,10 +91,35 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     }
 
     /**
+     * @since 3.0.0
+     */
+    public WriteIntoStatement macroWriteOneRow(RowToWrite row) {
+        columns.clear();
+        this.batchValues.clear();
+        List<String> dataRow = new ArrayList<>();
+        row.map.forEach((column, expression) -> {
+            columns.add(column);
+            dataRow.add(expression);
+        });
+        this.batchValues.add(dataRow);
+        return this;
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public WriteIntoStatement macroWriteOneRow(Handler<RowToWrite> rowEditor) {
+        RowToWrite rowToWrite = new RowToWrite();
+        rowEditor.handle(rowToWrite);
+        return macroWriteOneRow(rowToWrite);
+    }
+
+    /**
      * @param row One Json Object for one row
      * @return WriteIntoStatement
      * @since 1.7
      */
+    @Deprecated(since = "3.0.0")
     public WriteIntoStatement macroWriteOneRowWithJsonObject(JsonObject row) {
         columns.clear();
         this.batchValues.clear();
@@ -114,6 +141,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @return WriteIntoStatement
      * @since 1.6
      */
+    @Deprecated(since = "3.0.0")
     public WriteIntoStatement macroWriteOneRowWithMap(Map<String, Object> mapForOneRow) {
         columns.clear();
         this.batchValues.clear();
@@ -319,5 +347,23 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             list.add(chunkWIS);
         }
         return list;
+    }
+
+    public static class RowToWrite {
+        final Map<String, String> map = new ConcurrentHashMap<>();
+
+        public RowToWrite putValue(String columnName, String value) {
+            return putExpression(columnName, new Quoter(value).toString());
+        }
+
+        public RowToWrite putValue(String columnName, Number value) {
+            if (value == null) return this.putExpression(columnName, "NULL");
+            return putExpression(columnName, String.valueOf(value));
+        }
+
+        public RowToWrite putExpression(String columnName, String expression) {
+            map.put(columnName, expression);
+            return this;
+        }
     }
 }

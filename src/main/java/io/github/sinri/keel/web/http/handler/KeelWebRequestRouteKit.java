@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.http.handler;
 
 import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.web.ApiMeta;
+import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;

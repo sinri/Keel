@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.dysonsphere;
 
-import io.github.sinri.keel.web.KeelHttpServer;
+import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.github.sinri.keel.web.http.blackbox.KeelBlackBox;
 import io.github.sinri.keel.web.http.fastdocs.KeelFastDocsKit;
 import io.github.sinri.keel.web.http.handler.KeelWebRequestHandler;

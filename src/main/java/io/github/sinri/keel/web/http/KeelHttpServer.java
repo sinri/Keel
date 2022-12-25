@@ -1,4 +1,4 @@
-package io.github.sinri.keel.web;
+package io.github.sinri.keel.web.http;
 
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Handler;

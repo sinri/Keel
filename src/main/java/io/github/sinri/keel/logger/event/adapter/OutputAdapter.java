@@ -30,7 +30,7 @@ public class OutputAdapter implements KeelEventLoggerAdapter {
     }
 
     @Override
-    public void setKeel(Keel keel) {
+    public void initialize(Keel keel) {
     }
 
     @Override

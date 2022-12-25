@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.http.receptionist;
 
 import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.web.ApiMeta;
+import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpMethod;
@@ -129,7 +129,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         route.handler(routingContext -> {
             try {
                 R receptionist = receptionistConstructor.newInstance(keel, routingContext);
-                receptionist.setApiMeta(apiMeta);
+                //receptionist.setApiMeta(apiMeta);
                 receptionist.handle();
             } catch (Throwable e) {
                 routingContext.fail(e);

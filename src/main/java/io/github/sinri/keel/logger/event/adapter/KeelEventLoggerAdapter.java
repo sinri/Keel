@@ -10,7 +10,12 @@ import java.util.List;
 public interface KeelEventLoggerAdapter {
     Keel getKeel();
 
-    void setKeel(Keel keel);
+    /**
+     * FOR IMPLEMENTATION WITH SPI, KEEL INSTANCE IS INJECTED.
+     *
+     * @since 3.0.0
+     */
+    void initialize(Keel keel);
 
     /**
      * @since 2.9.4

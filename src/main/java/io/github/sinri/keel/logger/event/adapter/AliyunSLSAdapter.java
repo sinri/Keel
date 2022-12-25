@@ -14,7 +14,7 @@ public interface AliyunSLSAdapter extends KeelEventLoggerAdapter {
         ServiceLoader<AliyunSLSAdapter> serviceLoader = ServiceLoader.load(AliyunSLSAdapter.class);
         Optional<AliyunSLSAdapter> first = serviceLoader.findFirst();
         var adapter = first.orElseThrow();
-        adapter.setKeel(keel);
+        adapter.initialize(keel);
         return adapter;
     }
 
