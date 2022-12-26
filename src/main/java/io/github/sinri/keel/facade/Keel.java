@@ -13,16 +13,15 @@ import io.vertx.core.Verticle;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface Keel extends KeelTraitForVertx, KeelTraitForClusteredVertx, KeelTraitForVertxAsync, TraitForHelpers, MySQLDataSourceProvider {
 
-    //Keel instance = new KeelImpl();
-
-//    static Keel getInstance() {
-//        return instance;
-//    }
+    static Keel getInstance() {
+        return Objects.requireNonNull(KeelImpl.instanceRef.get());
+    }
 
     /**
      * In the beginning ...
@@ -34,6 +33,7 @@ public interface Keel extends KeelTraitForVertx, KeelTraitForClusteredVertx, Kee
                     if (!keel.isVertxInitialized()) {
                         throw new NullPointerException("KEEL NOT INITIALIZED");
                     }
+                    KeelImpl.instanceRef.set(keel);
                     return Future.succeededFuture(keel);
                 });
     }

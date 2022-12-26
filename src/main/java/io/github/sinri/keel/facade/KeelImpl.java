@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
 class KeelImpl implements Keel, KeelTraitForVertx, KeelTraitForClusteredVertx {
     private final KeelConfiguration configuration;
@@ -27,6 +28,8 @@ class KeelImpl implements Keel, KeelTraitForVertx, KeelTraitForClusteredVertx {
     private final Map<String, MySQLDataSource> mysqlKitMap = new ConcurrentHashMap<>();
     private @Nullable Vertx vertx;
     private @Nullable ClusterManager clusterManager;
+
+    public final static AtomicReference<Keel> instanceRef = new AtomicReference<>();
 
     public KeelImpl() {
         this.configuration = new KeelConfigurationImpl();
