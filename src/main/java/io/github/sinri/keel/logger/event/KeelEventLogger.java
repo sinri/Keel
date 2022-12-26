@@ -1,7 +1,6 @@
 package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
-import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
 import io.github.sinri.keel.logger.event.logger.KeelSilentEventLogger;
 import io.vertx.core.Handler;
 
@@ -14,11 +13,6 @@ import java.util.function.Supplier;
 public interface KeelEventLogger {
     static KeelEventLogger silentLogger() {
         return KeelSilentEventLogger.getInstance();
-    }
-
-    @Deprecated
-    static KeelEventLogger outputLogger() {
-        return KeelOutputEventLogger.getInstance();
     }
 
     Supplier<KeelEventLogCenter> getEventLogCenterSupplier();
