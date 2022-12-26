@@ -16,6 +16,7 @@ public interface KeelEventLogger {
         return KeelSilentEventLogger.getInstance();
     }
 
+    @Deprecated
     static KeelEventLogger outputLogger() {
         return KeelOutputEventLogger.getInstance();
     }

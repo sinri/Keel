@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.http.blackbox;
 
 import io.github.sinri.keel.facade.Keel3;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.web.http.blackbox.html.HTMLElement;
 import io.github.sinri.keel.web.http.blackbox.html.HTMLTagElement;
 import io.vertx.core.Future;
@@ -26,7 +26,7 @@ public class KeelBlackBox {
      */
     public static void installToRouter(String routeRootPath, String logDirPath, Router router) {
         var routeRootPathWithTailSplash = routeRootPath.endsWith("/") ? routeRootPath : (routeRootPath + "/");
-        var logger = KeelEventLogger.outputLogger();
+        var logger = KeelOutputEventLogCenter.getInstance().createLogger("KeelBlackBox");
         router.get(routeRootPathWithTailSplash + "*")
                 .failureHandler(routingContext -> {
                     logger.error("failure handler");

@@ -1,7 +1,5 @@
 package io.github.sinri.keel.facade;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
 import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -70,10 +68,5 @@ public class Keel3 {
             return getVertx().close();
         });
     }
-
-    public static KeelEventLogger getInstanceEventLogger() {
-        return KeelOutputEventLogger.getInstance();
-    }
-
 
 }

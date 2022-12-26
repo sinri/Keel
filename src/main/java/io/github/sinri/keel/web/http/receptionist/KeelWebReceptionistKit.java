@@ -1,7 +1,8 @@
 package io.github.sinri.keel.web.http.receptionist;
 
 import io.github.sinri.keel.helper.KeelHelpers;
-import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.Handler;
@@ -47,10 +48,12 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
      * @since 2.9.2
      */
     private Handler<RoutingContext> failureHandler = null;
+    private final KeelEventLogger logger;
 
     public KeelWebReceptionistKit(Class<R> classOfReceptionist, Router router) {
         this.classOfReceptionist = classOfReceptionist;
         this.router = router;
+        this.logger = KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName());
     }
 
     public void loadPackage(String packageName) {
@@ -60,7 +63,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         try {
             allClasses.forEach(this::loadClass);
         } catch (Exception e) {
-            KeelOutputEventLogger.getInstance().exception(e, getClass().getName() + "::loadPackage THROWS");
+            logger.exception(e, getClass().getName() + "::loadPackage THROWS");
         }
     }
 
@@ -68,13 +71,13 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         ApiMeta apiMeta = KeelHelpers.reflectionHelper().getAnnotationOfClass(c, ApiMeta.class);
         if (apiMeta == null) return;
 
-        KeelOutputEventLogger.getInstance().debug(getClass().getName() + " Loading " + c.getName());
+        logger.debug(getClass().getName() + " Loading " + c.getName());
 
         Constructor<? extends R> receptionistConstructor;
         try {
             receptionistConstructor = c.getConstructor(RoutingContext.class);
         } catch (NoSuchMethodException e) {
-            KeelOutputEventLogger.getInstance().exception(e, "HANDLER REFLECTION EXCEPTION");
+            logger.exception(e, "HANDLER REFLECTION EXCEPTION");
             return;
         }
 

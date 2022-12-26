@@ -1,29 +1,30 @@
 package io.github.sinri.keel.test;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.vertx.core.Handler;
+import io.vertx.core.VertxOptions;
 
 import java.util.concurrent.TimeUnit;
 
 public class SharedTestBootstrap {
 
-    public static void bootstrap(Handler<Keel> handler) {
-        Keel.genesis(keel -> keel
-                                .loadConfigureWithPropertiesFile("config.properties")
-                                .compose(configured -> keel.initializeVertx(vertxOptions -> vertxOptions
-                                        .setEventLoopPoolSize(4) // default 2 * number of cores on the machine
-                                        .setWorkerPoolSize(2)//default 20
-                                        .setMaxWorkerExecuteTime(60_000_000_000L) // 1s;  default 60_000_000_000 ns = 60s
-                                        .setMaxWorkerExecuteTimeUnit(TimeUnit.NANOSECONDS)
-                                        .setBlockedThreadCheckInterval(1000L) // default 1000 ms = 1s
-                                        .setBlockedThreadCheckIntervalUnit(TimeUnit.MILLISECONDS)
-                                        .setMaxEventLoopExecuteTime(2000000000L)//default 2000000000 ns = 2s
-                                        .setMaxEventLoopExecuteTimeUnit(TimeUnit.NANOSECONDS)))
-                        //.compose(v -> keel.initializeMySQLDataSource("local"))
+    public static void bootstrap(Handler<Void> handler) {
+        Keel3.getConfiguration().loadPropertiesFile("config.properties");
+        Keel3.initializeVertx(new VertxOptions()
+                        .setEventLoopPoolSize(4) // default 2 * number of cores on the machine
+                        .setWorkerPoolSize(2)//default 20
+                        .setMaxWorkerExecuteTime(60_000_000_000L) // 1s;  default 60_000_000_000 ns = 60s
+                        .setMaxWorkerExecuteTimeUnit(TimeUnit.NANOSECONDS)
+                        .setBlockedThreadCheckInterval(1000L) // default 1000 ms = 1s
+                        .setBlockedThreadCheckIntervalUnit(TimeUnit.MILLISECONDS)
+                        .setMaxEventLoopExecuteTime(2000000000L)//default 2000000000 ns = 2s
+                        .setMaxEventLoopExecuteTimeUnit(TimeUnit.NANOSECONDS)
                 )
-                .onSuccess(handler::handle)
+                .onSuccess(handler)
                 .onFailure(throwable -> {
-                    KeelEventLogger.outputLogger().exception(throwable, "Keel Initialize Failure");
+                    KeelOutputEventLogCenter.getInstance().createLogger("SharedTestBootstrap")
+                            .exception(throwable, "Keel Initialize Failure");
                 });
     }
 }

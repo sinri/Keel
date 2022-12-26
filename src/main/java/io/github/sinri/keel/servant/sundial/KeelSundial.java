@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.sundial;
 
 import io.github.sinri.keel.facade.Keel3;
-import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 
 import java.util.*;
@@ -19,7 +19,7 @@ public abstract class KeelSundial extends KeelVerticleBase {
 
     public void start() throws Exception {
         super.start();
-        setLogger(KeelOutputEventLogger.getInstance());
+        setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
 
         long delaySeconds = 60 - (System.currentTimeMillis() / 1000) % 60;
         this.timerID = Keel3.getVertx().setPeriodic(delaySeconds, 60_000L, timerID -> {

@@ -6,6 +6,7 @@ import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 
 import java.util.function.Supplier;
 
+@Deprecated
 public class KeelOutputEventLogger implements KeelEventLogger {
     private final static KeelOutputEventLogger instance = new KeelOutputEventLogger();
 

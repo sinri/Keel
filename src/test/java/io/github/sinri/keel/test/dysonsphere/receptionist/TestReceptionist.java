@@ -1,6 +1,7 @@
 package io.github.sinri.keel.test.dysonsphere.receptionist;
 
 import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.receptionist.KeelWebFutureReceptionist;
 import io.vertx.core.Future;
@@ -9,8 +10,8 @@ import io.vertx.ext.web.RoutingContext;
 
 @ApiMeta(routePath = "/receptionist/test", allowMethods = {"GET", "POST"})
 public class TestReceptionist extends KeelWebFutureReceptionist {
-    public TestReceptionist(Keel keel, RoutingContext routingContext) {
-        super(keel, routingContext);
+    public TestReceptionist(RoutingContext routingContext) {
+        super(routingContext);
     }
 
     @Override
@@ -21,6 +22,6 @@ public class TestReceptionist extends KeelWebFutureReceptionist {
 
     @Override
     protected KeelEventLogger createLogger() {
-        return getKeel().createOutputEventLogger(getClass().getName());
+        return KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName());
     }
 }

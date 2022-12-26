@@ -1,6 +1,7 @@
 package io.github.sinri.keel.test.dysonsphere.service;
 
 import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.handler.KeelWebRequestFutureHandler;
 import io.vertx.core.Future;
@@ -9,9 +10,6 @@ import io.vertx.ext.web.RoutingContext;
 
 @ApiMeta(routePath = "/service/test", allowMethods = {"GET", "POST"})
 public class TestService extends KeelWebRequestFutureHandler {
-    public TestService(Keel keel) {
-        super(keel);
-    }
 
     @Override
     protected Future<Object> handleRequestForFuture(RoutingContext routingContext) {
@@ -21,7 +19,7 @@ public class TestService extends KeelWebRequestFutureHandler {
 
     @Override
     protected KeelEventLogger createLogger() {
-        return getKeel().createOutputEventLogger(getClass().getName());
+        return KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName());
     }
 
 }
