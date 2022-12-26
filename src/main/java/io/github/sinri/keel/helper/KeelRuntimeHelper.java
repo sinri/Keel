@@ -44,7 +44,7 @@ public class KeelRuntimeHelper {
                         + new JsonObject()
                         .put("class", gc.getClass().getName())
                         .put("name", gc.getName())
-                        .put("memoryPoolNames", KeelHelpers.getInstance().stringHelper().joinStringArray(gc.getMemoryPoolNames(), ","))
+                        .put("memoryPoolNames", KeelHelpers.stringHelper().joinStringArray(gc.getMemoryPoolNames(), ","))
                         .put("objectName", gc.getObjectName())
                         .put("collectionCount", gc.getCollectionCount())
                         .put("collectionTime", gc.getCollectionTime())

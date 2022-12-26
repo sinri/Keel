@@ -1,6 +1,6 @@
 package io.github.sinri.keel.maids.watchman;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
@@ -13,8 +13,7 @@ abstract class KeelWatchmanImpl extends KeelVerticleBase implements KeelWatchman
     private final String watchmanName;
     private MessageConsumer<Long> consumer;
 
-    public KeelWatchmanImpl(Keel keel, String watchmanName) {
-        setKeel(keel);
+    public KeelWatchmanImpl(String watchmanName) {
         this.watchmanName = watchmanName;
     }
 
@@ -29,7 +28,7 @@ abstract class KeelWatchmanImpl extends KeelVerticleBase implements KeelWatchman
 
     @Override
     public void start() {
-        this.consumer = getKeel().eventBus().consumer(eventBusAddress());
+        this.consumer = Keel3.getVertx().eventBus().consumer(eventBusAddress());
         this.consumer.handler(this::consumeHandleMassage);
         this.consumer.exceptionHandler(throwable -> getLogger()
                 .exception(throwable, watchmanName() + " ERROR"));
@@ -43,9 +42,9 @@ abstract class KeelWatchmanImpl extends KeelVerticleBase implements KeelWatchman
         } catch (Exception ignore) {
             // 拟合不了拉倒
         }
-        getKeel().setPeriodic(
+        Keel3.getVertx().setPeriodic(
                 interval(),
-                timerID -> getKeel().eventBus()
+                timerID -> Keel3.getVertx().eventBus()
                         .send(eventBusAddress(), System.currentTimeMillis()));
     }
 
@@ -54,14 +53,14 @@ abstract class KeelWatchmanImpl extends KeelVerticleBase implements KeelWatchman
         getLogger().debug(watchmanName() + " TRIGGERED FOR " + timestamp);
 
         long x = timestamp / interval();
-        getKeel().sharedData().getLockWithTimeout(eventBusAddress() + "@" + x, Math.min(3_000L, interval() - 1), lockAR -> {
+        Keel3.getVertx().sharedData().getLockWithTimeout(eventBusAddress() + "@" + x, Math.min(3_000L, interval() - 1), lockAR -> {
             if (lockAR.failed()) {
                 getLogger().warning("LOCK ACQUIRE FAILED FOR " + timestamp + " i.e. " + x);
             } else {
                 Lock lock = lockAR.result();
                 getLogger().info("LOCK ACQUIRED FOR " + timestamp + " i.e. " + x);
                 regularHandler().handle(timestamp);
-                getKeel().setTimer(interval(), timerID -> {
+                Keel3.getVertx().setTimer(interval(), timerID -> {
                     lock.release();
                     getLogger().info("LOCK RELEASED FOR " + timestamp + " i.e. " + x);
                 });

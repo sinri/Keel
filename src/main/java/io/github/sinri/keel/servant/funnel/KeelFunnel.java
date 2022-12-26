@@ -1,7 +1,8 @@
 package io.github.sinri.keel.servant.funnel;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
 import io.github.sinri.keel.facade.async.FutureRepeat;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
@@ -41,14 +42,14 @@ public class KeelFunnel extends KeelVerticleBase {
         return new KeelFunnel().setOptions(options);
     }
 
-    public static Future<KeelFunnel> deployOneInstance(Keel keel, long interval) {
-        return deployOneInstance(keel, new Options().setQueryInterval(interval));
+    public static Future<KeelFunnel> deployOneInstance(long interval) {
+        return deployOneInstance(new Options().setQueryInterval(interval));
     }
 
-    public static Future<KeelFunnel> deployOneInstance(Keel keel, KeelFunnel.Options options) {
+    public static Future<KeelFunnel> deployOneInstance(KeelFunnel.Options options) {
         KeelFunnel keelFunnel = new KeelFunnel().setOptions(options);
         DeploymentOptions deploymentOptions = new DeploymentOptions().setWorker(true);
-        return keel.deployKeelVerticle(keelFunnel, deploymentOptions)
+        return Keel3.getVertx().deployVerticle(keelFunnel, deploymentOptions)
                 .compose(d -> Future.succeededFuture(keelFunnel));
     }
 
@@ -78,7 +79,7 @@ public class KeelFunnel extends KeelVerticleBase {
             return;
         }
         // 暇、続きの暇
-        getKeel().setTimer(getQueryInterval(), timerID -> query());
+        Keel3.getVertx().setTimer(getQueryInterval(), timerID -> query());
     }
 
     private Future<Void> pourOneDrip(FutureRepeat.RoutineResult routineResult) {
@@ -103,7 +104,7 @@ public class KeelFunnel extends KeelVerticleBase {
     private void pour() {
         getLogger().debug("POUR START");
 
-        getKeel().repeatedlyCall(this::pourOneDrip)
+        KeelAsyncKit.repeatedlyCall(this::pourOneDrip)
                 .onComplete(poured -> {
                     getLogger().debug("POUR END");
                     restingStartTime.set(new Date().getTime());

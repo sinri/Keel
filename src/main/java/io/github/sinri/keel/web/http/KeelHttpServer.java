@@ -1,5 +1,7 @@
 package io.github.sinri.keel.web.http;
 
+import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
@@ -51,11 +53,11 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
 
     @Override
     public void start() throws Exception {
-        setLogger(getKeel().createOutputEventLogger(getClass().getName()));
+        setLogger(KeelOutputEventLogger.getInstance());
 
-        this.server = getKeel().getVertx().createHttpServer(getHttpServerOptions());
+        this.server = Keel3.getVertx().createHttpServer(getHttpServerOptions());
 
-        Router router = Router.router(getKeel().getVertx());
+        Router router = Router.router(Keel3.getVertx());
         this.configureRoutes(router);
 
         server.requestHandler(router)
@@ -67,13 +69,13 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
                         HttpServer httpServer = httpServerAsyncResult.result();
                         getLogger().info("HTTP Server Established, Actual Port: " + httpServer.actualPort());
 
-                        this.getKeel().addClosePrepareHandler(this::terminate);
+//                        this.getKeel().addClosePrepareHandler(this::terminate);
                     } else {
                         Throwable throwable = httpServerAsyncResult.cause();
                         getLogger().exception(throwable, "Listen failed");
 
                         if (this.isMainService()) {
-                            this.getKeel().gracefullyClose();
+                            Keel3.gracefullyClose(Promise::complete);
                         }
                     }
                 })
@@ -89,7 +91,7 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
             }
 
             if (this.isMainService()) {
-                this.getKeel().gracefullyClose();
+                Keel3.gracefullyClose(Promise::complete);
             }
         });
     }

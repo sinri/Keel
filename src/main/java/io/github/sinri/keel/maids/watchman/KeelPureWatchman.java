@@ -1,6 +1,6 @@
 package io.github.sinri.keel.maids.watchman;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -14,16 +14,16 @@ public class KeelPureWatchman extends KeelWatchmanImpl {
 
     private final Options options;
 
-    protected KeelPureWatchman(Keel keel, String watchmanName, Options options) {
-        super(keel, watchmanName);
+    protected KeelPureWatchman(String watchmanName, Options options) {
+        super(watchmanName);
         this.options = options;
     }
 
-    public static Future<String> deploy(Keel keel, String watchmanName, Handler<Options> optionsHandler) {
+    public static Future<String> deploy(String watchmanName, Handler<Options> optionsHandler) {
         Options options = new Options();
         optionsHandler.handle(options);
-        KeelPureWatchman keelPureWatchman = new KeelPureWatchman(keel, watchmanName, options);
-        return keel.deployKeelVerticle(keelPureWatchman, new DeploymentOptions()
+        KeelPureWatchman keelPureWatchman = new KeelPureWatchman(watchmanName, options);
+        return Keel3.getVertx().deployVerticle(keelPureWatchman, new DeploymentOptions()
                 .setWorker(true)
         );
     }

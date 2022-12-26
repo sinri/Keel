@@ -1,6 +1,5 @@
 package io.github.sinri.keel.logger.event.adapter;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -20,16 +19,6 @@ public final class SilentAdapter implements KeelEventLoggerAdapter {
 
     public static SilentAdapter getInstance() {
         return instance;
-    }
-
-    @Override
-    public Keel getKeel() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void initialize(Keel keel) {
-
     }
 
     @Override

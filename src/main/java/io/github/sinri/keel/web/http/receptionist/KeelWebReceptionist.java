@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.http.receptionist;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.json.JsonObject;
@@ -14,18 +14,12 @@ import java.util.List;
  * @since 3.0.0 TEST PASSED
  */
 public abstract class KeelWebReceptionist {
-    private final Keel keel;
     private final RoutingContext routingContext;
     private final KeelEventLogger logger;
 
-    public KeelWebReceptionist(Keel keel, RoutingContext routingContext) {
-        this.keel = keel;
+    public KeelWebReceptionist(RoutingContext routingContext) {
         this.routingContext = routingContext;
         this.logger = createLogger();
-    }
-
-    public Keel getKeel() {
-        return keel;
     }
 
     protected RoutingContext getRoutingContext() {
@@ -70,7 +64,7 @@ public abstract class KeelWebReceptionist {
         var resp = new JsonObject()
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
-        String error = keel.stringHelper().renderThrowableChain(throwable);
+        String error = KeelHelpers.stringHelper().renderThrowableChain(throwable);
         resp.put("throwable", error);
         logger.exception(throwable, "RESPOND FAILURE");
         respondWithJsonObject(resp);
@@ -85,7 +79,7 @@ public abstract class KeelWebReceptionist {
     }
 
     public List<String> readRequestIPChain() {
-        return keel.netHelper().parseWebClientIPChain(routingContext);
+        return KeelHelpers.netHelper().parseWebClientIPChain(routingContext);
 //        return routingContext.get(KeelPlatformHandler.KEEL_REQUEST_CLIENT_IP_CHAIN);
     }
 

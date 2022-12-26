@@ -4,13 +4,56 @@ package io.github.sinri.keel.helper;
  * @since 3.0.0
  * 使用此类可以实现无需启动 VERTX 即可使用 HELPER。
  */
-public class KeelHelpers implements TraitForHelpers {
-    private static final KeelHelpers instance = new KeelHelpers();
+public interface KeelHelpers {
 
-    private KeelHelpers() {
+    static KeelBinaryHelper binaryHelper() {
+        return KeelBinaryHelper.getInstance();
     }
 
-    public static KeelHelpers getInstance() {
-        return instance;
+    static KeelDateTimeHelper datetimeHelper() {
+        return KeelDateTimeHelper.getInstance();
     }
+
+    static KeelFileHelper fileHelper() {
+        return KeelFileHelper.getInstance();
+    }
+
+    static KeelJsonHelper jsonHelper() {
+        return KeelJsonHelper.getInstance();
+    }
+
+    static KeelNetHelper netHelper() {
+        return KeelNetHelper.getInstance();
+    }
+
+    static KeelReflectionHelper reflectionHelper() {
+        return KeelReflectionHelper.getInstance();
+    }
+
+    static KeelStringHelper stringHelper() {
+        return KeelStringHelper.getInstance();
+    }
+
+    static KeelCryptographyHelper cryptographyHelper() {
+        return KeelCryptographyHelper.getInstance();
+    }
+
+    static KeelDigestHelper digestHelper() {
+        return KeelDigestHelper.getInstance();
+    }
+
+    /**
+     * @since 2.9.3
+     */
+    static KeelRuntimeHelper runtimeHelper() {
+        return KeelRuntimeHelper.getInstance();
+    }
+
+    /**
+     * @since 2.9.4
+     */
+    static KeelAuthenticationHelper authenticationHelper() {
+        return KeelAuthenticationHelper.getInstance();
+    }
+
 }

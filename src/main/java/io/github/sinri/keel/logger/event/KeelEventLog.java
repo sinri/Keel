@@ -1,7 +1,7 @@
 package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.json.JsonArray;
@@ -91,7 +91,7 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
     }
 
     public KeelEventLog timestamp(long timestamp) {
-        this.context(RESERVED_KEY_TIMESTAMP, KeelHelpers.getInstance().datetimeHelper().getDateExpression(new Date(timestamp), "yyyy-MM-dd HH:mm:ss.SSS"));
+        this.context(RESERVED_KEY_TIMESTAMP, KeelHelpers.datetimeHelper().getDateExpression(new Date(timestamp), "yyyy-MM-dd HH:mm:ss.SSS"));
         return this;
     }
 
@@ -110,12 +110,12 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
         return this;
     }
 
-    public KeelEventLog injectContext(Keel keel) {
+    public KeelEventLog injectContext() {
         this.context(KeelEventLog.RESERVED_KEY_THREAD_ID, Thread.currentThread().getId());
-        if (keel.isRunningInVertxCluster()) {
+        if (Keel3.isRunningInVertxCluster()) {
 //                jsonObject.put("use_cluster", "YES");
-            this.context(KeelEventLog.RESERVED_KEY_CLUSTER_NODE_ID, keel.getVertxNodeID());
-            this.context(KeelEventLog.RESERVED_KEY_CLUSTER_NODE_ADDRESS, keel.getVertxNodeNetAddress());
+            this.context(KeelEventLog.RESERVED_KEY_CLUSTER_NODE_ID, Keel3.getVertxNodeID());
+            this.context(KeelEventLog.RESERVED_KEY_CLUSTER_NODE_ADDRESS, Keel3.getVertxNodeNetAddress());
         } else {
 //                jsonObject.put("use_cluster", "NO");
         }

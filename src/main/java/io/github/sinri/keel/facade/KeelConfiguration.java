@@ -42,7 +42,7 @@ public interface KeelConfiguration extends JsonifiableEntity<KeelConfiguration> 
         for (var plainKey : plainKeySet) {
             String[] components = plainKey.split("\\.");
             List<Object> keychain = Arrays.asList(components);
-            KeelHelpers.getInstance().jsonHelper()
+            KeelHelpers.jsonHelper()
                     .writeIntoJsonObject(jsonObject, keychain, properties.getProperty(plainKey));
         }
         return jsonObject;

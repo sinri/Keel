@@ -1,5 +1,7 @@
 package io.github.sinri.keel.servant.queue;
 
+import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
@@ -74,7 +76,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
                 .eventually(v -> {
                     long waitingMs = nextTaskSeeker.waitingMs();
                     getLogger().debug("set timer for next routine after " + waitingMs + " ms");
-                    getKeel().setTimer(waitingMs, timerID -> routine());
+                    Keel3.getVertx().setTimer(waitingMs, timerID -> routine());
                     return Future.succeededFuture();
                 })
         ;
@@ -91,7 +93,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
     private Future<Void> whenSignalRunCame(KeelQueueNextTaskSeeker nextTaskSeeker) {
         this.queueStatus = QueueStatus.RUNNING;
 
-        return getKeel().repeatedlyCall(routineResult -> {
+        return KeelAsyncKit.repeatedlyCall(routineResult -> {
                     return Future.succeededFuture()
                             .compose(v -> nextTaskSeeker.get())
                             .compose(task -> {
@@ -106,7 +108,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
                                     getLogger().info("To run task: " + task.getTaskReference());
                                     getLogger().info("Trusted that task is already locked by seeker: " + task.getTaskReference());
                                     return Future.succeededFuture()
-                                            .compose(v -> task.deployMe(getKeel(), new DeploymentOptions().setWorker(true)))
+                                            .compose(v -> task.deployMe(new DeploymentOptions().setWorker(true)))
                                             .compose(
                                                     deploymentID -> {
                                                         getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);

@@ -1,6 +1,5 @@
 package io.github.sinri.keel.logger.event.center;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
 import io.github.sinri.keel.logger.event.adapter.KeelEventLoggerAdapter;
@@ -9,18 +8,10 @@ import io.vertx.core.Future;
 import java.util.List;
 
 public class KeelSyncEventLogCenter implements KeelEventLogCenter {
-    private final Keel keel;
     private final KeelEventLoggerAdapter adapter;
 
-    public KeelSyncEventLogCenter(Keel keel, KeelEventLoggerAdapter adapter) {
-        this.keel = keel;
+    public KeelSyncEventLogCenter(KeelEventLoggerAdapter adapter) {
         this.adapter = adapter;
-    }
-
-
-    @Override
-    public Keel getKeel() {
-        return this.keel;
     }
 
     @Override

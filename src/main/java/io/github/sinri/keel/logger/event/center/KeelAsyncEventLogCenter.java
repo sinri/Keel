@@ -1,6 +1,7 @@
 package io.github.sinri.keel.logger.event.center;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
 import io.github.sinri.keel.logger.event.adapter.KeelEventLoggerAdapter;
@@ -19,10 +20,8 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
     private final Queue<KeelEventLog> queue;
     private final int bufferSize = 1000;
     private boolean toClose = false;
-    private final Keel keel;
 
-    public KeelAsyncEventLogCenter(Keel keel, KeelEventLoggerAdapter adapter) {
-        this.keel = keel;
+    public KeelAsyncEventLogCenter(KeelEventLoggerAdapter adapter) {
         this.queue = new ConcurrentLinkedQueue<>();
         this.adapter = adapter;
 
@@ -30,10 +29,10 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
     }
 
     protected void start() {
-        keel.repeatedlyCall(routineResult -> {
+        KeelAsyncKit.repeatedlyCall(routineResult -> {
             return Future.succeededFuture()
                     .compose(v -> {
-                        return keel.getVertx().executeBlocking(promise -> {
+                        return Keel3.getVertx().executeBlocking(promise -> {
                             List<KeelEventLog> buffer = new ArrayList<>();
                             for (int i = 0; i < bufferSize; i++) {
                                 KeelEventLog eventLog = this.queue.poll();
@@ -53,7 +52,7 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
                         });
                     })
                     .recover(throwable -> {
-                        return keel.sleep(1000L)
+                        return KeelAsyncKit.sleep(1000L)
                                 .compose(v -> {
                                     return Future.succeededFuture();
                                 });
@@ -69,10 +68,6 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
         return adapter;
     }
 
-    @Override
-    public Keel getKeel() {
-        return this.keel;
-    }
 
     @Override
     public void log(KeelEventLog eventLog) {

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.program;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.cli.CLI;
@@ -17,17 +17,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 2.9 Greatly changed. No longer using Verticle with vertx cmd usage.
  */
 public abstract class KeelProgram {
-    private final Keel keel;
     private KeelEventLogger logger;
     private JsonObject optionMap;
-
-    public KeelProgram(Keel keel) {
-        this.keel = keel;
-    }
-
-    public Keel getKeel() {
-        return keel;
-    }
 
     public static void runProgramAndExit(KeelProgram program, List<String> args) {
         List<Option> options = program.defineCLIOptions();
@@ -70,7 +61,7 @@ public abstract class KeelProgram {
                     getLogger().exception(throwable, "FAILED");
                     returnCode.set(generateReturnCode(throwable));
                 })
-                .eventually(v -> getKeel().gracefullyClose(promise -> {
+                .eventually(v -> Keel3.gracefullyClose(promise -> {
                     // do nothing
                 }))
                 .onComplete(v -> {

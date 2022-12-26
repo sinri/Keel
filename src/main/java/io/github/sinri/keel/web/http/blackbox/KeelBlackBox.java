@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.http.blackbox;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.http.blackbox.html.HTMLElement;
 import io.github.sinri.keel.web.http.blackbox.html.HTMLTagElement;
@@ -20,12 +20,11 @@ import java.util.Date;
 public class KeelBlackBox {
 
     /**
-     * @param keel          Keel
      * @param routeRootPath start with '/', such as '/blackbox/'
      * @param logDirPath    real path such as '/var/log/xxx'
      * @param router        the router
      */
-    public static void installToRouter(Keel keel, String routeRootPath, String logDirPath, Router router) {
+    public static void installToRouter(String routeRootPath, String logDirPath, Router router) {
         var routeRootPathWithTailSplash = routeRootPath.endsWith("/") ? routeRootPath : (routeRootPath + "/");
         var logger = KeelEventLogger.outputLogger();
         router.get(routeRootPathWithTailSplash + "*")
@@ -51,7 +50,7 @@ public class KeelBlackBox {
                             return;
                         }
                         if (file.isDirectory()) {
-                            handleDir(keel, routingContext, file, logDirPath, routeRootPathWithTailSplash);
+                            handleDir(routingContext, file, logDirPath, routeRootPathWithTailSplash);
                         } else {
                             handleFile(routingContext, file);
                         }
@@ -62,8 +61,8 @@ public class KeelBlackBox {
                 });
     }
 
-    private static void handleDir(Keel keel, RoutingContext routingContext, File dir, String logDirPath, String routeRootPathWithTailSplash) {
-        keel.fileSystem().readDir(dir.getAbsolutePath())
+    private static void handleDir(RoutingContext routingContext, File dir, String logDirPath, String routeRootPathWithTailSplash) {
+        Keel3.getVertx().fileSystem().readDir(dir.getAbsolutePath())
                 .compose(children -> {
                     String relativeDirPath = dir.getAbsolutePath().substring(logDirPath.length());
 

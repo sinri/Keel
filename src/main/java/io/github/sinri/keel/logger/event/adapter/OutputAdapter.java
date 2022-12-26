@@ -1,6 +1,5 @@
 package io.github.sinri.keel.logger.event.adapter;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
@@ -25,15 +24,6 @@ public class OutputAdapter implements KeelEventLoggerAdapter {
     }
 
     @Override
-    public Keel getKeel() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void initialize(Keel keel) {
-    }
-
-    @Override
     public void close(Promise<Void> promise) {
         promise.complete();
     }
@@ -48,6 +38,6 @@ public class OutputAdapter implements KeelEventLoggerAdapter {
 
     @Override
     public Object processThrowable(Throwable throwable) {
-        return KeelHelpers.getInstance().stringHelper().renderThrowableChain(throwable);
+        return KeelHelpers.stringHelper().renderThrowableChain(throwable);
     }
 }

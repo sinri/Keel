@@ -1,6 +1,6 @@
 package io.github.sinri.keel.helper.runtime;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.Handler;
 
@@ -12,19 +12,15 @@ import java.util.concurrent.atomic.AtomicReference;
 public class KeelRuntimeMonitor {
     private final AtomicReference<GCStatResult> _lastGCRef = new AtomicReference<>();
     private final AtomicReference<CPUTimeResult> _lastCPUTimeRef = new AtomicReference<>();
-    private final Keel keel;
 
-    public KeelRuntimeMonitor(Keel keel) {
-        this.keel = keel;
-    }
 
     public void startRuntimeMonitor(long interval, Handler<MonitorSnapshot> handler) {
-        this.keel.setPeriodic(interval, timer -> {
+        Keel3.getVertx().setPeriodic(interval, timer -> {
             MonitorSnapshot monitorSnapshot = new MonitorSnapshot();
 
-            GCStatResult gcSnapshot = KeelHelpers.getInstance().runtimeHelper().getGCSnapshot();
-            CPUTimeResult cpuTimeSnapshot = KeelHelpers.getInstance().runtimeHelper().getCPUTimeSnapshot();
-            MemoryResult memorySnapshot = KeelHelpers.getInstance().runtimeHelper().getMemorySnapshot();
+            GCStatResult gcSnapshot = KeelHelpers.runtimeHelper().getGCSnapshot();
+            CPUTimeResult cpuTimeSnapshot = KeelHelpers.runtimeHelper().getCPUTimeSnapshot();
+            MemoryResult memorySnapshot = KeelHelpers.runtimeHelper().getMemorySnapshot();
 
             GCStatResult lastGC = _lastGCRef.get();
             if (lastGC == null) {

@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.tcp;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -25,12 +24,12 @@ public class KeelBasicSocketWrapper extends KeelAbstractSocketWrapper {
     private Consumer<Throwable> exceptionHandler = throwable -> {
     };
 
-    public KeelBasicSocketWrapper(Keel keel, NetSocket socket) {
-        super(keel, socket);
+    public KeelBasicSocketWrapper(NetSocket socket) {
+        super(socket);
     }
 
-    public KeelBasicSocketWrapper(Keel keel, NetSocket socket, String socketID) {
-        super(keel, socket, socketID);
+    public KeelBasicSocketWrapper(NetSocket socket, String socketID) {
+        super(socket, socketID);
     }
 
     public KeelBasicSocketWrapper setCloseHandler(Handler<Void> closeHandler) {

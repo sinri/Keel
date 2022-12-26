@@ -1,6 +1,8 @@
 package io.github.sinri.keel.web.http.handler;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
 import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.Handler;
@@ -23,7 +25,6 @@ import java.util.Set;
  * @since 3.0.0 TEST PASSED
  */
 public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
-    private final Keel keel;
     private final Router router;
     private final Class<S> classOfService;
     private final List<PlatformHandler> platformHandlers = new ArrayList<>();
@@ -47,10 +48,9 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
      */
     private Handler<RoutingContext> failureHandler = null;
 
-    public KeelWebRequestRouteKit(Keel keel, Class<S> classOfService) {
-        this.keel = keel;
+    public KeelWebRequestRouteKit(Class<S> classOfService) {
         this.classOfService = classOfService;
-        router = Router.router(keel.getVertx());
+        router = Router.router(Keel3.getVertx());
     }
 
     /**
@@ -61,8 +61,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
         return this;
     }
 
-    public KeelWebRequestRouteKit(Keel keel, Class<S> classOfService, Router router) {
-        this.keel = keel;
+    public KeelWebRequestRouteKit(Class<S> classOfService, Router router) {
         this.classOfService = classOfService;
         this.router = router;
     }
@@ -139,7 +138,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
         try {
             allClasses.forEach(this::loadClass);
         } catch (Exception e) {
-            keel.getInstantEventLogger().exception(e, "KeelWebRequestRouteKit::loadPackage THROWS");
+            KeelOutputEventLogger.getInstance().exception(e, "KeelWebRequestRouteKit::loadPackage THROWS");
         }
     }
 
@@ -148,17 +147,17 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
      * @since 2.9.2 return void
      */
     public void loadClass(Class<? extends S> c) {
-        ApiMeta apiMeta = keel.reflectionHelper().getAnnotationOfClass(c, ApiMeta.class);
+        ApiMeta apiMeta = KeelHelpers.reflectionHelper().getAnnotationOfClass(c, ApiMeta.class);
         if (apiMeta == null) return;
 
-        keel.getInstantEventLogger().debug("KeelWebRequestRouteKit Loading " + c.getName());
+        KeelOutputEventLogger.getInstance().debug("KeelWebRequestRouteKit Loading " + c.getName());
 
         S handler;
         try {
-            handler = c.getConstructor(Keel.class).newInstance(keel);
+            handler = c.getConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
-            keel.getInstantEventLogger().exception(e, "HANDLER REFLECTION EXCEPTION");
+            KeelOutputEventLogger.getInstance().exception(e, "HANDLER REFLECTION EXCEPTION");
             return;
         }
 
@@ -178,7 +177,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
 
         // === HANDLERS WEIGHT IN ORDER ===
         // PLATFORM
-        route.handler(new KeelPlatformHandler(keel));
+        route.handler(new KeelPlatformHandler());
         if (apiMeta.timeout() > 0) {
             // PlatformHandler
             route.handler(TimeoutHandler.create(apiMeta.timeout(), apiMeta.statusCodeForTimeout()));

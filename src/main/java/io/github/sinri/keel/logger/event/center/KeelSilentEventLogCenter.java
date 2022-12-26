@@ -1,6 +1,5 @@
 package io.github.sinri.keel.logger.event.center;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
 import io.vertx.core.Future;
@@ -14,11 +13,6 @@ public class KeelSilentEventLogCenter implements KeelEventLogCenter {
 
     public static KeelSilentEventLogCenter getInstance() {
         return instance;
-    }
-
-    @Override
-    public Keel getKeel() {
-        return null;
     }
 
     @Override

@@ -137,7 +137,7 @@ public class AmongstCondition implements MySQLCondition {
         if (inverseOperator) {
             s += " NOT";
         }
-        s += " " + OP_IN + " (" + KeelHelpers.getInstance().stringHelper().joinStringArray(targetSet, ",") + ")";
+        s += " " + OP_IN + " (" + KeelHelpers.stringHelper().joinStringArray(targetSet, ",") + ")";
         return s;
     }
 }

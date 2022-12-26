@@ -11,28 +11,26 @@ import java.util.function.Function;
  * @since 1.13
  */
 public class FutureForRange {
-    private final KeelTraitForVertxAsync keel;
     private final Options options;
 
-    private FutureForRange(KeelTraitForVertxAsync keel, Options options) {
-        this.keel = keel;
+    private FutureForRange(Options options) {
         this.options = options;
     }
 
     /**
      * @since 2.9
      */
-    static Future<Void> call(KeelTraitForVertxAsync keel, Options options, Function<Integer, Future<Void>> handleFunction) {
-        return new FutureForRange(keel, options).run(handleFunction);
+    static Future<Void> call(Options options, Function<Integer, Future<Void>> handleFunction) {
+        return new FutureForRange(options).run(handleFunction);
     }
 
     /**
      * @param times since 2.9 changed to int from Integer
      * @since 2.9
      */
-    static Future<Void> call(KeelTraitForVertxAsync keel, int times, Function<Integer, Future<Void>> handleFunction) {
+    static Future<Void> call(int times, Function<Integer, Future<Void>> handleFunction) {
         Options options = new Options().setEnd(times);
-        return new FutureForRange(keel, options).run(handleFunction);
+        return new FutureForRange(options).run(handleFunction);
     }
 
     /**
@@ -41,7 +39,7 @@ public class FutureForRange {
     private Future<Void> run(Function<Integer, Future<Void>> handleFunction) {
         AtomicInteger indexRef = new AtomicInteger(options.getStart());
 
-        return keel.repeatedlyCall(routineResult -> {
+        return KeelAsyncKit.repeatedlyCall(routineResult -> {
             if (indexRef.get() < options.getEnd()) {
                 return handleFunction.apply(indexRef.get())
                         .compose(v -> {

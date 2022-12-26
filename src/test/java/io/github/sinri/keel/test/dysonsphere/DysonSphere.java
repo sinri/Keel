@@ -1,6 +1,5 @@
 package io.github.sinri.keel.test.dysonsphere;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.vertx.core.DeploymentOptions;

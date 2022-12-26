@@ -1,6 +1,6 @@
 package io.github.sinri.keel.core.semaphore;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.shareddata.Counter;
@@ -16,24 +16,21 @@ public class KeelShareDataSemaphore {
 
     private final KeelEventLogger logger;
 
-    private final Keel keel;
 
-    public KeelShareDataSemaphore(Keel keel, String name, int permits) {
-        this.keel = keel;
+    public KeelShareDataSemaphore(String name, int permits) {
         this.name = name;
         this.permits = permits;
         this.logger = KeelEventLogger.silentLogger();
     }
 
-    public KeelShareDataSemaphore(Keel keel, String name, int permits, KeelEventLogger logger) {
-        this.keel = keel;
+    public KeelShareDataSemaphore(String name, int permits, KeelEventLogger logger) {
         this.name = name;
         this.permits = permits;
         this.logger = logger;
     }
 
     protected Future<Counter> getCounter() {
-        return this.keel.sharedData().getCounter(name);
+        return Keel3.getVertx().sharedData().getCounter(name);
     }
 
     public Future<Boolean> isNowAvailable() {

@@ -151,22 +151,22 @@ public class SelectStatement extends AbstractReadStatement {
         if (columns.isEmpty()) {
             sql.append("*");
         } else {
-            sql.append(KeelHelpers.getInstance().stringHelper().joinStringArray(columns, ","));
+            sql.append(KeelHelpers.stringHelper().joinStringArray(columns, ","));
         }
         if (!tables.isEmpty()) {
-            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("FROM ").append(KeelHelpers.getInstance().stringHelper().joinStringArray(tables, AbstractStatement.SQL_COMPONENT_SEPARATOR));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("FROM ").append(KeelHelpers.stringHelper().joinStringArray(tables, AbstractStatement.SQL_COMPONENT_SEPARATOR));
         }
         if (!whereConditionsComponent.isEmpty()) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("WHERE ").append(whereConditionsComponent);
         }
         if (!categories.isEmpty()) {
-            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("GROUP BY ").append(KeelHelpers.getInstance().stringHelper().joinStringArray(categories, ","));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("GROUP BY ").append(KeelHelpers.stringHelper().joinStringArray(categories, ","));
         }
         if (!havingConditionsComponent.isEmpty()) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("HAVING ").append(havingConditionsComponent);
         }
         if (!sortRules.isEmpty()) {
-            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("ORDER BY ").append(KeelHelpers.getInstance().stringHelper().joinStringArray(sortRules, ","));
+            sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("ORDER BY ").append(KeelHelpers.stringHelper().joinStringArray(sortRules, ","));
         }
         if (limit > 0) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("LIMIT ").append(limit).append(" OFFSET ").append(offset);
@@ -227,7 +227,7 @@ public class SelectStatement extends AbstractReadStatement {
             }
             if (!onConditions.isEmpty()) {
                 s += " ON ";
-                s += KeelHelpers.getInstance().stringHelper().joinStringArray(onConditions, " AND ");
+                s += KeelHelpers.stringHelper().joinStringArray(onConditions, " AND ");
             }
             return s;
         }

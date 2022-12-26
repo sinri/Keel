@@ -1,6 +1,6 @@
 package io.github.sinri.keel.email.smtp;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
 import io.github.sinri.keel.facade.KeelConfiguration;
 import io.vertx.core.Future;
 import io.vertx.ext.mail.MailClient;
@@ -14,34 +14,30 @@ import java.util.List;
  * @since 1.10
  */
 public class KeelSmtpKit {
-    private final Keel keel;
     private final String smtpName;
     private final MailConfig mailConfig;
     private final MailClient mailClient;
 
-    public KeelSmtpKit(Keel keel, String smtpName, boolean shared) {
-        this.keel = keel;
+    public KeelSmtpKit(String smtpName, boolean shared) {
         this.smtpName = smtpName;
-        this.mailConfig = buildMailConfig(keel.getConfiguration(), smtpName);
+        this.mailConfig = buildMailConfig(Keel3.getConfiguration(), smtpName);
         if (shared) {
-            this.mailClient = MailClient.createShared(keel.getVertx(), this.mailConfig, smtpName);
+            this.mailClient = MailClient.createShared(Keel3.getVertx(), this.mailConfig, smtpName);
         } else {
-            this.mailClient = MailClient.create(keel.getVertx(), this.mailConfig);
+            this.mailClient = MailClient.create(Keel3.getVertx(), this.mailConfig);
         }
     }
 
-    public KeelSmtpKit(Keel keel, String smtpName) {
-        this.keel = keel;
+    public KeelSmtpKit(String smtpName) {
         this.smtpName = smtpName;
-        this.mailConfig = buildMailConfig(keel.getConfiguration(), smtpName);
-        this.mailClient = MailClient.create(keel.getVertx(), this.mailConfig);
+        this.mailConfig = buildMailConfig(Keel3.getConfiguration(), smtpName);
+        this.mailClient = MailClient.create(Keel3.getVertx(), this.mailConfig);
     }
 
-    public KeelSmtpKit(Keel keel) {
-        this.keel = keel;
-        this.smtpName = keel.getConfiguration().readString("email", "smtp", "default_smtp_name");
-        this.mailConfig = buildMailConfig(keel.getConfiguration(), smtpName);
-        this.mailClient = MailClient.create(keel.getVertx(), this.mailConfig);
+    public KeelSmtpKit() {
+        this.smtpName = Keel3.getConfiguration().readString("email", "smtp", "default_smtp_name");
+        this.mailConfig = buildMailConfig(Keel3.getConfiguration(), smtpName);
+        this.mailClient = MailClient.create(Keel3.getVertx(), this.mailConfig);
     }
 
     private static MailConfig buildMailConfig(KeelConfiguration keelConfiguration, String smtpName) {

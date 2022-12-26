@@ -1,6 +1,7 @@
 package io.github.sinri.keel.maids.gatling;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
 import io.vertx.core.shareddata.Counter;
@@ -24,24 +25,24 @@ public class KeelGatling extends KeelVerticleBase {
         this.options = options;
     }
 
-    public static Future<String> deploy(Keel keel, String gatlingName, Handler<Options> optionHandler) {
+    public static Future<String> deploy(String gatlingName, Handler<Options> optionHandler) {
         Options options = new Options(gatlingName);
         optionHandler.handle(options);
         KeelGatling keelGatling = new KeelGatling(options);
-        return keel.deployKeelVerticle(keelGatling, new DeploymentOptions().setWorker(true));
+        return Keel3.getVertx().deployVerticle(keelGatling, new DeploymentOptions().setWorker(true));
     }
 
     protected Future<Void> rest() {
         int actualRestInterval = new Random().nextInt(
                 Math.toIntExact(options.getAverageRestInterval() / 2)
         ) + options.getAverageRestInterval();
-        return getKeel().sleep(actualRestInterval);
+        return KeelAsyncKit.sleep(actualRestInterval);
     }
 
     @Override
     public void start() throws Exception {
         barrelUsed.set(0);
-        getKeel().repeatedlyCall(routineResult -> {
+        KeelAsyncKit.repeatedlyCall(routineResult -> {
             return fireOnce();
         });
         //Keel.callFutureUntil(() -> fireOnce().compose(v -> Future.succeededFuture(false)));
@@ -70,7 +71,7 @@ public class KeelGatling extends KeelVerticleBase {
                         barrelUsed.decrementAndGet();
                     });
 
-                    return getKeel().sleep(10L);
+                    return KeelAsyncKit.sleep(10L);
                 })
                 .recover(throwable -> {
                     getLogger().exception(throwable, "FAILED TO LOAD BULLET");
@@ -84,7 +85,7 @@ public class KeelGatling extends KeelVerticleBase {
      * @return Future of a runnable bullet, or null.
      */
     private Future<Bullet> loadOneBullet() {
-        return getKeel().sharedData()
+        return Keel3.getVertx().sharedData()
                 .getLock("KeelGatling-" + this.options.getGatlingName() + "-Load")
                 .compose(lock -> this.options.getBulletLoader().get().andThen(ar -> lock.release()));
     }
@@ -92,11 +93,11 @@ public class KeelGatling extends KeelVerticleBase {
     protected Future<Void> requireExclusiveLocksOfBullet(Bullet bullet) {
         if (bullet.exclusiveLockSet() != null && !bullet.exclusiveLockSet().isEmpty()) {
             AtomicBoolean blocked = new AtomicBoolean(false);
-            return getKeel().iterativelyCall(
+            return KeelAsyncKit.iterativelyCall(
                             bullet.exclusiveLockSet(),
                             exclusiveLock -> {
                                 String exclusiveLockName = "KeelGatling-Bullet-Exclusive-Lock-" + exclusiveLock;
-                                return getKeel().sharedData()
+                                return Keel3.getVertx().sharedData()
                                         .getCounter(exclusiveLockName)
                                         .compose(Counter::incrementAndGet)
                                         .compose(increased -> {
@@ -120,9 +121,9 @@ public class KeelGatling extends KeelVerticleBase {
 
     protected Future<Void> releaseExclusiveLocksOfBullet(Bullet bullet) {
         if (bullet.exclusiveLockSet() != null && !bullet.exclusiveLockSet().isEmpty()) {
-            return getKeel().iterativelyCall(bullet.exclusiveLockSet(), exclusiveLock -> {
+            return KeelAsyncKit.iterativelyCall(bullet.exclusiveLockSet(), exclusiveLock -> {
                 String exclusiveLockName = "KeelGatling-Bullet-Exclusive-Lock-" + exclusiveLock;
-                return getKeel().sharedData().getCounter(exclusiveLockName)
+                return Keel3.getVertx().sharedData().getCounter(exclusiveLockName)
                         .compose(counter -> counter.decrementAndGet()
                                 .compose(x -> Future.succeededFuture()));
             });

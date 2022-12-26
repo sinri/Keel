@@ -6,7 +6,7 @@ public class KeelOutputEventLogCenter extends KeelSyncEventLogCenter {
     private final static KeelOutputEventLogCenter instance = new KeelOutputEventLogCenter();
 
     public KeelOutputEventLogCenter() {
-        super(null, OutputAdapter.getInstance());
+        super(OutputAdapter.getInstance());
     }
 
     public static KeelOutputEventLogCenter getInstance() {

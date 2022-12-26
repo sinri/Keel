@@ -1,6 +1,8 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.MySQLDataSource;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -38,10 +40,8 @@ public class TableRowClassGenerator {
      * Values other than the enum defined ones may be treated as null in JAVA.
      */
     private boolean supportLooseEnum;
-    private final Keel keel;
 
-    public TableRowClassGenerator(Keel keel, SqlConnection sqlConnection) {
-        this.keel = keel;
+    public TableRowClassGenerator(SqlConnection sqlConnection) {
         this.sqlConnection = sqlConnection;
         this.schema = null;
         this.tableSet = new HashSet<>();
@@ -114,28 +114,28 @@ public class TableRowClassGenerator {
     }
 
     private Future<Void> generateForTables(String packageName, String packagePath, Collection<String> tables) {
-        return keel.iterativelyCall(
+        return KeelAsyncKit.iterativelyCall(
                 tables,
                 table -> {
-                    String className = keel.stringHelper().fromUnderScoreCaseToCamelCase(table) + "TableRow";
+                    String className = KeelHelpers.stringHelper().fromUnderScoreCaseToCamelCase(table) + "TableRow";
                     String classFile = packagePath + "/" + className + ".java";
                     return this.generateClassCodeForOneTable(schema, table, packageName, className)
                             .compose(code -> {
                                 if (this.rewrite) {
-                                    return keel.fileSystem().writeFile(classFile, Buffer.buffer(code));
+                                    return Keel3.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                                 } else {
-                                    return keel.fileSystem().exists(classFile)
+                                    return Keel3.getVertx().fileSystem().exists(classFile)
                                             .compose(existed -> {
                                                 if (existed) {
-                                                    return keel.fileSystem().readFile(classFile)
+                                                    return Keel3.getVertx().fileSystem().readFile(classFile)
                                                             .compose(existedContentBuffer -> {
-                                                                return keel.fileSystem().writeFile(
+                                                                return Keel3.getVertx().fileSystem().writeFile(
                                                                         classFile,
                                                                         existedContentBuffer.appendString("\n\n").appendString(code)
                                                                 );
                                                             });
                                                 } else {
-                                                    return keel.fileSystem().writeFile(classFile, Buffer.buffer(code));
+                                                    return Keel3.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                                                 }
                                             });
                                 }
@@ -159,7 +159,7 @@ public class TableRowClassGenerator {
     }
 
     private String buildFieldGetter(String field, String type, String comment) {
-        String getter = "get" + keel.stringHelper().fromUnderScoreCaseToCamelCase(field);
+        String getter = "get" + KeelHelpers.stringHelper().fromUnderScoreCaseToCamelCase(field);
         String returnType = "Object";
         String readMethod = "readValue";
 
@@ -205,7 +205,7 @@ public class TableRowClassGenerator {
                 String[] enumValueArray = enumValuesString.split("[, ]+");
                 if (enumValueArray.length > 0) {
                     // to build enum
-                    enum_name = keel.stringHelper().fromUnderScoreCaseToCamelCase(field) + "Enum";
+                    enum_name = KeelHelpers.stringHelper().fromUnderScoreCaseToCamelCase(field) + "Enum";
 
                     getter_string
                             .append("\t/**\n")

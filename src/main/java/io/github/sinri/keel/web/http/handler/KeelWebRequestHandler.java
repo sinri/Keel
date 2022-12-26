@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.http.handler;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -14,17 +14,12 @@ import io.vertx.ext.web.RoutingContext;
  */
 abstract public class KeelWebRequestHandler implements KeelHttpHandler {
 
-    private final Keel keel;
     private final KeelEventLogger logger;
 
-    public KeelWebRequestHandler(Keel keel) {
-        this.keel = keel;
+    public KeelWebRequestHandler() {
         this.logger = createLogger();
     }
 
-    public Keel getKeel() {
-        return keel;
-    }
 
     abstract protected KeelEventLogger createLogger();
 
@@ -58,7 +53,7 @@ abstract public class KeelWebRequestHandler implements KeelHttpHandler {
         var x = new JsonObject()
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
-        String error = keel.stringHelper().renderThrowableChain(throwable);
+        String error = KeelHelpers.stringHelper().renderThrowableChain(throwable);
         x.put("throwable", error);
         logger.error(eventLog -> eventLog
                 .message("RESPOND FAILURE")

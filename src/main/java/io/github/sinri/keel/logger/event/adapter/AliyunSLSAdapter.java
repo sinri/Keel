@@ -1,6 +1,7 @@
 package io.github.sinri.keel.logger.event.adapter;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 
@@ -10,12 +11,10 @@ import java.util.*;
  * @since 3.0.0
  */
 public interface AliyunSLSAdapter extends KeelEventLoggerAdapter {
-    static AliyunSLSAdapter create(Keel keel) {
+    static AliyunSLSAdapter create() {
         ServiceLoader<AliyunSLSAdapter> serviceLoader = ServiceLoader.load(AliyunSLSAdapter.class);
         Optional<AliyunSLSAdapter> first = serviceLoader.findFirst();
-        var adapter = first.orElseThrow();
-        adapter.initialize(keel);
-        return adapter;
+        return first.orElseThrow();
     }
 
     @Override
@@ -31,7 +30,7 @@ public interface AliyunSLSAdapter extends KeelEventLoggerAdapter {
                     .add(eventLog);
         });
 
-        return getKeel().iterativelyCall(topicMap.keySet(), topic -> {
+        return KeelAsyncKit.iterativelyCall(topicMap.keySet(), topic -> {
             return Future.succeededFuture()
                     .compose(v -> {
                         List<KeelEventLog> keelEventLogs = topicMap.get(topic);
@@ -49,6 +48,6 @@ public interface AliyunSLSAdapter extends KeelEventLoggerAdapter {
 
     @Override
     default Object processThrowable(Throwable throwable) {
-        return getKeel().jsonHelper().renderThrowableChain(throwable);
+        return KeelHelpers.jsonHelper().renderThrowableChain(throwable);
     }
 }

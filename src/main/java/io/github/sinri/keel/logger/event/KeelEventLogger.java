@@ -1,6 +1,5 @@
 package io.github.sinri.keel.logger.event;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
 import io.github.sinri.keel.logger.event.logger.KeelSilentEventLogger;
@@ -25,19 +24,10 @@ public interface KeelEventLogger {
 
     String getPresetTopic();
 
-//    default String topic(@Nonnull JsonObject event) {
-//        String topic = event.getString(KeelEventLog.RESERVED_KEY_TOPIC);
-//        if (topic != null) return topic;
-//        return getPresetTopic();
-//    }
-
-    Keel getKeel();
 
     default void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
         KeelEventLog eventLog = new KeelEventLog();
-        if (getKeel() != null) {
-            eventLog.injectContext(getKeel());
-        }
+        eventLog.injectContext();
         eventLogHandler.handle(eventLog);
         getEventLogCenterSupplier().get().log(eventLog);
     }

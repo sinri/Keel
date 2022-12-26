@@ -1,6 +1,5 @@
 package io.github.sinri.keel.test.dysonsphere.service;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.handler.KeelWebRequestFutureHandler;

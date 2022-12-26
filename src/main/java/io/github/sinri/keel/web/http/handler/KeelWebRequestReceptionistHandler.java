@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.http.handler;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
 import io.github.sinri.keel.web.http.receptionist.KeelWebFutureReceptionist;
 import io.vertx.ext.web.RoutingContext;
 
@@ -11,21 +11,21 @@ import java.lang.reflect.InvocationTargetException;
 public class KeelWebRequestReceptionistHandler<R extends KeelWebFutureReceptionist> extends KeelWebRequestHandler {
     private final Class<R> rClass;
 
-    public KeelWebRequestReceptionistHandler(Keel keel, Class<R> rClass) {
-        super(keel);
+    public KeelWebRequestReceptionistHandler(Class<R> rClass) {
+        super();
         this.rClass = rClass;
     }
 
     @Override
     protected KeelEventLogger createLogger() {
-        return getKeel().getInstantEventLogger();
+        return KeelOutputEventLogger.getInstance();
     }
 
     @Override
     protected void handleRequest(RoutingContext routingContext) throws RuntimeException {
         try {
-            rClass.getConstructor(Keel.class, RoutingContext.class)
-                    .newInstance(getKeel(), routingContext)
+            rClass.getConstructor(RoutingContext.class)
+                    .newInstance(routingContext)
                     .handle();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {

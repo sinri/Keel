@@ -1,6 +1,7 @@
 package io.github.sinri.keel.web.http.receptionist;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.logger.event.logger.KeelOutputEventLogger;
 import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.Handler;
@@ -46,10 +47,8 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
      * @since 2.9.2
      */
     private Handler<RoutingContext> failureHandler = null;
-    private final Keel keel;
 
-    public KeelWebReceptionistKit(Keel keel, Class<R> classOfReceptionist, Router router) {
-        this.keel = keel;
+    public KeelWebReceptionistKit(Class<R> classOfReceptionist, Router router) {
         this.classOfReceptionist = classOfReceptionist;
         this.router = router;
     }
@@ -61,21 +60,21 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         try {
             allClasses.forEach(this::loadClass);
         } catch (Exception e) {
-            this.keel.getInstantEventLogger().exception(e, getClass().getName() + "::loadPackage THROWS");
+            KeelOutputEventLogger.getInstance().exception(e, getClass().getName() + "::loadPackage THROWS");
         }
     }
 
     public void loadClass(Class<? extends R> c) {
-        ApiMeta apiMeta = keel.reflectionHelper().getAnnotationOfClass(c, ApiMeta.class);
+        ApiMeta apiMeta = KeelHelpers.reflectionHelper().getAnnotationOfClass(c, ApiMeta.class);
         if (apiMeta == null) return;
 
-        keel.getInstantEventLogger().debug(getClass().getName() + " Loading " + c.getName());
+        KeelOutputEventLogger.getInstance().debug(getClass().getName() + " Loading " + c.getName());
 
         Constructor<? extends R> receptionistConstructor;
         try {
-            receptionistConstructor = c.getConstructor(Keel.class, RoutingContext.class);
+            receptionistConstructor = c.getConstructor(RoutingContext.class);
         } catch (NoSuchMethodException e) {
-            keel.getInstantEventLogger().exception(e, "HANDLER REFLECTION EXCEPTION");
+            KeelOutputEventLogger.getInstance().exception(e, "HANDLER REFLECTION EXCEPTION");
             return;
         }
 
@@ -95,7 +94,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
 
         // === HANDLERS WEIGHT IN ORDER ===
         // PLATFORM
-        route.handler(new KeelPlatformHandler(this.keel));
+        route.handler(new KeelPlatformHandler());
         if (apiMeta.timeout() > 0) {
             // PlatformHandler
             route.handler(TimeoutHandler.create(apiMeta.timeout(), apiMeta.statusCodeForTimeout()));
@@ -128,7 +127,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         // finally!
         route.handler(routingContext -> {
             try {
-                R receptionist = receptionistConstructor.newInstance(keel, routingContext);
+                R receptionist = receptionistConstructor.newInstance(routingContext);
                 //receptionist.setApiMeta(apiMeta);
                 receptionist.handle();
             } catch (Throwable e) {

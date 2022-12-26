@@ -69,7 +69,7 @@ public class KeelStringHelper {
      */
     public String bufferToHexMatrix(Buffer buffer, int rowSize) {
         StringBuilder matrix = new StringBuilder();
-        String s = KeelHelpers.getInstance().binaryHelper().encodeHexWithUpperDigits(buffer);
+        String s = KeelHelpers.binaryHelper().encodeHexWithUpperDigits(buffer);
         for (int i = 0; i < s.length(); i += 2) {
             matrix.append(s, i, i + 2).append(" ");
             if ((i / 2) % rowSize == rowSize - 1) {
@@ -94,7 +94,7 @@ public class KeelStringHelper {
                 camel.add(part.substring(0, 1).toUpperCase() + part.substring(1));
             }
         }
-        return KeelHelpers.getInstance().stringHelper().joinStringArray(camel, "");
+        return KeelHelpers.stringHelper().joinStringArray(camel, "");
     }
 
     /**
@@ -128,7 +128,7 @@ public class KeelStringHelper {
         if (part.length() > 0) {
             parts.add(part.toString());
         }
-        return KeelHelpers.getInstance().stringHelper().joinStringArray(parts, "_");
+        return KeelHelpers.stringHelper().joinStringArray(parts, "_");
     }
 
     /**
@@ -248,7 +248,7 @@ public class KeelStringHelper {
      * @since 2.9.4
      */
     public byte[] encodeWithBase64ToBytes(String s) {
-        return KeelHelpers.getInstance().binaryHelper().encodeWithBase64(s.getBytes());
+        return KeelHelpers.binaryHelper().encodeWithBase64(s.getBytes());
     }
 
     /**

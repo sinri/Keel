@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.http.prehandler;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
@@ -14,15 +13,6 @@ import io.vertx.ext.web.handler.AuthenticationHandler;
  * @since 3.0.0 TEST PASSED
  */
 abstract public class KeelAuthenticationHandler implements AuthenticationHandler {
-    private final Keel keel;
-
-    public KeelAuthenticationHandler(Keel keel) {
-        this.keel = keel;
-    }
-
-    public Keel getKeel() {
-        return keel;
-    }
 
     @Override
     public void handle(RoutingContext routingContext) {

@@ -40,7 +40,7 @@ public class JsonSchemeMismatchException extends Exception {
     public String getDesc() {
         String msg = getMessage();
         if (!getKeychain().isEmpty()) {
-            msg += " keychain: " + KeelHelpers.getInstance().stringHelper().joinStringArray(getKeychain(), " → ");
+            msg += " keychain: " + KeelHelpers.stringHelper().joinStringArray(getKeychain(), " → ");
         }
         return msg;
     }

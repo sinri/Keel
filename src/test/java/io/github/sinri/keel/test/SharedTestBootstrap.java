@@ -1,6 +1,5 @@
 package io.github.sinri.keel.test;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Handler;
 
