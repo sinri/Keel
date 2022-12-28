@@ -1,4 +1,4 @@
-package io.github.sinri.keel.facade.interfaces;
+package io.github.sinri.keel.facade.cluster;
 
 import com.hazelcast.config.*;
 import io.vertx.core.spi.cluster.ClusterManager;

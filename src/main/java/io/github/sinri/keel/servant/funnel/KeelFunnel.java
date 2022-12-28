@@ -1,6 +1,6 @@
 package io.github.sinri.keel.servant.funnel;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.FutureRepeat;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
@@ -49,7 +49,7 @@ public class KeelFunnel extends KeelVerticleBase {
     public static Future<KeelFunnel> deployOneInstance(KeelFunnel.Options options) {
         KeelFunnel keelFunnel = new KeelFunnel().setOptions(options);
         DeploymentOptions deploymentOptions = new DeploymentOptions().setWorker(true);
-        return Keel3.getVertx().deployVerticle(keelFunnel, deploymentOptions)
+        return Keel.getVertx().deployVerticle(keelFunnel, deploymentOptions)
                 .compose(d -> Future.succeededFuture(keelFunnel));
     }
 
@@ -79,7 +79,7 @@ public class KeelFunnel extends KeelVerticleBase {
             return;
         }
         // 暇、続きの暇
-        Keel3.getVertx().setTimer(getQueryInterval(), timerID -> query());
+        Keel.getVertx().setTimer(getQueryInterval(), timerID -> query());
     }
 
     private Future<Void> pourOneDrip(FutureRepeat.RoutineResult routineResult) {

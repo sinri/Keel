@@ -40,6 +40,7 @@ public abstract class KeelWebReceptionist {
         } catch (Throwable throwable) {
             logger.exception(throwable, event -> event
                     .message("RoutingContext has been dealt by others")
+                    .put("request_id", readRequestID())
                     .put("response", new JsonObject()
                             .put("code", routingContext.response().getStatusCode())
                             .put("message", routingContext.response().getStatusMessage())
@@ -55,8 +56,10 @@ public abstract class KeelWebReceptionist {
                 .put("code", "OK")
                 .put("data", data);
         logger.info(event -> event
-                .message("RESPOND SUCCESS")
-                .put("response", resp));
+                        .message("RESPOND SUCCESS")
+                        .put("request_id", readRequestID())
+                //.put("response", resp)
+        );
         respondWithJsonObject(resp);
     }
 
@@ -66,7 +69,10 @@ public abstract class KeelWebReceptionist {
                 .put("data", throwable.getMessage());
         String error = KeelHelpers.stringHelper().renderThrowableChain(throwable);
         resp.put("throwable", error);
-        logger.exception(throwable, "RESPOND FAILURE");
+        logger.exception(throwable, event -> event
+                .message("RESPOND FAILURE")
+                .put("request_id", readRequestID())
+        );
         respondWithJsonObject(resp);
     }
 

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.MySQLDataSource;
@@ -122,20 +122,20 @@ public class TableRowClassGenerator {
                     return this.generateClassCodeForOneTable(schema, table, packageName, className)
                             .compose(code -> {
                                 if (this.rewrite) {
-                                    return Keel3.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
+                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                                 } else {
-                                    return Keel3.getVertx().fileSystem().exists(classFile)
+                                    return Keel.getVertx().fileSystem().exists(classFile)
                                             .compose(existed -> {
                                                 if (existed) {
-                                                    return Keel3.getVertx().fileSystem().readFile(classFile)
+                                                    return Keel.getVertx().fileSystem().readFile(classFile)
                                                             .compose(existedContentBuffer -> {
-                                                                return Keel3.getVertx().fileSystem().writeFile(
+                                                                return Keel.getVertx().fileSystem().writeFile(
                                                                         classFile,
                                                                         existedContentBuffer.appendString("\n\n").appendString(code)
                                                                 );
                                                             });
                                                 } else {
-                                                    return Keel3.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
+                                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                                                 }
                                             });
                                 }

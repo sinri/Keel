@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
@@ -23,7 +23,7 @@ public class MySQLDataSource {
     public MySQLDataSource(KeelMySQLConfigure configure) {
         this.configure = configure;
         pool = MySQLPool.pool(
-                Keel3.getVertx(),
+                Keel.getVertx(),
                 configure.getConnectOptions(),
                 configure.getPoolOptions()
         );

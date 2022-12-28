@@ -1,6 +1,6 @@
 package io.github.sinri.keel.facade.async;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
@@ -14,7 +14,7 @@ public class FutureSleep {
     static Future<Void> call(long time) {
         Promise<Void> promise = Promise.promise();
         if (time < 1) time = 1;
-        Keel3.getVertx().setTimer(time, x -> promise.complete());
+        Keel.getVertx().setTimer(time, x -> promise.complete());
         return promise.future();
     }
 }

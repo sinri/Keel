@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.http;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Handler;
@@ -55,9 +55,9 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
     public void start() throws Exception {
         setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
 
-        this.server = Keel3.getVertx().createHttpServer(getHttpServerOptions());
+        this.server = Keel.getVertx().createHttpServer(getHttpServerOptions());
 
-        Router router = Router.router(Keel3.getVertx());
+        Router router = Router.router(Keel.getVertx());
         this.configureRoutes(router);
 
         server.requestHandler(router)
@@ -75,7 +75,7 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
                         getLogger().exception(throwable, "Listen failed");
 
                         if (this.isMainService()) {
-                            Keel3.gracefullyClose(Promise::complete);
+                            Keel.gracefullyClose(Promise::complete);
                         }
                     }
                 })
@@ -91,7 +91,7 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
             }
 
             if (this.isMainService()) {
-                Keel3.gracefullyClose(Promise::complete);
+                Keel.gracefullyClose(Promise::complete);
             }
         });
     }

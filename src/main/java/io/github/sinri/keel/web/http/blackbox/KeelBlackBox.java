@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.http.blackbox;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.web.http.blackbox.html.HTMLElement;
 import io.github.sinri.keel.web.http.blackbox.html.HTMLTagElement;
@@ -62,7 +62,7 @@ public class KeelBlackBox {
     }
 
     private static void handleDir(RoutingContext routingContext, File dir, String logDirPath, String routeRootPathWithTailSplash) {
-        Keel3.getVertx().fileSystem().readDir(dir.getAbsolutePath())
+        Keel.getVertx().fileSystem().readDir(dir.getAbsolutePath())
                 .compose(children -> {
                     String relativeDirPath = dir.getAbsolutePath().substring(logDirPath.length());
 

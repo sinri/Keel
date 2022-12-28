@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.http.prehandler;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.Future;
 import io.vertx.core.shareddata.Counter;
@@ -25,7 +25,7 @@ public class KeelPlatformHandler implements PlatformHandler {
         // BEFORE ASYNC PAUSE
         routingContext.request().pause();
         // START !
-        Keel3.getVertx().sharedData()
+        Keel.getVertx().sharedData()
                 .getCounter("KeelPlatformHandler-RequestID-Counter")
                 .compose(Counter::incrementAndGet)
                 .recover(throwable -> {

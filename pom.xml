@@ -262,7 +262,7 @@
                                     <transformers>
                                         <transformer
                                                 implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>io.github.sinri.keel.lagecy.Keel</mainClass>
+                                            <mainClass>io.github.sinri.keel.facade.Keel</mainClass>
                                         </transformer>
                                     </transformers>
                                 </configuration>

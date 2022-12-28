@@ -1,6 +1,6 @@
 package io.github.sinri.keel.helper.runtime;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.Handler;
 
@@ -15,7 +15,7 @@ public class KeelRuntimeMonitor {
 
 
     public void startRuntimeMonitor(long interval, Handler<MonitorSnapshot> handler) {
-        Keel3.getVertx().setPeriodic(interval, timer -> {
+        Keel.getVertx().setPeriodic(interval, timer -> {
             MonitorSnapshot monitorSnapshot = new MonitorSnapshot();
 
             GCStatResult gcSnapshot = KeelHelpers.runtimeHelper().getGCSnapshot();

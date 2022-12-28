@@ -1,6 +1,6 @@
 package io.github.sinri.keel.email.smtp;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.KeelConfiguration;
 import io.vertx.core.Future;
 import io.vertx.ext.mail.MailClient;
@@ -20,24 +20,24 @@ public class KeelSmtpKit {
 
     public KeelSmtpKit(String smtpName, boolean shared) {
         this.smtpName = smtpName;
-        this.mailConfig = buildMailConfig(Keel3.getConfiguration(), smtpName);
+        this.mailConfig = buildMailConfig(Keel.getConfiguration(), smtpName);
         if (shared) {
-            this.mailClient = MailClient.createShared(Keel3.getVertx(), this.mailConfig, smtpName);
+            this.mailClient = MailClient.createShared(Keel.getVertx(), this.mailConfig, smtpName);
         } else {
-            this.mailClient = MailClient.create(Keel3.getVertx(), this.mailConfig);
+            this.mailClient = MailClient.create(Keel.getVertx(), this.mailConfig);
         }
     }
 
     public KeelSmtpKit(String smtpName) {
         this.smtpName = smtpName;
-        this.mailConfig = buildMailConfig(Keel3.getConfiguration(), smtpName);
-        this.mailClient = MailClient.create(Keel3.getVertx(), this.mailConfig);
+        this.mailConfig = buildMailConfig(Keel.getConfiguration(), smtpName);
+        this.mailClient = MailClient.create(Keel.getVertx(), this.mailConfig);
     }
 
     public KeelSmtpKit() {
-        this.smtpName = Keel3.getConfiguration().readString("email", "smtp", "default_smtp_name");
-        this.mailConfig = buildMailConfig(Keel3.getConfiguration(), smtpName);
-        this.mailClient = MailClient.create(Keel3.getVertx(), this.mailConfig);
+        this.smtpName = Keel.getConfiguration().readString("email", "smtp", "default_smtp_name");
+        this.mailConfig = buildMailConfig(Keel.getConfiguration(), smtpName);
+        this.mailClient = MailClient.create(Keel.getVertx(), this.mailConfig);
     }
 
     private static MailConfig buildMailConfig(KeelConfiguration keelConfiguration, String smtpName) {

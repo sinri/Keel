@@ -8,7 +8,7 @@ import io.vertx.core.spi.cluster.NodeInfo;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public class Keel3 {
+public class Keel {
     private final static KeelConfiguration configuration = KeelConfiguration.createFromJsonObject(new JsonObject());
     private static @Nullable Vertx vertx;
     private static @Nullable ClusterManager clusterManager;

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.core.semaphore;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.shareddata.Counter;
@@ -30,7 +30,7 @@ public class KeelShareDataSemaphore {
     }
 
     protected Future<Counter> getCounter() {
-        return Keel3.getVertx().sharedData().getCounter(name);
+        return Keel.getVertx().sharedData().getCounter(name);
     }
 
     public Future<Boolean> isNowAvailable() {

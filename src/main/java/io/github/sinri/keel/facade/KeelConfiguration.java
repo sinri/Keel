@@ -66,6 +66,9 @@ public interface KeelConfiguration extends JsonifiableEntity<KeelConfiguration> 
         System.out.println("b: " + b.toJsonObject());
         KeelConfiguration c = a.extract("b", "c");
         System.out.println("c: " + c.toJsonObject());
+
+        KeelConfiguration fromPropertiesFile = KeelConfiguration.createFromPropertiesFile("sample.properties");
+        System.out.println("fromPropertiesFile: " + fromPropertiesFile.toJsonObject());
     }
 
     default KeelConfiguration putAll(KeelConfiguration keelConfiguration) {
@@ -97,5 +100,23 @@ public interface KeelConfiguration extends JsonifiableEntity<KeelConfiguration> 
 
     default @Nullable KeelConfiguration extract(String... keychain) {
         return readJsonifiableEntity(KeelConfigurationImpl.class, keychain);
+    }
+
+    default @Nullable Long readAsLong(String... keychain) {
+        String s = readString(keychain);
+        return s == null ? null : Long.valueOf(s);
+    }
+
+    default @Nullable Integer readAsInteger(String... keychain) {
+        String s = readString(keychain);
+        return s == null ? null : Integer.valueOf(s);
+    }
+
+    /**
+     * Parse TRUE/FALSE to boolean ignoring case.
+     */
+    default @Nullable Boolean readAsBoolean(String... keychain) {
+        String s = readString(keychain);
+        return s == null ? null : Boolean.valueOf(s);
     }
 }

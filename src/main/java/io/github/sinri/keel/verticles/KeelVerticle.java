@@ -1,6 +1,6 @@
 package io.github.sinri.keel.verticles;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -46,14 +46,14 @@ public interface KeelVerticle extends Verticle {
 
 
     default Future<String> deployMe(DeploymentOptions deploymentOptions) {
-        return Keel3.getVertx().deployVerticle(this, deploymentOptions);
+        return Keel.getVertx().deployVerticle(this, deploymentOptions);
     }
 
     /**
      * @since 2.8 add default implementation
      */
     default Future<Void> undeployMe() {
-        return Keel3.getVertx().undeploy(deploymentID());
+        return Keel.getVertx().undeploy(deploymentID());
     }
 
 }

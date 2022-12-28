@@ -13,6 +13,7 @@ public interface KeelEventLogCenter {
 
     Future<Void> gracefullyClose();
 
+
     default KeelEventLogger createLogger(String presetTopic) {
         return new KeelEventLoggerImpl(presetTopic, () -> this);
     }

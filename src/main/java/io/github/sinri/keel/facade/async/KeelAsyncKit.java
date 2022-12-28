@@ -1,8 +1,10 @@
 package io.github.sinri.keel.facade.async;
 
+import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * @since 3.0.0
@@ -62,5 +64,13 @@ public interface KeelAsyncKit {
 
     static <T, R> Future<FutureForEachParallel.ParallelResult> parallelForAllResult(Iterable<T> collection, Function<T, Future<R>> itemProcessor) {
         return FutureForEachParallel.call(collection, itemProcessor);
+    }
+
+    static Future<Void> exclusivelyCall(String lockName, Supplier<Future<Void>> exclusiveSupplier) {
+        return Keel.getVertx().sharedData()
+                .getLock(lockName)
+                .compose(lock -> Future.succeededFuture()
+                        .compose(v -> exclusiveSupplier.get())
+                        .andThen(ar -> lock.release()));
     }
 }

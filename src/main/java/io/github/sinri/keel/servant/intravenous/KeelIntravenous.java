@@ -1,6 +1,6 @@
 package io.github.sinri.keel.servant.intravenous;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -65,9 +65,9 @@ public class KeelIntravenous<T> extends KeelVerticleBase {
             }
             Future.succeededFuture()
                     .compose(v -> this.processor.apply(l))
-                    .andThen(ar -> Keel3.getVertx().setTimer(1L, x -> routine()));
+                    .andThen(ar -> Keel.getVertx().setTimer(1L, x -> routine()));
         } else {
-            Keel3.getVertx().setTimer(interval, x -> routine());
+            Keel.getVertx().setTimer(interval, x -> routine());
         }
     }
 
@@ -76,7 +76,7 @@ public class KeelIntravenous<T> extends KeelVerticleBase {
      * @since 2.9
      */
     public void registerMessageConsumer(String address) {
-        unregisterMessageConsumer(event -> consumer = Keel3.getVertx().eventBus()
+        unregisterMessageConsumer(event -> consumer = Keel.getVertx().eventBus()
                 .consumer(address, message -> drop(message.body())));
     }
 

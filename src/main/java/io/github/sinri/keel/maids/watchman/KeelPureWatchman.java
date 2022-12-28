@@ -1,6 +1,6 @@
 package io.github.sinri.keel.maids.watchman;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -23,7 +23,7 @@ public class KeelPureWatchman extends KeelWatchmanImpl {
         Options options = new Options();
         optionsHandler.handle(options);
         KeelPureWatchman keelPureWatchman = new KeelPureWatchman(watchmanName, options);
-        return Keel3.getVertx().deployVerticle(keelPureWatchman, new DeploymentOptions()
+        return Keel.getVertx().deployVerticle(keelPureWatchman, new DeploymentOptions()
                 .setWorker(true)
         );
     }

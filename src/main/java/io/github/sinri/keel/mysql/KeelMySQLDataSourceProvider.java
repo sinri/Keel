@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.KeelConfiguration;
 
 import javax.annotation.Nonnull;
@@ -19,7 +19,7 @@ public class KeelMySQLDataSourceProvider {
 
     public static MySQLDataSource getMySQLDataSource(@Nonnull String dataSourceName) {
         if (!mySQLDataSourceMap.containsKey(dataSourceName)) {
-            KeelConfiguration configuration = Keel3.getConfiguration().extract("mysql", dataSourceName);
+            KeelConfiguration configuration = Keel.getConfiguration().extract("mysql", dataSourceName);
             Objects.requireNonNull(configuration);
             KeelMySQLConfigure mySQLConfigure = new KeelMySQLConfigure(dataSourceName, configuration);
             MySQLDataSource mySQLDataSource = new MySQLDataSource(mySQLConfigure);
@@ -30,6 +30,6 @@ public class KeelMySQLDataSourceProvider {
 
     @Nonnull
     public static String defaultMySQLDataSourceName() {
-        return Objects.requireNonNullElse(Keel3.getConfiguration().readString("mysql", "default_data_source_name"), "default");
+        return Objects.requireNonNullElse(Keel.getConfiguration().readString("mysql", "default_data_source_name"), "default");
     }
 }

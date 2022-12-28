@@ -20,9 +20,9 @@ public interface KeelEventLogger {
     String getPresetTopic();
 
 
+
     default void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
-        KeelEventLog eventLog = new KeelEventLog();
-        eventLog.injectContext();
+        KeelEventLog eventLog = new KeelEventLog(KeelLogLevel.INFO, getPresetTopic());
         eventLogHandler.handle(eventLog);
         getEventLogCenterSupplier().get().log(eventLog);
     }

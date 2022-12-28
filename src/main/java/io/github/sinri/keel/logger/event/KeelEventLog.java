@@ -1,7 +1,7 @@
 package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.json.JsonArray;
@@ -25,28 +25,28 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
 
     public static final String RESERVED_KEY_TOPIC = "topic";
 
-    public KeelEventLog() {
-        this(KeelLogLevel.INFO);
-    }
+//    public KeelEventLog() {
+//        this(KeelLogLevel.INFO, "");
+//    }
+//
+//    public KeelEventLog(KeelLogLevel level) {
+//        this(level, "");
+//    }
 
-    public KeelEventLog(KeelLogLevel level) {
+    public KeelEventLog(KeelLogLevel level, String topic) {
         super();
         timestamp(System.currentTimeMillis());
-        topic("");
         level(level);
+        topic(topic);
         this.toJsonObject().put(RESERVED_KEY_EVENT, new JsonObject());
-    }
 
-    public KeelEventLog(JsonObject context) {
-        super(context);
-        if (context.getString(RESERVED_KEY_TIMESTAMP) == null) {
-            timestamp(System.currentTimeMillis());
-        }
-        if (context.getString(RESERVED_KEY_LEVEL) == null) {
-            level(KeelLogLevel.INFO);
-        }
-        if (this.toJsonObject().getJsonObject(RESERVED_KEY_EVENT) == null) {
-            this.toJsonObject().put(RESERVED_KEY_EVENT, new JsonObject());
+        this.context(KeelEventLog.RESERVED_KEY_THREAD_ID, Thread.currentThread().getId());
+        if (Keel.isRunningInVertxCluster()) {
+//                jsonObject.put("use_cluster", "YES");
+            this.context(KeelEventLog.RESERVED_KEY_CLUSTER_NODE_ID, Keel.getVertxNodeID());
+            this.context(KeelEventLog.RESERVED_KEY_CLUSTER_NODE_ADDRESS, Keel.getVertxNodeNetAddress());
+        } else {
+//                jsonObject.put("use_cluster", "NO");
         }
     }
 
@@ -91,8 +91,13 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
     }
 
     public KeelEventLog timestamp(long timestamp) {
-        this.context(RESERVED_KEY_TIMESTAMP, KeelHelpers.datetimeHelper().getDateExpression(new Date(timestamp), "yyyy-MM-dd HH:mm:ss.SSS"));
+        this.context(RESERVED_KEY_TIMESTAMP, timestamp);
+//                KeelHelpers.datetimeHelper().getDateExpression(new Date(timestamp), "yyyy-MM-dd HH:mm:ss.SSS")
         return this;
+    }
+
+    public long timestamp() {
+        return Objects.requireNonNullElse(readLong(RESERVED_KEY_TIMESTAMP), 0L);
     }
 
     public KeelEventLog level(KeelLogLevel level) {
@@ -100,9 +105,17 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
         return this;
     }
 
+    public KeelLogLevel level() {
+        return KeelLogLevel.valueOf(readString(RESERVED_KEY_LEVEL));
+    }
+
     public KeelEventLog topic(String topic) {
         this.toJsonObject().put(RESERVED_KEY_TOPIC, topic);
         return this;
+    }
+
+    public String topic() {
+        return readString(RESERVED_KEY_TOPIC);
     }
 
     public KeelEventLog message(String msg) {
@@ -110,22 +123,13 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
         return this;
     }
 
-    public KeelEventLog injectContext() {
-        this.context(KeelEventLog.RESERVED_KEY_THREAD_ID, Thread.currentThread().getId());
-        if (Keel3.isRunningInVertxCluster()) {
-//                jsonObject.put("use_cluster", "YES");
-            this.context(KeelEventLog.RESERVED_KEY_CLUSTER_NODE_ID, Keel3.getVertxNodeID());
-            this.context(KeelEventLog.RESERVED_KEY_CLUSTER_NODE_ADDRESS, Keel3.getVertxNodeNetAddress());
-        } else {
-//                jsonObject.put("use_cluster", "NO");
-        }
-        return this;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this.jsonObject.getString(RESERVED_KEY_TIMESTAMP))
+
+        String dateExpression = KeelHelpers.datetimeHelper().getDateExpression(new Date(timestamp()), "yyyy-MM-dd HH:mm:ss.SSS");
+
+        sb.append(dateExpression)
                 .append(" [").append(this.jsonObject.getString(RESERVED_KEY_LEVEL)).append("]");
         JsonObject context = new JsonObject();
         for (var k : this.jsonObject.fieldNames()) {

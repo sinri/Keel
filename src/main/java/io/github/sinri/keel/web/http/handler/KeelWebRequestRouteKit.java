@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.http.handler;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
@@ -53,7 +53,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
 
     public KeelWebRequestRouteKit(Class<S> classOfService) {
         this.classOfService = classOfService;
-        router = Router.router(Keel3.getVertx());
+        router = Router.router(Keel.getVertx());
         this.logger = KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName());
     }
 

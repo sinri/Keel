@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.dysonsphere;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.test.SharedTestBootstrap;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.vertx.core.DeploymentOptions;
@@ -16,7 +16,7 @@ public class DysonSphere {
     }
 
     private void startHttpServer() {
-        Keel3.getVertx().deployVerticle(DSHttpServer.class, new DeploymentOptions()
+        Keel.getVertx().deployVerticle(DSHttpServer.class, new DeploymentOptions()
                 .setConfig(new JsonObject()
                         .put(KeelHttpServer.CONFIG_HTTP_SERVER_PORT, 8080)
                 )

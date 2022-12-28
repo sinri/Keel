@@ -1,6 +1,6 @@
 package io.github.sinri.keel.logger.event.center;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
@@ -32,7 +32,7 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
         KeelAsyncKit.repeatedlyCall(routineResult -> {
             return Future.succeededFuture()
                     .compose(v -> {
-                        return Keel3.getVertx().executeBlocking(promise -> {
+                        return Keel.getVertx().executeBlocking(promise -> {
                             List<KeelEventLog> buffer = new ArrayList<>();
                             for (int i = 0; i < bufferSize; i++) {
                                 KeelEventLog eventLog = this.queue.poll();

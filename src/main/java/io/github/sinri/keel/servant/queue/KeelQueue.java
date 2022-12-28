@@ -1,6 +1,6 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.facade.Keel3;
+import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
@@ -76,7 +76,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
                 .eventually(v -> {
                     long waitingMs = nextTaskSeeker.waitingMs();
                     getLogger().debug("set timer for next routine after " + waitingMs + " ms");
-                    Keel3.getVertx().setTimer(waitingMs, timerID -> routine());
+                    Keel.getVertx().setTimer(waitingMs, timerID -> routine());
                     return Future.succeededFuture();
                 })
         ;
