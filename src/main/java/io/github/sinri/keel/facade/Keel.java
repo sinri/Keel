@@ -8,6 +8,9 @@ import io.vertx.core.spi.cluster.NodeInfo;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+/**
+ * It is the facade of Keel, i.e. itself, provides Vertx Instance.
+ */
 public class Keel {
     private final static KeelConfiguration configuration = KeelConfiguration.createFromJsonObject(new JsonObject());
     private static @Nullable Vertx vertx;

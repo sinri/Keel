@@ -3,13 +3,13 @@ package io.github.sinri.keel.mysql.matrix;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
-import io.github.sinri.keel.mysql.MySQLDataSource;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.sqlclient.SqlConnection;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -332,7 +332,7 @@ public class TableRowClassGenerator {
                             .append(" * (*￣∇￣*)\n")
                             .append(" * NOTICE BY KEEL:\n")
                             .append(" * \tTo avoid being rewritten, do not modify this file manually, unless editable confirmed.\n")
-                            .append(" * \tIt was auto-generated on ").append(MySQLDataSource.nowAsMySQLDatetime()).append(".\n")
+                            .append(" * \tIt was auto-generated on ").append(new Date()).append(".\n")
                             .append(" * @see ").append(this.getClass().getName()).append("\n")
                             .append(" */\n")
                             .append("public class ").append(className).append(" extends AbstractTableRow {").append("\n");

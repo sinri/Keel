@@ -1,6 +1,7 @@
 package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
@@ -18,17 +19,18 @@ import java.util.function.Function;
 
 public class MySQLDataSource {
     private final MySQLPool pool;
-    private final KeelMySQLConfigure configure;
+    private final KeelMySQLConfiguration configuration;
 
-    public MySQLDataSource(KeelMySQLConfigure configure) {
-        this.configure = configure;
+    public MySQLDataSource(KeelMySQLConfiguration configuration) {
+        this.configuration = configuration;
         pool = MySQLPool.pool(
                 Keel.getVertx(),
-                configure.getConnectOptions(),
-                configure.getPoolOptions()
+                configuration.getConnectOptions(),
+                configuration.getPoolOptions()
         );
     }
 
+    @Deprecated(since = "3.0.0")
     protected static String makePlaceholderString(int x) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < x; i++) {
@@ -38,6 +40,7 @@ public class MySQLDataSource {
         return result.toString();
     }
 
+    @Deprecated(since = "3.0.0")
     protected static String makeStandardWidthField(int x, int w) {
         StringBuilder s = new StringBuilder("" + x);
         if (s.length() < w) {
@@ -48,6 +51,7 @@ public class MySQLDataSource {
         return String.valueOf(s);
     }
 
+    @Deprecated(since = "3.0.0")
     public static String toMySQLDatetime(LocalDateTime datetime) {
         return makeStandardWidthField(datetime.getYear(), 4)
                 + "-" + makeStandardWidthField(datetime.getMonthValue(), 2)
@@ -62,13 +66,16 @@ public class MySQLDataSource {
      * @return Y-m-d H:i:s
      * @since 1.7
      */
+    @Deprecated(since = "3.0.0")
     public static String nowAsMySQLDatetime() {
-        return toMySQLDatetime(LocalDateTime.now());
+        return KeelHelpers.datetimeHelper().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss");
+//        return toMySQLDatetime(LocalDateTime.now());
     }
 
     /**
      * @since 1.1
      */
+    @Deprecated(since = "3.0.0")
     public static Future<Long> executeSqlForLastInsertedID(
             SqlConnection sqlConnection,
             String sqlTemplate,
@@ -90,6 +97,7 @@ public class MySQLDataSource {
     /**
      * @since 1.1
      */
+    @Deprecated(since = "3.0.0")
     public static Future<Long> executeSqlForLastInsertedID(
             SqlConnection sqlConnection,
             String sqlTemplate,
@@ -111,6 +119,7 @@ public class MySQLDataSource {
     /**
      * @since 1.1
      */
+    @Deprecated(since = "3.0.0")
     public static Future<Integer> executeSqlForAffectedRowCount(
             SqlConnection sqlConnection,
             String sqlTemplate,
@@ -138,6 +147,7 @@ public class MySQLDataSource {
     /**
      * @since 1.1
      */
+    @Deprecated(since = "3.0.0")
     public static Future<Integer> executeSqlForAffectedRowCount(
             SqlConnection sqlConnection,
             String sqlTemplate,
@@ -164,6 +174,7 @@ public class MySQLDataSource {
     /**
      * @since 1.1
      */
+    @Deprecated(since = "3.0.0")
     public static Future<ResultMatrix> executeSqlForResultMatrix(
             SqlConnection sqlConnection,
             String sqlTemplate,
@@ -182,6 +193,7 @@ public class MySQLDataSource {
     /**
      * @since 1.1
      */
+    @Deprecated(since = "3.0.0")
     public static Future<ResultMatrix> executeSqlForResultMatrix(
             SqlConnection sqlConnection,
             String sqlTemplate,
@@ -196,8 +208,8 @@ public class MySQLDataSource {
         return future;
     }
 
-    public KeelMySQLConfigure getConfigure() {
-        return configure;
+    public KeelMySQLConfiguration getConfiguration() {
+        return configuration;
     }
 
     /**
@@ -287,6 +299,7 @@ public class MySQLDataSource {
      * @return future with final result if committed, or failed future if rollback
      * @since 1.10
      */
+    @Deprecated(since = "3.0.0")
     public <T> Future<T> executeInTransaction(Function<SqlConnection, Future<T>> transactionBody) {
         AtomicReference<T> finalResult = new AtomicReference<>();
         AtomicReference<Throwable> cause = new AtomicReference<>();
@@ -307,6 +320,7 @@ public class MySQLDataSource {
      * @return the future for ResultMatrix, nullable
      * @since 1.4
      */
+    @Deprecated(since = "3.0.0")
     public Future<ResultMatrix> queryInConnection(SelectStatement selection) {
         return pool.withConnection(
                 sqlConnection -> MySQLDataSource.executeSqlForResultMatrix(

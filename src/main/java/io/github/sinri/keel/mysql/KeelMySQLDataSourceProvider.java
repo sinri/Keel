@@ -21,7 +21,7 @@ public class KeelMySQLDataSourceProvider {
         if (!mySQLDataSourceMap.containsKey(dataSourceName)) {
             KeelConfiguration configuration = Keel.getConfiguration().extract("mysql", dataSourceName);
             Objects.requireNonNull(configuration);
-            KeelMySQLConfigure mySQLConfigure = new KeelMySQLConfigure(dataSourceName, configuration);
+            KeelMySQLConfiguration mySQLConfigure = new KeelMySQLConfiguration(dataSourceName, configuration);
             MySQLDataSource mySQLDataSource = new MySQLDataSource(mySQLConfigure);
             mySQLDataSourceMap.put(dataSourceName, mySQLDataSource);
         }

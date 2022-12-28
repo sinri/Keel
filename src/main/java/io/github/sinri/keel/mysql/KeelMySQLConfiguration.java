@@ -1,7 +1,6 @@
 package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.facade.KeelConfiguration;
-import io.github.sinri.keel.facade.KeelConfigurationImpl;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
@@ -19,10 +18,10 @@ import java.util.Objects;
  * poolShared = false;
  * tcpKeepAlive=false;
  */
-public class KeelMySQLConfigure extends KeelConfigurationImpl {
+public class KeelMySQLConfiguration extends KeelConfiguration {
     private final String dataSourceName;
 
-    public KeelMySQLConfigure(String dataSourceName, KeelConfiguration keelConfiguration) {
+    public KeelMySQLConfiguration(String dataSourceName, KeelConfiguration keelConfiguration) {
         this.dataSourceName = dataSourceName;
         this.reloadDataFromJsonObject(keelConfiguration.toJsonObject());
     }
@@ -40,10 +39,10 @@ public class KeelMySQLConfigure extends KeelConfigurationImpl {
 //                + "&allowPublicKeyRetrieval="+(ssl ? "true" : "false");
 //    }
 
-    public static @Nullable KeelMySQLConfigure loadConfigurationForDataSource(@Nonnull KeelConfiguration keelConfiguration, @Nonnull String dataSourceName) {
+    public static @Nullable KeelMySQLConfiguration loadConfigurationForDataSource(@Nonnull KeelConfiguration keelConfiguration, @Nonnull String dataSourceName) {
         KeelConfiguration configuration = keelConfiguration.extract("mysql", dataSourceName);
         if (configuration == null) return null;
-        return new KeelMySQLConfigure(dataSourceName, configuration);
+        return new KeelMySQLConfiguration(dataSourceName, configuration);
     }
 
     public static void main(String[] args) {

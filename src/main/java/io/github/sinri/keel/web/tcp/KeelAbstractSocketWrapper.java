@@ -29,7 +29,8 @@ abstract public class KeelAbstractSocketWrapper {
         this.socket = socket;
         this.logger = KeelEventLogger.silentLogger();
 //        this.logger.setCategoryPrefix(socketID);
-        this.funnel = KeelFunnel.getOneInstanceToDeploy(10L);
+
+        this.funnel = new KeelFunnel();
         this.funnel.deployMe(new DeploymentOptions().setWorker(true));
 
         this.socket
@@ -38,8 +39,10 @@ abstract public class KeelAbstractSocketWrapper {
                             .message("READ BUFFER " + buffer.length() + " BYTES")
                             .put("buffer", KeelHelpers.binaryHelper().encodeHexWithUpperDigits(buffer))
                     );
-                    this.funnel.drop(() -> whenBufferComes(buffer)
-                            .compose(v -> Future.succeededFuture()));
+
+                    this.funnel.add(() -> {
+                        return whenBufferComes(buffer);
+                    });
                 })
                 .endHandler(end -> {
                     /*

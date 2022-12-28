@@ -7,6 +7,10 @@ import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
 import java.util.List;
 
+/**
+ * @since 3.0.0
+ * This interface provides a shortcut to create an instance of ClusterManager for SAE.
+ */
 public interface KeelClusterKit {
 
     static ClusterManager createClusterManagerForSAE(

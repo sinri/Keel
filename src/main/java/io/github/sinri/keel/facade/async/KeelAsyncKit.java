@@ -2,7 +2,11 @@ package io.github.sinri.keel.facade.async;
 
 import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.Promise;
+import io.vertx.core.VertxOptions;
 
+import java.util.Date;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -50,6 +54,10 @@ public interface KeelAsyncKit {
         return FutureSleep.call(t);
     }
 
+    static Future<Void> sleep(long t, Promise<Void> interrupter) {
+        return FutureSleep.call(t, interrupter);
+    }
+
     static <T> Future<Void> parallelForAllSuccess(Iterable<T> collection, Function<T, Future<Void>> itemProcessor) {
         return FutureForEachParallel.all(collection, itemProcessor);
     }
@@ -72,5 +80,31 @@ public interface KeelAsyncKit {
                 .compose(lock -> Future.succeededFuture()
                         .compose(v -> exclusiveSupplier.get())
                         .andThen(ar -> lock.release()));
+    }
+
+    /**
+     * @param promiseHandler execute a regular job, even if it is blocking, handle method is decided by users.
+     * @since 3.0.0
+     */
+    static void endless(Handler<Promise<Void>> promiseHandler) {
+        Promise<Void> promise = Promise.promise();
+        promiseHandler.handle(promise);
+        promise.future()
+                .andThen(ar -> Keel.getVertx()
+                        .setTimer(1L, timerID -> endless(promiseHandler)));
+    }
+
+    static void main(String[] args) {
+        Keel.initializeVertx(new VertxOptions()).onSuccess(v0 -> {
+            endless(new Handler<Promise<Void>>() {
+                @Override
+                public void handle(Promise<Void> event) {
+                    System.out.println(new Date());
+                    KeelAsyncKit.sleep(1000L).onSuccess(v -> {
+                        event.complete();
+                    });
+                }
+            });
+        });
     }
 }

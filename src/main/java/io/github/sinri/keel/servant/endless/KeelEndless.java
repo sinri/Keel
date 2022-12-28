@@ -19,7 +19,9 @@ import java.util.function.Supplier;
  * 仅用于单节点模式。
  *
  * @since 2.7
+ * @since 3.0.0 use io.github.sinri.keel.facade.async.KeelAsyncKit#endless(io.vertx.core.Handler) instead.
  */
+@Deprecated(since = "3.0.0")
 public class KeelEndless extends KeelVerticleBase {
     private final long restMS;
     private final Supplier<Future<Void>> supplier;

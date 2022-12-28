@@ -1,109 +1,94 @@
 package io.github.sinri.keel.servant.intravenous;
 
-import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.eventbus.MessageConsumer;
+import io.vertx.core.Promise;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
- * 随时接收参数包，并周期性轮询以供批处理。
- * Like original Sisiodosi, but implemented batch processing by default.
- * 设计为单节点模式下使用，但可经扩展用于集群模式。
- *
- * @since 2.9
+ * @param <T>
+ * @since 3.0.0
  */
 public class KeelIntravenous<T> extends KeelVerticleBase {
     private final Queue<T> queue;
-
+    private final AtomicReference<Promise<Void>> interruptRef;
     private final Function<List<T>, Future<Void>> processor;
-    private int batchSize;
-    private long interval;
-
-    private MessageConsumer<T> consumer;
 
     public KeelIntravenous(Function<List<T>, Future<Void>> processor) {
         this.queue = new ConcurrentLinkedQueue<>();
+        this.interruptRef = new AtomicReference<>();
         this.processor = processor;
-        this.interval = 100L;
-        this.batchSize = 1;
     }
 
-    public KeelIntravenous<T> setInterval(long interval) {
-        this.interval = interval;
-        return this;
+    private int getConfiguredBatchSize() {
+        var x = config().getInteger("batch_size", 1);
+        if (x < 1) x = 1;
+        return x;
     }
 
-    public KeelIntravenous<T> setBatchSize(int batchSize) {
-        this.batchSize = batchSize;
-        return this;
+    public void add(T t) {
+        queue.add(t);
+        Promise<Void> currentInterrupt = getCurrentInterrupt();
+        if (currentInterrupt != null) {
+            currentInterrupt.tryComplete();
+        }
     }
 
-    public void drop(T drip) {
-        queue.add(drip);
+    private Promise<Void> getCurrentInterrupt() {
+        return this.interruptRef.get();
     }
 
     @Override
     public void start() throws Exception {
-        super.start();
-        routine();
-    }
+        int configuredBatchSize = getConfiguredBatchSize();
+        KeelAsyncKit.endless(promise -> {
+            this.interruptRef.set(null);
+            //System.out.println("ENDLESS "+System.currentTimeMillis());
 
-    private void routine() {
-        if (this.queue.size() > 0) {
-            List<T> l = new ArrayList<>();
-            int i = 0;
-            while (!this.queue.isEmpty() && i < batchSize) {
-                l.add(this.queue.poll());
-            }
-            Future.succeededFuture()
-                    .compose(v -> this.processor.apply(l))
-                    .andThen(ar -> Keel.getVertx().setTimer(1L, x -> routine()));
-        } else {
-            Keel.getVertx().setTimer(interval, x -> routine());
-        }
-    }
+            KeelAsyncKit.repeatedlyCall(routineResult -> {
+                        List<T> buffer = new ArrayList<>();
+                        while (true) {
+                            T t = queue.poll();
+                            if (t != null) {
+                                buffer.add(t);
+                                if (buffer.size() >= configuredBatchSize) {
+                                    break;
+                                }
+                            } else {
+                                break;
+                            }
+                        }
+                        if (buffer.isEmpty()) {
+                            routineResult.stop();
+                            return Future.succeededFuture();
+                        }
 
-    /**
-     * @param address used in EventBus
-     * @since 2.9
-     */
-    public void registerMessageConsumer(String address) {
-        unregisterMessageConsumer(event -> consumer = Keel.getVertx().eventBus()
-                .consumer(address, message -> drop(message.body())));
-    }
+                        // got one job to do, no matter if done
+                        return Future.succeededFuture()
+                                .compose(v -> {
+                                    return this.processor.apply(buffer);
+                                })
+                                .compose(v -> {
+                                    return Future.succeededFuture();
+                                }, throwable -> {
+                                    return Future.succeededFuture();
+                                });
+                    })
+                    .andThen(ar -> {
+                        this.interruptRef.set(Promise.promise());
 
-    /**
-     * @since 2.9
-     */
-    public void unregisterMessageConsumer(Handler<AsyncResult<Void>> completionHandler) {
-        if (this.consumer != null) {
-            this.consumer.unregister(completionHandler);
-        } else {
-            Future.succeededFuture((Void) null).onComplete(completionHandler);
-        }
-    }
-
-    /**
-     * @since 2.9
-     */
-    public void unregisterMessageConsumer() {
-        unregisterMessageConsumer(event -> {
-
+                        KeelAsyncKit.sleep(60_000L, getCurrentInterrupt())
+                                .andThen(slept -> {
+                                    promise.complete();
+                                });
+                    });
         });
     }
-
-    @Override
-    public void stop() throws Exception {
-        super.stop();
-        unregisterMessageConsumer();
-    }
-
 }

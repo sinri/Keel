@@ -3,6 +3,7 @@ package io.github.sinri.keel.facade;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -13,24 +14,16 @@ import java.util.*;
 /**
  * @since 3.0.0
  */
-public interface KeelConfiguration extends JsonifiableEntity<KeelConfiguration> {
+public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
 
-    static KeelConfiguration createFromPropertiesFile(String propertiesFileName) {
-        KeelConfigurationImpl p = new KeelConfigurationImpl();
-        p.loadPropertiesFile(propertiesFileName);
-        return p;
+    private JsonObject data = new JsonObject();
+
+    public KeelConfiguration() {
+        this.data = new JsonObject();
     }
 
-    static KeelConfiguration createFromProperties(Properties properties) {
-        KeelConfigurationImpl p = new KeelConfigurationImpl();
-        p.putAll(properties);
-        return p;
-    }
-
-    static KeelConfiguration createFromJsonObject(JsonObject jsonObject) {
-        KeelConfigurationImpl p = new KeelConfigurationImpl();
-        p.putAll(jsonObject);
-        return p;
+    public KeelConfiguration(@Nonnull JsonObject jsonObject) {
+        this.data = jsonObject;
     }
 
     static @Nonnull JsonObject transformPropertiesToJsonObject(Properties properties) {
@@ -48,40 +41,42 @@ public interface KeelConfiguration extends JsonifiableEntity<KeelConfiguration> 
         return jsonObject;
     }
 
-    @Deprecated
-    static void main(String[] args) {
-        KeelConfiguration a = KeelConfiguration.createFromJsonObject(new JsonObject()
-                .put("a", "b")
-                .put("b", new JsonObject()
-                        .put("b1", "asdasd")
-                        .put("b2", "y89has")
-                        .put("c", new JsonObject()
-                                .put("c1", "asfdsf")
-                                .put("c2", "asdasdasd")
-                        )
-                )
-        );
-        System.out.println("a: " + a.toJsonObject());
-        KeelConfiguration b = a.extract("b");
-        System.out.println("b: " + b.toJsonObject());
-        KeelConfiguration c = a.extract("b", "c");
-        System.out.println("c: " + c.toJsonObject());
-
-        KeelConfiguration fromPropertiesFile = KeelConfiguration.createFromPropertiesFile("sample.properties");
-        System.out.println("fromPropertiesFile: " + fromPropertiesFile.toJsonObject());
+    public KeelConfiguration(@Nonnull Properties properties) {
+        this.data = KeelConfiguration.transformPropertiesToJsonObject(properties);
     }
 
-    default KeelConfiguration putAll(KeelConfiguration keelConfiguration) {
+    static KeelConfiguration createFromPropertiesFile(String propertiesFileName) {
+        KeelConfiguration p = new KeelConfiguration();
+        p.loadPropertiesFile(propertiesFileName);
+        return p;
+    }
+
+    static KeelConfiguration createFromProperties(Properties properties) {
+        KeelConfiguration p = new KeelConfiguration();
+        p.putAll(properties);
+        return p;
+    }
+
+    static KeelConfiguration createFromJsonObject(JsonObject jsonObject) {
+        KeelConfiguration p = new KeelConfiguration();
+        p.putAll(jsonObject);
+        return p;
+    }
+
+    public KeelConfiguration putAll(KeelConfiguration keelConfiguration) {
         return putAll(keelConfiguration.toJsonObject());
     }
 
-    default KeelConfiguration putAll(Properties properties) {
+    public KeelConfiguration putAll(Properties properties) {
         return putAll(KeelConfiguration.transformPropertiesToJsonObject(properties));
     }
 
-    KeelConfiguration putAll(JsonObject jsonObject);
+    public KeelConfiguration putAll(JsonObject jsonObject) {
+        data.mergeIn(jsonObject);
+        return this;
+    }
 
-    default KeelConfiguration loadPropertiesFile(String propertiesFileName) {
+    public KeelConfiguration loadPropertiesFile(String propertiesFileName) {
         Properties properties = new Properties();
         try {
             // here, the file named as `propertiesFileName` should be put along with JAR
@@ -98,16 +93,17 @@ public interface KeelConfiguration extends JsonifiableEntity<KeelConfiguration> 
         return putAll(properties);
     }
 
-    default @Nullable KeelConfiguration extract(String... keychain) {
-        return readJsonifiableEntity(KeelConfigurationImpl.class, keychain);
+    public KeelConfiguration extract(String... keychain) {
+        JsonObject jsonObject = Objects.requireNonNullElse(readJsonObject(keychain), new JsonObject());
+        return new KeelConfiguration(jsonObject);
     }
 
-    default @Nullable Long readAsLong(String... keychain) {
+    public @Nullable Long readAsLong(String... keychain) {
         String s = readString(keychain);
         return s == null ? null : Long.valueOf(s);
     }
 
-    default @Nullable Integer readAsInteger(String... keychain) {
+    public @Nullable Integer readAsInteger(String... keychain) {
         String s = readString(keychain);
         return s == null ? null : Integer.valueOf(s);
     }
@@ -115,8 +111,19 @@ public interface KeelConfiguration extends JsonifiableEntity<KeelConfiguration> 
     /**
      * Parse TRUE/FALSE to boolean ignoring case.
      */
-    default @Nullable Boolean readAsBoolean(String... keychain) {
+    public @Nullable Boolean readAsBoolean(String... keychain) {
         String s = readString(keychain);
         return s == null ? null : Boolean.valueOf(s);
+    }
+
+    @Override
+    public @NotNull JsonObject toJsonObject() {
+        return this.data;
+    }
+
+    @Override
+    public @NotNull KeelConfiguration reloadDataFromJsonObject(JsonObject data) {
+        this.data = data;
+        return this;
     }
 }
