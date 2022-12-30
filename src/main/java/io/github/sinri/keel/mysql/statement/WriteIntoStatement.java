@@ -8,10 +8,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -87,6 +84,38 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             }
         }
         this.batchValues.add(t);
+        return this;
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public WriteIntoStatement macroWriteRows(Collection<RowToWrite> rows) {
+        if (rows == null || rows.isEmpty()) {
+            throw new RuntimeException();
+        }
+        columns.clear();
+        this.batchValues.clear();
+
+        rows.forEach(row -> {
+            if (row.map.isEmpty()) {
+                throw new RuntimeException();
+            }
+
+            List<String> dataRow = new ArrayList<>();
+
+            if (columns.isEmpty()) {
+                columns.addAll(row.map.keySet());
+            }
+
+            columns.forEach(key -> {
+                var value = row.map.get(key);
+                dataRow.add(value);
+            });
+
+            this.batchValues.add(dataRow);
+        });
+
         return this;
     }
 

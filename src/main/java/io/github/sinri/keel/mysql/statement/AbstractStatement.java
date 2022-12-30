@@ -57,31 +57,28 @@ abstract public class AbstractStatement {
      * @param sqlConnection Fetched from Pool
      * @return the result matrix wrapped in a future, any error would cause a failed future
      * @since 2.8 将整个运作体加入了try-catch，统一加入审计日志，出现异常时一律异步报错。
+     * @since 3.0.0 removed try-catch
      */
     public final Future<ResultMatrix> execute(SqlConnection sqlConnection) {
-        try {
-            String sql = this.toString();
-            getSqlAuditLogger().info(statement_uuid + " sql: " + sql);
-            return sqlConnection.preparedQuery(sql)
-                    .execute()
-                    .compose(
-                            rows -> {
+        return Future.succeededFuture(this.toString())
+                .compose(sql -> {
+                    getSqlAuditLogger().info(statement_uuid + " sql: " + sql);
+                    return sqlConnection.preparedQuery(sql).execute()
+                            .compose(rows -> {
                                 ResultMatrix resultMatrix = ResultMatrix.create(rows);
-                                getSqlAuditLogger().info(
-                                        event -> event.message(statement_uuid + " done")
-                                                .put("TotalAffectedRows", resultMatrix.getTotalAffectedRows())
-                                                .put("TotalFetchedRows", resultMatrix.getTotalFetchedRows())
-                                );
                                 return Future.succeededFuture(resultMatrix);
-                            },
-                            throwable -> {
-                                getSqlAuditLogger().exception(throwable, statement_uuid + " execute failed");
-                                return Future.failedFuture(throwable);
-                            }
+                            });
+                })
+                .compose(resultMatrix -> {
+                    getSqlAuditLogger().info(
+                            event -> event.message(statement_uuid + " done")
+                                    .put("TotalAffectedRows", resultMatrix.getTotalAffectedRows())
+                                    .put("TotalFetchedRows", resultMatrix.getTotalFetchedRows())
                     );
-        } catch (Throwable throwable) {
-            getSqlAuditLogger().exception(throwable, statement_uuid + " exception");
-            return Future.failedFuture(throwable);
-        }
+                    return Future.succeededFuture(resultMatrix);
+                }, throwable -> {
+                    getSqlAuditLogger().exception(throwable, statement_uuid + " execute failed");
+                    return Future.failedFuture(throwable);
+                });
     }
 }

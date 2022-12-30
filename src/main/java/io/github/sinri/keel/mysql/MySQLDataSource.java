@@ -2,14 +2,12 @@ package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.helper.KeelHelpers;
-import io.github.sinri.keel.mysql.exception.KeelMySQLException;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.vertx.core.Future;
 import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.SqlConnection;
-import io.vertx.sqlclient.TransactionRollbackException;
 import io.vertx.sqlclient.Tuple;
 
 import java.time.LocalDateTime;
@@ -216,81 +214,14 @@ public class MySQLDataSource {
      * @since 2.8
      */
     public <T> Future<T> withConnection(Function<SqlConnection, Future<T>> function) {
-        return pool.getConnection()
-                .recover(throwable -> Future.failedFuture(new KeelMySQLException(
-                        "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withConnection`," +
-                                " failed to get connection from the pool, cause message: " +
-                                throwable.getMessage(),
-                        throwable
-                )))
-                .compose(sqlConnection -> Future.succeededFuture()
-                        .compose(v -> {
-                            try {
-                                return function.apply(sqlConnection);
-                            } catch (Throwable throwable) {
-                                return Future.failedFuture(throwable);
-                            }
-                        })
-                        .eventually(v -> sqlConnection.close())
-                );
+        return pool.withConnection(function);
     }
 
     /**
      * @since 2.8
      */
     public <T> Future<T> withTransaction(Function<SqlConnection, Future<T>> function) {
-        return pool.getConnection()
-                .recover(throwable -> Future.failedFuture(new KeelMySQLException(
-                        "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
-                                " failed to get connection from the pool, cause message: " +
-                                throwable.getMessage(),
-                        throwable
-                )))
-                .compose(sqlConnection -> sqlConnection.begin()
-                        .compose(transaction -> Future.succeededFuture()
-                                .compose(v -> {
-                                    try {
-                                        return function.apply(sqlConnection);
-                                    } catch (Throwable throwable) {
-                                        return Future.failedFuture(throwable);
-                                    }
-                                })
-                                .compose(res -> transaction.commit()
-                                        .compose((v) -> Future.succeededFuture(res))
-                                )
-                                .recover(err -> {
-                                            if (err instanceof TransactionRollbackException) {
-                                                return Future.failedFuture(err);
-                                            }
-                                            return transaction.rollback()
-                                                    .compose(v -> Future.failedFuture(new KeelMySQLException(
-                                                                    "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
-                                                                            " a rollback performed after an error met, cause message: " +
-                                                                            err.getMessage(),
-                                                                    err
-                                                            )),
-                                                            rollbackFailure -> Future.failedFuture(new KeelMySQLException(
-                                                                    "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
-                                                                            " after an error met (cause message: " + err.getMessage() + ")," +
-                                                                            " a rollback performed but failed (cause message: " + rollbackFailure.getMessage() + ")",
-                                                                    new KeelMySQLException(
-                                                                            "When executing `io.github.sinri.keel.mysql.KeelMySQLKit.withTransaction`," +
-                                                                                    " a rollback should be performed after an error met, cause message: " +
-                                                                                    err.getMessage(),
-                                                                            err
-                                                                    )
-                                                            ))
-                                                    )
-                                                    .compose(v -> {
-                                                        // would not come here
-                                                        return Future.succeededFuture();
-                                                    });
-
-                                        }
-                                )
-                        )
-                        .onComplete(ar -> sqlConnection.close())
-                );
+        return pool.withTransaction(function);
     }
 
     /**
