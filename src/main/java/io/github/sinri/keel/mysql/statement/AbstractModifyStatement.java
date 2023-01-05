@@ -21,4 +21,16 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
                     return Future.succeededFuture(afx);
                 });
     }
+
+    /**
+     * @since 3.0.0
+     */
+    public static AbstractModifyStatement buildWithRawSQL(String sql) {
+        return new AbstractModifyStatement() {
+            @Override
+            public String toString() {
+                return sql;
+            }
+        };
+    }
 }

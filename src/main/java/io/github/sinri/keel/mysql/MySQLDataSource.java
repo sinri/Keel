@@ -1,12 +1,15 @@
 package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.vertx.core.Future;
 import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.mysqlclient.MySQLPool;
+import io.vertx.sqlclient.Cursor;
+import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.Tuple;
 
@@ -261,4 +264,28 @@ public class MySQLDataSource {
                 )
         );
     }
+
+    /**
+     * @since 3.0.0
+     */
+    public Future<Void> queryForRowStream(String sql, int streamFetchSize, Function<Row, Future<Void>> matrixRowAsyncHandler) {
+        return this.pool.withTransaction(sqlConnection -> {
+            return sqlConnection.prepare(sql).compose(preparedStatement -> {
+                Cursor cursor = preparedStatement.cursor();
+                return KeelAsyncKit.repeatedlyCall(routineResult -> {
+                            return cursor.read(streamFetchSize)
+                                    .compose(rows -> KeelAsyncKit
+                                            .parallelForAllSuccess(rows, matrixRowAsyncHandler))
+                                    .eventually(v -> {
+                                        if (!cursor.hasMore()) {
+                                            routineResult.stop();
+                                        }
+                                        return Future.succeededFuture();
+                                    });
+                        })
+                        .eventually(eventually -> cursor.close());
+            });
+        });
+    }
+
 }

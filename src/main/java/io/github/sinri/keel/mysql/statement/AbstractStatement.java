@@ -81,4 +81,18 @@ abstract public class AbstractStatement {
                     return Future.failedFuture(throwable);
                 });
     }
+
+    /**
+     * @param sql
+     * @return
+     * @since 3.0.0
+     */
+    public static AbstractStatement buildWithRawSQL(String sql) {
+        return new AbstractStatement() {
+            @Override
+            public String toString() {
+                return sql;
+            }
+        };
+    }
 }

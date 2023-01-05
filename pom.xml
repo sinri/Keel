@@ -72,28 +72,28 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-mysql-client</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-unit</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web-client</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
         </dependency>
         <!--        <dependency>-->
         <!--            <groupId>mysql</groupId>-->
@@ -103,7 +103,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-mail-client</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
         <dependency>
@@ -124,12 +124,12 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-config-yaml</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-config</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -149,24 +149,24 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-codegen</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>23.0.0</version>
+            <version>23.1.0</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-hazelcast</artifactId>
-            <version>4.3.5</version>
+            <version>4.3.6</version>
         </dependency>
         <dependency>
             <groupId>com.github.oshi</groupId>
             <artifactId>oshi-core</artifactId>
-            <version>6.3.2</version>
+            <version>6.4.0</version>
         </dependency>
 
         <!--        <dependency>-->
@@ -217,7 +217,7 @@
                                     <transformers>
                                         <transformer
                                                 implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>io.github.sinri.keel.lagecy.Keel</mainClass>
+                                            <mainClass>io.github.sinri.keel.facade.Keel</mainClass>
                                         </transformer>
                                     </transformers>
                                 </configuration>

@@ -69,4 +69,16 @@ public abstract class AbstractReadStatement extends AbstractStatement {
     ) {
         return ResultRow.fetchResultRowsToUniqueKeyBoundMap(sqlConnection, this, classT, uniqueKeyGenerator);
     }
+
+    /**
+     * @since 3.0.0
+     */
+    public static AbstractReadStatement buildWithRawSQL(String sql) {
+        return new AbstractReadStatement() {
+            @Override
+            public String toString() {
+                return sql;
+            }
+        };
+    }
 }
