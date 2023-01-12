@@ -1,5 +1,8 @@
 package io.github.sinri.keel.helper;
 
+import io.github.sinri.keel.facade.Keel;
+import io.vertx.core.Future;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
@@ -22,9 +25,9 @@ public class KeelFileHelper {
 
     }
 
-     static KeelFileHelper getInstance() {
-         return instance;
-     }
+    static KeelFileHelper getInstance() {
+        return instance;
+    }
 
     public byte[] readFileAsByteArray(String filePath, boolean seekInsideJarWhenNotFound) throws IOException {
         try {
@@ -99,5 +102,13 @@ public class KeelFileHelper {
             e.printStackTrace();
         }
         return jarEntryList;
+    }
+
+    /**
+     * @return absolute created Temp File path
+     * @since 3.0.0
+     */
+    public Future<String> crateTempFile(String prefix, String suffix) {
+        return Keel.getVertx().fileSystem().createTempFile(prefix, suffix);
     }
 }

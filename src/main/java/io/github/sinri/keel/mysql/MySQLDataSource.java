@@ -8,13 +8,13 @@ import io.github.sinri.keel.mysql.statement.SelectStatement;
 import io.vertx.core.Future;
 import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.mysqlclient.MySQLPool;
-import io.vertx.sqlclient.Cursor;
-import io.vertx.sqlclient.Row;
-import io.vertx.sqlclient.SqlConnection;
-import io.vertx.sqlclient.Tuple;
+import io.vertx.sqlclient.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
@@ -268,14 +268,14 @@ public class MySQLDataSource {
     /**
      * @since 3.0.0
      */
-    public Future<Void> queryForRowStream(String sql, int streamFetchSize, Function<Row, Future<Void>> matrixRowAsyncHandler) {
+    public Future<Void> queryForRowStream(String sql, int streamFetchSize, Function<Row, Future<Void>> rowAsyncHandler) {
         return this.pool.withTransaction(sqlConnection -> {
             return sqlConnection.prepare(sql).compose(preparedStatement -> {
                 Cursor cursor = preparedStatement.cursor();
                 return KeelAsyncKit.repeatedlyCall(routineResult -> {
                             return cursor.read(streamFetchSize)
                                     .compose(rows -> KeelAsyncKit
-                                            .parallelForAllSuccess(rows, matrixRowAsyncHandler))
+                                            .parallelForAllSuccess(rows, rowAsyncHandler))
                                     .eventually(v -> {
                                         if (!cursor.hasMore()) {
                                             routineResult.stop();
@@ -288,4 +288,127 @@ public class MySQLDataSource {
         });
     }
 
+    /**
+     * @since 3.0.0 EXPERIMENTAL
+     */
+    public Future<Iterator<Row>> queryForStreamRowIterator(String sql, int streamFetchSize) {
+        // todo 确认能不能按期望运行
+        return this.pool.withTransaction(sqlConnection -> {
+            return sqlConnection.prepare(sql).compose(preparedStatement -> {
+                Cursor cursor = preparedStatement.cursor();
+                IteratorOverCursor iteratorOverCursor = new IteratorOverCursor(cursor, streamFetchSize);
+                return Future.succeededFuture(iteratorOverCursor);
+            });
+        });
+    }
+
+    /**
+     * @since 3.0.0 EXPERIMENTAL
+     */
+    public Future<Iterable<Row>> queryForStreamRowIterable(String sql, int streamFetchSize) {
+        // todo 确认能不能按期望运行
+        return this.pool.withTransaction(sqlConnection -> {
+            return sqlConnection.prepare(sql).compose(preparedStatement -> {
+                Cursor cursor = preparedStatement.cursor();
+                IterableOverCursor iterableOverCursor = new IterableOverCursor(cursor, streamFetchSize);
+                return Future.succeededFuture(iterableOverCursor);
+            });
+        });
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    private static class IteratorOverCursor implements Iterator<Row> {
+        private final Cursor cursor;
+        private final int batchSize;
+        private Iterator<Row> rowIterator;
+        private Throwable error;
+        private boolean over;
+        private boolean loading;
+
+        public IteratorOverCursor(Cursor cursor) {
+            this.cursor = cursor;
+            this.batchSize = 100;
+            load();
+        }
+
+        public IteratorOverCursor(Cursor cursor, int batchSize) {
+            this.cursor = cursor;
+            this.batchSize = batchSize;
+            load();
+        }
+
+        private void load() {
+            over = false;
+            error = null;
+            loading = true;
+            this.cursor.read(batchSize, rowSetAsyncResult -> {
+                if (rowSetAsyncResult.failed()) {
+                    error = rowSetAsyncResult.cause();
+                    rowIterator = null;
+                    over = true;
+                } else {
+                    RowSet<Row> rowSet = rowSetAsyncResult.result();
+                    rowIterator = rowSet.iterator();
+                    over = !cursor.hasMore();
+                }
+
+                loading = false;
+            });
+        }
+
+        public Throwable getError() {
+            return error;
+        }
+
+        protected Iterator<Row> getRowIterator() {
+            if (loading) {
+                try {
+                    Thread.sleep(100L);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                return getRowIterator();
+            }
+            return rowIterator;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (over) return false;
+            Iterator<Row> iterator = getRowIterator();
+            if (iterator == null) return false;
+            return iterator.hasNext();
+        }
+
+        @Override
+        public Row next() {
+            Iterator<Row> iterator = getRowIterator();
+            if (iterator == null) throw new NoSuchElementException();
+            return iterator.next();
+        }
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    private static class IterableOverCursor implements Iterable<Row> {
+
+        private final IteratorOverCursor iteratorOverCursor;
+
+        public IterableOverCursor(Cursor cursor) {
+            this.iteratorOverCursor = new IteratorOverCursor(cursor);
+        }
+
+        public IterableOverCursor(Cursor cursor, int batchSize) {
+            this.iteratorOverCursor = new IteratorOverCursor(cursor, batchSize);
+        }
+
+        @NotNull
+        @Override
+        public Iterator<Row> iterator() {
+            return this.iteratorOverCursor;
+        }
+    }
 }

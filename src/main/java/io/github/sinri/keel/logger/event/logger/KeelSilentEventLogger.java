@@ -27,6 +27,16 @@ public class KeelSilentEventLogger implements KeelEventLogger {
     }
 
     @Override
+    public Handler<KeelEventLog> getPresetEventLogEditor() {
+        return null;
+    }
+
+    @Override
+    public KeelEventLogger setPresetEventLogEditor(Handler<KeelEventLog> editor) {
+        return this;
+    }
+
+    @Override
     public void log(@NotNull Handler<KeelEventLog> eventLogHandler) {
         // keep silent
     }

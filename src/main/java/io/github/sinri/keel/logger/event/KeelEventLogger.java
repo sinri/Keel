@@ -19,10 +19,19 @@ public interface KeelEventLogger {
 
     String getPresetTopic();
 
+    Handler<KeelEventLog> getPresetEventLogEditor();
+
+    KeelEventLogger setPresetEventLogEditor(Handler<KeelEventLog> editor);
 
 
     default void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
         KeelEventLog eventLog = new KeelEventLog(KeelLogLevel.INFO, getPresetTopic());
+
+        Handler<KeelEventLog> presetEventLogEditor = getPresetEventLogEditor();
+        if (presetEventLogEditor != null) {
+            presetEventLogEditor.handle(eventLog);
+        }
+
         eventLogHandler.handle(eventLog);
         getEventLogCenterSupplier().get().log(eventLog);
     }

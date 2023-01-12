@@ -6,6 +6,7 @@ import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
 import io.github.sinri.keel.logger.event.adapter.KeelEventLoggerAdapter;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,48 +21,57 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
     private final Queue<KeelEventLog> queue;
     private final int bufferSize = 1000;
     private boolean toClose = false;
+    private final Promise<Void> closePromise;
 
     public KeelAsyncEventLogCenter(KeelEventLoggerAdapter adapter) {
         this.queue = new ConcurrentLinkedQueue<>();
         this.adapter = adapter;
+        this.closePromise = Promise.promise();
 
         start();
     }
 
     protected void start() {
         KeelAsyncKit.repeatedlyCall(routineResult -> {
-            return Future.succeededFuture()
-                    .compose(v -> {
-                        return Keel.getVertx().executeBlocking(promise -> {
-                            List<KeelEventLog> buffer = new ArrayList<>();
-                            for (int i = 0; i < bufferSize; i++) {
-                                KeelEventLog eventLog = this.queue.poll();
-                                if (eventLog == null) {
-                                    break;
-                                }
-                                buffer.add(eventLog);
-                            }
-                            if (buffer.isEmpty()) {
-                                promise.fail("EMPTY");
-                            } else {
-                                getAdapter().dealWithLogs(buffer)
-                                        .andThen(ar -> {
-                                            promise.complete();
-                                        });
-                            }
-                        });
-                    })
-                    .recover(throwable -> {
-                        return KeelAsyncKit.sleep(1000L)
-                                .compose(v -> {
-                                    return Future.succeededFuture();
+                    return Future.succeededFuture()
+                            .compose(v -> {
+                                return Keel.getVertx().executeBlocking(promise -> {
+                                    List<KeelEventLog> buffer = new ArrayList<>();
+                                    for (int i = 0; i < bufferSize; i++) {
+                                        KeelEventLog eventLog = this.queue.poll();
+                                        if (eventLog == null) {
+                                            break;
+                                        }
+                                        buffer.add(eventLog);
+                                    }
+                                    if (buffer.isEmpty()) {
+                                        promise.fail("EMPTY");
+                                    } else {
+                                        getAdapter().dealWithLogs(buffer)
+                                                .andThen(ar -> {
+                                                    promise.complete();
+                                                });
+                                    }
                                 });
-                    })
-                    .compose(v -> {
-                        if (toClose) routineResult.stop();
-                        return Future.succeededFuture(null);
-                    });
-        });
+                            })
+                            .recover(throwable -> {
+                                return KeelAsyncKit.sleep(1000L)
+                                        .compose(v -> {
+                                            return Future.succeededFuture();
+                                        });
+                            })
+                            .compose(v -> {
+                                if (toClose) {
+                                    if (this.queue.size() == 0) {
+                                        routineResult.stop();
+                                    }
+                                }
+                                return Future.succeededFuture(null);
+                            });
+                })
+                .andThen(ended -> {
+                    closePromise.complete();
+                });
     }
 
     public KeelEventLoggerAdapter getAdapter() {
@@ -71,6 +81,11 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
 
     @Override
     public void log(KeelEventLog eventLog) {
+        if (toClose) {
+            System.out.println("[warning] " + getClass().getName() + " TO CLOSE, LOG WOULD NOT BE RECEIVED");
+            System.out.println(eventLog.toString());
+            return;
+        }
         this.queue.add(eventLog);
     }
 
@@ -82,6 +97,8 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
     @Override
     public Future<Void> gracefullyClose() {
         toClose = true;
-        return getAdapter().gracefullyClose();
+        return this.closePromise.future().compose(v -> {
+            return getAdapter().gracefullyClose();
+        });
     }
 }

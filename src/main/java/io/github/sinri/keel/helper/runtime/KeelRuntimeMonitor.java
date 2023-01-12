@@ -23,12 +23,11 @@ public class KeelRuntimeMonitor {
             MemoryResult memorySnapshot = KeelHelpers.runtimeHelper().getMemorySnapshot();
 
             GCStatResult lastGC = _lastGCRef.get();
-            if (lastGC == null) {
-                _lastGCRef.set(gcSnapshot);
-            } else {
+            if (lastGC != null) {
                 GCStatResult gcDiff = gcSnapshot.since(lastGC);
                 monitorSnapshot.setGCStat(gcDiff);
             }
+            _lastGCRef.set(gcSnapshot);
 
             CPUTimeResult lastCpuTime = this._lastCPUTimeRef.get();
             if (lastCpuTime == null) {
