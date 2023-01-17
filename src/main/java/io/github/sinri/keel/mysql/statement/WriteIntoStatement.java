@@ -381,18 +381,28 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     public static class RowToWrite {
         final Map<String, String> map = new ConcurrentHashMap<>();
 
+        @Deprecated(since = "3.0.0", forRemoval = true)
         public RowToWrite putValue(String columnName, String value) {
-            return putExpression(columnName, new Quoter(value).toString());
+            return put(columnName, value);
         }
 
+        @Deprecated(since = "3.0.0", forRemoval = true)
         public RowToWrite putValue(String columnName, Number value) {
-            if (value == null) return this.putExpression(columnName, "NULL");
-            return putExpression(columnName, String.valueOf(value));
+            return put(columnName, value);
         }
 
         public RowToWrite putExpression(String columnName, String expression) {
             map.put(columnName, expression);
             return this;
+        }
+
+        public RowToWrite put(String columnName, String value) {
+            return putExpression(columnName, new Quoter(value).toString());
+        }
+
+        public RowToWrite put(String columnName, Number value) {
+            if (value == null) return this.putExpression(columnName, "NULL");
+            return putExpression(columnName, String.valueOf(value));
         }
     }
 }

@@ -2,12 +2,10 @@ package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
 import io.github.sinri.keel.facade.Keel;
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -125,25 +123,29 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        return toJsonObject().toString();
 
-        String dateExpression = KeelHelpers.datetimeHelper().getDateExpression(new Date(timestamp()), "yyyy-MM-dd HH:mm:ss.SSS");
-
-        sb.append(dateExpression)
-                .append(" [").append(this.jsonObject.getString(RESERVED_KEY_LEVEL)).append("]");
-        JsonObject context = new JsonObject();
-        for (var k : this.jsonObject.fieldNames()) {
-            if (Objects.equals(k, RESERVED_KEY_TIMESTAMP)) break;
-            if (Objects.equals(k, RESERVED_KEY_LEVEL)) break;
-            if (Objects.equals(k, RESERVED_KEY_EVENT)) break;
-            context.put(k, this.jsonObject.getValue(k));
-        }
-        sb.append(" ").append(context);
-
-        JsonObject event = this.jsonObject.getJsonObject(RESERVED_KEY_EVENT);
-        for (var k : event.fieldNames()) {
-            sb.append("\n").append(k).append(": ").append(event.getValue(k));
-        }
-        return sb.toString();
+//        StringBuilder sb = new StringBuilder();
+//
+//        String dateExpression = KeelHelpers.datetimeHelper().getDateExpression(new Date(timestamp()), "yyyy-MM-dd HH:mm:ss.SSS");
+//
+//        sb.append(dateExpression)
+//                .append(" [").append(this.jsonObject.getString(RESERVED_KEY_LEVEL)).append("]");
+//        JsonObject context = new JsonObject();
+//        for (var k : this.jsonObject.fieldNames()) {
+//            if (Objects.equals(k, RESERVED_KEY_TIMESTAMP)) continue;
+//            if (Objects.equals(k, RESERVED_KEY_LEVEL)) continue;
+//            if (Objects.equals(k, RESERVED_KEY_EVENT)) continue;
+//            context.put(k, this.jsonObject.getValue(k));
+//        }
+//        sb.append(" ").append(context.toString());
+//
+//        JsonObject event = this.jsonObject.getJsonObject(RESERVED_KEY_EVENT);
+////        for (var k : event.fieldNames()) {
+////            sb.append("\n").append(k).append(": ").append(event.getValue(k));
+////        }
+//        sb.append(" | ").append(event.toString());
+//
+//        return sb.toString();
     }
 }
