@@ -10,6 +10,7 @@ import java.util.function.Function;
 /**
  * @since 1.3
  */
+@Deprecated(since = "3.0.0", forRemoval = true)
 public class KeelShareDataSemaphore {
     final private String name;
     final private int permits;
