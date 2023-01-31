@@ -2,10 +2,13 @@ package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.core.json.SimpleJsonifiableEntity;
 import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.KeelLogLevel;
+import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Date;
 import java.util.Objects;
 
 /**
@@ -121,31 +124,37 @@ public class KeelEventLog extends SimpleJsonifiableEntity {
         return this;
     }
 
+    public static Future<String> render(KeelEventLog eventLog) {
+        StringBuilder sb = new StringBuilder();
+
+        String dateExpression = KeelHelpers.datetimeHelper().getDateExpression(new Date(eventLog.timestamp()), "yyyy-MM-dd HH:mm:ss.SSS");
+
+        sb.append(dateExpression)
+                .append(" [").append(eventLog.toJsonObject().getString(RESERVED_KEY_LEVEL)).append("]")
+                .append(" <").append(eventLog.topic()).append(">")
+                //.append(" ").append(eventLog.message())
+                .append("\n");
+        JsonObject context = new JsonObject();
+        for (var k : eventLog.toJsonObject().fieldNames()) {
+            if (Objects.equals(k, RESERVED_KEY_TIMESTAMP)) continue;
+            if (Objects.equals(k, RESERVED_KEY_LEVEL)) continue;
+            if (Objects.equals(k, RESERVED_KEY_EVENT)) continue;
+            context.put(k, eventLog.toJsonObject().getValue(k));
+        }
+        JsonObject event = eventLog.toJsonObject().getJsonObject(RESERVED_KEY_EVENT);
+
+        sb.append(KeelHelpers.jsonHelper().renderJsonToStringBlock("event", event));
+        sb.append(KeelHelpers.jsonHelper().renderJsonToStringBlock("context", context));
+
+        return Future.succeededFuture(sb.toString());
+    }
+
+    public String message() {
+        return this.readString(RESERVED_KEY_EVENT, RESERVED_KEY_EVENT_MSG);
+    }
+
     @Override
     public String toString() {
         return toJsonObject().toString();
-
-//        StringBuilder sb = new StringBuilder();
-//
-//        String dateExpression = KeelHelpers.datetimeHelper().getDateExpression(new Date(timestamp()), "yyyy-MM-dd HH:mm:ss.SSS");
-//
-//        sb.append(dateExpression)
-//                .append(" [").append(this.jsonObject.getString(RESERVED_KEY_LEVEL)).append("]");
-//        JsonObject context = new JsonObject();
-//        for (var k : this.jsonObject.fieldNames()) {
-//            if (Objects.equals(k, RESERVED_KEY_TIMESTAMP)) continue;
-//            if (Objects.equals(k, RESERVED_KEY_LEVEL)) continue;
-//            if (Objects.equals(k, RESERVED_KEY_EVENT)) continue;
-//            context.put(k, this.jsonObject.getValue(k));
-//        }
-//        sb.append(" ").append(context.toString());
-//
-//        JsonObject event = this.jsonObject.getJsonObject(RESERVED_KEY_EVENT);
-////        for (var k : event.fieldNames()) {
-////            sb.append("\n").append(k).append(": ").append(event.getValue(k));
-////        }
-//        sb.append(" | ").append(event.toString());
-//
-//        return sb.toString();
     }
 }

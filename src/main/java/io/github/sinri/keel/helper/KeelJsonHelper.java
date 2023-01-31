@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * @since 2.6
@@ -220,12 +222,34 @@ public class KeelJsonHelper {
     }
 
     /**
-     * @param throwable
-     * @return
      * @since 3.0.0
      */
     public JsonObject renderThrowableChain(Throwable throwable) {
         return renderThrowableChain(throwable, Set.of());
+    }
+
+    public static void main(String[] args) {
+        KeelJsonHelper keelJsonHelper = new KeelJsonHelper();
+        var x1 = keelJsonHelper.renderJsonToStringBlock("x1", new JsonObject()
+                .put("a", "A")
+                .put("b", new JsonObject()
+                        .put("c", "d")
+                        .put("e", new JsonArray()
+                                .add("f")
+                                .add("g")
+                                .add(new JsonObject()
+                                        .put("h", "i")
+                                        .put("j", "k")
+                                )
+                                .add(new JsonArray()
+                                        .add("l")
+                                        .add("m")))
+                )
+                .put("n", new JsonArray()
+                        .add("o")
+                        .add(null))
+        );
+        System.out.println(x1);
     }
 
     /**
@@ -238,7 +262,7 @@ public class KeelJsonHelper {
         JsonObject x = new JsonObject()
                 .put("class", throwable.getClass().getName())
                 .put("message", throwable.getMessage())
-                .put("stack", buildStackChainText(throwable.getStackTrace(), ignorableStackPackageSet))
+                .put("stack", filterStackTraceToJsonArray(throwable.getStackTrace(), ignorableStackPackageSet))
                 .put("cause", null);
 
         JsonObject upper = x;
@@ -246,7 +270,7 @@ public class KeelJsonHelper {
             JsonObject current = new JsonObject()
                     .put("class", cause.getClass().getName())
                     .put("message", cause.getMessage())
-                    .put("stack", buildStackChainText(cause.getStackTrace(), ignorableStackPackageSet))
+                    .put("stack", filterStackTraceToJsonArray(cause.getStackTrace(), ignorableStackPackageSet))
                     .put("cause", null);
             upper.put("cause", current);
             upper = current;
@@ -256,11 +280,12 @@ public class KeelJsonHelper {
         return x;
     }
 
-    /**
-     * @since 2.9
-     */
-    public JsonArray buildStackChainText(StackTraceElement[] stackTrace, Set<String> ignorableStackPackageSet) {
-        JsonArray array = new JsonArray();
+    public void filterStackTrace(
+            StackTraceElement[] stackTrace,
+            Set<String> ignorableStackPackageSet,
+            BiConsumer<String, Integer> ignoredStackTraceItemsConsumer,
+            Consumer<StackTraceElement> stackTraceItemConsumer
+    ) {
         if (stackTrace != null) {
             String ignoringClassPackage = null;
             int ignoringCount = 0;
@@ -275,34 +300,18 @@ public class KeelJsonHelper {
                 }
                 if (matchedClassPackage == null) {
                     if (ignoringCount > 0) {
-                        array.add(new JsonObject()
-                                .put("type", "ignored")
-                                .put("package", ignoringClassPackage)
-                                .put("count", ignoringCount)
-                        );
-
+                        ignoredStackTraceItemsConsumer.accept(ignoringClassPackage, ignoringCount);
                         ignoringClassPackage = null;
                         ignoringCount = 0;
                     }
 
-                    array.add(new JsonObject()
-                            .put("type", "call")
-                            .put("class", stackTranceItem.getClassName())
-                            .put("method", stackTranceItem.getMethodName())
-                            .put("file", stackTranceItem.getFileName())
-                            .put("line", stackTranceItem.getLineNumber())
-                    );
+                    stackTraceItemConsumer.accept(stackTranceItem);
                 } else {
                     if (ignoringCount > 0) {
                         if (ignoringClassPackage.equals(matchedClassPackage)) {
                             ignoringCount += 1;
                         } else {
-                            array.add(new JsonObject()
-                                    .put("type", "ignored")
-                                    .put("package", ignoringClassPackage)
-                                    .put("count", ignoringCount)
-                            );
-
+                            ignoredStackTraceItemsConsumer.accept(ignoringClassPackage, ignoringCount);
                             ignoringClassPackage = matchedClassPackage;
                             ignoringCount = 1;
                         }
@@ -313,14 +322,146 @@ public class KeelJsonHelper {
                 }
             }
             if (ignoringCount > 0) {
+                ignoredStackTraceItemsConsumer.accept(ignoringClassPackage, ignoringCount);
+            }
+        }
+    }
+
+    /**
+     * @since 2.9 original name: buildStackChainText
+     * @since 3.0.0 become private and renamed to filterStackTraceToJsonArray
+     */
+    private JsonArray filterStackTraceToJsonArray(StackTraceElement[] stackTrace, Set<String> ignorableStackPackageSet) {
+        JsonArray array = new JsonArray();
+
+        filterStackTrace(stackTrace, ignorableStackPackageSet, new BiConsumer<String, Integer>() {
+            @Override
+            public void accept(String ignoringClassPackage, Integer ignoringCount) {
                 array.add(new JsonObject()
                         .put("type", "ignored")
                         .put("package", ignoringClassPackage)
                         .put("count", ignoringCount)
                 );
             }
-        }
+        }, new Consumer<StackTraceElement>() {
+            @Override
+            public void accept(StackTraceElement stackTranceItem) {
+                array.add(new JsonObject()
+                        .put("type", "call")
+                        .put("class", stackTranceItem.getClassName())
+                        .put("method", stackTranceItem.getMethodName())
+                        .put("file", stackTranceItem.getFileName())
+                        .put("line", stackTranceItem.getLineNumber())
+                );
+            }
+        });
+
+//        if (stackTrace != null) {
+//            String ignoringClassPackage = null;
+//            int ignoringCount = 0;
+//            for (StackTraceElement stackTranceItem : stackTrace) {
+//                String className = stackTranceItem.getClassName();
+//                String matchedClassPackage = null;
+//                for (var cp : ignorableStackPackageSet) {
+//                    if (className.startsWith(cp)) {
+//                        matchedClassPackage = cp;
+//                        break;
+//                    }
+//                }
+//                if (matchedClassPackage == null) {
+//                    if (ignoringCount > 0) {
+//                        array.add(new JsonObject()
+//                                .put("type", "ignored")
+//                                .put("package", ignoringClassPackage)
+//                                .put("count", ignoringCount)
+//                        );
+//
+//                        ignoringClassPackage = null;
+//                        ignoringCount = 0;
+//                    }
+//
+//                    array.add(new JsonObject()
+//                            .put("type", "call")
+//                            .put("class", stackTranceItem.getClassName())
+//                            .put("method", stackTranceItem.getMethodName())
+//                            .put("file", stackTranceItem.getFileName())
+//                            .put("line", stackTranceItem.getLineNumber())
+//                    );
+//                } else {
+//                    if (ignoringCount > 0) {
+//                        if (ignoringClassPackage.equals(matchedClassPackage)) {
+//                            ignoringCount += 1;
+//                        } else {
+//                            array.add(new JsonObject()
+//                                    .put("type", "ignored")
+//                                    .put("package", ignoringClassPackage)
+//                                    .put("count", ignoringCount)
+//                            );
+//
+//                            ignoringClassPackage = matchedClassPackage;
+//                            ignoringCount = 1;
+//                        }
+//                    } else {
+//                        ignoringClassPackage = matchedClassPackage;
+//                        ignoringCount = 1;
+//                    }
+//                }
+//            }
+//            if (ignoringCount > 0) {
+//                array.add(new JsonObject()
+//                        .put("type", "ignored")
+//                        .put("package", ignoringClassPackage)
+//                        .put("count", ignoringCount)
+//                );
+//            }
+//        }
         return array;
     }
 
+    /**
+     * @since 3.0.0
+     */
+    public String renderJsonToStringBlock(String name, Object object) {
+        if (object == null) {
+            return "null";
+        }
+        return renderJsonItem(name, object, 0, null);
+    }
+
+    /**
+     * @param key    Key of entry amongst the entries, or the index amongst the array.
+     * @param object Value of entry amongst the entries, or the item amongst the array.
+     * @return rendered string block ended with NEW_LINE.
+     */
+    private String renderJsonItem(String key, Object object, int indentation, String typeMark) {
+        StringBuilder subBlock = new StringBuilder();
+        if (indentation > 1) {
+            subBlock.append(" ".repeat(indentation - 2));
+            subBlock.append(typeMark).append(" ");
+        } else {
+            subBlock.append(" ".repeat(Math.max(0, indentation)));
+        }
+
+        if (key != null) {
+            subBlock.append(key).append(": ");
+        }
+        if (object instanceof JsonObject) {
+            subBlock.append("\n");
+            ((JsonObject) object).forEach(entry -> {
+                subBlock.append(
+                        renderJsonItem(entry.getKey(), entry.getValue(), indentation + 2, "+")
+                );
+            });
+        } else if (object instanceof JsonArray) {
+            subBlock.append("\n");
+            for (int i = 0; i < ((JsonArray) object).size(); i++) {
+                subBlock.append(
+                        renderJsonItem(i + "", ((JsonArray) object).getValue(i), indentation + 2, "-")
+                );
+            }
+        } else {
+            subBlock.append(object).append("\n");
+        }
+        return subBlock.toString();
+    }
 }

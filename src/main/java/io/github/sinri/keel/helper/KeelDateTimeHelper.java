@@ -17,9 +17,17 @@ public class KeelDateTimeHelper {
 
     }
 
-     static KeelDateTimeHelper getInstance() {
-         return instance;
-     }
+    static KeelDateTimeHelper getInstance() {
+        return instance;
+    }
+
+    /**
+     * @return current timestamp expressed in MySQL Date Time Format
+     * @since 3.0.0
+     */
+    public String getCurrentDateExpression() {
+        return getCurrentDateExpression("yyyy-MM-dd HH:mm:ss");
+    }
 
     /**
      * @param format "yyyyMMdd" or "yyyy-MM-dd HH:mm:ss", etc. if null, return null

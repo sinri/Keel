@@ -17,16 +17,6 @@ public class KeelEventLoggerImpl implements KeelEventLogger {
         this(presetTopic, eventLogCenterSupplier, null);
     }
 
-    @Override
-    public Supplier<KeelEventLogCenter> getEventLogCenterSupplier() {
-        return eventLogCenterSupplier;
-    }
-
-    @Override
-    public String getPresetTopic() {
-        return presetTopic;
-    }
-
     public KeelEventLoggerImpl(
             String presetTopic,
             Supplier<KeelEventLogCenter> eventLogCenterSupplier,
@@ -35,6 +25,16 @@ public class KeelEventLoggerImpl implements KeelEventLogger {
         this.presetTopic = presetTopic;
         this.eventLogCenterSupplier = eventLogCenterSupplier;
         this.presetEventLogEditor = presetEventLogEditor;
+    }
+
+    @Override
+    public Supplier<KeelEventLogCenter> getEventLogCenterSupplier() {
+        return eventLogCenterSupplier;
+    }
+
+    @Override
+    public String getPresetTopic() {
+        return presetTopic;
     }
 
     @Override

@@ -2,6 +2,7 @@ package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.logger.KeelSilentEventLogger;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
@@ -15,7 +16,17 @@ public interface KeelEventLogger {
         return KeelSilentEventLogger.getInstance();
     }
 
+    /**
+     * Note: it is better to keep log center stable.
+     */
     Supplier<KeelEventLogCenter> getEventLogCenterSupplier();
+
+    /**
+     * Note: if `getEventLogCenterSupplier` generate instances dynamically, the default implement would not affect.
+     */
+    default Future<Void> gracefullyCloseLogCenter() {
+        return getEventLogCenterSupplier().get().gracefullyClose();
+    }
 
     String getPresetTopic();
 
