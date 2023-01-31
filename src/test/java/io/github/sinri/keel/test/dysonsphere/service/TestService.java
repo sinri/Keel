@@ -18,8 +18,7 @@ public class TestService extends KeelWebRequestFutureHandler {
     }
 
     @Override
-    protected KeelEventLogger createLogger() {
+    protected KeelEventLogger createLogger(RoutingContext routingContext) {
         return KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName());
     }
-
 }

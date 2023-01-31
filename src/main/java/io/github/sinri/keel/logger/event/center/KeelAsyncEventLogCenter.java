@@ -20,8 +20,8 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
     private final KeelEventLoggerAdapter adapter;
     private final Queue<KeelEventLog> queue;
     private final int bufferSize = 1000;
-    private boolean toClose = false;
     private final Promise<Void> closePromise;
+    private boolean toClose = false;
 
     public KeelAsyncEventLogCenter(KeelEventLoggerAdapter adapter) {
         this.queue = new ConcurrentLinkedQueue<>();

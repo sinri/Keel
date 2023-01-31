@@ -16,7 +16,9 @@ public class TestReceptionist extends KeelWebFutureReceptionist {
 
     @Override
     protected Future<Object> handleForFuture() {
+        getLogger().info("handleForFuture start");
         JsonObject jsonObject = new JsonObject().put("path", getRoutingContext().request().path());
+        getLogger().info("handleForFuture ready");
         return Future.succeededFuture(jsonObject);
     }
 

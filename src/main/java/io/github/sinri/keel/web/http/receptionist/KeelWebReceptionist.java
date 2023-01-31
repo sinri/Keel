@@ -1,8 +1,10 @@
 package io.github.sinri.keel.web.http.receptionist;
 
 import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
@@ -20,6 +22,20 @@ public abstract class KeelWebReceptionist {
     public KeelWebReceptionist(RoutingContext routingContext) {
         this.routingContext = routingContext;
         this.logger = createLogger();
+        Handler<KeelEventLog> previous = this.logger.getPresetEventLogEditor();
+        this.logger.setPresetEventLogEditor(eventLog -> {
+            eventLog
+                    .put("request", new JsonObject()
+                            .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
+                            .put("method", routingContext.request().method().name())
+                            .put("path", routingContext.request().path())
+                            .put("handler", this.getClass().getName())
+                    );
+
+            if (previous != null) {
+                previous.handle(eventLog);
+            }
+        });
     }
 
     protected RoutingContext getRoutingContext() {
@@ -40,7 +56,7 @@ public abstract class KeelWebReceptionist {
         } catch (Throwable throwable) {
             logger.exception(throwable, event -> event
                     .message("RoutingContext has been dealt by others")
-                    .put("request_id", readRequestID())
+                    //.put("request_id", readRequestID())
                     .put("response", new JsonObject()
                             .put("code", routingContext.response().getStatusCode())
                             .put("message", routingContext.response().getStatusMessage())
@@ -57,7 +73,7 @@ public abstract class KeelWebReceptionist {
                 .put("data", data);
         logger.info(event -> event
                         .message("RESPOND SUCCESS")
-                        .put("request_id", readRequestID())
+                //.put("request_id", readRequestID())
                 //.put("response", resp)
         );
         respondWithJsonObject(resp);
@@ -71,7 +87,7 @@ public abstract class KeelWebReceptionist {
         resp.put("throwable", error);
         logger.exception(throwable, event -> event
                 .message("RESPOND FAILURE")
-                .put("request_id", readRequestID())
+                //.put("request_id", readRequestID())
         );
         respondWithJsonObject(resp);
     }

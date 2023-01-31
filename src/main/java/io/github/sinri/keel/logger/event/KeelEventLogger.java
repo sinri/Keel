@@ -36,14 +36,27 @@ public interface KeelEventLogger {
 
 
     default void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
-        KeelEventLog eventLog = new KeelEventLog(KeelLogLevel.INFO, getPresetTopic());
+        // done debugging
+//        System.out.println("KeelEventLogger::log("+eventLogHandler+") start");
+
+        KeelEventLog eventLog = KeelEventLog.create(KeelLogLevel.INFO, getPresetTopic());
+
+//        System.out.println("KeelEventLogger::log("+eventLogHandler+") eventLog created");
 
         Handler<KeelEventLog> presetEventLogEditor = getPresetEventLogEditor();
         if (presetEventLogEditor != null) {
+//            System.out.println("KeelEventLogger::log("+eventLogHandler+") presetEventLogEditor is not null");
             presetEventLogEditor.handle(eventLog);
+        } else {
+//            System.out.println("KeelEventLogger::log("+eventLogHandler+") presetEventLogEditor is null");
         }
 
+//        System.out.println("KeelEventLogger::log("+eventLogHandler+") presetEventLogEditor done");
+
         eventLogHandler.handle(eventLog);
+
+//        System.out.println("KeelEventLogger::log("+eventLogHandler+") eventLogHandler done");
+
         getEventLogCenterSupplier().get().log(eventLog);
     }
 
@@ -56,11 +69,17 @@ public interface KeelEventLogger {
     }
 
     default void info(@Nonnull Handler<KeelEventLog> eventLogHandler) {
+        // done debugging
+//        System.out.println("KeelEventLogger::info("+eventLogHandler+") start");
         log(eventLog -> {
+//            System.out.println("KeelEventLogger::info("+eventLogHandler+") inside handler start");
             eventLog.level(KeelLogLevel.INFO);
             eventLog.topic(getPresetTopic());
+//            System.out.println("KeelEventLogger::info("+eventLogHandler+") inside handler go");
             eventLogHandler.handle(eventLog);
+//            System.out.println("KeelEventLogger::info("+eventLogHandler+") inside handler gone");
         });
+//        System.out.println("KeelEventLogger::info("+eventLogHandler+") end");
     }
 
     default void notice(@Nonnull Handler<KeelEventLog> eventLogHandler) {
@@ -137,7 +156,10 @@ public interface KeelEventLogger {
     }
 
     default void info(String msg) {
+        // done debugging
+//        System.out.println("KeelEventLogger::info("+msg+") start");
         info(eventLog -> eventLog.message(msg));
+//        System.out.println("KeelEventLogger::info("+msg+") end");
     }
 
     default void notice(String msg) {

@@ -22,7 +22,7 @@ public interface AliyunSLSAdapter extends KeelEventLoggerAdapter {
         Map<String, List<KeelEventLog>> topicMap = new HashMap<>();
 
         buffer.forEach(eventLog -> {
-            String topic = eventLog.readString(KeelEventLog.RESERVED_KEY_TOPIC);
+            String topic = eventLog.topic();
             if (topic == null) {
                 topic = "";
             }

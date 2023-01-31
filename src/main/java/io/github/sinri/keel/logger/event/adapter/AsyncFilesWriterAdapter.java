@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 
 /**
@@ -19,7 +18,6 @@ import java.util.function.Function;
 public class AsyncFilesWriterAdapter implements KeelEventLoggerAdapter {
     private final String logDir;
     private final String dateFormat;
-    private final Queue<KeelEventLog> queue;
     private final Function<KeelEventLog, String> eventLogComposer;
 
     public AsyncFilesWriterAdapter(String logDir) {
@@ -34,7 +32,6 @@ public class AsyncFilesWriterAdapter implements KeelEventLoggerAdapter {
         this.logDir = logDir;
         this.dateFormat = dateFormat;
         this.eventLogComposer = eventLogComposer;
-        this.queue = new ConcurrentLinkedQueue<>();
     }
 
 

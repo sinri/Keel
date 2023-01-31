@@ -1,7 +1,10 @@
 package io.github.sinri.keel.web.http.handler;
 
 import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
@@ -12,22 +15,17 @@ import io.vertx.ext.web.RoutingContext;
  * @since 2.9.2 Remove Property `RoutingContext`.
  * @since 3.0.0 TEST PASSED
  */
-abstract public class KeelWebRequestHandler implements KeelHttpHandler {
-
-    private final KeelEventLogger logger;
+abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
+    protected static final String KEEL_REQUEST_LOGGER = "KEEL_REQUEST_LOGGER";
 
     public KeelWebRequestHandler() {
-        this.logger = createLogger();
     }
 
-
-    abstract protected KeelEventLogger createLogger();
-
-    public KeelEventLogger getLogger() {
-        return logger;
-    }
+    abstract protected KeelEventLogger createLogger(RoutingContext routingContext);
 
     protected void respondOnSuccess(RoutingContext routingContext, Object data) {
+        var logger = getLogger(routingContext);
+
         JsonObject resp = new JsonObject()
                 .put("code", "OK")
                 .put("data", data);
@@ -50,6 +48,8 @@ abstract public class KeelWebRequestHandler implements KeelHttpHandler {
     }
 
     protected void respondOnFailure(RoutingContext routingContext, Throwable throwable) {
+        var logger = getLogger(routingContext);
+
         var x = new JsonObject()
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
@@ -75,7 +75,31 @@ abstract public class KeelWebRequestHandler implements KeelHttpHandler {
     }
 
     public final void handle(RoutingContext routingContext) {
+        KeelEventLogger logger = createLogger(routingContext);
+        logger.setPresetEventLogEditor(eventLog -> {
+            eventLog
+                    .put("request", new JsonObject()
+                            .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
+                            .put("method", routingContext.request().method().name())
+                            .put("path", routingContext.request().path())
+                            .put("handler", this.getClass().getName())
+                    );
+
+            Handler<KeelEventLog> presetEventLogEditor = logger.getPresetEventLogEditor();
+            if (presetEventLogEditor != null) {
+                presetEventLogEditor.handle(eventLog);
+            }
+        });
+        routingContext.put(KEEL_REQUEST_LOGGER, logger);
+
         handleRequest(routingContext);
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    protected final KeelEventLogger getLogger(RoutingContext routingContext) {
+        return routingContext.get(KEEL_REQUEST_LOGGER);
     }
 
     abstract protected void handleRequest(RoutingContext routingContext);
