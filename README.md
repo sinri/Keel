@@ -13,7 +13,7 @@ A website framework with VERT.X for ex-PHP-ers, exactly Ark Framework Users.
 <dependency>
     <groupId>io.github.sinri</groupId>
     <artifactId>Keel</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
 </dependency>
 ```
 
