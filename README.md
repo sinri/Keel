@@ -23,6 +23,7 @@ A website framework with VERT.X for ex-PHP-ers, exactly Ark Framework Users.
 * [org.commonmark:commonmark](https://github.com/commonmark/commonmark-java) ![GitHub](https://img.shields.io/github/license/commonmark/commonmark-java)
 * [org.reflections:reflections](https://github.com/ronmamo/reflections) ![GitHub](https://img.shields.io/github/license/ronmamo/reflections)
 * [com.warrenstrange:googleauth](https://github.com/wstrange/GoogleAuth) ![GitHub](https://img.shields.io/github/license/wstrange/GoogleAuth)
+* [com.github.oshi:oshi-core](https://github.com/oshi/oshi) ![GitHub](https://img.shields.io/github/license/oshi/oshi)
 
 ## ABOUT 3.0.0
 
