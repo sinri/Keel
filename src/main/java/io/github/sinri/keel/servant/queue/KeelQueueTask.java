@@ -1,28 +1,24 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticle;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 
 /**
  * @since 2.1
  */
-public abstract class KeelQueueTask extends KeelVerticle {
-    public KeelQueueTask() {
-        super();
-    }
+public abstract class KeelQueueTask extends KeelVerticleBase {
 
     abstract public String getTaskReference();
 
     abstract public String getTaskCategory();
 
-    @Deprecated(since = "2.8")
-    abstract public boolean isRunSerially();
 
-    abstract protected KeelLogger prepareLogger();
+    abstract protected KeelEventLogger prepareLogger();
+
 
     /**
-     * 被设计在seeker.seek方法中调用
+     * 被设计在 seeker.get 方法中调用
      */
     public Future<Void> lockTaskBeforeDeployment() {
         // 如果需要就重载此方法
@@ -31,14 +27,12 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     // as verticle
     public final void start() {
-//        Keel.registerDeployedKeelVerticle(this);
-
         setLogger(prepareLogger());
         notifyAfterDeployed();
         Future.succeededFuture()
                 .compose(v -> run())
                 .recover(throwable -> {
-                    getLogger().exception("KeelQueueTask Caught throwable from Method run", throwable);
+                    getLogger().exception(throwable, "KeelQueueTask Caught throwable from Method run");
                     return Future.succeededFuture();
                 })
                 .eventually(v -> {
@@ -56,11 +50,5 @@ public abstract class KeelQueueTask extends KeelVerticle {
 
     protected void notifyBeforeUndeploy() {
         // do nothing by default
-    }
-
-    @Override
-    public void stop() throws Exception {
-        super.stop();
-//        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
     }
 }

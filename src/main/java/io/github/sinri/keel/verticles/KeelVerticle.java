@@ -1,78 +1,59 @@
 package io.github.sinri.keel.verticles;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import io.vertx.sqlclient.SqlConnection;
-
-import java.util.function.Function;
+import io.vertx.core.Verticle;
+import io.vertx.core.json.JsonObject;
 
 /**
- * 在 Keel 2.0 中，有一个异象，是将所有逻辑扔进 Verticle 里运行来模拟同一线程。
- *
- * @since 2.0
+ * @since 1.14
  */
-abstract public class KeelVerticle extends AbstractVerticle implements KeelVerticleInterface {
+public interface KeelVerticle extends Verticle {
 
-    private KeelLogger logger = KeelLogger.silentLogger();
-
-    /**
-     * @since 2.4 do not rely on context anymore
-     * @since 2.8 become public
-     */
-    public KeelLogger getLogger() {
-        return logger;
-    }
+    KeelEventLogger getLogger();
 
     /**
      * @since 2.4 do not rely on context anymore
      * @since 2.7 became public
+     * @since 2.9.3 become optional with nothing to do
      */
-    public final void setLogger(KeelLogger logger) {
-        this.logger = logger;
+    void setLogger(KeelEventLogger logger);
+
+    /**
+     * copied from AbstractVerticle
+     *
+     * @since 2.8
+     */
+    String deploymentID();
+
+    /**
+     * copied from AbstractVerticle
+     *
+     * @see AbstractVerticle
+     * @since 2.8
+     */
+    JsonObject config();
+
+    default JsonObject getVerticleInfo() {
+        return new JsonObject()
+                .put("class", this.getClass().getName())
+                .put("config", this.config())
+                .put("deployment_id", this.deploymentID());
+    }
+
+
+    default Future<String> deployMe(DeploymentOptions deploymentOptions) {
+        return Keel.getVertx().deployVerticle(this, deploymentOptions);
     }
 
     /**
-     * @since 2.4
+     * @since 2.8 add default implementation
      */
-    @Deprecated(since = "2.8", forRemoval = true)
-    protected final <R> Future<R> executeWithMySQL(Function<SqlConnection, Future<R>> executor) {
-        return Keel.getMySQLKit().withConnection(executor);
+    default Future<Void> undeployMe() {
+        return Keel.getVertx().undeploy(deploymentID());
     }
 
-    /**
-     * @since 2.4
-     */
-    @Deprecated(since = "2.8", forRemoval = true)
-    protected final <R> Future<R> executeWithMySQL(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
-        return Keel.getMySQLKit(dataSourceName).withConnection(executor);
-    }
-
-    /**
-     * @since 2.4
-     */
-    @Deprecated(since = "2.8", forRemoval = true)
-    protected final <R> Future<R> executeWithinMySQLTransaction(Function<SqlConnection, Future<R>> executor) {
-        return Keel.getMySQLKit().withTransaction(executor);
-    }
-
-    /**
-     * @since 2.4
-     */
-    @Deprecated(since = "2.8", forRemoval = true)
-    protected final <R> Future<R> executeWithinMySQLTransaction(String dataSourceName, Function<SqlConnection, Future<R>> executor) {
-        return Keel.getMySQLKit(dataSourceName).withTransaction(executor);
-    }
-
-    @Deprecated(since = "2.8")
-    public final Future<String> deployMeAsWorker() {
-        return Keel.getVertx().deployVerticle(this, new DeploymentOptions().setWorker(true));
-    }
-
-    @Deprecated(since = "2.8")
-    public final Future<String> deployMeAsWorker(DeploymentOptions deploymentOptions) {
-        return Keel.getVertx().deployVerticle(this, deploymentOptions.setWorker(true));
-    }
 }

@@ -1,14 +1,15 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureForEach;
-import io.github.sinri.keel.mysql.KeelMySQLKit;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.sqlclient.SqlConnection;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -113,10 +114,10 @@ public class TableRowClassGenerator {
     }
 
     private Future<Void> generateForTables(String packageName, String packagePath, Collection<String> tables) {
-        return FutureForEach.call(
+        return KeelAsyncKit.iterativelyCall(
                 tables,
                 table -> {
-                    String className = Keel.stringHelper().fromUnderScoreCaseToCamelCase(table) + "TableRow";
+                    String className = KeelHelpers.stringHelper().fromUnderScoreCaseToCamelCase(table) + "TableRow";
                     String classFile = packagePath + "/" + className + ".java";
                     return this.generateClassCodeForOneTable(schema, table, packageName, className)
                             .compose(code -> {
@@ -158,7 +159,7 @@ public class TableRowClassGenerator {
     }
 
     private String buildFieldGetter(String field, String type, String comment) {
-        String getter = "get" + Keel.stringHelper().fromUnderScoreCaseToCamelCase(field);
+        String getter = "get" + KeelHelpers.stringHelper().fromUnderScoreCaseToCamelCase(field);
         String returnType = "Object";
         String readMethod = "readValue";
 
@@ -204,7 +205,7 @@ public class TableRowClassGenerator {
                 String[] enumValueArray = enumValuesString.split("[, ]+");
                 if (enumValueArray.length > 0) {
                     // to build enum
-                    enum_name = Keel.stringHelper().fromUnderScoreCaseToCamelCase(field) + "Enum";
+                    enum_name = KeelHelpers.stringHelper().fromUnderScoreCaseToCamelCase(field) + "Enum";
 
                     getter_string
                             .append("\t/**\n")
@@ -331,7 +332,7 @@ public class TableRowClassGenerator {
                             .append(" * (*￣∇￣*)\n")
                             .append(" * NOTICE BY KEEL:\n")
                             .append(" * \tTo avoid being rewritten, do not modify this file manually, unless editable confirmed.\n")
-                            .append(" * \tIt was auto-generated on ").append(KeelMySQLKit.nowAsMySQLDatetime()).append(".\n")
+                            .append(" * \tIt was auto-generated on ").append(new Date()).append(".\n")
                             .append(" * @see ").append(this.getClass().getName()).append("\n")
                             .append(" */\n")
                             .append("public class ").append(className).append(" extends AbstractTableRow {").append("\n");

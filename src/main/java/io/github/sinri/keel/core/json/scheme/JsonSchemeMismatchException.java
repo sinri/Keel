@@ -1,6 +1,6 @@
 package io.github.sinri.keel.core.json.scheme;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +40,7 @@ public class JsonSchemeMismatchException extends Exception {
     public String getDesc() {
         String msg = getMessage();
         if (!getKeychain().isEmpty()) {
-            msg += " keychain: " + Keel.stringHelper().joinStringArray(getKeychain(), " → ");
+            msg += " keychain: " + KeelHelpers.stringHelper().joinStringArray(getKeychain(), " → ");
         }
         return msg;
     }

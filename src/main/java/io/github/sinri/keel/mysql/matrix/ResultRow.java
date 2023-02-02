@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.Keel;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
@@ -11,14 +10,67 @@ import io.vertx.sqlclient.SqlConnection;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 /**
  * @since 2.7
  */
 public interface ResultRow extends JsonifiableEntity<ResultRow> {
+    /**
+     * @param sqlConnection
+     * @param readStatement
+     * @param classOfTableRow
+     * @param categoryGenerator
+     * @param <K>
+     * @param <T>
+     * @return
+     * @since 2.9.4
+     */
+    static <K, T extends ResultRow> Future<Map<K, List<T>>> fetchResultRowsToCategorizedMap(
+            SqlConnection sqlConnection,
+            AbstractReadStatement readStatement,
+            Class<T> classOfTableRow,
+            Function<T, K> categoryGenerator
+    ) {
+        Map<K, List<T>> map = new HashMap<>();
+        return fetchResultRows(sqlConnection, readStatement, classOfTableRow)
+                .compose(list -> {
+                    list.forEach(item -> {
+                        K category = categoryGenerator.apply(item);
+                        map.computeIfAbsent(category, k -> new ArrayList<>()).add(item);
+                    });
+                    return Future.succeededFuture(map);
+                });
+    }
+
+    /**
+     * @param sqlConnection
+     * @param readStatement
+     * @param classOfTableRow
+     * @param uniqueKeyGenerator
+     * @param <K>
+     * @param <T>
+     * @return
+     * @since 2.9.4
+     */
+    static <K, T extends ResultRow> Future<Map<K, T>> fetchResultRowsToUniqueKeyBoundMap(
+            SqlConnection sqlConnection,
+            AbstractReadStatement readStatement,
+            Class<T> classOfTableRow,
+            Function<T, K> uniqueKeyGenerator
+    ) {
+        Map<K, T> map = new HashMap<>();
+        return fetchResultRows(sqlConnection, readStatement, classOfTableRow)
+                .compose(list -> {
+                    list.forEach(item -> {
+                        K uniqueKey = uniqueKeyGenerator.apply(item);
+                        map.put(uniqueKey, item);
+                    });
+                    return Future.succeededFuture(map);
+                });
+    }
+
     /**
      * 在给定的SqlConnection上利用指定的AbstractReadStatement进行SQL查询（查询失败时异步报错）；
      * 尝试获取查询结果；
@@ -74,26 +126,14 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
         return toJsonObject();
     }
 
-    @Deprecated(since = "2.8", forRemoval = true)
-    default String getFieldAsString(String field) {
-        return readString(field);
-    }
-
-    @Deprecated(since = "2.8", forRemoval = true)
-    default Number getFieldAsNumber(String field) {
-        return readNumber(field);
-    }
-
-    @Deprecated(since = "2.8", forRemoval = true)
-    default String getFieldAsDateTime(String filed) {
-        return Keel.dateTimeHelper().getMySQLFormatLocalDateTimeExpression(getRow().getString(filed));
-    }
-
     /**
      * @since 2.8
+     * @since 2.9.4 fix null field error
      */
     default String readDateTime(String field) {
-        return LocalDateTime.parse(readString(field))
+        String s = readString(field);
+        if (s == null) return null;
+        return LocalDateTime.parse(s)
                 .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
 
@@ -101,8 +141,13 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
         return readString(field);
     }
 
+    /**
+     * @since 2.9.4 fix null field error
+     */
     default String readTime(String field) {
-        return readString(field)
+        var s = readString(field);
+        if (s == null) return null;
+        return s
                 .replaceAll("[PTS]+", "")
                 .replaceAll("[HM]", ":");
     }

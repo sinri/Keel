@@ -1,6 +1,7 @@
 package io.github.sinri.keel.core.json.scheme;
 
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Pattern;
 
@@ -46,7 +47,7 @@ public class JsonStringScheme extends JsonValueScheme<String> {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public @NotNull JsonObject toJsonObject() {
         return super.toJsonObject()
                 .put("scheme_type", getJsonElementSchemeType())
                 .put("pattern", pattern)
@@ -55,7 +56,7 @@ public class JsonStringScheme extends JsonValueScheme<String> {
     }
 
     @Override
-    public JsonElementScheme<String> reloadDataFromJsonObject(JsonObject jsonObject) {
+    public @NotNull JsonElementScheme<String> reloadDataFromJsonObject(JsonObject jsonObject) {
         super.reloadDataFromJsonObject(jsonObject);
 
         this.allowBlank = jsonObject.getBoolean("allow_blank", true);

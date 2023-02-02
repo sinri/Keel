@@ -1,7 +1,6 @@
 package io.github.sinri.keel.web.udp;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
@@ -17,22 +16,22 @@ import java.util.function.BiConsumer;
 public class KeelUDPTransceiver {
     private final int port;
     private final DatagramSocket udpServer;
-    private KeelLogger logger;
+    private KeelEventLogger logger;
     private BiConsumer<SocketAddress, Buffer> datagramSocketConsumer = (sender, buffer) -> {
         // do nothing
     };
 
-    public KeelUDPTransceiver(int port) {
+    public KeelUDPTransceiver(DatagramSocket udpServer, int port, KeelEventLogger logger) {
         this.port = port;
-        this.udpServer = Keel.getVertx().createDatagramSocket();
-        this.logger = KeelLogger.silentLogger();
+        this.udpServer = udpServer;
+        this.logger = logger;
     }
 
-    public KeelLogger getLogger() {
+    public KeelEventLogger getLogger() {
         return logger;
     }
 
-    public KeelUDPTransceiver setLogger(KeelLogger logger) {
+    public KeelUDPTransceiver setLogger(KeelEventLogger logger) {
         this.logger = logger;
         return this;
     }
@@ -57,7 +56,7 @@ public class KeelUDPTransceiver {
                                 logger.info("read end");
                             })
                             .exceptionHandler(throwable -> {
-                                logger.exception("read error", throwable);
+                                logger.exception(throwable, "read error");
                             });
                     return Future.succeededFuture();
                 });
@@ -69,7 +68,7 @@ public class KeelUDPTransceiver {
                     logger.info("sent to " + targetAddress + ":" + targetPort + " data: " + buffer);
                 })
                 .onFailure(throwable -> {
-                    logger.exception("failed to send to " + targetAddress + ":" + targetPort, throwable);
+                    logger.exception(throwable, "failed to send to " + targetAddress + ":" + targetPort);
                 });
     }
 
@@ -79,7 +78,7 @@ public class KeelUDPTransceiver {
                     logger.info("closed");
                 })
                 .onFailure(throwable -> {
-                    logger.exception("failed to close", throwable);
+                    logger.exception(throwable, "failed to close");
                 });
     }
 }

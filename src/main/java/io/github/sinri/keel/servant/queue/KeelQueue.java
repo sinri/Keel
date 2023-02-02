@@ -1,28 +1,22 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.controlflow.FutureUntil;
-import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.verticles.KeelVerticle;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 
 /**
+ * 标准的队列服务实现。
+ * <p>
+ * 仅用于单节点模式。
+ *
  * @since 2.1
  */
-public abstract class KeelQueue extends KeelVerticle {
+public abstract class KeelQueue extends KeelVerticleBase {
 
-    /**
-     * 部署之前可以与部署之后的日志器不同实例，也可以相同
-     */
-    private KeelLogger logger;
     private QueueStatus queueStatus = QueueStatus.INIT;
-
-    public KeelQueue() {
-        super();
-
-        this.logger = prepareLogger();
-    }
 
     public QueueStatus getQueueStatus() {
         return queueStatus;
@@ -33,28 +27,21 @@ public abstract class KeelQueue extends KeelVerticle {
         return this;
     }
 
-    abstract protected KeelLogger prepareLogger();
+    abstract protected KeelEventLogger prepareLogger();
 
-    @Override
-    public KeelLogger getLogger() {
-        return logger;
-    }
 
     abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
 
     public void start() {
-//        Keel.registerDeployedKeelVerticle(this);
-
         // 部署之后重新加载一遍
-        this.logger = prepareLogger();
-        setLogger(this.logger);
+        setLogger(prepareLogger());
 
         this.queueStatus = QueueStatus.RUNNING;
 
         try {
             routine();
         } catch (Exception e) {
-            getLogger().exception("Exception in routine", e);
+            getLogger().exception(e, "Exception in routine");
             undeployMe();
         }
     }
@@ -105,7 +92,8 @@ public abstract class KeelQueue extends KeelVerticle {
 
     private Future<Void> whenSignalRunCame(KeelQueueNextTaskSeeker nextTaskSeeker) {
         this.queueStatus = QueueStatus.RUNNING;
-        return FutureUntil.call(() -> {
+
+        return KeelAsyncKit.repeatedlyCall(routineResult -> {
                     return Future.succeededFuture()
                             .compose(v -> nextTaskSeeker.get())
                             .compose(task -> {
@@ -113,7 +101,8 @@ public abstract class KeelQueue extends KeelVerticle {
                                     // 队列里已经空了，不必再找
                                     getLogger().debug("No more task todo");
                                     // 通知 FutureUntil 结束
-                                    return Future.succeededFuture(true);
+                                    routineResult.stop();
+                                    return Future.succeededFuture();
                                 } else {
                                     // 队列里找出来一个task, deploy it (至于能不能跑起来有没有锁就不管了)
                                     getLogger().info("To run task: " + task.getTaskReference());
@@ -124,19 +113,19 @@ public abstract class KeelQueue extends KeelVerticle {
                                                     deploymentID -> {
                                                         getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);
                                                         // 通知 FutureUntil 继续下一轮
-                                                        return Future.succeededFuture(false);
+                                                        return Future.succeededFuture();
                                                     },
                                                     throwable -> {
-                                                        getLogger().exception("CANNOT DEPLOY TASK [" + task.getTaskReference() + "] VERTICLE", throwable);
+                                                        getLogger().exception(throwable, "CANNOT DEPLOY TASK [" + task.getTaskReference() + "] VERTICLE");
                                                         // 通知 FutureUntil 继续下一轮
-                                                        return Future.succeededFuture(false);
+                                                        return Future.succeededFuture();
                                                     }
                                             );
                                 }
                             });
                 })
                 .recover(throwable -> {
-                    getLogger().exception("KeelQueue 递归找活干里出现了奇怪的故障", throwable);
+                    getLogger().exception(throwable, "KeelQueue 递归找活干里出现了奇怪的故障");
                     return Future.succeededFuture();
                 });
     }

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.condition.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -13,7 +13,7 @@ import java.util.function.Function;
  * @since 1.9 all the callback function could return null safely. by Sinri 2020-02-07
  */
 public class ConditionsComponent {
-    protected final List<KeelMySQLCondition> conditions;
+    protected final List<MySQLCondition> conditions;
 
     public ConditionsComponent() {
         conditions = new ArrayList<>();
@@ -82,7 +82,7 @@ public class ConditionsComponent {
     @Override
     public String toString() {
         if (conditions.isEmpty()) return "";
-        return Keel.stringHelper().joinStringArray(conditions, " and ");
+        return KeelHelpers.stringHelper().joinStringArray(conditions, " and ");
     }
 
     /**

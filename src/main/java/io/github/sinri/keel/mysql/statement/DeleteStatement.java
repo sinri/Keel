@@ -1,6 +1,7 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.Keel;
+
+import io.github.sinri.keel.helper.KeelHelpers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class DeleteStatement extends AbstractModifyStatement {
     }
 
     /**
-     * @param function ConditionsComponent -> this
+     * @param function ConditionsComponent → this
      * @return this
      * @since 1.4
      */
@@ -73,7 +74,7 @@ public class DeleteStatement extends AbstractModifyStatement {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "WHERE " + whereConditionsComponent;
         }
         if (!sortRules.isEmpty()) {
-            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + Keel.stringHelper().joinStringArray(sortRules, ",");
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + KeelHelpers.stringHelper().joinStringArray(sortRules, ",");
         }
         if (limit > 0) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "limit " + limit;

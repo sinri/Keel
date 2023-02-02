@@ -1,7 +1,9 @@
 package io.github.sinri.keel.web.tcp;
 
-import io.github.sinri.keel.core.logger.KeelLogger;
-import io.github.sinri.keel.servant.sisiodosi.KeelSisiodosi;
+import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.servant.funnel.KeelFunnel;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
@@ -15,8 +17,8 @@ import java.util.UUID;
 abstract public class KeelAbstractSocketWrapper {
     private final String socketID;
     private final NetSocket socket;
-    private final KeelSisiodosi sisiodosi;
-    private KeelLogger logger;
+    private final KeelFunnel funnel;
+    private KeelEventLogger logger;
 
     public KeelAbstractSocketWrapper(NetSocket socket) {
         this(socket, UUID.randomUUID().toString());
@@ -25,15 +27,22 @@ abstract public class KeelAbstractSocketWrapper {
     public KeelAbstractSocketWrapper(NetSocket socket, String socketID) {
         this.socketID = socketID;
         this.socket = socket;
-        this.logger = KeelLogger.silentLogger();
-        this.logger.setCategoryPrefix(socketID);
-        this.sisiodosi = new KeelSisiodosi(getClass().getName() + "-" + socketID);
+        this.logger = KeelEventLogger.silentLogger();
+//        this.logger.setCategoryPrefix(socketID);
+
+        this.funnel = new KeelFunnel();
+        this.funnel.deployMe(new DeploymentOptions().setWorker(true));
 
         this.socket
                 .handler(buffer -> {
-                    getLogger().info("READ BUFFER " + buffer.length() + " BYTES");
-                    getLogger().buffer(buffer);
-                    this.sisiodosi.drop(v -> whenBufferComes(buffer));
+                    getLogger().info(eventLog -> eventLog
+                            .message("READ BUFFER " + buffer.length() + " BYTES")
+                            .put("buffer", KeelHelpers.binaryHelper().encodeHexWithUpperDigits(buffer))
+                    );
+
+                    this.funnel.add(() -> {
+                        return whenBufferComes(buffer);
+                    });
                 })
                 .endHandler(end -> {
                     /*
@@ -60,23 +69,24 @@ abstract public class KeelAbstractSocketWrapper {
                     whenDrain();
                 })
                 .closeHandler(close -> {
-                    getLogger().info("CLOSE");
-                    this.sisiodosi.stop();
+                    getLogger().info("SOCKET CLOSE");
+                    this.funnel.undeployMe();
                     whenClose();
                 })
                 .exceptionHandler(throwable -> {
-                    getLogger().exception("EXCEPTION", throwable);
+                    getLogger().exception(throwable, "socket exception");
                     whenExceptionOccurred(throwable);
                 });
     }
 
-    public KeelLogger getLogger() {
+
+    public KeelEventLogger getLogger() {
         return logger;
     }
 
-    public KeelAbstractSocketWrapper setLogger(KeelLogger logger) {
+    public KeelAbstractSocketWrapper setLogger(KeelEventLogger logger) {
         this.logger = logger;
-        this.logger.setCategoryPrefix(socketID);
+//        this.logger.setCategoryPrefix(socketID);
         return this;
     }
 

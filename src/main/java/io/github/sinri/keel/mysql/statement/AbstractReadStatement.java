@@ -5,6 +5,8 @@ import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 
 /**
@@ -32,5 +34,51 @@ public abstract class AbstractReadStatement extends AbstractStatement {
      */
     public <T extends ResultRow> Future<List<T>> queryForRowList(SqlConnection sqlConnection, Class<T> classT) {
         return ResultRow.fetchResultRows(sqlConnection, this, classT);
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public static AbstractReadStatement buildWithRawSQL(String sql) {
+        return new AbstractReadStatement() {
+            @Override
+            public String toString() {
+                return sql;
+            }
+        };
+    }
+
+    /**
+     * @param sqlConnection
+     * @param classT
+     * @param categoryGenerator
+     * @param <K>
+     * @param <T>
+     * @return
+     * @since 2.9.4
+     */
+    public <K, T extends ResultRow> Future<Map<K, List<T>>> queryForCategorizedMap(
+            SqlConnection sqlConnection,
+            Class<T> classT,
+            Function<T, K> categoryGenerator
+    ) {
+        return ResultRow.fetchResultRowsToCategorizedMap(sqlConnection, this, classT, categoryGenerator);
+    }
+
+    /**
+     * @param sqlConnection
+     * @param classT
+     * @param uniqueKeyGenerator
+     * @param <K>
+     * @param <T>
+     * @return
+     * @since 2.9.4
+     */
+    public <K, T extends ResultRow> Future<Map<K, T>> queryForUniqueKeyBoundMap(
+            SqlConnection sqlConnection,
+            Class<T> classT,
+            Function<T, K> uniqueKeyGenerator
+    ) {
+        return ResultRow.fetchResultRowsToUniqueKeyBoundMap(sqlConnection, this, classT, uniqueKeyGenerator);
     }
 }

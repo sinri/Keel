@@ -1,9 +1,8 @@
 package io.github.sinri.keel.core.semaphore;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.core.logger.KeelLogger;
+import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.Counter;
 
 import java.util.function.Function;
@@ -11,19 +10,21 @@ import java.util.function.Function;
 /**
  * @since 1.3
  */
+@Deprecated(since = "3.0.0", forRemoval = true)
 public class KeelShareDataSemaphore {
     final private String name;
     final private int permits;
 
-    private final KeelLogger logger;
+    private final KeelEventLogger logger;
+
 
     public KeelShareDataSemaphore(String name, int permits) {
         this.name = name;
         this.permits = permits;
-        this.logger = KeelLogger.silentLogger();
+        this.logger = KeelEventLogger.silentLogger();
     }
 
-    public KeelShareDataSemaphore(String name, int permits, KeelLogger logger) {
+    public KeelShareDataSemaphore(String name, int permits, KeelEventLogger logger) {
         this.name = name;
         this.permits = permits;
         this.logger = logger;
@@ -66,7 +67,11 @@ public class KeelShareDataSemaphore {
         return getCounter()
                 .compose(Counter::incrementAndGet)
                 .compose(current -> {
-                    logger.debug(getClass() + " acquire, current " + current, new JsonObject().put("runnable", current <= permits));
+                    logger.debug(eventLog -> {
+                        eventLog.message(getClass() + " acquire")
+                                .put("current", current)
+                                .put("runnable", current <= permits);
+                    });
                     if (current <= permits) {
                         return Future.succeededFuture(true);
                     } else {

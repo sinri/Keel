@@ -1,16 +1,15 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.mysql.KeelMySQLQuoter;
+import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.mysql.Quoter;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class WriteIntoStatement extends AbstractModifyStatement {
@@ -67,7 +66,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
                 if (item == null) {
                     t.add("NULL");
                 } else {
-                    t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
+                    t.add(new Quoter(String.valueOf(item)).toString());
                 }
             }
             this.batchValues.add(t);
@@ -81,7 +80,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             if (item == null) {
                 t.add("NULL");
             } else {
-                t.add(new KeelMySQLQuoter(String.valueOf(item)).toString());
+                t.add(new Quoter(String.valueOf(item)).toString());
             }
         }
         this.batchValues.add(t);
@@ -89,10 +88,67 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     }
 
     /**
+     * @since 3.0.0
+     */
+    public WriteIntoStatement macroWriteRows(Collection<RowToWrite> rows) {
+        if (rows == null || rows.isEmpty()) {
+            throw new RuntimeException();
+        }
+        columns.clear();
+        this.batchValues.clear();
+
+        rows.forEach(row -> {
+            if (row.map.isEmpty()) {
+                throw new RuntimeException();
+            }
+
+            List<String> dataRow = new ArrayList<>();
+
+            if (columns.isEmpty()) {
+                columns.addAll(row.map.keySet());
+            }
+
+            columns.forEach(key -> {
+                var value = row.map.get(key);
+                dataRow.add(value);
+            });
+
+            this.batchValues.add(dataRow);
+        });
+
+        return this;
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public WriteIntoStatement macroWriteOneRow(RowToWrite row) {
+        columns.clear();
+        this.batchValues.clear();
+        List<String> dataRow = new ArrayList<>();
+        row.map.forEach((column, expression) -> {
+            columns.add(column);
+            dataRow.add(expression);
+        });
+        this.batchValues.add(dataRow);
+        return this;
+    }
+
+    /**
+     * @since 3.0.0
+     */
+    public WriteIntoStatement macroWriteOneRow(Handler<RowToWrite> rowEditor) {
+        RowToWrite rowToWrite = new RowToWrite();
+        rowEditor.handle(rowToWrite);
+        return macroWriteOneRow(rowToWrite);
+    }
+
+    /**
      * @param row One Json Object for one row
      * @return WriteIntoStatement
      * @since 1.7
      */
+    @Deprecated(since = "3.0.0")
     public WriteIntoStatement macroWriteOneRowWithJsonObject(JsonObject row) {
         columns.clear();
         this.batchValues.clear();
@@ -102,7 +158,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             if (entry.getValue() == null) {
                 dataRow.add("NULL");
             } else {
-                dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+                dataRow.add(new Quoter(entry.getValue().toString()).toString());
             }
         });
         this.batchValues.add(dataRow);
@@ -114,6 +170,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @return WriteIntoStatement
      * @since 1.6
      */
+    @Deprecated(since = "3.0.0")
     public WriteIntoStatement macroWriteOneRowWithMap(Map<String, Object> mapForOneRow) {
         columns.clear();
         this.batchValues.clear();
@@ -123,7 +180,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             if (value == null) {
                 dataRow.add("NULL");
             } else {
-                dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+                dataRow.add(new Quoter(String.valueOf(value)).toString());
             }
         });
         this.batchValues.add(dataRow);
@@ -148,7 +205,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
                     if (entry.getValue() == null) {
                         dataRow.add("NULL");
                     } else {
-                        dataRow.add(new KeelMySQLQuoter(entry.getValue().toString()).toString());
+                        dataRow.add(new Quoter(entry.getValue().toString()).toString());
                     }
                 });
                 isFirstRow.set(false);
@@ -176,7 +233,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
                 if (value == null) {
                     dataRow.add("NULL");
                 } else {
-                    dataRow.add(new KeelMySQLQuoter(String.valueOf(value)).toString());
+                    dataRow.add(new Quoter(String.valueOf(value)).toString());
                 }
             });
             this.batchValues.add(dataRow);
@@ -256,7 +313,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             sql += schema + ".";
         }
         sql += table;
-        sql += " (" + Keel.stringHelper().joinStringArray(columns, ",") + ")";
+        sql += " (" + KeelHelpers.stringHelper().joinStringArray(columns, ",") + ")";
         if (sourceTableName != null) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "TABLE " + sourceTableName;
         } else if (sourceSelectSQL != null) {
@@ -265,15 +322,15 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "VALUES" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             for (List<String> row : batchValues) {
-                items.add("(" + Keel.stringHelper().joinStringArray(row, ",") + ")");
+                items.add("(" + KeelHelpers.stringHelper().joinStringArray(row, ",") + ")");
             }
-            sql += Keel.stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
+            sql += KeelHelpers.stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         if (!onDuplicateKeyUpdateAssignmentMap.isEmpty()) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ON DUPLICATE KEY UPDATE" + AbstractStatement.SQL_COMPONENT_SEPARATOR;
             List<String> items = new ArrayList<>();
             onDuplicateKeyUpdateAssignmentMap.forEach((key, value) -> items.add(key + " = " + value));
-            sql += Keel.stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
+            sql += KeelHelpers.stringHelper().joinStringArray(items, "," + AbstractStatement.SQL_COMPONENT_SEPARATOR);
         }
         if (!getRemarkAsComment().isEmpty()) {
             sql += "\n-- " + getRemarkAsComment() + "\n";
@@ -319,5 +376,33 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             list.add(chunkWIS);
         }
         return list;
+    }
+
+    public static class RowToWrite {
+        final Map<String, String> map = new ConcurrentHashMap<>();
+
+        @Deprecated(since = "3.0.0", forRemoval = true)
+        public RowToWrite putValue(String columnName, String value) {
+            return put(columnName, value);
+        }
+
+        @Deprecated(since = "3.0.0", forRemoval = true)
+        public RowToWrite putValue(String columnName, Number value) {
+            return put(columnName, value);
+        }
+
+        public RowToWrite putExpression(String columnName, String expression) {
+            map.put(columnName, expression);
+            return this;
+        }
+
+        public RowToWrite put(String columnName, String value) {
+            return putExpression(columnName, new Quoter(value).toString());
+        }
+
+        public RowToWrite put(String columnName, Number value) {
+            if (value == null) return this.putExpression(columnName, "NULL");
+            return putExpression(columnName, String.valueOf(value));
+        }
     }
 }

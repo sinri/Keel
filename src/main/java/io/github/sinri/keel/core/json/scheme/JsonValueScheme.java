@@ -1,6 +1,7 @@
 package io.github.sinri.keel.core.json.scheme;
 
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @since 2.7
@@ -12,7 +13,7 @@ abstract public class JsonValueScheme<T> implements JsonElementScheme<T> {
     private boolean optional = false;
 
     @Override
-    public JsonObject toJsonObject() {
+    public @NotNull JsonObject toJsonObject() {
         return new JsonObject()
                 .put("scheme_type", getJsonElementSchemeType())
                 .put("nullable", nullable)
@@ -40,7 +41,7 @@ abstract public class JsonValueScheme<T> implements JsonElementScheme<T> {
     }
 
     @Override
-    public JsonElementScheme<T> reloadDataFromJsonObject(JsonObject jsonObject) {
+    public @NotNull JsonElementScheme<T> reloadDataFromJsonObject(JsonObject jsonObject) {
         this.nullable = jsonObject.getBoolean("nullable", false);
         this.optional = jsonObject.getBoolean("optional", false);
         return this;

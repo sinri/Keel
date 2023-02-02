@@ -1,7 +1,7 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.Keel;
-import io.github.sinri.keel.mysql.KeelMySQLQuoter;
+import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.mysql.Quoter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,12 +58,12 @@ public class UpdateStatement extends AbstractModifyStatement {
     }
 
     public UpdateStatement setWithValue(String column, Number value) {
-        assignments.add(column + "=" + (new KeelMySQLQuoter(value)));
+        assignments.add(column + "=" + (new Quoter(value)));
         return this;
     }
 
     public UpdateStatement setWithValue(String column, String value) {
-        assignments.add(column + "=" + (new KeelMySQLQuoter(value)));
+        assignments.add(column + "=" + (new Quoter(value)));
         return this;
     }
 
@@ -93,12 +93,12 @@ public class UpdateStatement extends AbstractModifyStatement {
             sql += " " + schema + ".";
         }
         sql += table;
-        sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "SET " + Keel.stringHelper().joinStringArray(assignments, ",");
+        sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "SET " + KeelHelpers.stringHelper().joinStringArray(assignments, ",");
         if (!whereConditionsComponent.isEmpty()) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "WHERE " + whereConditionsComponent;
         }
         if (!sortRules.isEmpty()) {
-            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + Keel.stringHelper().joinStringArray(sortRules, ",");
+            sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "ORDER BY " + KeelHelpers.stringHelper().joinStringArray(sortRules, ",");
         }
         if (limit > 0) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "LIMIT " + limit;

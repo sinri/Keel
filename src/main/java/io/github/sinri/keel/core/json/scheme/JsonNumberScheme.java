@@ -1,6 +1,7 @@
 package io.github.sinri.keel.core.json.scheme;
 
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 
@@ -49,13 +50,13 @@ public class JsonNumberScheme extends JsonValueScheme<Number> {
     }
 
     @Override
-    public JsonObject toJsonObject() {
+    public @NotNull JsonObject toJsonObject() {
         return super.toJsonObject()
                 .put("scheme_type", getJsonElementSchemeType());
     }
 
     @Override
-    public JsonElementScheme<Number> reloadDataFromJsonObject(JsonObject jsonObject) {
+    public @NotNull JsonElementScheme<Number> reloadDataFromJsonObject(JsonObject jsonObject) {
         super.reloadDataFromJsonObject(jsonObject);
         return this;
     }
