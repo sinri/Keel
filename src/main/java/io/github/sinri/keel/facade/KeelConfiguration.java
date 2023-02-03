@@ -98,6 +98,15 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
         return new KeelConfiguration(jsonObject);
     }
 
+    /**
+     * @param dotJoinedKeyChain raw keychain in properties file, such as `a.b.c`
+     * @since 3.0.1
+     */
+    public String fastRead(@NotNull String dotJoinedKeyChain) {
+        String[] split = dotJoinedKeyChain.split("\\.");
+        return readString(split);
+    }
+
     public @Nullable Long readAsLong(String... keychain) {
         String s = readString(keychain);
         return s == null ? null : Long.valueOf(s);

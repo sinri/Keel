@@ -4,6 +4,8 @@ import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.logger.KeelSilentEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
@@ -114,43 +116,6 @@ public interface KeelEventLogger {
         });
     }
 
-//    default void log(KeelEventLog eventLog) {
-//        getEventLogCenterSupplier().get().log(eventLog);
-//    }
-
-//    default void log(@Nonnull KeelLogLevel level, @Nonnull String msg) {
-//        log(buildEventLog(level, new JsonObject()
-//                .put(KeelEventLog.RESERVED_KEY_EVENT_MSG, msg)));
-//    }
-
-//    default void log(@Nonnull KeelLogLevel level, @Nonnull JsonObject event) {
-//        log(buildEventLog(level, event));
-//    }
-
-//    default void debug(JsonObject event) {
-//        log(KeelLogLevel.DEBUG, event);
-//    }
-//
-//    default void info(JsonObject event) {
-//        log(KeelLogLevel.INFO, event);
-//    }
-//
-//    default void notice(JsonObject event) {
-//        log(KeelLogLevel.NOTICE, event);
-//    }
-//
-//    default void warning(JsonObject event) {
-//        log(KeelLogLevel.WARNING, event);
-//    }
-//
-//    default void error(JsonObject event) {
-//        log(KeelLogLevel.ERROR, event);
-//    }
-//
-//    default void fatal(JsonObject event) {
-//        log(KeelLogLevel.FATAL, event);
-//    }
-
     default void debug(String msg) {
         debug(eventLog -> eventLog.message(msg));
     }
@@ -192,6 +157,16 @@ public interface KeelEventLogger {
         });
     }
 
+    /**
+     * @since 3.0.1
+     */
+    default void exception(@Nonnull Throwable throwable, @Nonnull String msg, @Nullable JsonObject context) {
+        exception(throwable, eventLog -> {
+            eventLog.message(msg);
+            if (context != null) eventLog.put("context", context);
+        });
+    }
+
     default void exception(@Nonnull Throwable throwable, @Nonnull Handler<KeelEventLog> eventLogHandler) {
         error(eventLog -> {
             eventLog.put(KeelEventLog.RESERVED_KEY_EVENT_EXCEPTION, this.processThrowable(throwable));
@@ -199,9 +174,63 @@ public interface KeelEventLogger {
         });
     }
 
-//    default void exception(@Nonnull Throwable throwable, JsonObject event) {
-//        error(event
-//                //.put(KeelEventLog.RESERVED_KEY_EVENT_MSG, "Exception" + " × " + throwable.getMessage())
-//                .put(KeelEventLog.RESERVED_KEY_EVENT_EXCEPTION, processThrowable(throwable)));
-//    }
+    /**
+     * @since 3.0.1
+     */
+    default void debug(String msg, JsonObject context) {
+        debug(event -> {
+            event.message(msg);
+            if (context != null) event.put("context", context);
+        });
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    default void info(String msg, JsonObject context) {
+        info(event -> {
+            event.message(msg);
+            if (context != null) event.put("context", context);
+        });
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    default void notice(String msg, JsonObject context) {
+        notice(event -> {
+            event.message(msg);
+            if (context != null) event.put("context", context);
+        });
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    default void warning(String msg, JsonObject context) {
+        warning(event -> {
+            event.message(msg);
+            if (context != null) event.put("context", context);
+        });
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    default void error(String msg, JsonObject context) {
+        error(event -> {
+            event.message(msg);
+            if (context != null) event.put("context", context);
+        });
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    default void fatal(String msg, JsonObject context) {
+        fatal(event -> {
+            event.message(msg);
+            if (context != null) event.put("context", context);
+        });
+    }
 }

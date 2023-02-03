@@ -391,6 +391,13 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             return put(columnName, value);
         }
 
+        /**
+         * @since 3.0.1
+         */
+        public RowToWrite putNow(String columnName) {
+            return this.putExpression(columnName, "now()");
+        }
+
         public RowToWrite putExpression(String columnName, String expression) {
             map.put(columnName, expression);
             return this;
