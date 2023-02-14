@@ -19,7 +19,6 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
     private JsonObject data = new JsonObject();
 
     public KeelConfiguration() {
-        this.data = new JsonObject();
     }
 
     public KeelConfiguration(@Nonnull JsonObject jsonObject) {
@@ -102,6 +101,7 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
      * @param dotJoinedKeyChain raw keychain in properties file, such as `a.b.c`
      * @since 3.0.1
      */
+    @Deprecated(since = "3.0.1")
     public String fastRead(@NotNull String dotJoinedKeyChain) {
         String[] split = dotJoinedKeyChain.split("\\.");
         return readString(split);

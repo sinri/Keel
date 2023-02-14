@@ -75,4 +75,30 @@ public class KeelDateTimeHelper {
                 .withZone(ZoneId.of("GMT"));
         return gmt.format(LocalDateTime.now());
     }
+
+    /**
+     * @since 3.0.1
+     */
+    protected String makeStandardWidthField(int x, int w) {
+        StringBuilder s = new StringBuilder("" + x);
+        if (s.length() < w) {
+            for (int i = 0; i < w - s.length(); i++) {
+                s.insert(0, "0");
+            }
+        }
+        return String.valueOf(s);
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    public String toMySQLDatetime(LocalDateTime datetime) {
+        return makeStandardWidthField(datetime.getYear(), 4)
+                + "-" + makeStandardWidthField(datetime.getMonthValue(), 2)
+                + "-" + makeStandardWidthField(datetime.getDayOfMonth(), 2)
+                + " "
+                + makeStandardWidthField(datetime.getHour(), 2)
+                + ":" + makeStandardWidthField(datetime.getMinute(), 2)
+                + ":" + makeStandardWidthField(datetime.getSecond(), 2);
+    }
 }

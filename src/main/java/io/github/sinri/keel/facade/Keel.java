@@ -4,6 +4,7 @@ import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.spi.cluster.NodeInfo;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -18,6 +19,15 @@ public class Keel {
 
     public static KeelConfiguration getConfiguration() {
         return configuration;
+    }
+
+    /**
+     * @param dotJoinedKeyChain such as `a.b.c`
+     * @since 3.0.1
+     */
+    public static String config(@NotNull String dotJoinedKeyChain) {
+        String[] split = dotJoinedKeyChain.split("\\.");
+        return getConfiguration().readString(split);
     }
 
     public static Vertx getVertx() {
@@ -43,6 +53,17 @@ public class Keel {
                         return Future.succeededFuture();
                     });
         }
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    public static void initializeVertxStandalone(VertxOptions vertxOptions) {
+        if (vertxOptions.getClusterManager() != null) {
+            vertxOptions.setClusterManager(null);
+        }
+        clusterManager = null;
+        vertx = Vertx.vertx(vertxOptions);
     }
 
     public static boolean isVertxInitialized() {
