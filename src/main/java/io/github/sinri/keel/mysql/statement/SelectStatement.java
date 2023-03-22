@@ -6,9 +6,11 @@ import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.MySQLCondition;
 import io.github.sinri.keel.mysql.condition.RawCondition;
 import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class SelectStatement extends AbstractReadStatement {
@@ -140,7 +142,8 @@ public class SelectStatement extends AbstractReadStatement {
         return this;
     }
 
-    public SelectStatement setLockMode(String lockMode) {
+    public SelectStatement setLockMode(@NotNull String lockMode) {
+        Objects.requireNonNull(lockMode);
         this.lockMode = lockMode;
         return this;
     }
