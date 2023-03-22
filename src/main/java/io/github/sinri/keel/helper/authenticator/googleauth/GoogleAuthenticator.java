@@ -491,19 +491,19 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator {
     }
 
 
-    public int getTotpPassword(String secret) {
+    @Override public int getTotpPassword(String secret) {
         return getTotpPassword(secret, new Date().getTime());
     }
 
-    public int getTotpPassword(String secret, long time) {
+    @Override public int getTotpPassword(String secret, long time) {
         return calculateCode(decodeSecret(secret), getTimeWindowFromTime(time));
     }
 
-    public int getTotpPasswordOfUser(String userName) {
+    @Override public int getTotpPasswordOfUser(String userName) {
         return getTotpPasswordOfUser(userName, new Date().getTime());
     }
 
-    public int getTotpPasswordOfUser(String userName, long time) {
+    @Override public int getTotpPasswordOfUser(String userName, long time) {
         ICredentialRepository repository = getValidCredentialRepository();
 
         return calculateCode(
@@ -597,7 +597,7 @@ public final class GoogleAuthenticator implements IGoogleAuthenticator {
      * @return the first registered ICredentialRepository or <code>null</code>
      * if none is found.
      */
-    public ICredentialRepository getCredentialRepository() {
+    @Override public ICredentialRepository getCredentialRepository() {
         if (this.credentialRepositorySearched) return this.credentialRepository;
 
         this.credentialRepositorySearched = true;

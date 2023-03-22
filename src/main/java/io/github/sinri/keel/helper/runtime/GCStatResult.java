@@ -80,7 +80,7 @@ public class GCStatResult implements RuntimeStatResult<GCStatResult> {
         return this;
     }
 
-    public long getStatTime() {
+    @Override public long getStatTime() {
         return statTime;
     }
 

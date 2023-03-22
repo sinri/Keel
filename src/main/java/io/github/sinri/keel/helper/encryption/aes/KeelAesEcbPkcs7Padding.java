@@ -54,7 +54,7 @@ public class KeelAesEcbPkcs7Padding extends KeelAesUsingPkcs7Padding {
      * @param source 源字符串
      * @return 加密后的密文
      */
-    public String encrypt(String source) {
+    @Override public String encrypt(String source) {
         try {
             byte[] sourceBytes = source.getBytes(ENCODING);
             byte[] keyBytes = getKey().getBytes(ENCODING);
@@ -76,7 +76,7 @@ public class KeelAesEcbPkcs7Padding extends KeelAesUsingPkcs7Padding {
      * @param encryptStr 加密后的密文
      * @return 源字符串
      */
-    public String decrypt(String encryptStr) {
+    @Override public String decrypt(String encryptStr) {
         try {
             byte[] sourceBytes = Base64.getDecoder().decode(encryptStr);
             byte[] keyBytes = getKey().getBytes(ENCODING);

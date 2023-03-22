@@ -18,13 +18,13 @@ import java.util.function.Function;
  */
 public interface ResultRow extends JsonifiableEntity<ResultRow> {
     /**
-     * @param sqlConnection
-     * @param readStatement
-     * @param classOfTableRow
-     * @param categoryGenerator
-     * @param <K>
-     * @param <T>
-     * @return
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
      * @since 2.9.4
      */
     static <K, T extends ResultRow> Future<Map<K, List<T>>> fetchResultRowsToCategorizedMap(
@@ -45,13 +45,13 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
     }
 
     /**
-     * @param sqlConnection
-     * @param readStatement
-     * @param classOfTableRow
-     * @param uniqueKeyGenerator
-     * @param <K>
-     * @param <T>
-     * @return
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
      * @since 2.9.4
      */
     static <K, T extends ResultRow> Future<Map<K, T>> fetchResultRowsToUniqueKeyBoundMap(

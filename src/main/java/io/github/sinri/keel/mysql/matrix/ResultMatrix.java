@@ -95,9 +95,9 @@ public interface ResultMatrix {
     <T extends ResultRow> List<T> buildTableRowList(Class<T> classOfTableRow);
 
     /**
-     * @param categoryGenerator
-     * @param <K>
-     * @return
+     * 
+     * 
+     * 
      * @since 2.9.4
      */
     default <K> Future<Map<K, List<JsonObject>>> buildCategorizedRowsMap(Function<JsonObject, K> categoryGenerator) {
@@ -111,9 +111,9 @@ public interface ResultMatrix {
     }
 
     /**
-     * @param uniqueKeyGenerator
-     * @param <K>
-     * @return
+     * 
+     * 
+     * 
      * @since 2.9.4
      */
     default <K> Future<Map<K, JsonObject>> buildUniqueKeyBoundRowMap(Function<JsonObject, K> uniqueKeyGenerator) {
@@ -129,11 +129,11 @@ public interface ResultMatrix {
     /**
      * Categorized Rows Map, i.e. category mapping to a list of rows.
      *
-     * @param classOfTableRow
-     * @param categoryGenerator
-     * @param <K>
-     * @param <T>
-     * @return
+     * 
+     * 
+     * 
+     * 
+     * 
      * @since 2.9.4
      */
     default <K, T extends ResultRow> Future<Map<K, List<T>>> buildCategorizedRowsMap(Class<T> classOfTableRow, Function<T, K> categoryGenerator) {
@@ -150,11 +150,11 @@ public interface ResultMatrix {
      * Unique key bound rows map, i.e. One unique Key mapping to one result row.
      * WARNING: if the uniqueKeyGenerator provides duplicated key, the mapped value would be uncertainly single.
      *
-     * @param classOfTableRow
-     * @param uniqueKeyGenerator
-     * @param <K>
-     * @param <T>
-     * @return
+     * 
+     * 
+     * 
+     * 
+     * 
      */
     default <K, T extends ResultRow> Future<Map<K, T>> buildUniqueKeyBoundRowMap(Class<T> classOfTableRow, Function<T, K> uniqueKeyGenerator) {
         Map<K, T> map = new HashMap<>();
@@ -169,10 +169,10 @@ public interface ResultMatrix {
     /**
      * 类似矩阵转置的玩意。
      *
-     * @param rowToMapHandler
-     * @param <K>
-     * @param <V>
-     * @return
+     * 
+     * 
+     * 
+     * 
      * @since 2.9.4
      */
     default <K, V> Future<Map<K, V>> buildCustomizedMap(

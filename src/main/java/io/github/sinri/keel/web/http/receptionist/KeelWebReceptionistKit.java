@@ -91,7 +91,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
 
         if (apiMeta.virtualHost() != null && !apiMeta.virtualHost().equals("")) {
             route.virtualHost(apiMeta.virtualHost());
-        } else if (this.virtualHost != null && !Objects.equals("", this.virtualHost)) {
+        } else if (this.virtualHost != null && !Objects.equals(this.virtualHost, "")) {
             route.virtualHost(this.virtualHost);
         }
 

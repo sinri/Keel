@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * @param <K>
- * @param <V>
+ * 
+ * 
  * @since 2.9
  */
 public interface KeelEverlastingCacheInterface<K, V> {
@@ -23,16 +23,18 @@ public interface KeelEverlastingCacheInterface<K, V> {
     void save(Map<K, V> appendEntries);
 
     /**
-     * @return cache value or null when not-existed
+     *Returns cache value or null when not-existed.
+ 
      */
     default V read(K k) {
         return read(k, null);
     }
 
     /**
-     * @param k key
+     *Returns cache value or default when not-existed.
+ @param k key
      * @param v default value for the situation that key not existed
-     * @return @return cache value or default when not-existed
+     *  
      */
     V read(K k, V v);
 

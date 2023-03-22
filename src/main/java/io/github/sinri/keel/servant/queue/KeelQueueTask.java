@@ -26,7 +26,7 @@ public abstract class KeelQueueTask extends KeelVerticleBase {
     }
 
     // as verticle
-    public final void start() {
+    @Override public final void start() {
         setLogger(prepareLogger());
         notifyAfterDeployed();
         Future.succeededFuture()

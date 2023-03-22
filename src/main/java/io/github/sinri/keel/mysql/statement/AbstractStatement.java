@@ -35,7 +35,7 @@ abstract public class AbstractStatement {
     /**
      * @return The SQL Generated
      */
-    public abstract String toString();
+    @Override public abstract String toString();
 
     protected String getRemarkAsComment() {
         return remarkAsComment;
@@ -51,8 +51,8 @@ abstract public class AbstractStatement {
     }
 
     /**
-     * @param sql
-     * @return
+     * 
+     * 
      * @since 3.0.0
      */
     public static AbstractStatement buildWithRawSQL(String sql) {

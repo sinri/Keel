@@ -1,15 +1,22 @@
 package io.github.sinri.keel.logger.event.adapter;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+
+import com.google.common.base.Splitter;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -47,15 +54,15 @@ public class AsyncFilesWriterAdapter implements KeelEventLoggerAdapter {
         for (KeelEventLog eventLog : buffer) {
             try {
                 String topic = eventLog.topic();
-                String[] topicComponents = topic.replaceAll("(^[.]+)|([.]+$)", "").split("[.]+");
+                List<String> topicComponents = Splitter.onPattern("[.]+").splitToList(topic.replaceAll("(^[.]+)|([.]+$)", ""));
 
                 String finalTopic;
                 File finalDir;
-                if (topicComponents.length > 1) {
-                    finalTopic = topicComponents[topicComponents.length - 1];
+                if (topicComponents.size() > 1) {
+                    finalTopic = topicComponents.get(topicComponents.size() - 1);
                     StringBuilder x = new StringBuilder(this.logDir);
-                    for (int i = 0; i < topicComponents.length - 1; i++) {
-                        x.append(File.separator).append(topicComponents[i]);
+                    for (int i = 0; i < topicComponents.size() - 1; i++) {
+                        x.append(File.separator).append(topicComponents.get(i));
                     }
                     finalDir = new File(x.toString());
                 } else {
@@ -92,7 +99,7 @@ public class AsyncFilesWriterAdapter implements KeelEventLoggerAdapter {
     }
 
     private Future<Void> dealWithLogsForOneFile(File file, List<KeelEventLog> buffer) {
-        try (FileWriter fileWriter = new FileWriter(file, true)) {
+        try (Writer fileWriter = Files.newBufferedWriter(file.toPath(), UTF_8, CREATE, APPEND)) {
             for (KeelEventLog eventLog : buffer) {
                 if (this.eventLogComposer == null) {
                     fileWriter.write(eventLog.toString() + "\n");

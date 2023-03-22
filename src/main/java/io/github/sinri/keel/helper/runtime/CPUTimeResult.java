@@ -139,7 +139,7 @@ public class CPUTimeResult implements RuntimeStatResult<CPUTimeResult> {
         return statTime;
     }
 
-    public CPUTimeResult since(CPUTimeResult startResult) {
+    @Override public CPUTimeResult since(CPUTimeResult startResult) {
         return new CPUTimeResult(getStatTime())
                 .setSpentInUserState(this.getSpentInUserState() - startResult.getSpentInUserState())
                 .setSpentInNiceState(this.getSpentInNiceState() - startResult.getSpentInNiceState())
@@ -167,7 +167,7 @@ public class CPUTimeResult implements RuntimeStatResult<CPUTimeResult> {
         return new DecimalFormat("#.##").format(getCpuUsage() * 100);
     }
 
-    public JsonObject toJsonObject() {
+    @Override public JsonObject toJsonObject() {
         return new JsonObject()
                 .put("stat_time", getStatTime())
                 .put("User", this.spentInUserState)

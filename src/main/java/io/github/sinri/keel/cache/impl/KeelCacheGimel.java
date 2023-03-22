@@ -11,8 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BooleanSupplier;
 
 /**
- * @param <K>
- * @param <V>
+ * 
+ * 
  * @since 2.9
  */
 public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<K, V> {
@@ -25,7 +25,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
         map = new HashMap<>();
     }
 
-    public long getLockWaitMs() {
+    @Override public long getLockWaitMs() {
         return lockWaitMs;
     }
 

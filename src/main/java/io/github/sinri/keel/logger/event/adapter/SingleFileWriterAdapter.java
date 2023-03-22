@@ -1,20 +1,26 @@
 package io.github.sinri.keel.logger.event.adapter;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
+
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class SingleFileWriterAdapter implements KeelEventLoggerAdapter {
-    private FileWriter fileWriter;
+    private Writer fileWriter;
 
     public SingleFileWriterAdapter(String filepath) {
         try {
-            fileWriter = new FileWriter(filepath, true);
+            fileWriter = Files.newBufferedWriter(Paths.get(filepath), UTF_8, CREATE, APPEND);
         } catch (IOException e) {
             fileWriter = null;
         }

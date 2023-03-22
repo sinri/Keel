@@ -168,14 +168,16 @@ public class KeelGatling extends KeelVerticleBase {
         }
 
         /**
-         * @return 加特林机枪名称（集群中各节点之间的识别同一组加特林机枪类的实例用）
+         *Returns \u52a0\u7279\u6797\u673a\u67aa\u540d\u79f0\uff08\u96c6\u7fa4\u4e2d\u5404\u8282\u70b9\u4e4b\u95f4\u7684\u8bc6\u522b\u540c\u4e00\u7ec4\u52a0\u7279\u6797\u673a\u67aa\u7c7b\u7684\u5b9e\u4f8b\u7528\uff09.
+ 
          */
         public String getGatlingName() {
             return gatlingName;
         }
 
         /**
-         * @return 枪管数量（并发任务数）
+         *Returns \u67aa\u7ba1\u6570\u91cf\uff08\u5e76\u53d1\u4efb\u52a1\u6570\uff09.
+ 
          */
         public int getBarrels() {
             return barrels;
@@ -190,7 +192,8 @@ public class KeelGatling extends KeelVerticleBase {
         }
 
         /**
-         * @return 弹带更换平均等待时长（没有新任务时的休眠期，单位0.001秒）
+         *Returns \u5f39\u5e26\u66f4\u6362\u5e73\u5747\u7b49\u5f85\u65f6\u957f\uff08\u6ca1\u6709\u65b0\u4efb\u52a1\u65f6\u7684\u4f11\u7720\u671f\uff0c\u5355\u4f4d0.001\u79d2\uff09.
+ 
          */
         public int getAverageRestInterval() {
             return averageRestInterval;
@@ -205,7 +208,8 @@ public class KeelGatling extends KeelVerticleBase {
         }
 
         /**
-         * @return 供弹器（新任务生成器）
+         *Returns \u4f9b\u5f39\u5668\uff08\u65b0\u4efb\u52a1\u751f\u6210\u5668\uff09.
+ 
          */
         public Supplier<Future<Bullet>> getBulletLoader() {
             return bulletLoader;

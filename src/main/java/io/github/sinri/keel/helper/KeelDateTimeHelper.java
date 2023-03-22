@@ -73,6 +73,6 @@ public class KeelDateTimeHelper {
                         Locale.ENGLISH
                 )
                 .withZone(ZoneId.of("GMT"));
-        return gmt.format(LocalDateTime.now());
+        return gmt.format(LocalDateTime.now(ZoneId.systemDefault()));
     }
 }

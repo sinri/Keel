@@ -3,9 +3,9 @@ package io.github.sinri.keel.core;
 import io.vertx.core.Future;
 
 /**
- * @param <T>
- * @param <A>
- * @param <S>
+ * 
+ * 
+ * 
  * @since 1.13
  */
 public class DuplexExecutor<T, A, S, E extends Throwable> {

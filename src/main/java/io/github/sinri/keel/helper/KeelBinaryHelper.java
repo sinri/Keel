@@ -1,8 +1,9 @@
 package io.github.sinri.keel.helper;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import io.github.sinri.keel.helper.encryption.base32.Base32;
 import io.vertx.core.buffer.Buffer;
-
 import java.util.Base64;
 
 public class KeelBinaryHelper {
@@ -106,14 +107,14 @@ public class KeelBinaryHelper {
      * @since 2.9.4
      */
     public String encodeWithBase64ToString(byte[] bytes) {
-        return new String(encodeWithBase64(bytes));
+        return new String(encodeWithBase64(bytes), UTF_8);
     }
 
     /**
      * @since 2.9.4
      */
     public byte[] encodeWithBase32(byte[] bytes) {
-        return encodeWithBase32ToString(bytes).getBytes();
+        return encodeWithBase32ToString(bytes).getBytes(UTF_8);
     }
 
     /**
@@ -127,13 +128,13 @@ public class KeelBinaryHelper {
      * @since 2.9.4
      */
     public byte[] decodeWithBase32(byte[] bytes) {
-        return Base32.decode(new String(bytes));
+        return Base32.decode(new String(bytes, UTF_8));
     }
 
     /**
      * @since 2.9.4
      */
     public String decodeWithBase32ToString(byte[] bytes) {
-        return new String(decodeWithBase32(bytes));
+        return new String(decodeWithBase32(bytes), UTF_8);
     }
 }

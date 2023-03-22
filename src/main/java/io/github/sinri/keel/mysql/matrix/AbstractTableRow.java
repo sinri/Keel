@@ -12,14 +12,16 @@ public abstract class AbstractTableRow extends SimpleResultRow {
     }
 
     /**
-     * @return default null
+     *Returns default null.
+ 
      */
     public String sourceSchemaName() {
         return null;
     }
 
     /**
-     * @return table name
+     *Returns table name.
+ 
      */
     abstract public String sourceTableName();
 }

@@ -1,8 +1,10 @@
 package io.github.sinri.keel.helper;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import com.google.common.base.Splitter;
 import io.github.sinri.keel.helper.encryption.base32.Base32;
 import io.vertx.core.buffer.Buffer;
-
 import java.util.*;
 
 /**
@@ -87,7 +89,7 @@ public class KeelStringHelper {
         if (underScoreCase == null) {
             return null;
         }
-        String[] parts = underScoreCase.toLowerCase().split("[\\s_]");
+        Iterable<String> parts = Splitter.onPattern("[\\s_]").split(underScoreCase.toLowerCase());
         List<String> camel = new ArrayList<>();
         for (var part : parts) {
             if (part != null && !part.isEmpty() && !part.isBlank()) {
@@ -248,14 +250,14 @@ public class KeelStringHelper {
      * @since 2.9.4
      */
     public byte[] encodeWithBase64ToBytes(String s) {
-        return KeelHelpers.binaryHelper().encodeWithBase64(s.getBytes());
+        return KeelHelpers.binaryHelper().encodeWithBase64(s.getBytes(UTF_8));
     }
 
     /**
      * @since 2.9.4
      */
     public String encodeWithBase64(String s) {
-        return new String(encodeWithBase64ToBytes(s));
+        return new String(encodeWithBase64ToBytes(s), UTF_8);
     }
 
     /**
@@ -269,7 +271,7 @@ public class KeelStringHelper {
      * @since 2.9.4
      */
     public String encodeWithBase32(String s) {
-        return Base32.encode(s.getBytes());
+        return Base32.encode(s.getBytes(UTF_8));
     }
 
     /**
@@ -283,6 +285,6 @@ public class KeelStringHelper {
      * @since 2.9.4
      */
     public String decodeWithBase32(String s) {
-        return new String(decodeWithBase32ToBytes(s));
+        return new String(decodeWithBase32ToBytes(s), UTF_8);
     }
 }

@@ -29,6 +29,6 @@ public class ValueWrapper<P> {
     }
 
     public boolean isAliveNow() {
-        return (new Date().getTime()) < this.death;
+        return  new Date().getTime() < this.death;
     }
 }

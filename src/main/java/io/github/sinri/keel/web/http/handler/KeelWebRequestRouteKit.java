@@ -21,7 +21,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * @param <S>
+ * 
  * @since 2.9
  * @since 3.0.0 TEST PASSED
  */
@@ -175,7 +175,7 @@ public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
 
         if (apiMeta.virtualHost() != null && !apiMeta.virtualHost().equals("")) {
             route.virtualHost(apiMeta.virtualHost());
-        } else if (this.virtualHost != null && !Objects.equals("", this.virtualHost)) {
+        } else if (this.virtualHost != null && !Objects.equals(this.virtualHost, "")) {
             route.virtualHost(this.virtualHost);
         }
 

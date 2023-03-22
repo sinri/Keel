@@ -12,5 +12,5 @@ public interface MySQLCondition {
      * @return The generated SQL component as String
      * @throws KeelSQLGenerateError when the sql component could not be generated correctly
      */
-    String toString();
+    @Override String toString();
 }

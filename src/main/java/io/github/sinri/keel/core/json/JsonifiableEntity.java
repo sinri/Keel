@@ -88,7 +88,7 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
     /**
      * @since 2.8
      */
-    default void writeToBuffer(Buffer buffer) {
+    @Override default void writeToBuffer(Buffer buffer) {
         JsonObject jsonObject = this.toJsonObject();
         jsonObject.writeToBuffer(buffer);
     }
@@ -96,7 +96,7 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
     /**
      * @since 2.8
      */
-    default int readFromBuffer(int pos, Buffer buffer) {
+    @Override default int readFromBuffer(int pos, Buffer buffer) {
         JsonObject jsonObject = new JsonObject();
         int i = jsonObject.readFromBuffer(pos, buffer);
         this.reloadDataFromJsonObject(jsonObject);

@@ -28,7 +28,7 @@ public class KeelPureWatchman extends KeelWatchmanImpl {
         );
     }
 
-    public KeelWatchmanEventHandler regularHandler() {
+    @Override public KeelWatchmanEventHandler regularHandler() {
         return options.getHandler();
     }
 

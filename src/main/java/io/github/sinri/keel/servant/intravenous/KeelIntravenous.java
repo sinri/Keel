@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 /**
- * @param <T>
+ * 
  * @since 3.0.0
  */
 public class KeelIntravenous<T> extends KeelVerticleBase {

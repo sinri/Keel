@@ -31,19 +31,19 @@ class ResultMatrixImpl implements ResultMatrix {
         return rowSet;
     }
 
-    public int getTotalFetchedRows() {
+    @Override public int getTotalFetchedRows() {
         return rowSet.size();
     }
 
-    public int getTotalAffectedRows() {
+    @Override public int getTotalAffectedRows() {
         return rowSet.rowCount();
     }
 
-    public long getLastInsertedID() {
+    @Override public long getLastInsertedID() {
         return rowSet.property(MySQLClient.LAST_INSERTED_ID);
     }
 
-    public JsonArray toJsonArray() {
+    @Override public JsonArray toJsonArray() {
         JsonArray array = new JsonArray();
         for (var row : rowList) {
             array.add(row.toJson());
@@ -51,7 +51,7 @@ class ResultMatrixImpl implements ResultMatrix {
         return array;
     }
 
-    public List<JsonObject> getRowList() {
+    @Override public List<JsonObject> getRowList() {
         List<JsonObject> l = new ArrayList<>();
         for (var item : rowList) {
             l.add(item.toJson());
@@ -59,14 +59,14 @@ class ResultMatrixImpl implements ResultMatrix {
         return l;
     }
 
-    public JsonObject getFirstRow() throws KeelSQLResultRowIndexError {
+    @Override public JsonObject getFirstRow() throws KeelSQLResultRowIndexError {
         return getRowByIndex(0);
     }
 
     /**
      * @throws KeelSQLResultRowIndexError 行号不正确时抛出异常
      */
-    public JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError {
+    @Override public JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError {
         try {
             return rowList.get(index).toJson();
         } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
@@ -78,7 +78,7 @@ class ResultMatrixImpl implements ResultMatrix {
      * @throws KeelSQLResultRowIndexError 行号不正确时抛出异常
      * @throws RuntimeException           封装类的时候可能会抛出异常
      */
-    public <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
+    @Override public <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
         try {
             return ResultMatrix.buildTableRow(getRowByIndex(index), classOfTableRow);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
@@ -90,7 +90,7 @@ class ResultMatrixImpl implements ResultMatrix {
     /**
      * @throws RuntimeException 封装类的时候可能会抛出异常
      */
-    public <T extends ResultRow> List<T> buildTableRowList(Class<T> classOfTableRow) {
+    @Override public <T extends ResultRow> List<T> buildTableRowList(Class<T> classOfTableRow) {
         try {
             return ResultMatrix.buildTableRowList(getRowList(), classOfTableRow);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
@@ -107,19 +107,19 @@ class ResultMatrixImpl implements ResultMatrix {
         return KeelHelpers.datetimeHelper().getMySQLFormatLocalDateTimeExpression(getFirstRow().getString(columnName));
     }
 
-    public String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError {
+    @Override public String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError {
         return getFirstRow().getString(columnName);
     }
 
-    public Numeric getOneColumnOfFirstRowAsNumeric(String columnName) throws KeelSQLResultRowIndexError {
+    @Override public Numeric getOneColumnOfFirstRowAsNumeric(String columnName) throws KeelSQLResultRowIndexError {
         return Numeric.create(getFirstRow().getNumber(columnName));
     }
 
-    public Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelSQLResultRowIndexError {
+    @Override public Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelSQLResultRowIndexError {
         return getFirstRow().getInteger(columnName);
     }
 
-    public Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelSQLResultRowIndexError {
+    @Override public Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelSQLResultRowIndexError {
         return getFirstRow().getLong(columnName);
     }
 
@@ -135,7 +135,7 @@ class ResultMatrixImpl implements ResultMatrix {
         return x;
     }
 
-    public List<String> getOneColumnAsString(String columnName) {
+    @Override public List<String> getOneColumnAsString(String columnName) {
         List<String> x = new ArrayList<>();
         for (var row : rowList) {
             x.add(row.getString(columnName));
@@ -143,7 +143,7 @@ class ResultMatrixImpl implements ResultMatrix {
         return x;
     }
 
-    public List<Numeric> getOneColumnAsNumeric(String columnName) {
+    @Override public List<Numeric> getOneColumnAsNumeric(String columnName) {
         List<Numeric> x = new ArrayList<>();
         for (var row : rowList) {
             x.add(row.getNumeric(columnName));
@@ -151,7 +151,7 @@ class ResultMatrixImpl implements ResultMatrix {
         return x;
     }
 
-    public List<Long> getOneColumnAsLong(String columnName) {
+    @Override public List<Long> getOneColumnAsLong(String columnName) {
         List<Long> x = new ArrayList<>();
         for (var row : rowList) {
             x.add(row.getLong(columnName));
@@ -159,7 +159,7 @@ class ResultMatrixImpl implements ResultMatrix {
         return x;
     }
 
-    public List<Integer> getOneColumnAsInteger(String columnName) {
+    @Override public List<Integer> getOneColumnAsInteger(String columnName) {
         List<Integer> x = new ArrayList<>();
         for (var row : rowList) {
             x.add(row.getInteger(columnName));

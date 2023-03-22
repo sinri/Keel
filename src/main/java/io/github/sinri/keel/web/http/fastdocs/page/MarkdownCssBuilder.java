@@ -1,8 +1,9 @@
 package io.github.sinri.keel.web.http.fastdocs.page;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -24,7 +25,7 @@ public class MarkdownCssBuilder implements FastDocsContentResponder {
                     .getResourceAsStream("web-fastdocs-css/github-markdown.4.0.0.min.css");
             if (resourceAsStream != null) {
                 try {
-                    cssFileContent = new String(resourceAsStream.readAllBytes());
+                    cssFileContent = new String(resourceAsStream.readAllBytes(), UTF_8);
                 } catch (IOException e) {
                     return "";
                 }

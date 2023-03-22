@@ -1,5 +1,6 @@
 package io.github.sinri.keel.mysql;
 
+import com.google.errorprone.annotations.InlineMe;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
@@ -9,14 +10,13 @@ import io.vertx.core.Future;
 import io.vertx.mysqlclient.MySQLClient;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.*;
-import org.jetbrains.annotations.NotNull;
-
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
 
 public class MySQLDataSource {
     private final MySQLPool pool;
@@ -67,7 +67,8 @@ public class MySQLDataSource {
      * @return Y-m-d H:i:s
      * @since 1.7
      */
-    @Deprecated(since = "3.0.0")
+    @InlineMe(replacement = "KeelHelpers.datetimeHelper().getCurrentDateExpression(\"yyyy-MM-dd HH:mm:ss\")", imports = "io.github.sinri.keel.helper.KeelHelpers")
+@Deprecated(since = "3.0.0")
     public static String nowAsMySQLDatetime() {
         return KeelHelpers.datetimeHelper().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss");
 //        return toMySQLDatetime(LocalDateTime.now());
@@ -358,9 +359,7 @@ public class MySQLDataSource {
             });
         }
 
-        public Throwable getError() {
-            return error;
-        }
+        
 
         protected Iterator<Row> getRowIterator() {
             if (loading) {
@@ -397,9 +396,7 @@ public class MySQLDataSource {
 
         private final IteratorOverCursor iteratorOverCursor;
 
-        public IterableOverCursor(Cursor cursor) {
-            this.iteratorOverCursor = new IteratorOverCursor(cursor);
-        }
+        
 
         public IterableOverCursor(Cursor cursor, int batchSize) {
             this.iteratorOverCursor = new IteratorOverCursor(cursor, batchSize);

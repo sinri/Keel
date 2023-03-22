@@ -7,8 +7,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
 /**
- * @param <K>
- * @param <V>
+ * 
+ * 
  * @since 1.14
  */
 public interface KeelAsyncCacheInterface<K, V> {

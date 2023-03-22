@@ -32,7 +32,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
 
     abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
 
-    public void start() {
+    @Override public void start() {
         // 部署之后重新加载一遍
         setLogger(prepareLogger());
 

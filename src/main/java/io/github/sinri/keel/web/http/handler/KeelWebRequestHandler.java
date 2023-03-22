@@ -74,7 +74,7 @@ abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
         }
     }
 
-    public final void handle(RoutingContext routingContext) {
+    @Override public final void handle(RoutingContext routingContext) {
         KeelEventLogger logger = createLogger(routingContext);
         logger.setPresetEventLogEditor(eventLog -> {
             eventLog

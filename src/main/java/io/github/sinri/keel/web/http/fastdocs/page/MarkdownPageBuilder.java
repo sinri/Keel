@@ -1,10 +1,10 @@
 package io.github.sinri.keel.web.http.fastdocs.page;
 
+import com.google.common.base.Splitter;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.markdown.KeelMarkdownKit;
 import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;
-
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -32,10 +32,10 @@ public class MarkdownPageBuilder implements FastDocsContentResponder {
     }
 
     protected String getComputedBreadcrumbDivContent() {
-        String[] components = URLDecoder.decode(
+        Iterable<String> components = Splitter.on('/').split(URLDecoder.decode(
                 options.ctx.request().path().substring(this.options.rootURLPath.length()),
                 StandardCharsets.UTF_8
-        ).split("/");
+        ));
         List<String> x = new ArrayList<>();
         StringBuilder href = new StringBuilder(this.options.rootURLPath);
         x.add("<a href='" + href + "index.md" + "'>" + options.subjectOfDocuments + "</a>");

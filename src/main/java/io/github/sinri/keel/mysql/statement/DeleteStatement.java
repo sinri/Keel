@@ -45,7 +45,7 @@ public class DeleteStatement extends AbstractModifyStatement {
      * @since 1.4
      */
     public DeleteStatement where(Function<ConditionsComponent, ConditionsComponent> function) {
-        function.apply(whereConditionsComponent);
+        var unused = function.apply(whereConditionsComponent);
         return this;
     }
 
@@ -64,7 +64,7 @@ public class DeleteStatement extends AbstractModifyStatement {
         return this;
     }
 
-    public String toString() {
+    @Override public String toString() {
         String sql = "DELETE FROM ";
         if (schema != null) {
             sql += schema + ".";

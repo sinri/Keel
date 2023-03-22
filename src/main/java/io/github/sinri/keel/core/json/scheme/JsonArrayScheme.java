@@ -307,7 +307,7 @@ public class JsonArrayScheme extends JsonValueScheme<JsonArray> {
 //        return this;
 //    }
 
-    public JsonArray getDigested() {
+    @Override public JsonArray getDigested() {
         return this.digested;
     }
 }

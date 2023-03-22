@@ -49,12 +49,12 @@ public abstract class AbstractReadStatement extends AbstractStatement {
     }
 
     /**
-     * @param sqlConnection
-     * @param classT
-     * @param categoryGenerator
-     * @param <K>
-     * @param <T>
-     * @return
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
      * @since 2.9.4
      */
     public <K, T extends ResultRow> Future<Map<K, List<T>>> queryForCategorizedMap(
@@ -66,12 +66,12 @@ public abstract class AbstractReadStatement extends AbstractStatement {
     }
 
     /**
-     * @param sqlConnection
-     * @param classT
-     * @param uniqueKeyGenerator
-     * @param <K>
-     * @param <T>
-     * @return
+     * 
+     * 
+     * 
+     * 
+     * 
+     * 
      * @since 2.9.4
      */
     public <K, T extends ResultRow> Future<Map<K, T>> queryForUniqueKeyBoundMap(

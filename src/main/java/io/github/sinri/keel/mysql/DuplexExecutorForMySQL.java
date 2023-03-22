@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 /**
- * @param <T>
+ * 
  * @since 1.13
  * @deprecated since 2.1
  */

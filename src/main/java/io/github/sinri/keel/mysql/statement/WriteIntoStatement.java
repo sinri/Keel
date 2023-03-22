@@ -1,5 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
+import com.google.errorprone.annotations.InlineMe;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.Quoter;
 import io.vertx.core.Future;
@@ -7,7 +8,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -307,7 +307,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         return this;
     }
 
-    public String toString() {
+    @Override public String toString() {
         String sql = writeType + " " + ignoreMark + " INTO ";
         if (schema != null) {
             sql += schema + ".";
@@ -381,13 +381,15 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     public static class RowToWrite {
         final Map<String, String> map = new ConcurrentHashMap<>();
 
-        @Deprecated(since = "3.0.0", forRemoval = true)
-        public RowToWrite putValue(String columnName, String value) {
+        @InlineMe(replacement = "this.put(columnName, value)")
+@Deprecated(since = "3.0.0", forRemoval = true)
+        public final RowToWrite putValue(String columnName, String value) {
             return put(columnName, value);
         }
 
-        @Deprecated(since = "3.0.0", forRemoval = true)
-        public RowToWrite putValue(String columnName, Number value) {
+        @InlineMe(replacement = "this.put(columnName, value)")
+@Deprecated(since = "3.0.0", forRemoval = true)
+        public final RowToWrite putValue(String columnName, Number value) {
             return put(columnName, value);
         }
 

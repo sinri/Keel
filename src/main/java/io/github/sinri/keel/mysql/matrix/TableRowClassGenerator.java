@@ -1,5 +1,6 @@
 package io.github.sinri.keel.mysql.matrix;
 
+import com.google.common.base.Splitter;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
@@ -7,10 +8,10 @@ import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.sqlclient.SqlConnection;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -202,8 +203,8 @@ public class TableRowClassGenerator {
             Matcher matcher = patternForLooseEnum.matcher(comment);
             if (matcher.find()) {
                 String enumValuesString = matcher.group(1);
-                String[] enumValueArray = enumValuesString.split("[, ]+");
-                if (enumValueArray.length > 0) {
+                List<String> enumValueArray = Splitter.onPattern("[, ]+").splitToList(enumValuesString);
+                if (enumValueArray.size() > 0) {
                     // to build enum
                     enum_name = KeelHelpers.stringHelper().fromUnderScoreCaseToCamelCase(field) + "Enum";
 

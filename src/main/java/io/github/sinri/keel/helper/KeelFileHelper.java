@@ -54,8 +54,9 @@ public class KeelFileHelper {
     }
 
     /**
-     * @param filePath path string of the target file, or directory
-     * @return the URL of target file; if not there, null return.
+     *Returns the URL of target file; if not there, null return.
+ @param filePath path string of the target file, or directory
+     * 
      */
     public URL getUrlOfFileInJar(String filePath) {
         return KeelFileHelper.class.getClassLoader().getResource(filePath);

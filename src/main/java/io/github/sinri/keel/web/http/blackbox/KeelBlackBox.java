@@ -123,7 +123,7 @@ public class KeelBlackBox {
                                             )
                                             .addSubElement(new HTMLTagElement("td")
                                                     .setAttributes("style='margin:5px 10px;border-bottom: gray 1px dashed;'")
-                                                    .setContent((new Date(childFile.lastModified()).toString()))
+                                                    .setContent( new Date(childFile.lastModified()).toString())
                                             )
                             );
                         });

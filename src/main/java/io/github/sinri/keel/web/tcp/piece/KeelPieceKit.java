@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 /**
  * 配合 KeelSisiodosi 食用。
  *
- * @param <P>
+ * 
  * @since 2.8
  */
 public abstract class KeelPieceKit<P extends KeelPiece> implements Consumer<Buffer> {

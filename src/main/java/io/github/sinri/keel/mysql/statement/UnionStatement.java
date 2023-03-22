@@ -49,7 +49,7 @@ public class UnionStatement extends AbstractReadStatement {
         return this;
     }
 
-    public String toString() {
+    @Override public String toString() {
         return KeelHelpers.stringHelper().joinStringArray(selections, " ") + (
                 getRemarkAsComment().isEmpty() ? "" : ("\n-- " + getRemarkAsComment())
         );

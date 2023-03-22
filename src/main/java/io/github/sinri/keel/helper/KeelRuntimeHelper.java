@@ -29,12 +29,12 @@ public class KeelRuntimeHelper {
     public GCStatResult getGCSnapshot() {
         GCStatResult gcStat = new GCStatResult();
         for (GarbageCollectorMXBean gc : ManagementFactory.getGarbageCollectorMXBeans()) {
-            if (Objects.equals("G1 Young Generation", gc.getName())) {
+            if (Objects.equals(gc.getName(), "G1 Young Generation")) {
                 gcStat.addGCCountAsYoung(gc.getCollectionCount());
                 if (gc.getCollectionTime() >= 0) {
                     gcStat.addGCTimeAsYoung(gc.getCollectionTime());
                 }
-            } else if (Objects.equals("G1 Old Generation", gc.getName())) {
+            } else if (Objects.equals(gc.getName(), "G1 Old Generation")) {
                 gcStat.addGCCountAsOld(gc.getCollectionCount());
                 if (gc.getCollectionTime() >= 0) {
                     gcStat.addGCTimeAsOld(gc.getCollectionTime());

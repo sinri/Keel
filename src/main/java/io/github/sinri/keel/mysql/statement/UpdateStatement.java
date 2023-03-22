@@ -58,17 +58,17 @@ public class UpdateStatement extends AbstractModifyStatement {
     }
 
     public UpdateStatement setWithValue(String column, Number value) {
-        assignments.add(column + "=" + (new Quoter(value)));
+        assignments.add(column + "=" +  new Quoter(value));
         return this;
     }
 
     public UpdateStatement setWithValue(String column, String value) {
-        assignments.add(column + "=" + (new Quoter(value)));
+        assignments.add(column + "=" +  new Quoter(value));
         return this;
     }
 
     public UpdateStatement where(Function<ConditionsComponent, ConditionsComponent> function) {
-        function.apply(whereConditionsComponent);
+        var unused = function.apply(whereConditionsComponent);
         return this;
     }
 
@@ -87,7 +87,7 @@ public class UpdateStatement extends AbstractModifyStatement {
         return this;
     }
 
-    public String toString() {
+    @Override public String toString() {
         String sql = "UPDATE " + ignoreMark;
         if (schema != null) {
             sql += " " + schema + ".";

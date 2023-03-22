@@ -99,7 +99,7 @@ public class SelectStatement extends AbstractReadStatement {
      * @since 1.4
      */
     public SelectStatement where(Function<ConditionsComponent, ConditionsComponent> function) {
-        function.apply(whereConditionsComponent);
+        var unused = function.apply(whereConditionsComponent);
         return this;
     }
 
@@ -114,7 +114,7 @@ public class SelectStatement extends AbstractReadStatement {
     }
 
     public SelectStatement having(Function<ConditionsComponent, ConditionsComponent> function) {
-        function.apply(havingConditionsComponent);
+        var unused = function.apply(havingConditionsComponent);
         return this;
     }
 
@@ -145,7 +145,7 @@ public class SelectStatement extends AbstractReadStatement {
         return this;
     }
 
-    public String toString() {
+    @Override public String toString() {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
         if (columns.isEmpty()) {
@@ -171,7 +171,7 @@ public class SelectStatement extends AbstractReadStatement {
         if (limit > 0) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append("LIMIT ").append(limit).append(" OFFSET ").append(offset);
         }
-        if (!"".equals(lockMode)) {
+        if (!lockMode.equals("")) {
             sql.append(AbstractStatement.SQL_COMPONENT_SEPARATOR).append(lockMode);
         }
         if (!getRemarkAsComment().isEmpty()) {
@@ -220,7 +220,7 @@ public class SelectStatement extends AbstractReadStatement {
             return this;
         }
 
-        public String toString() {
+        @Override public String toString() {
             String s = joinType + " " + tableExpression;
             if (alias != null) {
                 s += " AS " + alias;
@@ -260,7 +260,7 @@ public class SelectStatement extends AbstractReadStatement {
             return this;
         }
 
-        public String toString() {
+        @Override public String toString() {
             StringBuilder column = new StringBuilder();
             if (expression == null) {
                 if (schema == null) {

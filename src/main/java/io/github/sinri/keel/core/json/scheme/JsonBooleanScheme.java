@@ -68,7 +68,7 @@ public class JsonBooleanScheme extends JsonValueScheme<Boolean> {
         }
 //        if (object instanceof Boolean) {
         if (expected != null) {
-            if (object != expected) {
+            if (!object.equals(expected)) {
                 throw new JsonSchemeMismatchException(JsonSchemeMismatchException.RuleValueNotExpected);
             }
         }

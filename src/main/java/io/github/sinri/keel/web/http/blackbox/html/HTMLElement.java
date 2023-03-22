@@ -9,7 +9,7 @@ public class HTMLElement {
         this.htmlTag = htmlTag;
     }
 
-    public String toString() {
+    @Override public String toString() {
         return this.header + "\n" + this.htmlTag.toString();
     }
 }

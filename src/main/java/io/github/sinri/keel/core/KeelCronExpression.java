@@ -1,6 +1,8 @@
 package io.github.sinri.keel.core;
 
+import com.google.common.base.Splitter;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,16 +20,16 @@ public class KeelCronExpression {
     public KeelCronExpression(String rawCronExpression) {
         this.rawCronExpression = rawCronExpression;
 
-        String[] parts = rawCronExpression.trim().split("\\s+");
-        if (parts.length != 5) {
+        List<String> parts = Splitter.onPattern("\\s+").splitToList(rawCronExpression.trim());
+        if (parts.size() != 5) {
             throw new RuntimeException("Invalid Cron Expression");
         }
 
-        String minuteExpression = parts[0]; // 0-59
-        String hourExpression = parts[1]; // 0-23
-        String dayExpression = parts[2]; // 1-31
-        String monthExpression = parts[3]; // 1-12
-        String weekdayExpression = parts[4];// 0-6
+        String minuteExpression = parts.get(0); // 0-59
+        String hourExpression = parts.get(1); // 0-23
+        String dayExpression = parts.get(2); // 1-31
+        String monthExpression = parts.get(3); // 1-12
+        String weekdayExpression = parts.get(4);// 0-6
 
         parseField(minuteExpression, minuteOptions, 0, 59);
         parseField(hourExpression, hourOptions, 0, 23);

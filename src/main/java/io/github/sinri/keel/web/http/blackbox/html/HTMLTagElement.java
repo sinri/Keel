@@ -43,7 +43,7 @@ public class HTMLTagElement {
         return this;
     }
 
-    public String toString() {
+    @Override public String toString() {
         String a = "";
         if (attributes != null) {
             a = attributes;

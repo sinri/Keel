@@ -43,8 +43,9 @@ public class KeelShareDataSemaphore {
     }
 
     /**
-     * @param function the function to execute
-     * @return released Future, succeed or failed
+     *Returns released Future, succeed or failed.
+ @param function the function to execute
+     * 
      */
     public Future<Void> tryExecute(Function<Void, Future<Void>> function) {
         return acquire().compose(acquired -> {

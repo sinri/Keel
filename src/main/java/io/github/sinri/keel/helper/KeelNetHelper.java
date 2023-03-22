@@ -1,8 +1,8 @@
 package io.github.sinri.keel.helper;
 
+import com.google.common.base.Splitter;
 import io.vertx.core.json.JsonArray;
 import io.vertx.ext.web.RoutingContext;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -118,7 +118,7 @@ public class KeelNetHelper {
         JsonArray clientIPChain = new JsonArray();
         String xForwardedFor = ctx.request().getHeader("X-Forwarded-For");
         if (xForwardedFor != null) {
-            String[] split = xForwardedFor.split("[ ,]+");
+            Iterable<String> split = Splitter.onPattern("[ ,]+").split(xForwardedFor);
             for (var item : split) {
                 clientIPChain.add(item);
             }

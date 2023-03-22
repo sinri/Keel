@@ -99,35 +99,35 @@ abstract public class KeelAuthenticationHandler implements AuthenticationHandler
 
         final boolean legal;
         final Throwable throwable;
-        final int respondStatusCode;
+        
         final JsonObject principle;
 
 
         public AuthenticateResultImpl() {
             this.legal = true;
             this.throwable = null;
-            this.respondStatusCode = 401;
+            
             this.principle = null;
         }
 
         public AuthenticateResultImpl(JsonObject principle) {
             this.legal = true;
             this.throwable = null;
-            this.respondStatusCode = 401;
+            
             this.principle = principle;
         }
 
         public AuthenticateResultImpl(Throwable throwable) {
             this.legal = false;
             this.throwable = throwable;
-            this.respondStatusCode = 401;
+            
             this.principle = null;
         }
 
         public AuthenticateResultImpl(int respondStatusCode, Throwable throwable) {
             this.legal = false;
             this.throwable = throwable;
-            this.respondStatusCode = respondStatusCode;
+            
             this.principle = null;
         }
 

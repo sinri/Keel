@@ -1,15 +1,18 @@
 package io.github.sinri.keel.facade;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @since 3.0.0
@@ -80,7 +83,7 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
         Properties properties = new Properties();
         try {
             // here, the file named as `propertiesFileName` should be put along with JAR
-            properties.load(new FileReader(propertiesFileName));
+            properties.load(Files.newBufferedReader(Paths.get(propertiesFileName), UTF_8));
         } catch (IOException e) {
             System.err.println("Cannot find the file config.properties. Use the embedded one.");
             try {
