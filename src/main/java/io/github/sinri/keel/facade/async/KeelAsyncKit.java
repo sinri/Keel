@@ -166,23 +166,23 @@ public interface KeelAsyncKit {
                 });
     }
 
-    static void main(String[] args) {
-        CompletableFuture<String> f = CompletableFuture.supplyAsync(new Supplier<String>() {
-            @Override
-            public String get() {
-                throw new RuntimeException("888");
-                //return "123";
-            }
-        });
-        f
-                .exceptionally(throwable -> {
-                    System.err.println("exceptionally:" + throwable);
-                    return "000";
-                })
-                .whenComplete((r, t) -> {
-                    System.out.println("r: " + r);
-                    System.err.println("t:" + t);
-                })
-        ;
-    }
+//    static void main(String[] args) {
+//        CompletableFuture<String> f = CompletableFuture.supplyAsync(new Supplier<String>() {
+//            @Override
+//            public String get() {
+//                throw new RuntimeException("888");
+//                //return "123";
+//            }
+//        });
+//        f
+//                .exceptionally(throwable -> {
+//                    System.err.println("exceptionally:" + throwable);
+//                    return "000";
+//                })
+//                .whenComplete((r, t) -> {
+//                    System.out.println("r: " + r);
+//                    System.err.println("t:" + t);
+//                })
+//        ;
+//    }
 }
