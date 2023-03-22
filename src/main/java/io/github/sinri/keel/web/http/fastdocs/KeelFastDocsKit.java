@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * @since 1.12
@@ -97,7 +98,7 @@ public class KeelFastDocsKit {
                 .put("path", ctx.request().path())
                 .put("stream_id", ctx.request().streamId());
         logger.debug(event -> event.message("processRouterRequest start").put("request", requestInfo));
-        if (ctx.request().method() != HttpMethod.GET) {
+        if (!Objects.equals(ctx.request().method(), HttpMethod.GET)) {
             ctx.response().setStatusCode(405).end();
             logger.warning(event -> event.message("processRouterRequest ends with 405").put("request", requestInfo));
             return;
