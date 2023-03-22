@@ -41,8 +41,8 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
 
     @Override
     public V read(K k, V v) {
-        lock.lock();
         V r;
+        lock.lock();
         try {
             r = map.getOrDefault(k, v);
         } finally {
