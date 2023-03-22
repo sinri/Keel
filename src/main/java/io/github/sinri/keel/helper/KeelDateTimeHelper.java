@@ -67,13 +67,20 @@ public class KeelDateTimeHelper {
      * @return Date Time in RFC 1123: Mon, 31 Oct 2022 01:18:43 GMT
      * @since 2.9.1
      */
-    public String getGMTDateTimeExpression() {
+    public String getGMTDateTimeExpression(ZoneId zoneId) {
         DateTimeFormatter gmt = DateTimeFormatter.ofPattern(
                         "EEE, dd MMM yyyy HH:mm:ss z",
                         Locale.ENGLISH
                 )
                 .withZone(ZoneId.of("GMT"));
-        return gmt.format(LocalDateTime.now());
+        return gmt.format(LocalDateTime.now(zoneId));
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    public String getGMTDateTimeExpression() {
+        return getGMTDateTimeExpression(ZoneId.systemDefault());
     }
 
     /**
