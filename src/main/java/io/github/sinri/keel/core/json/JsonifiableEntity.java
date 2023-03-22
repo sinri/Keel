@@ -73,8 +73,8 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
             return bClass.getConstructor(JsonObject.class).newInstance(jsonObject);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException ignored) {
+            return null;
         }
-        return null;
     }
 
 
