@@ -9,6 +9,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -75,11 +77,18 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
         return this;
     }
 
+    /**
+     * @since 3.0.1
+     */
     public KeelConfiguration loadPropertiesFile(String propertiesFileName) {
+        return loadPropertiesFile(propertiesFileName, StandardCharsets.UTF_8);
+    }
+
+    public KeelConfiguration loadPropertiesFile(String propertiesFileName, Charset charset) {
         Properties properties = new Properties();
         try {
             // here, the file named as `propertiesFileName` should be put along with JAR
-            properties.load(new FileReader(propertiesFileName));
+            properties.load(new FileReader(propertiesFileName, charset));
         } catch (IOException e) {
             System.err.println("Cannot find the file config.properties. Use the embedded one.");
             try {
