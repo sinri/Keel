@@ -99,7 +99,7 @@ public class KeelFileHelper {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return jarEntryList;
     }
