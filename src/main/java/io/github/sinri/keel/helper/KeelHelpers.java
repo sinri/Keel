@@ -56,4 +56,7 @@ public interface KeelHelpers {
         return KeelAuthenticationHelper.getInstance();
     }
 
+    static KeelRandomHelper randomHelper() {
+        return KeelRandomHelper.getInstance();
+    }
 }
