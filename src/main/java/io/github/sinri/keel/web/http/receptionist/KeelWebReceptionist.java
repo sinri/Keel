@@ -5,6 +5,7 @@ import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.Handler;
+import io.vertx.core.http.impl.CookieImpl;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
@@ -107,5 +108,30 @@ public abstract class KeelWebReceptionist {
 
     public User readRequestUser() {
         return routingContext.user();
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    protected void addCookie(String name, String value, Long maxAge, boolean httpOnly) {
+        CookieImpl cookie = new CookieImpl(name, value);
+        cookie.setPath("/");
+        cookie.setMaxAge(maxAge);
+        cookie.setHttpOnly(httpOnly);
+        getRoutingContext().response().addCookie(cookie);
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    protected void addCookie(String name, String value, Long maxAge) {
+        addCookie(name, value, maxAge, false);
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    protected void removeCookie(String name) {
+        getRoutingContext().response().removeCookie(name);
     }
 }

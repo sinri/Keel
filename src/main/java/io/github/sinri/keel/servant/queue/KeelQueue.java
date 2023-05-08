@@ -15,7 +15,6 @@ import io.vertx.core.Future;
  * @since 2.1
  */
 public abstract class KeelQueue extends KeelVerticleBase {
-
     private QueueStatus queueStatus = QueueStatus.INIT;
 
     public QueueStatus getQueueStatus() {
@@ -27,14 +26,28 @@ public abstract class KeelQueue extends KeelVerticleBase {
         return this;
     }
 
-    abstract protected KeelEventLogger prepareLogger();
+    /**
+     * @since 3.0.1 USE KeelVerticleBase::setLogger INSTEAD.
+     */
+    @Deprecated(since = "3.0.1")
+    protected KeelEventLogger prepareLogger() {
+        return null;
+    }
 
 
     abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
 
+    /**
+     * @since 3.0.1
+     */
+    abstract protected SignalReader getSignalReader();
+
     public void start() {
-        // 部署之后重新加载一遍
-        setLogger(prepareLogger());
+        // todo 部署之后重新加载一遍 3.0.1 开始为兼容原有逻辑，日后灭之
+        KeelEventLogger preparedLogger = prepareLogger();
+        if (preparedLogger != null) {
+            setLogger(preparedLogger);
+        }
 
         this.queueStatus = QueueStatus.RUNNING;
 
@@ -46,15 +59,27 @@ public abstract class KeelQueue extends KeelVerticleBase {
         }
     }
 
-    abstract protected Future<QueueSignal> readSignal();
+    /**
+     * @since 3.0.1 Implement getSignalReader instead.
+     */
+    @Deprecated(since = "3.0.1")
+    protected Future<QueueSignal> readSignal() {
+        return getSignalReader().readSignal();
+    }
 
     protected final void routine() {
         getLogger().debug("KeelQueue::routine start");
+        var signalReader = getSignalReader();
         KeelQueueNextTaskSeeker nextTaskSeeker = getNextTaskSeeker();
 
         Future.succeededFuture()
                 .compose(v -> {
-                    return readSignal();
+                    if (signalReader != null) {
+                        return signalReader.readSignal();
+                    } else {
+                        // todo to be removed since 3.0.1
+                        return readSignal();
+                    }
                 })
                 .recover(throwable -> {
                     getLogger().debug("AS IS. Failed to read signal: " + throwable.getMessage());
@@ -146,5 +171,9 @@ public abstract class KeelQueue extends KeelVerticleBase {
         INIT,
         RUNNING,
         STOPPED
+    }
+
+    public interface SignalReader {
+        Future<KeelQueue.QueueSignal> readSignal();
     }
 }

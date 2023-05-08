@@ -87,7 +87,7 @@ public class KeelDateTimeHelper {
      * @since 3.0.1
      */
     protected String makeStandardWidthField(int x, int w) {
-        StringBuilder s = new StringBuilder("" + x);
+        StringBuilder s = new StringBuilder(String.valueOf(x));
         if (s.length() < w) {
             for (int i = 0; i < w - s.length(); i++) {
                 s.insert(0, "0");
@@ -107,5 +107,18 @@ public class KeelDateTimeHelper {
                 + makeStandardWidthField(datetime.getHour(), 2)
                 + ":" + makeStandardWidthField(datetime.getMinute(), 2)
                 + ":" + makeStandardWidthField(datetime.getSecond(), 2);
+    }
+
+    public static final String MYSQL_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final String MYSQL_DATE_PATTERN = "yyyy-MM-dd";
+    public static final String MYSQL_TIME_PATTERN = "HH:mm:ss";
+
+    /**
+     * @param formatPattern MYSQL_DATETIME_PATTERN,MYSQL_DATE_PATTERN,MYSQL_TIME_PATTERN
+     * @since 3.0.1
+     */
+    public String toMySQLDatetime(LocalDateTime localDateTime, String formatPattern) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(formatPattern);
+        return localDateTime.format(dateTimeFormatter);
     }
 }

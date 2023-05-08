@@ -59,6 +59,10 @@ public abstract class KeelSundial extends KeelVerticleBase {
                 // since 3.0.1
                 fetchPlans()
                         .compose(plans -> {
+                            if (plans == null) {
+                                // treat null as NOT MODIFIED
+                                return Future.succeededFuture();
+                            }
                             Set<String> toDelete = new HashSet<>(planMap.keySet());
                             plans.forEach(plan -> {
                                 toDelete.remove(plan.key());
@@ -86,6 +90,7 @@ public abstract class KeelSundial extends KeelVerticleBase {
     /**
      * @since 3.0.1
      * Before plansSupplier is removed, when plansSupplier returns non-null supplier, use that and ignore this.
+     * If future as null, means `NOT MODIFIED`.
      */
     abstract protected Future<Collection<KeelSundialPlan>> fetchPlans();
 
