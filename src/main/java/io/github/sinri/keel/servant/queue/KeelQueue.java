@@ -2,10 +2,10 @@ package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 标准的队列服务实现。
@@ -26,29 +26,15 @@ public abstract class KeelQueue extends KeelVerticleBase {
         return this;
     }
 
-    /**
-     * @since 3.0.1 USE KeelVerticleBase::setLogger INSTEAD.
-     */
-    @Deprecated(since = "3.0.1")
-    protected KeelEventLogger prepareLogger() {
-        return null;
-    }
-
 
     abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
 
     /**
      * @since 3.0.1
      */
-    abstract protected SignalReader getSignalReader();
+    abstract protected @NotNull SignalReader getSignalReader();
 
     public void start() {
-        // todo 部署之后重新加载一遍 3.0.1 开始为兼容原有逻辑，日后灭之
-        KeelEventLogger preparedLogger = prepareLogger();
-        if (preparedLogger != null) {
-            setLogger(preparedLogger);
-        }
-
         this.queueStatus = QueueStatus.RUNNING;
 
         try {
@@ -59,14 +45,6 @@ public abstract class KeelQueue extends KeelVerticleBase {
         }
     }
 
-    /**
-     * @since 3.0.1 Implement getSignalReader instead.
-     */
-    @Deprecated(since = "3.0.1")
-    protected Future<QueueSignal> readSignal() {
-        return getSignalReader().readSignal();
-    }
-
     protected final void routine() {
         getLogger().debug("KeelQueue::routine start");
         var signalReader = getSignalReader();
@@ -74,12 +52,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
 
         Future.succeededFuture()
                 .compose(v -> {
-                    if (signalReader != null) {
-                        return signalReader.readSignal();
-                    } else {
-                        // todo to be removed since 3.0.1
-                        return readSignal();
-                    }
+                    return signalReader.readSignal();
                 })
                 .recover(throwable -> {
                     getLogger().debug("AS IS. Failed to read signal: " + throwable.getMessage());
