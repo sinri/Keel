@@ -110,31 +110,27 @@ public class MySQLDataSource {
      */
     public <T> Future<T> withTransaction(Function<SqlConnection, Future<T>> function) {
         return withConnection(sqlConnection -> {
-            return sqlConnection.begin()
-                    .compose(transaction -> {
-                        return Future.succeededFuture()
-                                .compose(v -> {
-                                    // execute and commit
-                                    return function.apply(sqlConnection)
-                                            .compose(t -> transaction.commit()
-                                                    .compose(committed -> Future.succeededFuture(t)));
-                                })
-                                .compose(Future::succeededFuture, err -> {
-                                    if (err instanceof TransactionRollbackException) {
-                                        // already rollback
-                                        return Future.failedFuture(new KeelMySQLException("MySQLDataSource ROLLBACK Done Manually", err));
-                                    } else {
-                                        return transaction.rollback()
-                                                .compose(
-                                                        rollbackDone -> Future.failedFuture(new KeelMySQLException("MySQLDataSource ROLLBACK Done")),
-                                                        rollbackError -> Future.failedFuture(new KeelMySQLException("MySQLDataSource ROLLBACK Failed", rollbackError))
-                                                );
-                                    }
-                                });
-                    }, beginFailure -> Future.failedFuture(new KeelMySQLConnectionException(
-                            "MySQLDataSource Failed to get SqlConnection for transaction From Pool: " + beginFailure,
-                            beginFailure
-                    )));
+            return sqlConnection.begin().compose(transaction -> {
+                return Future.succeededFuture().compose(v -> {
+                            // execute and commit
+                            return function.apply(sqlConnection)
+                                    .compose(t -> transaction
+                                            .commit().compose(committed -> Future.succeededFuture(t)));
+                        })
+                        .compose(Future::succeededFuture, err -> {
+                            if (err instanceof TransactionRollbackException) {
+                                // already rollback
+                                return Future.failedFuture(new KeelMySQLException("MySQLDataSource ROLLBACK Done Manually", err));
+                            } else {
+                                // since 3.0.3 rollback failure would be thrown directly to downstream.
+                                return transaction.rollback()
+                                        .compose(rollbackDone -> Future.failedFuture(new KeelMySQLException("MySQLDataSource ROLLBACK Finished", err)));
+                            }
+                        });
+            }, beginFailure -> Future.failedFuture(new KeelMySQLConnectionException(
+                    "MySQLDataSource Failed to get SqlConnection for transaction From Pool: " + beginFailure,
+                    beginFailure
+            )));
         });
         //return pool.withTransaction(function);
     }
