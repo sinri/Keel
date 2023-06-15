@@ -53,19 +53,19 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
 //                .setCharset("utf8")
                 .setDatabase("D")
                 .setUser("U")
-                .setPassword("P");
+                .setPassword("P")
+                .setConnectTimeout(5000);
         System.out.println("mySQLConnectOptions: " + mySQLConnectOptions.toJson().encodePrettily());
 
         PoolOptions poolOptions = new PoolOptions()
                 .setConnectionTimeout(2)
-//                .setConnectionTimeoutUnit(TimeUnit.SECONDS)
+                .setConnectionTimeoutUnit(TimeUnit.SECONDS)
                 ;
         System.out.println("poolOptions: " + poolOptions.toJson().encodePrettily());
-
     }
 
     public MySQLConnectOptions getConnectOptions() {
-        // mysql.XXX.connect::database,host,password,port,user,charset,useAffectedRows
+        // mysql.XXX.connect::database,host,password,port,user,charset,useAffectedRows,connectionTimeout
         MySQLConnectOptions mySQLConnectOptions = new MySQLConnectOptions()
                 .setUseAffectedRows(true);
         mySQLConnectOptions.setHost(getHost())
@@ -88,7 +88,7 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
     }
 
     public PoolOptions getPoolOptions() {
-        // mysql.XXX.pool::connectionTimeout
+        // mysql.XXX.pool::poolConnectionTimeout
         PoolOptions poolOptions = new PoolOptions();
         Integer poolMaxSize = getPoolMaxSize();
         if (poolMaxSize != null) {
