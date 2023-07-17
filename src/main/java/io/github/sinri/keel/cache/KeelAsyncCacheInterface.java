@@ -1,6 +1,7 @@
 package io.github.sinri.keel.cache;
 
 import io.github.sinri.keel.cache.impl.KeelCacheBet;
+import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 
 import java.util.concurrent.ConcurrentMap;
@@ -87,5 +88,19 @@ public interface KeelAsyncCacheInterface<K, V> {
         public NotCached(String key) {
             super("For key [" + key + "], no available cached record found.");
         }
+    }
+
+    /**
+     * Start an endless for cleaning up.
+     * Use it manually if needed.
+     *
+     * @since 3.0.4
+     */
+    default void startEndlessCleanUp(long sleepTime) {
+        KeelAsyncKit.endless(() -> {
+            return cleanUp().compose(cleaned -> {
+                return KeelAsyncKit.sleep(sleepTime);
+            });
+        });
     }
 }

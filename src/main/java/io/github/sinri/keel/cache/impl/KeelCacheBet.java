@@ -93,7 +93,7 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
         this.map.keySet().forEach(key -> {
             ValueWrapper<V> vw = this.map.get(key);
             if (vw != null) {
-                if (!vw.isAliveNow()) {
+                if (vw.isAliveNow()) {
                     snapshot.put(key, vw.getValue());
                 }
             }
