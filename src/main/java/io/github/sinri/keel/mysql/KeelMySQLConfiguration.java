@@ -7,6 +7,7 @@ import io.vertx.sqlclient.PoolOptions;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * KeelMySQLConfigure for connections and pool.
@@ -52,19 +53,19 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
 //                .setCharset("utf8")
                 .setDatabase("D")
                 .setUser("U")
-                .setPassword("P");
+                .setPassword("P")
+                .setConnectTimeout(5000);
         System.out.println("mySQLConnectOptions: " + mySQLConnectOptions.toJson().encodePrettily());
 
         PoolOptions poolOptions = new PoolOptions()
                 .setConnectionTimeout(2)
-//                .setConnectionTimeoutUnit(TimeUnit.SECONDS)
+                .setConnectionTimeoutUnit(TimeUnit.SECONDS)
                 ;
         System.out.println("poolOptions: " + poolOptions.toJson().encodePrettily());
-
     }
 
     public MySQLConnectOptions getConnectOptions() {
-        // mysql.XXX.connect::database,host,password,port,user,charset,useAffectedRows
+        // mysql.XXX.connect::database,host,password,port,user,charset,useAffectedRows,connectionTimeout
         MySQLConnectOptions mySQLConnectOptions = new MySQLConnectOptions()
                 .setUseAffectedRows(true);
         mySQLConnectOptions.setHost(getHost())
@@ -77,19 +78,26 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
         if (schema != null) {
             mySQLConnectOptions.setDatabase(schema);
         }
+
+        Integer connectionTimeout = getConnectionTimeout();
+        if (connectionTimeout != null) {
+            mySQLConnectOptions.setConnectTimeout(connectionTimeout);
+        }
+
         return mySQLConnectOptions;
     }
 
     public PoolOptions getPoolOptions() {
-        // mysql.XXX.pool::connectionTimeout
+        // mysql.XXX.pool::poolConnectionTimeout
         PoolOptions poolOptions = new PoolOptions();
         Integer poolMaxSize = getPoolMaxSize();
         if (poolMaxSize != null) {
             poolOptions.setMaxSize(poolMaxSize);
         }
-        Integer connectionTimeout = getConnectionTimeout();
-        if (connectionTimeout != null) {
-            poolOptions.setConnectionTimeout(connectionTimeout);
+        Integer poolConnectionTimeout = getPoolConnectionTimeout();
+        if (poolConnectionTimeout != null) {
+            poolOptions.setConnectionTimeout(poolConnectionTimeout);
+            poolOptions.setConnectionTimeoutUnit(TimeUnit.SECONDS);
         }
         return poolOptions;
     }
@@ -134,7 +142,24 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
         return dataSourceName;
     }
 
-    public Integer getConnectionTimeout() {
+    /**
+     * The default value of connect timeout = 60000 ms
+     *
+     * @return connectTimeout - connect timeout, in ms
+     * @since 3.0.1 let it be its original setting!
+     */
+    private Integer getConnectionTimeout() {
         return readAsInteger("connectionTimeout");
+    }
+
+    /**
+     * Set the amount of time a client will wait for a connection from the pool.
+     * If the time is exceeded without a connection available, an exception is provided.
+     * TimeUnit would be set by `setConnectionTimeoutUnit`
+     *
+     * @see <a href="https://vertx.io/docs/apidocs/io/vertx/sqlclient/PoolOptions.html#setConnectionTimeout-int-">...</a>
+     */
+    public Integer getPoolConnectionTimeout() {
+        return readAsInteger("poolConnectionTimeout");
     }
 }

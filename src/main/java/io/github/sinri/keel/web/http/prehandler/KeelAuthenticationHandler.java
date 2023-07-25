@@ -33,8 +33,7 @@ abstract public class KeelAuthenticationHandler implements AuthenticationHandler
                     }
 
                     routingContext.setUser(authenticateResult.authenticatedUser());
-                })
-                .andThen(ar -> {
+
                     // RESUME
                     routingContext.request().resume();
                     // NEXT

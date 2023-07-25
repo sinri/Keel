@@ -7,6 +7,7 @@ import io.vertx.core.Promise;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -16,10 +17,19 @@ import java.util.function.Supplier;
 public class KeelFunnel extends KeelVerticleBase {
     private final AtomicReference<Promise<Void>> interruptRef;
     private final Queue<Supplier<Future<Void>>> queue;
+    private final AtomicLong sleepTimeRef;
 
     public KeelFunnel() {
+        this.sleepTimeRef = new AtomicLong(1_000L);
         this.queue = new ConcurrentLinkedQueue<>();
         this.interruptRef = new AtomicReference<>();
+    }
+
+    public void setSleepTime(long sleepTime) {
+        if (sleepTime <= 1) {
+            throw new IllegalArgumentException();
+        }
+        this.sleepTimeRef.set(sleepTime);
     }
 
     public void add(Supplier<Future<Void>> supplier) {
@@ -54,19 +64,43 @@ public class KeelFunnel extends KeelVerticleBase {
                                     return supplier.get();
                                 })
                                 .compose(v -> {
+                                    //getLogger().debug("funnel done");
                                     return Future.succeededFuture();
                                 }, throwable -> {
+                                    getLogger().exception(throwable, "funnel task error");
                                     return Future.succeededFuture();
                                 });
                     })
                     .andThen(ar -> {
                         this.interruptRef.set(Promise.promise());
 
-                        KeelAsyncKit.sleep(60_000L, getCurrentInterrupt())
+                        KeelAsyncKit.sleep(this.sleepTimeRef.get(), getCurrentInterrupt())
                                 .andThen(slept -> {
                                     promise.complete();
                                 });
                     });
         });
     }
+
+//    @Deprecated
+//    public static void main(String[] args) {
+//        Keel.initializeVertxStandalone(new VertxOptions());
+//        KeelFunnel funnel = new KeelFunnel();
+//        funnel.setLogger(KeelOutputEventLogCenter.getInstance().createLogger("FunnelMainTest"));
+//        funnel.deployMe(new DeploymentOptions().setWorker(true)).compose(deploymentID -> {
+//                    funnel.add(new Supplier<Future<Void>>() {
+//                        @Override
+//                        public Future<Void> get() {
+//                            System.out.println("!!!");
+//                            return Future.succeededFuture();
+//                        }
+//                    });
+//                    return Future.succeededFuture();
+//                }).compose(v -> {
+//                    return KeelAsyncKit.sleep(3000L);
+//                })
+//                .eventually(v -> {
+//                    return Keel.getVertx().close();
+//                });
+//    }
 }

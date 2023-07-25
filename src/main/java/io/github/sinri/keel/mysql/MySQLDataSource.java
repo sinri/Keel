@@ -2,211 +2,55 @@ package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.helper.KeelHelpers;
-import io.github.sinri.keel.mysql.matrix.ResultMatrix;
-import io.github.sinri.keel.mysql.statement.SelectStatement;
+import io.github.sinri.keel.mysql.exception.KeelMySQLConnectionException;
+import io.github.sinri.keel.mysql.exception.KeelMySQLException;
 import io.vertx.core.Future;
-import io.vertx.mysqlclient.MySQLClient;
+import io.vertx.core.Promise;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.time.LocalDateTime;
 import java.util.Iterator;
-import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public class MySQLDataSource {
     private final MySQLPool pool;
     private final KeelMySQLConfiguration configuration;
+    /**
+     * @since 3.0.2
+     */
+    private final AtomicInteger connectionAvailableCounter = new AtomicInteger(0);
 
     public MySQLDataSource(KeelMySQLConfiguration configuration) {
+        this(configuration, new Function<SqlConnection, Future<Void>>() {
+            @Override
+            public Future<Void> apply(SqlConnection sqlConnection) {
+                return Future.succeededFuture();
+            }
+        });
+    }
+
+    /**
+     * @param configuration
+     * @param connectionSetUpFunction
+     * @since 3.0.2
+     */
+    public MySQLDataSource(KeelMySQLConfiguration configuration, @NotNull Function<SqlConnection, Future<Void>> connectionSetUpFunction) {
         this.configuration = configuration;
         pool = MySQLPool.pool(
                 Keel.getVertx(),
                 configuration.getConnectOptions(),
                 configuration.getPoolOptions()
         );
-    }
-
-    @Deprecated(since = "3.0.0")
-    protected static String makePlaceholderString(int x) {
-        StringBuilder result = new StringBuilder();
-        for (int i = 0; i < x; i++) {
-            if (i > 0) result.append(",");
-            result.append("?");
-        }
-        return result.toString();
-    }
-
-    @Deprecated(since = "3.0.0")
-    protected static String makeStandardWidthField(int x, int w) {
-        StringBuilder s = new StringBuilder("" + x);
-        if (s.length() < w) {
-            for (int i = 0; i < w - s.length(); i++) {
-                s.insert(0, "0");
-            }
-        }
-        return String.valueOf(s);
-    }
-
-    @Deprecated(since = "3.0.0")
-    public static String toMySQLDatetime(LocalDateTime datetime) {
-        return makeStandardWidthField(datetime.getYear(), 4)
-                + "-" + makeStandardWidthField(datetime.getMonthValue(), 2)
-                + "-" + makeStandardWidthField(datetime.getDayOfMonth(), 2)
-                + " "
-                + makeStandardWidthField(datetime.getHour(), 2)
-                + ":" + makeStandardWidthField(datetime.getMinute(), 2)
-                + ":" + makeStandardWidthField(datetime.getSecond(), 2);
-    }
-
-    /**
-     * @return Y-m-d H:i:s
-     * @since 1.7
-     */
-    @Deprecated(since = "3.0.0")
-    public static String nowAsMySQLDatetime() {
-        return KeelHelpers.datetimeHelper().getCurrentDateExpression("yyyy-MM-dd HH:mm:ss");
-//        return toMySQLDatetime(LocalDateTime.now());
-    }
-
-    /**
-     * @since 1.1
-     */
-    @Deprecated(since = "3.0.0")
-    public static Future<Long> executeSqlForLastInsertedID(
-            SqlConnection sqlConnection,
-            String sqlTemplate,
-            List<Tuple> batch,
-            boolean useRecover
-    ) {
-        Future<Long> future = sqlConnection.preparedQuery(sqlTemplate).executeBatch(batch).compose(rows -> {
-            long lastInsertId = rows.property(MySQLClient.LAST_INSERTED_ID);
-            // here the lastInsertId would be the first id batch inserted.
-            // if not inserted, would not come here but as failed
-            return Future.succeededFuture(lastInsertId);
+        pool.connectHandler(sqlConnection -> {
+            connectionSetUpFunction.apply(sqlConnection)
+                    .onComplete(ar -> {
+                        connectionAvailableCounter.incrementAndGet();
+                        sqlConnection.close();
+                    });
         });
-        if (useRecover) {
-            future = future.recover(throwable -> Future.succeededFuture(-1L));
-        }
-        return future;
-    }
-
-    /**
-     * @since 1.1
-     */
-    @Deprecated(since = "3.0.0")
-    public static Future<Long> executeSqlForLastInsertedID(
-            SqlConnection sqlConnection,
-            String sqlTemplate,
-            Tuple data,
-            boolean useRecover
-    ) {
-        Future<Long> future = sqlConnection.preparedQuery(sqlTemplate).execute(data).compose(rows -> {
-            long lastInsertId = rows.property(MySQLClient.LAST_INSERTED_ID);
-            // here the lastInsertId would be the first id batch inserted.
-            // if not inserted, would not come here but as failed
-            return Future.succeededFuture(lastInsertId);
-        });
-        if (useRecover) {
-            future = future.recover(throwable -> Future.succeededFuture(-1L));
-        }
-        return future;
-    }
-
-    /**
-     * @since 1.1
-     */
-    @Deprecated(since = "3.0.0")
-    public static Future<Integer> executeSqlForAffectedRowCount(
-            SqlConnection sqlConnection,
-            String sqlTemplate,
-            Tuple data,
-            boolean useRecover
-    ) {
-        Future<Integer> future = sqlConnection.preparedQuery(sqlTemplate).execute(data).compose(rows -> {
-            // conditions matched zero rows: afx = 0
-            // conditions matched rows and modified them all: afx = all rows
-            // if `useAffectedRows` is set to `true`,
-            //   conditions matched rows but not modified any: afx = 0
-            //   conditions matched rows but modified partly: afx = exact partly rows
-            // otherwise,
-            //   conditions matched rows but not modified any: afx = all rows
-            //   conditions matched rows but modified partly: afx = all rows
-            int afx = rows.rowCount();
-            return Future.succeededFuture(afx);
-        });
-        if (useRecover) {
-            future = future.recover(throwable -> Future.succeededFuture(-1));
-        }
-        return future;
-    }
-
-    /**
-     * @since 1.1
-     */
-    @Deprecated(since = "3.0.0")
-    public static Future<Integer> executeSqlForAffectedRowCount(
-            SqlConnection sqlConnection,
-            String sqlTemplate,
-            boolean useRecover
-    ) {
-        Future<Integer> future = sqlConnection.preparedQuery(sqlTemplate).execute().compose(rows -> {
-            // conditions matched zero rows: afx = 0
-            // conditions matched rows and modified them all: afx = all rows
-            // if `useAffectedRows` is set to `true`,
-            //   conditions matched rows but not modified any: afx = 0
-            //   conditions matched rows but modified partly: afx = exact partly rows
-            // otherwise,
-            //   conditions matched rows but not modified any: afx = all rows
-            //   conditions matched rows but modified partly: afx = all rows
-            int afx = rows.rowCount();
-            return Future.succeededFuture(afx);
-        });
-        if (useRecover) {
-            future = future.recover(throwable -> Future.succeededFuture(-1));
-        }
-        return future;
-    }
-
-    /**
-     * @since 1.1
-     */
-    @Deprecated(since = "3.0.0")
-    public static Future<ResultMatrix> executeSqlForResultMatrix(
-            SqlConnection sqlConnection,
-            String sqlTemplate,
-            Tuple data,
-            boolean useRecover
-    ) {
-        Future<ResultMatrix> future = sqlConnection.preparedQuery(sqlTemplate).execute(data).compose(rows -> {
-            return Future.succeededFuture(ResultMatrix.create(rows));
-        });
-        if (useRecover) {
-            future = future.recover(throwable -> Future.succeededFuture(null));
-        }
-        return future;
-    }
-
-    /**
-     * @since 1.1
-     */
-    @Deprecated(since = "3.0.0")
-    public static Future<ResultMatrix> executeSqlForResultMatrix(
-            SqlConnection sqlConnection,
-            String sqlTemplate,
-            boolean useRecover
-    ) {
-        Future<ResultMatrix> future = sqlConnection.preparedQuery(sqlTemplate).execute().compose(rows -> {
-            return Future.succeededFuture(ResultMatrix.create(rows));
-        });
-        if (useRecover) {
-            future = future.recover(throwable -> Future.succeededFuture(null));
-        }
-        return future;
     }
 
     public KeelMySQLConfiguration getConfiguration() {
@@ -214,56 +58,83 @@ public class MySQLDataSource {
     }
 
     /**
+     * @return the number of connections in use right now
+     * @since 3.0.2
+     */
+    public int getAvailableConnectionCount() {
+        return connectionAvailableCounter.get();
+    }
+
+    /**
      * @since 2.8
+     * @since 3.0.2 re-wrap by Keel
      */
     public <T> Future<T> withConnection(Function<SqlConnection, Future<T>> function) {
-        return pool.withConnection(function);
+        // since 3.0.2
+        Promise<T> promise = Promise.promise();
+        pool.getConnection(ar -> {
+            if (ar.failed()) {
+                promise.fail(new KeelMySQLConnectionException(
+                        "MySQLDataSource Failed to get SqlConnection From Pool (available: " + connectionAvailableCounter.get() + "): " + ar.cause(),
+                        ar.cause()
+                ));
+            } else {
+                connectionAvailableCounter.decrementAndGet();
+
+                var sqlConnection = ar.result();
+                Future.succeededFuture()
+                        .compose(v -> function.apply(sqlConnection))
+                        .onComplete(tAsyncResult -> {
+                            sqlConnection.close();
+
+                            connectionAvailableCounter.incrementAndGet();
+
+                            if (tAsyncResult.failed()) {
+                                promise.fail(new KeelMySQLException(
+                                        "MySQLDataSource Failed Within SqlConnection: " + tAsyncResult.cause(),
+                                        tAsyncResult.cause()
+                                ));
+                            } else {
+                                promise.complete(tAsyncResult.result());
+                            }
+                        });
+            }
+        });
+        return promise.future();
+        //return pool.withConnection(function);
     }
 
     /**
      * @since 2.8
+     * @since 3.0.2 re-wrap by Keel
      */
     public <T> Future<T> withTransaction(Function<SqlConnection, Future<T>> function) {
-        return pool.withTransaction(function);
+        return withConnection(sqlConnection -> {
+            return sqlConnection.begin().compose(transaction -> {
+                return Future.succeededFuture().compose(v -> {
+                            // execute and commit
+                            return function.apply(sqlConnection)
+                                    .compose(t -> transaction
+                                            .commit().compose(committed -> Future.succeededFuture(t)));
+                        })
+                        .compose(Future::succeededFuture, err -> {
+                            if (err instanceof TransactionRollbackException) {
+                                // already rollback
+                                return Future.failedFuture(new KeelMySQLException("MySQLDataSource ROLLBACK Done Manually", err));
+                            } else {
+                                // since 3.0.3 rollback failure would be thrown directly to downstream.
+                                return transaction.rollback()
+                                        .compose(rollbackDone -> Future.failedFuture(new KeelMySQLException("MySQLDataSource ROLLBACK Finished", err)));
+                            }
+                        });
+            }, beginFailure -> Future.failedFuture(new KeelMySQLConnectionException(
+                    "MySQLDataSource Failed to get SqlConnection for transaction From Pool: " + beginFailure,
+                    beginFailure
+            )));
+        });
+        //return pool.withTransaction(function);
     }
 
-    /**
-     * @param transactionBody the function with sql connection for future
-     * @param <T>             the final result class/type
-     * @return future with final result if committed, or failed future if rollback
-     * @since 1.10
-     */
-    @Deprecated(since = "3.0.0")
-    public <T> Future<T> executeInTransaction(Function<SqlConnection, Future<T>> transactionBody) {
-        AtomicReference<T> finalResult = new AtomicReference<>();
-        AtomicReference<Throwable> cause = new AtomicReference<>();
-        return pool
-                .withTransaction(transactionBody)
-                .onSuccess(finalResult::set)
-                .onFailure(cause::set)
-                .eventually(v -> {
-                    if (cause.get() == null) {
-                        return Future.succeededFuture(finalResult.get());
-                    }
-                    return Future.failedFuture(cause.get());
-                });
-    }
-
-    /**
-     * @param selection the SELECT STATEMENT BUILDER
-     * @return the future for ResultMatrix, nullable
-     * @since 1.4
-     */
-    @Deprecated(since = "3.0.0")
-    public Future<ResultMatrix> queryInConnection(SelectStatement selection) {
-        return pool.withConnection(
-                sqlConnection -> MySQLDataSource.executeSqlForResultMatrix(
-                        sqlConnection,
-                        selection.toString(),
-                        false
-                )
-        );
-    }
 
     /**
      * @since 3.0.0

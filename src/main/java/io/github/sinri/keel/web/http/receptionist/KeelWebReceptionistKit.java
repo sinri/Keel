@@ -16,7 +16,6 @@ import org.reflections.Reflections;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -91,7 +90,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
 
         if (apiMeta.virtualHost() != null && !apiMeta.virtualHost().equals("")) {
             route.virtualHost(apiMeta.virtualHost());
-        } else if (this.virtualHost != null && !Objects.equals("", this.virtualHost)) {
+        } else if (this.virtualHost != null && !this.virtualHost.equals("")) {
             route.virtualHost(this.virtualHost);
         }
 

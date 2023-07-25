@@ -388,7 +388,7 @@ public class BCrypt {
     private static String encode_base64(byte[] d, int len)
             throws IllegalArgumentException {
         int off = 0;
-        StringBuffer rs = new StringBuffer();
+        StringBuilder rs = new StringBuilder();
         int c1, c2;
 
         if (len <= 0 || len > d.length)
@@ -436,40 +436,40 @@ public class BCrypt {
      * byte array. Note that this is *not* compatible with
      * the standard MIME-base64 encoding.
      *
-     * @param s       the string to decode
-     * @param maxolen the maximum number of bytes to decode
+     * @param stringToDecode    the string to decode
+     * @param maxLengthToDecode the maximum number of bytes to decode
      * @return an array containing the decoded bytes
      * @throws IllegalArgumentException if maxolen is invalid
      */
-    private static byte[] decode_base64(String s, int maxolen)
+    private static byte[] decode_base64(String stringToDecode, int maxLengthToDecode)
             throws IllegalArgumentException {
-        StringBuffer rs = new StringBuffer();
-        int off = 0, slen = s.length(), olen = 0;
+        StringBuilder rs = new StringBuilder();
+        int off = 0, slen = stringToDecode.length(), olen = 0;
         byte[] ret;
         byte c1, c2, c3, c4, o;
 
-        if (maxolen <= 0)
-            throw new IllegalArgumentException("Invalid maxolen");
+        if (maxLengthToDecode <= 0)
+            throw new IllegalArgumentException("Invalid maxolen(maxLengthToDecode)");
 
-        while (off < slen - 1 && olen < maxolen) {
-            c1 = char64(s.charAt(off++));
-            c2 = char64(s.charAt(off++));
+        while (off < slen - 1 && olen < maxLengthToDecode) {
+            c1 = char64(stringToDecode.charAt(off++));
+            c2 = char64(stringToDecode.charAt(off++));
             if (c1 == -1 || c2 == -1)
                 break;
             o = (byte) (c1 << 2);
             o |= (c2 & 0x30) >> 4;
             rs.append((char) o);
-            if (++olen >= maxolen || off >= slen)
+            if (++olen >= maxLengthToDecode || off >= slen)
                 break;
-            c3 = char64(s.charAt(off++));
+            c3 = char64(stringToDecode.charAt(off++));
             if (c3 == -1)
                 break;
             o = (byte) ((c2 & 0x0f) << 4);
             o |= (c3 & 0x3c) >> 2;
             rs.append((char) o);
-            if (++olen >= maxolen || off >= slen)
+            if (++olen >= maxLengthToDecode || off >= slen)
                 break;
-            c4 = char64(s.charAt(off++));
+            c4 = char64(stringToDecode.charAt(off++));
             o = (byte) ((c3 & 0x03) << 6);
             o |= c4;
             rs.append((char) o);
@@ -528,7 +528,7 @@ public class BCrypt {
         byte[] passwordb, saltb, hashed;
         char minor = (char) 0;
         int rounds, off;
-        StringBuffer rs = new StringBuffer();
+        StringBuilder rs = new StringBuilder();
 
         if (salt.charAt(0) != '$' || salt.charAt(1) != '2')
             throw new IllegalArgumentException("Invalid salt version");
@@ -583,7 +583,7 @@ public class BCrypt {
      * @return an encoded salt value
      */
     public static String gensalt(int log_rounds, SecureRandom random) {
-        StringBuffer rs = new StringBuffer();
+        StringBuilder rs = new StringBuilder();
         byte[] rnd = new byte[BCRYPT_SALT_LEN];
 
         random.nextBytes(rnd);

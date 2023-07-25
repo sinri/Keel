@@ -182,7 +182,7 @@ public class Base32 {
      * allocated in memory)
      */
     static public String encode(final byte[] bytes) {
-        StringBuffer base32 = new StringBuffer((bytes.length * 8 + 4) / 5);
+        StringBuilder base32 = new StringBuilder((bytes.length * 8 + 4) / 5);
         int currByte, digit, i = 0;
         while (i < bytes.length) {
             // INVARIANTS FOR EACH STEP n in [0..5[; digit in [0..31[;

@@ -26,12 +26,15 @@ public class KeelRuntimeMonitor {
             if (lastGC != null) {
                 GCStatResult gcDiff = gcSnapshot.since(lastGC);
                 monitorSnapshot.setGCStat(gcDiff);
+            } else {
+                monitorSnapshot.setGCStat(new GCStatResult());
             }
             _lastGCRef.set(gcSnapshot);
 
             CPUTimeResult lastCpuTime = this._lastCPUTimeRef.get();
             if (lastCpuTime == null) {
                 _lastCPUTimeRef.set(cpuTimeSnapshot);
+                monitorSnapshot.setCPUTime(new CPUTimeResult());
             } else {
                 CPUTimeResult cpuTimeDiff = cpuTimeSnapshot.since(lastCpuTime);
                 monitorSnapshot.setCPUTime(cpuTimeDiff);

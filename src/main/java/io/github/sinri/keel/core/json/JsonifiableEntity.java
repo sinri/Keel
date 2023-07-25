@@ -67,14 +67,14 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
             x.reloadDataFromJsonObject(jsonObject);
             return x;
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException ignored) {
+                 NoSuchMethodException ignored1) {
+            try {
+                return bClass.getConstructor(JsonObject.class).newInstance(jsonObject);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                     NoSuchMethodException ignored2) {
+                return null;
+            }
         }
-        try {
-            return bClass.getConstructor(JsonObject.class).newInstance(jsonObject);
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException ignored) {
-        }
-        return null;
     }
 
 

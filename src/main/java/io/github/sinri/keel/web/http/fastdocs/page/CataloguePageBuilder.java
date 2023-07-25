@@ -162,7 +162,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         }
         //boxHref = boxHref + "/index.md";
 
-        sb.append("<div class='dir_box_body_item' style='display: inline-flex'>");
+        sb.append("<div class='dir_box_body_item'>");
         sb.append("<div style='display: inline-block;width:20px;border-left: 1px solid lightgrey;'>&nbsp;</div>".repeat(Math.max(0, tree.level)));
         sb.append("<div class='dir_box_title' style='display: inline-block;'>")
 //                .append("<span>")
@@ -181,7 +181,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
                 if (child.href.endsWith("/index.md")) {
                     sb.append(createHTMLCodeForDir(child));
                 } else {
-                    sb.append("<div class='dir_box_body_item' style='display: inline-flex'>");
+                    sb.append("<div class='dir_box_body_item'>");
                     sb.append("<div style='display: inline-block;width:20px;border-left: 1px solid lightgrey;'>&nbsp;</div>".repeat(Math.max(0, tree.level + 1)));
                     //                .append("<span>")
                     //                            .append("\uD83D\uDCC4&nbsp;")

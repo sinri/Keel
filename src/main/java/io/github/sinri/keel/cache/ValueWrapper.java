@@ -12,7 +12,7 @@ public class ValueWrapper<P> {
 
     public ValueWrapper(P value, long lifeInSeconds) {
         this.value = value;
-        this.birth = new Date().getTime();
+        this.birth = System.currentTimeMillis();//new Date().getTime();
         this.death = this.birth + lifeInSeconds * 1000L;
     }
 

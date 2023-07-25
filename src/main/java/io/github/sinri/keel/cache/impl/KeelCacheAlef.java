@@ -7,8 +7,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * An implementation of KeelCacheInterface, using ConcurrentHashMap.
+ *
  * @since 2.5
- * An implementation of KeelCacheInterface, using ConcurrentHashMap
  */
 public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
     private final ConcurrentMap<K, ValueWrapper<V>> map;
@@ -75,7 +76,7 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
         this.map.keySet().forEach(key -> {
             ValueWrapper<V> vw = this.map.get(key);
             if (vw != null) {
-                if (!vw.isAliveNow()) {
+                if (vw.isAliveNow()) {
                     snapshot.put(key, vw.getValue());
                 }
             }

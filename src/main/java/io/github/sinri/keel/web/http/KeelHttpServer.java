@@ -1,6 +1,7 @@
 package io.github.sinri.keel.web.http;
 
 import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Handler;
@@ -50,9 +51,13 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
         return this;
     }
 
+    protected KeelEventLogger createLogger() {
+        return KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName());
+    }
+
     @Override
     public void start() throws Exception {
-        setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
+        setLogger(createLogger());
 
         this.server = Keel.getVertx().createHttpServer(getHttpServerOptions());
 

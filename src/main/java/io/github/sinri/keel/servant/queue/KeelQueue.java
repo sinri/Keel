@@ -2,10 +2,10 @@ package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * 标准的队列服务实现。
@@ -15,7 +15,6 @@ import io.vertx.core.Future;
  * @since 2.1
  */
 public abstract class KeelQueue extends KeelVerticleBase {
-
     private QueueStatus queueStatus = QueueStatus.INIT;
 
     public QueueStatus getQueueStatus() {
@@ -27,15 +26,15 @@ public abstract class KeelQueue extends KeelVerticleBase {
         return this;
     }
 
-    abstract protected KeelEventLogger prepareLogger();
-
 
     abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
 
-    public void start() {
-        // 部署之后重新加载一遍
-        setLogger(prepareLogger());
+    /**
+     * @since 3.0.1
+     */
+    abstract protected @NotNull SignalReader getSignalReader();
 
+    public void start() {
         this.queueStatus = QueueStatus.RUNNING;
 
         try {
@@ -46,15 +45,14 @@ public abstract class KeelQueue extends KeelVerticleBase {
         }
     }
 
-    abstract protected Future<QueueSignal> readSignal();
-
     protected final void routine() {
         getLogger().debug("KeelQueue::routine start");
+        var signalReader = getSignalReader();
         KeelQueueNextTaskSeeker nextTaskSeeker = getNextTaskSeeker();
 
         Future.succeededFuture()
                 .compose(v -> {
-                    return readSignal();
+                    return signalReader.readSignal();
                 })
                 .recover(throwable -> {
                     getLogger().debug("AS IS. Failed to read signal: " + throwable.getMessage());
@@ -146,5 +144,9 @@ public abstract class KeelQueue extends KeelVerticleBase {
         INIT,
         RUNNING,
         STOPPED
+    }
+
+    public interface SignalReader {
+        Future<KeelQueue.QueueSignal> readSignal();
     }
 }

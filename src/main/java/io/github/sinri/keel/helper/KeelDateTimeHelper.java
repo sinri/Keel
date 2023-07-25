@@ -67,12 +67,58 @@ public class KeelDateTimeHelper {
      * @return Date Time in RFC 1123: Mon, 31 Oct 2022 01:18:43 GMT
      * @since 2.9.1
      */
-    public String getGMTDateTimeExpression() {
+    public String getGMTDateTimeExpression(ZoneId zoneId) {
         DateTimeFormatter gmt = DateTimeFormatter.ofPattern(
                         "EEE, dd MMM yyyy HH:mm:ss z",
                         Locale.ENGLISH
                 )
                 .withZone(ZoneId.of("GMT"));
-        return gmt.format(LocalDateTime.now());
+        return gmt.format(LocalDateTime.now(zoneId));
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    public String getGMTDateTimeExpression() {
+        return getGMTDateTimeExpression(ZoneId.systemDefault());
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    protected String makeStandardWidthField(int x, int w) {
+        StringBuilder s = new StringBuilder(String.valueOf(x));
+        if (s.length() < w) {
+            for (int i = 0; i < w - s.length(); i++) {
+                s.insert(0, "0");
+            }
+        }
+        return String.valueOf(s);
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    public String toMySQLDatetime(LocalDateTime datetime) {
+        return makeStandardWidthField(datetime.getYear(), 4)
+                + "-" + makeStandardWidthField(datetime.getMonthValue(), 2)
+                + "-" + makeStandardWidthField(datetime.getDayOfMonth(), 2)
+                + " "
+                + makeStandardWidthField(datetime.getHour(), 2)
+                + ":" + makeStandardWidthField(datetime.getMinute(), 2)
+                + ":" + makeStandardWidthField(datetime.getSecond(), 2);
+    }
+
+    public static final String MYSQL_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final String MYSQL_DATE_PATTERN = "yyyy-MM-dd";
+    public static final String MYSQL_TIME_PATTERN = "HH:mm:ss";
+
+    /**
+     * @param formatPattern MYSQL_DATETIME_PATTERN,MYSQL_DATE_PATTERN,MYSQL_TIME_PATTERN
+     * @since 3.0.1
+     */
+    public String toMySQLDatetime(LocalDateTime localDateTime, String formatPattern) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(formatPattern);
+        return localDateTime.format(dateTimeFormatter);
     }
 }

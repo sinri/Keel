@@ -4,9 +4,9 @@ import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
-import io.vertx.core.VertxOptions;
 
-import java.util.Date;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -94,17 +94,95 @@ public interface KeelAsyncKit {
                         .setTimer(1L, timerID -> endless(promiseHandler)));
     }
 
-    static void main(String[] args) {
-        Keel.initializeVertx(new VertxOptions()).onSuccess(v0 -> {
-            endless(new Handler<Promise<Void>>() {
-                @Override
-                public void handle(Promise<Void> event) {
-                    System.out.println(new Date());
-                    KeelAsyncKit.sleep(1000L).onSuccess(v -> {
-                        event.complete();
+    /**
+     * @param supplier
+     * @since 3.0.1
+     */
+    static void endless(Supplier<Future<Void>> supplier) {
+        KeelAsyncKit.repeatedlyCall(routineResult -> {
+            return Future.succeededFuture()
+                    .compose(v -> {
+                        return supplier.get();
+                    })
+                    .eventually(v -> {
+                        return Future.succeededFuture();
                     });
-                }
-            });
         });
     }
+
+    /**
+     * @since 3.0.1
+     */
+    static <R> Future<R> vertxizedCompletableFuture(CompletableFuture<R> completableFuture) {
+        Promise<R> promise = Promise.promise();
+        completableFuture.whenComplete((r, t) -> {
+            if (t != null) {
+                promise.fail(t);
+            } else {
+                promise.complete(r);
+            }
+        });
+        return promise.future();
+    }
+
+    /**
+     * @since 3.0.1
+     */
+    static <R> Future<R> vertxizedRawFuture(java.util.concurrent.Future<R> rawFuture, long sleepTime) {
+        return KeelAsyncKit.repeatedlyCall(routineResult -> {
+                    if (rawFuture.isDone() || rawFuture.isCancelled()) {
+                        routineResult.stop();
+                    }
+                    return sleep(sleepTime);
+                })
+                .compose(slept -> {
+                    try {
+                        return Future.succeededFuture(rawFuture.get());
+                    } catch (InterruptedException | ExecutionException e) {
+                        return Future.failedFuture(e);
+                    }
+                });
+    }
+
+    @Deprecated
+    static <R> Future<R> waitForCompletableFuture(CompletableFuture<R> completableFuture, long gapTime) {
+        return KeelAsyncKit.repeatedlyCall(routineResult -> {
+                    if (completableFuture.isDone() || completableFuture.isCancelled() || completableFuture.isCompletedExceptionally()) {
+                        routineResult.stop();
+                    }
+                    return KeelAsyncKit.sleep(gapTime);
+                })
+                .compose(v -> {
+                    if (completableFuture.isDone()) {
+                        try {
+                            R r = completableFuture.get();
+                            return Future.succeededFuture(r);
+                        } catch (ExecutionException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        throw new RuntimeException("not done");
+                    }
+                });
+    }
+
+//    static void main(String[] args) {
+//        CompletableFuture<String> f = CompletableFuture.supplyAsync(new Supplier<String>() {
+//            @Override
+//            public String get() {
+//                throw new RuntimeException("888");
+//                //return "123";
+//            }
+//        });
+//        f
+//                .exceptionally(throwable -> {
+//                    System.err.println("exceptionally:" + throwable);
+//                    return "000";
+//                })
+//                .whenComplete((r, t) -> {
+//                    System.out.println("r: " + r);
+//                    System.err.println("t:" + t);
+//                })
+//        ;
+//    }
 }
