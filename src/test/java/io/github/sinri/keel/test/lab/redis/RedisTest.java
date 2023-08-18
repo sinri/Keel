@@ -62,20 +62,20 @@ public class RedisTest {
                     return KeelAsyncKit.sleep(2000L);
                 })
                 .compose(slept -> {
-                    return kit.getScalarWithKey(key).compose(value -> {
+                    return kit.getString(key).compose(value -> {
                         System.out.println("after 2s, value: " + value);
                         return KeelAsyncKit.sleep(2000L);
                     });
                 })
                 .compose(slept -> {
-                    return kit.getScalarWithKey(key).compose(value -> {
+                    return kit.getString(key).compose(value -> {
                         System.out.println("after 2s, value: " + value);
                         return kit.deleteKey(key);
                     });
                 })
                 .compose(deleted -> {
                     System.out.println("deletion: " + deleted);
-                    return kit.getScalarWithKey(key).compose(value -> {
+                    return kit.getString(key).compose(value -> {
                         System.out.println("after deletion, value: " + value);
                         return KeelAsyncKit.sleep(2000L);
                     });

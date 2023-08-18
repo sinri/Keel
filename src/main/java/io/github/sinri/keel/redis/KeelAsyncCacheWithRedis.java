@@ -24,7 +24,7 @@ public class KeelAsyncCacheWithRedis implements KeelAsyncCacheInterface<String, 
 
     @Override
     public Future<String> read(String key) {
-        return this.redisKit.getScalarWithKey(key);
+        return this.redisKit.getString(key);
     }
 
     @Override
