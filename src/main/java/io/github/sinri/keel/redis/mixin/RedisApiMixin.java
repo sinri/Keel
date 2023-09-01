@@ -14,12 +14,7 @@ import java.util.Objects;
 public interface RedisApiMixin {
     Redis getClient();
 
-    default Future<RedisAPI> api() {
-        return getClient().connect().compose(redisConnection -> {
-            RedisAPI api = RedisAPI.api(redisConnection);
-            return Future.succeededFuture(api);
-        });
-    }
+    Future<RedisAPI> api();
 
     /**
      * EXISTS key [key ...]
