@@ -4,7 +4,9 @@ import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.mysql.exception.KeelMySQLConnectionException;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.*;
@@ -185,6 +187,21 @@ public class MySQLDataSource {
                 return Future.succeededFuture(iterableOverCursor);
             });
         });
+    }
+
+    /**
+     * @since 3.0.5
+     */
+    public Future<Void> close() {
+        return this.pool.close();
+    }
+
+    /**
+     * @param ar
+     * @since 3.0.5
+     */
+    public void close(Handler<AsyncResult<Void>> ar) {
+        this.pool.close(ar);
     }
 
     /**
