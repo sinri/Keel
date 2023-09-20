@@ -83,7 +83,7 @@ public interface RedisListMixin extends RedisApiMixin {
      * 与 LPUSH 相反，当 key 不存在的时候不会进行任何操作。
      *
      * @return 执行push操作后列表list的长度。
-     * REDIS >= 4.0: 支持一次插入多个值。老版本一次只能插入一个值。
+     * REDIS &gt;= 4.0: 支持一次插入多个值。老版本一次只能插入一个值。
      */
     default Future<Integer> pushToExistedListHead(String key, List<String> elements) {
         return api().compose(api -> {
@@ -154,7 +154,7 @@ public interface RedisListMixin extends RedisApiMixin {
      * LTRIM key start stop
      * Redis LTRIM 用于修剪(trim)一个已存在的 list，这样 list 就会只包含指定范围的指定元素。start 和 stop 都是由0开始计数的， 这里的 0 是列表里的第一个元素（表头），1 是第二个元素，以此类推。
      * start 和 end 也可以用负数来表示与表尾的偏移量，比如 -1 表示列表里的最后一个元素， -2 表示倒数第二个，等等。
-     * 超过范围的下标并不会产生错误：如果 start 超过列表尾部，或者 start > end，结果会是列表变成空表（即该 key 会被移除）。 如果 end 超过列表尾部，Redis 会将其当作列表的最后一个元素。
+     * 超过范围的下标并不会产生错误：如果 start 超过列表尾部，或者 start &gt; end，结果会是列表变成空表（即该 key 会被移除）。 如果 end 超过列表尾部，Redis 会将其当作列表的最后一个元素。
      */
     default Future<Void> trimList(String key, int start, int stop) {
         return api().compose(api -> {
@@ -300,8 +300,8 @@ public interface RedisListMixin extends RedisApiMixin {
     /**
      * LREM key count element
      * Redis LREM 用于从列表 key 中删除前 count 个值等于 element 的元素。 这个 count 参数通过下面几种方式影响这个操作：
-     * count > 0: 从头到尾删除值为 value 的元素。
-     * count < 0: 从尾到头删除值为 value 的元素。
+     * count &gt; 0: 从头到尾删除值为 value 的元素。
+     * count &lt; 0: 从尾到头删除值为 value 的元素。
      * count = 0: 移除所有值为 value 的元素。
      * 比如， LREM list -2 “hello” 会从列表key中删除最后两个出现的 “hello”。
      * 需要注意的是，不存在key会被当作空list处理，所以当 key 不存在的时候，这个命令会返回 0。
