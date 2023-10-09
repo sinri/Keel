@@ -1,7 +1,10 @@
 package io.github.sinri.keel.helper;
 
+import org.reflections.Reflections;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Set;
 
 /**
  * @since 2.6
@@ -45,5 +48,17 @@ public class KeelReflectionHelper {
      */
     public <T extends Annotation> T getAnnotationOfClass(Class<?> anyClass, Class<T> classOfAnnotation) {
         return anyClass.getAnnotation(classOfAnnotation);
+    }
+
+    /**
+     * @param packageName In this package
+     * @param baseClass   seek any class implementations of this class
+     * @param <R>         the target base class to seek its implementations
+     * @return the sought classes in a set
+     * @since 3.0.6
+     */
+    public <R> Set<Class<? extends R>> seekClassDescendantsInPackage(String packageName, Class<R> baseClass) {
+        Reflections reflections = new Reflections(packageName);
+        return reflections.getSubTypesOf(baseClass);
     }
 }
