@@ -9,6 +9,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -98,6 +99,19 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
             }
         }
 
+        return putAll(properties);
+    }
+
+    /**
+     * @since 3.0.6
+     */
+    public KeelConfiguration loadPropertiesFileContent(String content) {
+        Properties properties = new Properties();
+        try {
+            properties.load(new StringReader(content));
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot load given properties content.", e);
+        }
         return putAll(properties);
     }
 
