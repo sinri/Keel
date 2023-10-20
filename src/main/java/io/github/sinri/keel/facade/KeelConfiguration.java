@@ -3,7 +3,6 @@ package io.github.sinri.keel.facade;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,6 +21,14 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
     private JsonObject data = new JsonObject();
 
     public KeelConfiguration() {
+    }
+
+    /**
+     * @param another
+     * @since 3.0.7
+     */
+    public KeelConfiguration(@Nonnull KeelConfiguration another) {
+        this(another.toJsonObject());
     }
 
     public KeelConfiguration(@Nonnull JsonObject jsonObject) {
@@ -125,7 +132,7 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
      * @since 3.0.1
      */
     @Deprecated(since = "3.0.1")
-    public String fastRead(@NotNull String dotJoinedKeyChain) {
+    public String fastRead(@Nonnull String dotJoinedKeyChain) {
         String[] split = dotJoinedKeyChain.split("\\.");
         return readString(split);
     }
@@ -149,12 +156,12 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
     }
 
     @Override
-    public @NotNull JsonObject toJsonObject() {
+    public @Nonnull JsonObject toJsonObject() {
         return this.data;
     }
 
     @Override
-    public @NotNull KeelConfiguration reloadDataFromJsonObject(JsonObject data) {
+    public @Nonnull KeelConfiguration reloadDataFromJsonObject(JsonObject data) {
         this.data = data;
         return this;
     }

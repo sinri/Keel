@@ -3,7 +3,10 @@ package io.github.sinri.keel.helper;
 import io.github.sinri.keel.helper.encryption.base32.Base32;
 import io.vertx.core.buffer.Buffer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @since 2.6
@@ -43,9 +46,10 @@ public class KeelStringHelper {
      * @param x         a list
      * @param separator separator
      * @return the joined string
-     * @since 2.0 list → collection
+     * @since 2.0 List → Collection
+     * @since 3.0.7 Collection → Iterable
      */
-    public String joinStringArray(Collection<?> x, String separator) {
+    public String joinStringArray(Iterable<?> x, String separator) {
         StringBuilder result = new StringBuilder();
 
         final int[] i = {0};
