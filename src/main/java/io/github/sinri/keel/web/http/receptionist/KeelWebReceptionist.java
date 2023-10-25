@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -93,11 +94,17 @@ public abstract class KeelWebReceptionist {
         respondWithJsonObject(resp);
     }
 
-    public String readRequestID() {
+    /**
+     * @since 3.0.8 mark it nullable as it might be null.
+     */
+    public @Nullable String readRequestID() {
         return routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID);
     }
 
-    public long readRequestStartTime() {
+    /**
+     * @since 3.0.8 mark it nullable as it might be null.
+     */
+    public @Nullable Long readRequestStartTime() {
         return routingContext.get(KeelPlatformHandler.KEEL_REQUEST_START_TIME);
     }
 

@@ -51,8 +51,6 @@ abstract public class AbstractStatement {
     }
 
     /**
-     * @param sql
-     * @return
      * @since 3.0.0
      */
     public static AbstractStatement buildWithRawSQL(String sql) {

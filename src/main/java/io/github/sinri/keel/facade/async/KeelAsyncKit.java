@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 
 /**
  * @since 3.0.0
+ * @since 3.0.8 changed a lot.
  */
 public interface KeelAsyncKit {
     /**
@@ -70,7 +71,7 @@ public interface KeelAsyncKit {
         return FutureForEachParallel.join(collection, itemProcessor);
     }
 
-    static <T, R> Future<FutureForEachParallel.ParallelResult> parallelForAllResult(Iterable<T> collection, Function<T, Future<R>> itemProcessor) {
+    static <T, R> Future<FutureForEachParallel.ParallelResult<R>> parallelForAllResult(Iterable<T> collection, Function<T, Future<R>> itemProcessor) {
         return FutureForEachParallel.call(collection, itemProcessor);
     }
 
@@ -95,19 +96,13 @@ public interface KeelAsyncKit {
     }
 
     /**
-     * @param supplier
+     * @param supplier An async job handler, results a Void Future.
      * @since 3.0.1
      */
     static void endless(Supplier<Future<Void>> supplier) {
-        KeelAsyncKit.repeatedlyCall(routineResult -> {
-            return Future.succeededFuture()
-                    .compose(v -> {
-                        return supplier.get();
-                    })
-                    .eventually(v -> {
-                        return Future.succeededFuture();
-                    });
-        });
+        KeelAsyncKit.repeatedlyCall(routineResult -> Future.succeededFuture()
+                .compose(v -> supplier.get())
+                .eventually(v -> Future.succeededFuture()));
     }
 
     /**
@@ -144,7 +139,7 @@ public interface KeelAsyncKit {
                 });
     }
 
-    @Deprecated
+    @Deprecated(since = "3.0.1", forRemoval = true)
     static <R> Future<R> waitForCompletableFuture(CompletableFuture<R> completableFuture, long gapTime) {
         return KeelAsyncKit.repeatedlyCall(routineResult -> {
                     if (completableFuture.isDone() || completableFuture.isCancelled() || completableFuture.isCompletedExceptionally()) {
@@ -165,24 +160,4 @@ public interface KeelAsyncKit {
                     }
                 });
     }
-
-//    static void main(String[] args) {
-//        CompletableFuture<String> f = CompletableFuture.supplyAsync(new Supplier<String>() {
-//            @Override
-//            public String get() {
-//                throw new RuntimeException("888");
-//                //return "123";
-//            }
-//        });
-//        f
-//                .exceptionally(throwable -> {
-//                    System.err.println("exceptionally:" + throwable);
-//                    return "000";
-//                })
-//                .whenComplete((r, t) -> {
-//                    System.out.println("r: " + r);
-//                    System.err.println("t:" + t);
-//                })
-//        ;
-//    }
 }

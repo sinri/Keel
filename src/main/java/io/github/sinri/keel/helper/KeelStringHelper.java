@@ -30,12 +30,13 @@ public class KeelStringHelper {
      * @param <T>       the class of item in array
      * @return the joined string
      * @since 1.11
+     * @since 3.0.8 toString → String.valueOf
      */
     public <T> String joinStringArray(T[] x, String separator) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < x.length; i++) {
             if (i > 0) result.append(separator);
-            result.append(x[i].toString());
+            result.append(x[i]);
         }
         return result.toString();
     }
@@ -48,6 +49,7 @@ public class KeelStringHelper {
      * @return the joined string
      * @since 2.0 List → Collection
      * @since 3.0.7 Collection → Iterable
+     * @since 3.0.8 toString → String.valueOf
      */
     public String joinStringArray(Iterable<?> x, String separator) {
         StringBuilder result = new StringBuilder();
@@ -55,7 +57,7 @@ public class KeelStringHelper {
         final int[] i = {0};
         x.forEach(item -> {
             if (i[0] > 0) result.append(separator);
-            result.append(item.toString());
+            result.append(item);
             i[0] += 1;
         });
 
