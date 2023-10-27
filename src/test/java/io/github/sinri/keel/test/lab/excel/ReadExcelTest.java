@@ -2,7 +2,7 @@ package io.github.sinri.keel.test.lab.excel;
 
 import io.github.sinri.keel.excel.entity.SimpleTemplatedRow;
 import io.github.sinri.keel.excel.read.KeelSpreadSheetReader;
-import io.github.sinri.keel.excel.read.ReaderOptions;
+import io.github.sinri.keel.excel.read.SheetReadOptions;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
@@ -29,11 +29,8 @@ public class ReadExcelTest extends KeelVerticleBase {
 
         Future.succeededFuture()
                 .compose(v -> {
-                    return new KeelSpreadSheetReader().readEntireSheet(
-                            new ReaderOptions()
-                                    .setFileName("/Users/leqee/code/Keel/src/test/resources/excel/excel_1.xlsx")
-                                    .setSheetNo(0)
-                    );
+                    return new KeelSpreadSheetReader("/Users/leqee/code/Keel/src/test/resources/excel/excel_1.xlsx")
+                            .readEntireSheet(SheetReadOptions.forIndex(0));
                 })
                 .compose(spreadSheetMatrix -> {
 //                    spreadSheetMatrix.getRawRowList().forEach(rawRow -> {

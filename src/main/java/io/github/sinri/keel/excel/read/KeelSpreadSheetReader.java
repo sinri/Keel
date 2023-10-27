@@ -7,8 +7,8 @@ import com.alibaba.excel.read.listener.PageReadListener;
 import com.alibaba.excel.read.metadata.ReadSheet;
 import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,47 +17,48 @@ import java.util.List;
  * @since 3.0.8
  */
 public class KeelSpreadSheetReader {
+    private final ExcelReaderBuilder excelReaderBuilder = new ExcelReaderBuilder();
 
-    public Future<SpreadSheetMatrix> readEntireSheet(Handler<ReaderOptions> readerOptionsBuilder) {
-        ReaderOptions readerOptions = new ReaderOptions();
-        readerOptionsBuilder.handle(readerOptions);
-        return this.readEntireSheet(readerOptions);
+    public KeelSpreadSheetReader(String filePath) {
+        excelReaderBuilder.file(filePath);
     }
 
-    public Future<SpreadSheetMatrix> readEntireSheet(ReaderOptions readerOptions) {
+    public KeelSpreadSheetReader(InputStream inputStream) {
+        excelReaderBuilder.file(inputStream);
+    }
+
+    public Future<SpreadSheetMatrix> readEntireSheet(SheetReadOptions sheetReadOptions) {
         return Keel.getVertx().executeBlocking(promise -> {
             try {
-                var x = this.blockReadEntireSheet(readerOptions);
-                promise.complete(x);
+                SpreadSheetMatrix matrix = this.blockReadEntireSheet(sheetReadOptions);
+                promise.complete(matrix);
             } catch (Throwable e) {
                 promise.fail(e);
             }
         });
     }
 
-    private SpreadSheetMatrix blockReadEntireSheet(ReaderOptions readerOptions) throws Throwable {
+    private SpreadSheetMatrix blockReadEntireSheet(SheetReadOptions sheetReadOptions) throws Throwable {
         SpreadSheetMatrix matrix = new SpreadSheetMatrix();
-        PageReadListener<LinkedHashMap<Integer, String>> listener = new PageReadListener<>(rows -> rows
-                .forEach(row -> {
-                    List<String> rowAsList = new ArrayList<>();
-                    row.forEach((k, v) -> rowAsList.add(v));
-                    matrix.addRow(rowAsList);
-                }));
-
-        ExcelReaderBuilder excelReaderBuilder = new ExcelReaderBuilder();
-        if (readerOptions.getFileName() != null) {
-            excelReaderBuilder.file(readerOptions.getFileName());
-        } else {
-            excelReaderBuilder.file(readerOptions.getFileInputStream());
-        }
-
-        excelReaderBuilder.registerReadListener(listener);
+        excelReaderBuilder.registerReadListener(new SpreadSheetMatrixRowCollector(matrix));
         try (ExcelReader excelReader = excelReaderBuilder.build()) {
-            ReadSheet readSheet = EasyExcel.readSheet(readerOptions.getSheetNo(), readerOptions.getSheetName())
-                    .headRowNumber(readerOptions.getHeadRowNumber())
+            ReadSheet readSheet = EasyExcel.readSheet(sheetReadOptions.getSheetNo(), sheetReadOptions.getSheetName())
+                    .headRowNumber(sheetReadOptions.getHeadRowNumber())
                     .build();
             excelReader.read(readSheet);
             return matrix;
+        }
+    }
+
+    private static class SpreadSheetMatrixRowCollector extends PageReadListener<LinkedHashMap<Integer, String>> {
+
+        public SpreadSheetMatrixRowCollector(SpreadSheetMatrix matrix) {
+            super(rows -> rows
+                    .forEach(row -> {
+                        List<String> rowAsList = new ArrayList<>();
+                        row.forEach((k, v) -> rowAsList.add(v));
+                        matrix.addRow(rowAsList);
+                    }));
         }
     }
 }
