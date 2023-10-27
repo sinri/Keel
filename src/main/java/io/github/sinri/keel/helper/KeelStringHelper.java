@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @since 2.6
@@ -290,5 +292,20 @@ public class KeelStringHelper {
      */
     public String decodeWithBase32(String s) {
         return new String(decodeWithBase32ToBytes(s));
+    }
+
+    /**
+     * @param flags compile flags, such as `Pattern.DOTALL`.
+     * @param group such as 0 for the entire, n for the Nth component.
+     * @since 3.0.8
+     */
+    public List<String> regexFindAll(String regex, int flags, String text, int group) {
+        List<String> blankParamGroups = new ArrayList<>();
+        Pattern patternForSpacedArgument = Pattern.compile(regex, flags);
+        Matcher patternForSpacedArgumentMatcher = patternForSpacedArgument.matcher(text);
+        while (patternForSpacedArgumentMatcher.find()) {
+            blankParamGroups.add(patternForSpacedArgumentMatcher.group(group));
+        }
+        return blankParamGroups;
     }
 }
