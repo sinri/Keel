@@ -10,7 +10,7 @@ A Java framework with VERT.X eco, for projects for web, job and more.
 <dependency>
     <groupId>io.github.sinri</groupId>
     <artifactId>Keel</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.8</version>
 </dependency>
 ```
 
@@ -21,6 +21,7 @@ A Java framework with VERT.X eco, for projects for web, job and more.
 * [org.reflections:reflections](https://github.com/ronmamo/reflections) ![GitHub](https://img.shields.io/github/license/ronmamo/reflections)
 * [com.warrenstrange:googleauth](https://github.com/wstrange/GoogleAuth) ![GitHub](https://img.shields.io/github/license/wstrange/GoogleAuth)
 * [com.github.oshi:oshi-core](https://github.com/oshi/oshi) ![GitHub](https://img.shields.io/github/license/oshi/oshi)
+* [com.alibaba:easyexcel](https://github.com/alibaba/easyexcel) ![GitHub](https://img.shields.io/github/license/alibaba/easyexcel)
 
 ## ABOUT 3.0.0
 
