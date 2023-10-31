@@ -4,6 +4,7 @@ import io.github.sinri.keel.excel.entity.SimpleTemplatedRow;
 import io.github.sinri.keel.excel.read.KeelSpreadSheetReader;
 import io.github.sinri.keel.excel.read.SheetReadOptions;
 import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -33,6 +34,10 @@ public class ReadExcelTest extends KeelVerticleBase {
                             .readEntireSheet(SheetReadOptions.forIndex(0));
                 })
                 .compose(spreadSheetMatrix -> {
+                    spreadSheetMatrix.getHeaders().forEach(headerRow -> {
+                        System.out.println("HEADER | " + KeelHelpers.stringHelper().joinStringArray(headerRow, " = "));
+                    });
+
 //                    spreadSheetMatrix.getRawRowList().forEach(rawRow -> {
 //                        System.out.println("Raw Row: " + String.join(",", rawRow));
 //                    });
