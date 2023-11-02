@@ -23,7 +23,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     final List<String> columns = new ArrayList<>();
     final List<List<String>> batchValues = new ArrayList<>();
     final Map<String, String> onDuplicateKeyUpdateAssignmentMap = new HashMap<>();
-    String writeType = INSERT;
+    final String writeType;
     String ignoreMark = "";
     String schema;
     String table;
@@ -31,7 +31,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     String sourceTableName;
 
     public WriteIntoStatement() {
-
+        this.writeType = INSERT;
     }
 
     public WriteIntoStatement(String writeType) {

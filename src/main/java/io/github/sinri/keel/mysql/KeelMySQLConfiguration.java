@@ -59,8 +59,7 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
 
         PoolOptions poolOptions = new PoolOptions()
                 .setConnectionTimeout(2)
-                .setConnectionTimeoutUnit(TimeUnit.SECONDS)
-                ;
+                .setConnectionTimeoutUnit(TimeUnit.SECONDS);
         System.out.println("poolOptions: " + poolOptions.toJson().encodePrettily());
     }
 
@@ -99,6 +98,8 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
             poolOptions.setConnectionTimeout(poolConnectionTimeout);
             poolOptions.setConnectionTimeoutUnit(TimeUnit.SECONDS);
         }
+        poolOptions.setShared(getPoolShared());
+        poolOptions.setName("Keel-MySQL-Pool-" + this.getDataSourceName());
         return poolOptions;
     }
 
@@ -161,5 +162,16 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
      */
     public Integer getPoolConnectionTimeout() {
         return readAsInteger("poolConnectionTimeout");
+    }
+
+    /**
+     * @since 3.0.9
+     * You can share an pool between multiple verticles or instances of the same verticle.
+     * Such pool should be created outside a verticle otherwise it will be closed when the verticle
+     * that created it is undeployed.
+     */
+    public boolean getPoolShared() {
+        //return "YES".equals(readString("poolShared"));
+        return !("NO".equals(readString("poolShared")));
     }
 }

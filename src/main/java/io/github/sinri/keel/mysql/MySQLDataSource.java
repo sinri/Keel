@@ -35,8 +35,6 @@ public class MySQLDataSource {
     }
 
     /**
-     * @param configuration
-     * @param connectionSetUpFunction
      * @since 3.0.2
      */
     public MySQLDataSource(KeelMySQLConfiguration configuration, @NotNull Function<SqlConnection, Future<Void>> connectionSetUpFunction) {
@@ -77,7 +75,10 @@ public class MySQLDataSource {
         pool.getConnection(ar -> {
             if (ar.failed()) {
                 promise.fail(new KeelMySQLConnectionException(
-                        "MySQLDataSource Failed to get SqlConnection From Pool (available: " + connectionAvailableCounter.get() + "): " + ar.cause(),
+                        "MySQLDataSource Failed to get SqlConnection From Pool " +
+                                "`" + this.getConfiguration().getDataSourceName() + "` " +
+                                "(available: " + connectionAvailableCounter.get() + "): " +
+                                ar.cause(),
                         ar.cause()
                 ));
             } else {
