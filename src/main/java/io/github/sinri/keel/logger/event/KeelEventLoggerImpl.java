@@ -1,7 +1,10 @@
 package io.github.sinri.keel.logger.event;
 
 import io.vertx.core.Handler;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class KeelEventLoggerImpl implements KeelEventLogger {
@@ -46,5 +49,27 @@ public class KeelEventLoggerImpl implements KeelEventLogger {
     public KeelEventLogger setPresetEventLogEditor(Handler<KeelEventLog> editor) {
         this.presetEventLogEditor = editor;
         return this;
+    }
+
+    /**
+     * @since 3.0.10
+     */
+    private final List<KeelEventLogger> bypassLoggerList = new ArrayList<>();
+
+    /**
+     * @since 3.0.10
+     */
+    @Override
+    public void addBypassLogger(KeelEventLogger bypassLogger) {
+        this.bypassLoggerList.add(bypassLogger);
+    }
+
+    /**
+     * @since 3.0.10
+     */
+    @NotNull
+    @Override
+    public List<KeelEventLogger> getBypassLoggers() {
+        return this.bypassLoggerList;
     }
 }

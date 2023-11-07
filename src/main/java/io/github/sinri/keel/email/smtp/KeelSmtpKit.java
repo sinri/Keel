@@ -42,7 +42,7 @@ public class KeelSmtpKit {
     public KeelSmtpKit() {
         this(
                 Objects.requireNonNull(
-                        Keel.getConfiguration().readString("email", "smtp", "default_smtp_name"),
+                        Keel.config("email.smtp.default_smtp_name"),
                         "email.smtp.default_smtp_name is not configured"
                 )
         );

@@ -7,6 +7,7 @@ import io.github.sinri.keel.logger.event.center.KeelSilentEventLogCenter;
 import io.vertx.core.Handler;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 public class KeelSilentEventLogger implements KeelEventLogger {
@@ -34,6 +35,17 @@ public class KeelSilentEventLogger implements KeelEventLogger {
     @Override
     public KeelEventLogger setPresetEventLogEditor(Handler<KeelEventLog> editor) {
         return this;
+    }
+
+    @Override
+    public void addBypassLogger(KeelEventLogger bypassLogger) {
+
+    }
+
+    @NotNull
+    @Override
+    public List<KeelEventLogger> getBypassLoggers() {
+        return List.of();
     }
 
     @Override

@@ -19,6 +19,9 @@ public class RedisKit implements RedisApiMixin, RedisScalarMixin, RedisListMixin
     private final AtomicReference<RedisConnection> redisConnectionRef = new AtomicReference<>();
 
     public RedisKit(String redisInstanceKey) {
+        /*
+         * URL should be redis://[:password@]host[:port][/db-number]
+         */
         String url = Keel.getConfiguration().readString("redis", redisInstanceKey, "url");
         Objects.requireNonNull(url);
         this.client = Redis.createClient(Keel.getVertx(), new RedisOptions()

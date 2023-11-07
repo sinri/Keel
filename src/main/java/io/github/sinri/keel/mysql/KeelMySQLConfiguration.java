@@ -128,7 +128,7 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
         if (schema == null) {
             schema = readString("database");
         }
-        return schema;
+        return Objects.requireNonNullElse(schema, "");
     }
 
     public String getCharset() {
