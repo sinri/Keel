@@ -3,6 +3,7 @@ package io.github.sinri.keel.cache.impl;
 import io.github.sinri.keel.cache.KeelCacheInterface;
 import io.github.sinri.keel.cache.ValueWrapper;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -31,12 +32,12 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public void save(K key, V value, long lifeInSeconds) {
+    public void save(@Nonnull K key, V value, long lifeInSeconds) {
         this.map.put(key, new ValueWrapper<>(value, lifeInSeconds));
     }
 
     @Override
-    public V read(K key, V fallbackValue) {
+    public V read(@Nonnull K key, V fallbackValue) {
         ValueWrapper<V> vw = this.map.get(key);
         if (vw == null) {
             return fallbackValue;
@@ -49,7 +50,7 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public void remove(K key) {
+    public void remove(@Nonnull K key) {
         this.map.remove(key);
     }
 
@@ -71,6 +72,7 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
+    @Nonnull
     public ConcurrentMap<K, V> getSnapshotMap() {
         ConcurrentMap<K, V> snapshot = new ConcurrentHashMap<>();
         this.map.keySet().forEach(key -> {

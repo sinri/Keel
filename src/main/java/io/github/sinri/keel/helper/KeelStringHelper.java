@@ -3,6 +3,8 @@ package io.github.sinri.keel.helper;
 import io.github.sinri.keel.helper.encryption.base32.Base32;
 import io.vertx.core.buffer.Buffer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -34,7 +36,10 @@ public class KeelStringHelper {
      * @since 1.11
      * @since 3.0.8 toString → String.valueOf
      */
-    public <T> String joinStringArray(T[] x, String separator) {
+    @Nonnull
+    public <T> String joinStringArray(@Nullable T[] x, @Nonnull String separator) {
+        if (x == null) return "";
+
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < x.length; i++) {
             if (i > 0) result.append(separator);
@@ -53,7 +58,10 @@ public class KeelStringHelper {
      * @since 3.0.7 Collection → Iterable
      * @since 3.0.8 toString → String.valueOf
      */
-    public String joinStringArray(Iterable<?> x, String separator) {
+    @Nonnull
+    public String joinStringArray(@Nullable Iterable<?> x, @Nonnull String separator) {
+        if (x == null) return "";
+
         StringBuilder result = new StringBuilder();
 
         final int[] i = {0};
@@ -75,7 +83,8 @@ public class KeelStringHelper {
      * @return the matrix of hex as string
      * @since 1.11
      */
-    public String bufferToHexMatrix(Buffer buffer, int rowSize) {
+    @Nonnull
+    public String bufferToHexMatrix(@Nonnull Buffer buffer, int rowSize) {
         StringBuilder matrix = new StringBuilder();
         String s = KeelHelpers.binaryHelper().encodeHexWithUpperDigits(buffer);
         for (int i = 0; i < s.length(); i += 2) {
@@ -91,7 +100,8 @@ public class KeelStringHelper {
     /**
      * @since 2.7
      */
-    public String fromUnderScoreCaseToCamelCase(String underScoreCase) {
+    @Nullable
+    public String fromUnderScoreCaseToCamelCase(@Nullable String underScoreCase) {
         if (underScoreCase == null) {
             return null;
         }
@@ -108,7 +118,8 @@ public class KeelStringHelper {
     /**
      * @since 2.7
      */
-    public String fromCamelCaseToUserScoreCase(String camelCase) {
+    @Nullable
+    public String fromCamelCaseToUserScoreCase(@Nullable String camelCase) {
         if (camelCase == null) {
             return null;
         }
@@ -142,7 +153,8 @@ public class KeelStringHelper {
     /**
      * @since 2.9
      */
-    public String buildStackChainText(StackTraceElement[] stackTrace, Set<String> ignorableStackPackageSet) {
+    @Nonnull
+    public String buildStackChainText(@Nullable StackTraceElement[] stackTrace, @Nonnull Set<String> ignorableStackPackageSet) {
         StringBuilder sb = new StringBuilder();
         if (stackTrace != null) {
             String ignoringClassPackage = null;
@@ -209,7 +221,8 @@ public class KeelStringHelper {
     /**
      * @since 2.9
      */
-    public String buildStackChainText(StackTraceElement[] stackTrace) {
+    @Nonnull
+    public String buildStackChainText(@Nullable StackTraceElement[] stackTrace) {
         return buildStackChainText(stackTrace, Set.of());
     }
 
@@ -217,7 +230,8 @@ public class KeelStringHelper {
     /**
      * @since 2.9
      */
-    public String renderThrowableChain(Throwable throwable, Set<String> ignorableStackPackageSet) {
+    @Nonnull
+    public String renderThrowableChain(@Nullable Throwable throwable, @Nonnull Set<String> ignorableStackPackageSet) {
         if (throwable == null) return "";
         Throwable cause = throwable.getCause();
         StringBuilder sb = new StringBuilder();
@@ -248,49 +262,56 @@ public class KeelStringHelper {
     /**
      * @since 2.9
      */
-    public String renderThrowableChain(Throwable throwable) {
+    @Nonnull
+    public String renderThrowableChain(@Nullable Throwable throwable) {
         return renderThrowableChain(throwable, Set.of());
     }
 
     /**
      * @since 2.9.4
      */
-    public byte[] encodeWithBase64ToBytes(String s) {
+    @Nonnull
+    public byte[] encodeWithBase64ToBytes(@Nonnull String s) {
         return KeelHelpers.binaryHelper().encodeWithBase64(s.getBytes());
     }
 
     /**
      * @since 2.9.4
      */
-    public String encodeWithBase64(String s) {
+    @Nonnull
+    public String encodeWithBase64(@Nonnull String s) {
         return new String(encodeWithBase64ToBytes(s));
     }
 
     /**
      * @since 2.9.4
      */
-    public byte[] decodeWithBase64ToBytes(String s) {
+    @Nonnull
+    public byte[] decodeWithBase64ToBytes(@Nonnull String s) {
         return Base64.getDecoder().decode(s);
     }
 
     /**
      * @since 2.9.4
      */
-    public String encodeWithBase32(String s) {
+    @Nonnull
+    public String encodeWithBase32(@Nonnull String s) {
         return Base32.encode(s.getBytes());
     }
 
     /**
      * @since 2.9.4
      */
-    public byte[] decodeWithBase32ToBytes(String s) {
+    @Nonnull
+    public byte[] decodeWithBase32ToBytes(@Nonnull String s) {
         return Base32.decode(s);
     }
 
     /**
      * @since 2.9.4
      */
-    public String decodeWithBase32(String s) {
+    @Nonnull
+    public String decodeWithBase32(@Nonnull String s) {
         return new String(decodeWithBase32ToBytes(s));
     }
 
@@ -299,7 +320,8 @@ public class KeelStringHelper {
      * @param group such as 0 for the entire, n for the Nth component.
      * @since 3.0.8
      */
-    public List<String> regexFindAll(String regex, int flags, String text, int group) {
+    @Nonnull
+    public List<String> regexFindAll(@Nonnull String regex, int flags, @Nonnull String text, int group) {
         List<String> blankParamGroups = new ArrayList<>();
         Pattern patternForSpacedArgument = Pattern.compile(regex, flags);
         Matcher patternForSpacedArgumentMatcher = patternForSpacedArgument.matcher(text);

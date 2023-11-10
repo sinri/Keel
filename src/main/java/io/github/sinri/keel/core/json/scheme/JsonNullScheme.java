@@ -1,7 +1,8 @@
 package io.github.sinri.keel.core.json.scheme;
 
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 /**
  * @since 2.7
@@ -18,13 +19,13 @@ public class JsonNullScheme extends JsonValueScheme<Object> {
     }
 
     @Override
-    public @NotNull JsonObject toJsonObject() {
+    public @Nonnull JsonObject toJsonObject() {
         return super.toJsonObject()
                 .put("scheme_type", getJsonElementSchemeType());
     }
 
     @Override
-    public @NotNull JsonElementScheme<Object> reloadDataFromJsonObject(JsonObject jsonObject) {
+    public @Nonnull JsonElementScheme<Object> reloadDataFromJsonObject(@Nonnull JsonObject jsonObject) {
         return super.reloadDataFromJsonObject(jsonObject);
     }
 

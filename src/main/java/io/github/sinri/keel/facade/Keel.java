@@ -4,8 +4,8 @@ import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.spi.cluster.NodeInfo;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
@@ -17,7 +17,7 @@ public class Keel {
     private static @Nullable Vertx vertx;
     private static @Nullable ClusterManager clusterManager;
 
-    public static KeelConfiguration getConfiguration() {
+    public static @Nonnull KeelConfiguration getConfiguration() {
         return configuration;
     }
 
@@ -25,12 +25,12 @@ public class Keel {
      * @param dotJoinedKeyChain such as `a.b.c`
      * @since 3.0.1
      */
-    public static String config(@NotNull String dotJoinedKeyChain) {
+    public static @Nullable String config(@Nonnull String dotJoinedKeyChain) {
         String[] split = dotJoinedKeyChain.split("\\.");
         return getConfiguration().readString(split);
     }
 
-    public static Vertx getVertx() {
+    public static @Nonnull Vertx getVertx() {
         Objects.requireNonNull(vertx);
         return vertx;
     }
@@ -40,7 +40,7 @@ public class Keel {
         return clusterManager;
     }
 
-    public static Future<Void> initializeVertx(VertxOptions vertxOptions) {
+    public static Future<Void> initializeVertx(@Nonnull VertxOptions vertxOptions) {
         if (vertxOptions.getClusterManager() == null) {
             clusterManager = null;
             vertx = Vertx.vertx(vertxOptions);
@@ -58,7 +58,7 @@ public class Keel {
     /**
      * @since 3.0.1
      */
-    public static void initializeVertxStandalone(VertxOptions vertxOptions) {
+    public static void initializeVertxStandalone(@Nonnull VertxOptions vertxOptions) {
         if (vertxOptions.getClusterManager() != null) {
             vertxOptions.setClusterManager(null);
         }
@@ -74,18 +74,24 @@ public class Keel {
         return isVertxInitialized() && getVertx().isClustered();
     }
 
-    public static String getVertxNodeNetAddress() {
-        if (getClusterManager() == null) return null;
+    /**
+     * @since 3.0.10 when running in standalone mode, return empty string instead of null.
+     */
+    public static @Nonnull String getVertxNodeNetAddress() {
+        if (getClusterManager() == null) return "";
         NodeInfo nodeInfo = getClusterManager().getNodeInfo();
         return nodeInfo.host() + ":" + nodeInfo.port();
     }
 
-    public static String getVertxNodeID() {
-        if (getClusterManager() == null) return null;
+    /**
+     * @since 3.0.10 when running in standalone mode, return empty string instead of null.
+     */
+    public static @Nonnull String getVertxNodeID() {
+        if (getClusterManager() == null) return "";
         return getClusterManager().getNodeId();
     }
 
-    public static Future<Void> gracefullyClose(Handler<Promise<Void>> promiseHandler) {
+    public static Future<Void> gracefullyClose(@Nonnull Handler<Promise<Void>> promiseHandler) {
         Promise<Void> promise = Promise.promise();
         promiseHandler.handle(promise);
         return promise.future().compose(v -> {
@@ -93,4 +99,10 @@ public class Keel {
         });
     }
 
+    /**
+     * @since 3.0.10
+     */
+    public static Future<Void> close() {
+        return gracefullyClose(Promise::complete);
+    }
 }

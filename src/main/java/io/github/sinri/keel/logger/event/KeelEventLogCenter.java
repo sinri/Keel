@@ -3,23 +3,30 @@ package io.github.sinri.keel.logger.event;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * @since 2.9.4 实验性设计
  */
 public interface KeelEventLogCenter {
 
-    void log(KeelEventLog eventLog);
+    void log(@Nonnull KeelEventLog eventLog);
 
-    Object processThrowable(Throwable throwable);
+    @Nullable
+    Object processThrowable(@Nullable Throwable throwable);
 
+    @Nonnull
     Future<Void> gracefullyClose();
 
 
-    default KeelEventLogger createLogger(String presetTopic) {
+    @Nonnull
+    default KeelEventLogger createLogger(@Nonnull String presetTopic) {
         return createLogger(presetTopic, null);
     }
 
-    default KeelEventLogger createLogger(String presetTopic, Handler<KeelEventLog> editor) {
+    @Nonnull
+    default KeelEventLogger createLogger(@Nonnull String presetTopic, @Nullable Handler<KeelEventLog> editor) {
         return new KeelEventLoggerImpl(presetTopic, () -> this, editor);
     }
 

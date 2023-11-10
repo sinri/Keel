@@ -24,17 +24,10 @@ public class KeelSpreadSheetReader {
     }
 
     public Future<SpreadSheetMatrix> readEntireSheet(SheetReadOptions sheetReadOptions) {
-        return Keel.getVertx().executeBlocking(promise -> {
-            try {
-                SpreadSheetMatrix matrix = this.blockReadEntireSheet(sheetReadOptions);
-                promise.complete(matrix);
-            } catch (Throwable e) {
-                promise.fail(e);
-            }
-        });
+        return Keel.getVertx().executeBlocking(() -> blockReadEntireSheet(sheetReadOptions));
     }
 
-    private SpreadSheetMatrix blockReadEntireSheet(SheetReadOptions sheetReadOptions) throws Throwable {
+    private SpreadSheetMatrix blockReadEntireSheet(SheetReadOptions sheetReadOptions) {
         SpreadSheetMatrixRowCollector spreadSheetMatrixRowCollector = new SpreadSheetMatrixRowCollector();
         excelReaderBuilder.registerReadListener(spreadSheetMatrixRowCollector);
         try (ExcelReader excelReader = excelReaderBuilder.build()) {

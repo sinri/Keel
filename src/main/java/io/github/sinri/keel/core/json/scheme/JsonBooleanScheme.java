@@ -1,7 +1,8 @@
 package io.github.sinri.keel.core.json.scheme;
 
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 /**
  * @since 2.7
@@ -28,14 +29,14 @@ public class JsonBooleanScheme extends JsonValueScheme<Boolean> {
     }
 
     @Override
-    public @NotNull JsonObject toJsonObject() {
+    public @Nonnull JsonObject toJsonObject() {
         return super.toJsonObject()
                 .put("scheme_type", getJsonElementSchemeType())
                 .put("expected", expected);
     }
 
     @Override
-    public @NotNull JsonElementScheme<Boolean> reloadDataFromJsonObject(JsonObject jsonObject) {
+    public @Nonnull JsonElementScheme<Boolean> reloadDataFromJsonObject(@Nonnull JsonObject jsonObject) {
         super.reloadDataFromJsonObject(jsonObject);
         this.expected = jsonObject.getBoolean("expected");
         return this;

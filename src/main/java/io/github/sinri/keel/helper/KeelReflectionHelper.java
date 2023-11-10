@@ -2,6 +2,8 @@ package io.github.sinri.keel.helper;
 
 import org.reflections.Reflections;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -25,7 +27,8 @@ public class KeelReflectionHelper {
      * @return target annotation
      * @since 1.13
      */
-    public <T extends Annotation> T getAnnotationOfMethod(Method method, Class<T> classOfAnnotation, T defaultAnnotation) {
+    @Nullable
+    public <T extends Annotation> T getAnnotationOfMethod(@Nonnull Method method, @Nonnull Class<T> classOfAnnotation, @Nullable T defaultAnnotation) {
         T annotation = method.getAnnotation(classOfAnnotation);
         if (annotation == null) {
             return defaultAnnotation;
@@ -36,7 +39,8 @@ public class KeelReflectionHelper {
     /**
      * @since 2.6
      */
-    public <T extends Annotation> T getAnnotationOfMethod(Method method, Class<T> classOfAnnotation) {
+    @Nullable
+    public <T extends Annotation> T getAnnotationOfMethod(@Nonnull Method method, @Nonnull Class<T> classOfAnnotation) {
         return getAnnotationOfMethod(method, classOfAnnotation, null);
     }
 
@@ -46,7 +50,8 @@ public class KeelReflectionHelper {
      *                              Note that any annotation returned by this method is a declaration annotation.
      * @since 2.8
      */
-    public <T extends Annotation> T getAnnotationOfClass(Class<?> anyClass, Class<T> classOfAnnotation) {
+    @Nullable
+    public <T extends Annotation> T getAnnotationOfClass(@Nonnull Class<?> anyClass, @Nonnull Class<T> classOfAnnotation) {
         return anyClass.getAnnotation(classOfAnnotation);
     }
 
@@ -57,8 +62,16 @@ public class KeelReflectionHelper {
      * @return the sought classes in a set
      * @since 3.0.6
      */
-    public <R> Set<Class<? extends R>> seekClassDescendantsInPackage(String packageName, Class<R> baseClass) {
+    public <R> Set<Class<? extends R>> seekClassDescendantsInPackage(@Nonnull String packageName, @Nonnull Class<R> baseClass) {
         Reflections reflections = new Reflections(packageName);
         return reflections.getSubTypesOf(baseClass);
+    }
+
+    /**
+     * @return Whether the given `baseClass` is the base of the given `implementClass`.
+     * @since 3.0.10
+     */
+    public boolean isClassAssignable(@Nonnull Class<?> baseClass, @Nonnull Class<?> implementClass) {
+        return baseClass.isAssignableFrom(implementClass);
     }
 }

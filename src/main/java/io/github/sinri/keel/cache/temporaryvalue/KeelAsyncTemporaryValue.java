@@ -2,8 +2,8 @@ package io.github.sinri.keel.cache.temporaryvalue;
 
 import io.github.sinri.keel.cache.ValueWrapper;
 import io.vertx.core.Future;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -55,7 +55,7 @@ public class KeelAsyncTemporaryValue<P> {
         });
     }
 
-    public Future<P> getOrReload(@NotNull Supplier<Future<P>> loader) {
+    public Future<P> getOrReload(@Nonnull Supplier<Future<P>> loader) {
         return Future.succeededFuture(this.valueWrapperAtomicReference.get())
                 .compose(pValueWrapper -> {
                     if (pValueWrapper == null) {

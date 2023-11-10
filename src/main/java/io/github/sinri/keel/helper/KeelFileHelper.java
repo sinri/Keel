@@ -3,6 +3,8 @@ package io.github.sinri.keel.helper;
 import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
@@ -29,7 +31,7 @@ public class KeelFileHelper {
         return instance;
     }
 
-    public byte[] readFileAsByteArray(String filePath, boolean seekInsideJarWhenNotFound) throws IOException {
+    public @Nonnull byte[] readFileAsByteArray(@Nonnull String filePath, boolean seekInsideJarWhenNotFound) throws IOException {
         try {
             return Files.readAllBytes(Path.of(filePath));
         } catch (IOException e) {
@@ -57,7 +59,8 @@ public class KeelFileHelper {
      * @param filePath path string of the target file, or directory
      * @return the URL of target file; if not there, null return.
      */
-    public URL getUrlOfFileInJar(String filePath) {
+    @Nullable
+    public URL getUrlOfFileInJar(@Nonnull String filePath) {
         return KeelFileHelper.class.getClassLoader().getResource(filePath);
     }
 
@@ -67,7 +70,8 @@ public class KeelFileHelper {
      * @param root ends with '/'
      * @return list of JarEntry
      */
-    public List<JarEntry> traversalInJar(String root) {
+    @Nonnull
+    public List<JarEntry> traversalInJar(@Nonnull String root) {
         List<JarEntry> jarEntryList = new ArrayList<>();
         try {
             // should root ends with '/'?
@@ -108,7 +112,7 @@ public class KeelFileHelper {
      * @return absolute created Temp File path
      * @since 3.0.0
      */
-    public Future<String> crateTempFile(String prefix, String suffix) {
+    public Future<String> crateTempFile(@Nullable String prefix, @Nullable String suffix) {
         return Keel.getVertx().fileSystem().createTempFile(prefix, suffix);
     }
 }

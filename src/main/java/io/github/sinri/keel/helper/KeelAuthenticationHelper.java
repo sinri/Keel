@@ -5,6 +5,9 @@ import io.github.sinri.keel.helper.authenticator.googleauth.GoogleAuthenticatorC
 import io.github.sinri.keel.helper.encryption.bcrypt.BCrypt;
 import io.vertx.core.Handler;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 /**
  * @since 2.9.4
  */
@@ -23,7 +26,7 @@ public class KeelAuthenticationHelper {
      * @since 2.8
      * @since 2.9.4 moved from digest to authentication
      */
-    public String php_password_hash(String password) {
+    public @Nonnull String php_password_hash(@Nonnull String password) {
         return BCrypt.hashpw(password);
     }
 
@@ -31,7 +34,7 @@ public class KeelAuthenticationHelper {
      * @since 2.8
      * @since 2.9.4 moved from digest to authentication
      */
-    public boolean php_password_verify(String password, String hash) {
+    public boolean php_password_verify(@Nonnull String password, @Nonnull String hash) {
         return BCrypt.checkpw(password, hash);
     }
 
@@ -49,7 +52,7 @@ public class KeelAuthenticationHelper {
      *
      * @since 2.9.4
      */
-    public GoogleAuthenticator getGoogleAuthenticator(Handler<GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder> configBuildHandler) {
+    public GoogleAuthenticator getGoogleAuthenticator(@Nullable Handler<GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder> configBuildHandler) {
         var configBuilder = new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder();
         if (configBuildHandler != null) {
             configBuildHandler.handle(configBuilder);

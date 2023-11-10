@@ -2,6 +2,7 @@ package io.github.sinri.keel.cache.impl;
 
 import io.github.sinri.keel.cache.KeelEverlastingCacheInterface;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -20,7 +21,7 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
 
 
     @Override
-    public void save(K k, V v) {
+    public void save(@Nonnull K k, V v) {
         lock.lock();
         try {
             map.put(k, v);
@@ -30,7 +31,7 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
     }
 
     @Override
-    public void save(Map<K, V> appendEntries) {
+    public void save(@Nonnull Map<K, V> appendEntries) {
         lock.lock();
         try {
             map.putAll(appendEntries);
@@ -40,7 +41,7 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
     }
 
     @Override
-    public V read(K k, V v) {
+    public V read(@Nonnull K k, V v) {
         V r;
         lock.lock();
         try {
@@ -52,7 +53,7 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
     }
 
     @Override
-    public void remove(K key) {
+    public void remove(@Nonnull K key) {
         lock.lock();
         try {
             map.remove(key);
@@ -62,7 +63,7 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
     }
 
     @Override
-    public void remove(Collection<K> keys) {
+    public void remove(@Nonnull Collection<K> keys) {
         lock.lock();
         try {
             keys.forEach(map::remove);
@@ -86,7 +87,7 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
      * @since 2.9.4 no longer implemented by replace map
      */
     @Override
-    public void replaceAll(Map<K, V> newEntries) {
+    public void replaceAll(@Nonnull Map<K, V> newEntries) {
         lock.lock();
         try {
             Set<K> ks = newEntries.keySet();
@@ -102,6 +103,7 @@ public class KeelCacheVet<K, V> implements KeelEverlastingCacheInterface<K, V> {
     }
 
     @Override
+    @Nonnull
     public Map<K, V> getSnapshotMap() {
         return Collections.unmodifiableMap(map);
     }

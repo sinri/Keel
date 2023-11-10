@@ -18,7 +18,7 @@ public class TemplateArgumentMapping extends HashMap<String, TemplateArgument> {
         return this;
     }
 
-    public TemplateArgumentMapping bindNumbers(@Nonnull String argumentName, @Nonnull Collection<Number> numbers) {
+    public TemplateArgumentMapping bindNumbers(@Nonnull String argumentName, @Nonnull Collection<? extends Number> numbers) {
         this.put(argumentName, TemplateArgument.forNumbers(numbers));
         return this;
     }

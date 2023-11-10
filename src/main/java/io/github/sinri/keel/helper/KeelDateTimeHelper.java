@@ -11,6 +11,11 @@ import java.util.Locale;
  * @since 2.6
  */
 public class KeelDateTimeHelper {
+    public static final String MYSQL_DATETIME_MS_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String MYSQL_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
+    public static final String MYSQL_DATE_PATTERN = "yyyy-MM-dd";
+    public static final String MYSQL_TIME_PATTERN = "HH:mm:ss";
+    public static final String GMT_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
     private static final KeelDateTimeHelper instance = new KeelDateTimeHelper();
 
     private KeelDateTimeHelper() {
@@ -24,9 +29,25 @@ public class KeelDateTimeHelper {
     /**
      * @return current timestamp expressed in MySQL Date Time Format
      * @since 3.0.0
+     * @since 3.0.10 use `getCurrentDatetime` instead.
      */
+    @Deprecated(since = "3.0.10", forRemoval = true)
     public String getCurrentDateExpression() {
-        return getCurrentDateExpression("yyyy-MM-dd HH:mm:ss");
+        return getCurrentDatetime();
+    }
+
+    /**
+     * @since 3.0.10
+     */
+    public String getCurrentDatetime() {
+        return getCurrentDateExpression(MYSQL_DATETIME_PATTERN);
+    }
+
+    /**
+     * @since 3.0.10
+     */
+    public String getCurrentDate() {
+        return getCurrentDateExpression(MYSQL_DATE_PATTERN);
     }
 
     /**
@@ -52,6 +73,14 @@ public class KeelDateTimeHelper {
     }
 
     /**
+     * @since 3.0.10
+     */
+    public String getDateExpression(long timestamp, String format) {
+        Date date = new Date(timestamp);
+        return getDateExpression(date, format);
+    }
+
+    /**
      * From MySQL DataTime String to Standard Expression
      *
      * @param localDateTimeExpression yyyy-MM-ddTHH:mm:ss
@@ -60,7 +89,7 @@ public class KeelDateTimeHelper {
      */
     public String getMySQLFormatLocalDateTimeExpression(String localDateTimeExpression) {
         return LocalDateTime.parse(localDateTimeExpression)
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+                .format(DateTimeFormatter.ofPattern(MYSQL_DATETIME_PATTERN));
     }
 
     /**
@@ -69,7 +98,7 @@ public class KeelDateTimeHelper {
      */
     public String getGMTDateTimeExpression(ZoneId zoneId) {
         DateTimeFormatter gmt = DateTimeFormatter.ofPattern(
-                        "EEE, dd MMM yyyy HH:mm:ss z",
+                        GMT_PATTERN,
                         Locale.ENGLISH
                 )
                 .withZone(ZoneId.of("GMT"));
@@ -108,10 +137,6 @@ public class KeelDateTimeHelper {
                 + ":" + makeStandardWidthField(datetime.getMinute(), 2)
                 + ":" + makeStandardWidthField(datetime.getSecond(), 2);
     }
-
-    public static final String MYSQL_DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
-    public static final String MYSQL_DATE_PATTERN = "yyyy-MM-dd";
-    public static final String MYSQL_TIME_PATTERN = "HH:mm:ss";
 
     /**
      * @param formatPattern MYSQL_DATETIME_PATTERN,MYSQL_DATE_PATTERN,MYSQL_TIME_PATTERN

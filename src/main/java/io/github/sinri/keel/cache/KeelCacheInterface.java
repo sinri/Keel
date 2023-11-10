@@ -5,6 +5,7 @@ import io.github.sinri.keel.cache.impl.KeelCacheDummy;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
@@ -33,29 +34,6 @@ public interface KeelCacheInterface<K, V> {
     }
 
     /**
-     * @param cache         KeelCacheInterface
-     * @param key           cache key
-     * @param generator     if not cached for key, use this function to generate one asynchronously
-     * @param lifeInSeconds life in seconds
-     * @param <K>           key type
-     * @param <V>           value type
-     * @return future of value
-     * @since 2.1
-     */
-    @Deprecated(forRemoval = true, since = "2.8")
-    static <K, V> Future<V> ensureAndRead(KeelCacheInterface<K, V> cache, K key, Function<K, Future<V>> generator, long lifeInSeconds) {
-        V existed = cache.read(key);
-        if (existed != null) {
-            return Future.succeededFuture(existed);
-        }
-        return generator.apply(key)
-                .compose(v -> {
-                    cache.save(key, v, lifeInSeconds);
-                    return Future.succeededFuture(v);
-                });
-    }
-
-    /**
      * @since 2.8
      */
     long getDefaultLifeInSeconds();
@@ -72,12 +50,12 @@ public interface KeelCacheInterface<K, V> {
      * @param value         value
      * @param lifeInSeconds The lifetime of the cache item, in seconds.
      */
-    void save(K key, V value, long lifeInSeconds);
+    void save(@Nonnull K key, V value, long lifeInSeconds);
 
     /**
      * @since 2.8
      */
-    default void save(K key, V value) {
+    default void save(@Nonnull K key, V value) {
         save(key, value, getDefaultLifeInSeconds());
     }
 
@@ -88,7 +66,7 @@ public interface KeelCacheInterface<K, V> {
      * @param fallbackValue the certain value returned when not found
      * @return value of found available cached item, or `fallbackValue`
      */
-    V read(K key, V fallbackValue);
+    V read(@Nonnull K key, V fallbackValue);
 
     /**
      * Read an available cached item with key, or return `null` when not found.
@@ -96,7 +74,7 @@ public interface KeelCacheInterface<K, V> {
      * @param key key
      * @return value of found available cached item, or `null`
      */
-    default V read(K key) {
+    default V read(@Nonnull K key) {
         return this.read(key, null);
     }
 
@@ -105,7 +83,7 @@ public interface KeelCacheInterface<K, V> {
      *
      * @param key key
      */
-    void remove(K key);
+    void remove(@Nonnull K key);
 
     /**
      * Remove all the cached items.
@@ -121,12 +99,13 @@ public interface KeelCacheInterface<K, V> {
      * @return ConcurrentMap K → V alive value only
      * @since 1.14
      */
+    @Nonnull
     ConcurrentMap<K, V> getSnapshotMap();
 
     /**
      * @since 2.8
      */
-    default Future<V> read(K key, Function<K, Future<V>> generator, long lifeInSeconds) {
+    default Future<V> read(@Nonnull K key, Function<K, Future<V>> generator, long lifeInSeconds) {
         V existed = this.read(key);
         if (existed != null) {
             return Future.succeededFuture(existed);

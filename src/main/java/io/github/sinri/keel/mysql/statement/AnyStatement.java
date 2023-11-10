@@ -1,6 +1,7 @@
 package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
+import io.github.sinri.keel.mysql.statement.templated.TemplateArgumentMapping;
 import io.github.sinri.keel.mysql.statement.templated.TemplatedModifyStatement;
 import io.github.sinri.keel.mysql.statement.templated.TemplatedReadStatement;
 import io.github.sinri.keel.mysql.statement.templated.TemplatedStatement;
@@ -62,15 +63,17 @@ public interface AnyStatement {
         return writeIntoStatement;
     }
 
-    static TemplatedReadStatement templatedRead(String path, Handler<TemplatedReadStatement> templatedReadStatementHandler) {
+    static TemplatedReadStatement templatedRead(String path, Handler<TemplateArgumentMapping> templatedReadStatementHandler) {
         TemplatedReadStatement readStatement = TemplatedStatement.loadTemplateToRead(path);
-        templatedReadStatementHandler.handle(readStatement);
+        TemplateArgumentMapping arguments = readStatement.getArguments();
+        templatedReadStatementHandler.handle(arguments);
         return readStatement;
     }
 
-    static TemplatedModifyStatement templatedModify(String path, Handler<TemplatedModifyStatement> templatedModifyStatementHandler) {
+    static TemplatedModifyStatement templatedModify(String path, Handler<TemplateArgumentMapping> templatedModifyStatementHandler) {
         TemplatedModifyStatement templatedModifyStatement = TemplatedStatement.loadTemplateToModify(path);
-        templatedModifyStatementHandler.handle(templatedModifyStatement);
+        TemplateArgumentMapping arguments = templatedModifyStatement.getArguments();
+        templatedModifyStatementHandler.handle(arguments);
         return templatedModifyStatement;
     }
 

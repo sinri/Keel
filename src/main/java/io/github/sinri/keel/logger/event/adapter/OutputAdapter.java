@@ -6,6 +6,8 @@ import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Function;
 
@@ -20,7 +22,7 @@ public class OutputAdapter implements KeelEventLoggerAdapter {
     private static final OutputAdapter defaultInstance = new OutputAdapter(null);
     private final Function<KeelEventLog, Future<String>> converter;
 
-    private OutputAdapter(Function<KeelEventLog, Future<String>> converter) {
+    private OutputAdapter(@Nullable Function<KeelEventLog, Future<String>> converter) {
         this.converter = converter;
     }
 
@@ -28,17 +30,18 @@ public class OutputAdapter implements KeelEventLoggerAdapter {
         return defaultInstance;
     }
 
-    public static OutputAdapter getInstance(Function<KeelEventLog, Future<String>> converter) {
+    public static OutputAdapter getInstance(@Nullable Function<KeelEventLog, Future<String>> converter) {
         return new OutputAdapter(converter);
     }
 
     @Override
-    public void close(Promise<Void> promise) {
+    public void close(@Nonnull Promise<Void> promise) {
         promise.complete();
     }
 
     @Override
-    public Future<Void> dealWithLogs(List<KeelEventLog> buffer) {
+    @Nonnull
+    public Future<Void> dealWithLogs(@Nonnull List<KeelEventLog> buffer) {
         return KeelAsyncKit.iterativelyCall(buffer, eventLog -> {
             try {
                 if (converter == null) {
@@ -60,7 +63,8 @@ public class OutputAdapter implements KeelEventLoggerAdapter {
     }
 
     @Override
-    public Object processThrowable(Throwable throwable) {
+    @Nullable
+    public Object processThrowable(@Nullable Throwable throwable) {
         return KeelHelpers.stringHelper().renderThrowableChain(throwable);
     }
 }

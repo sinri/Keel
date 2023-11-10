@@ -34,7 +34,7 @@ public class TemplateArgument {
         return forExpression(String.valueOf(number));
     }
 
-    public static TemplateArgument forNumbers(@Nonnull Collection<Number> numbers) {
+    public static TemplateArgument forNumbers(@Nonnull Collection<? extends Number> numbers) {
         List<String> list = new ArrayList<>();
         numbers.forEach(number -> {
             list.add(String.valueOf(number));

@@ -5,6 +5,8 @@ import io.github.sinri.keel.logger.event.KeelEventLogCenter;
 import io.github.sinri.keel.logger.event.adapter.KeelEventLoggerAdapter;
 import io.vertx.core.Future;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class KeelSyncEventLogCenter implements KeelEventLogCenter {
@@ -15,16 +17,18 @@ public class KeelSyncEventLogCenter implements KeelEventLogCenter {
     }
 
     @Override
-    public void log(KeelEventLog eventLog) {
+    public void log(@Nonnull KeelEventLog eventLog) {
         adapter.dealWithLogs(List.of(eventLog));
     }
 
     @Override
-    public Object processThrowable(Throwable throwable) {
+    @Nullable
+    public Object processThrowable(@Nullable Throwable throwable) {
         return this.adapter.processThrowable(throwable);
     }
 
     @Override
+    @Nonnull
     public Future<Void> gracefullyClose() {
         return this.adapter.gracefullyClose();
     }

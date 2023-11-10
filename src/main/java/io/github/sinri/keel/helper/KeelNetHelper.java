@@ -3,10 +3,13 @@ package io.github.sinri.keel.helper;
 import io.vertx.core.json.JsonArray;
 import io.vertx.ext.web.RoutingContext;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @since 2.8
@@ -28,7 +31,8 @@ public class KeelNetHelper {
         System.out.println("s=" + s);
     }
 
-    public Long convertIPv4ToNumber(String ipv4) {
+    @Nullable
+    public Long convertIPv4ToNumber(@Nullable String ipv4) {
         //Converts a String that represents an IP to an int.
         try {
             InetAddress i = InetAddress.getByName(ipv4);
@@ -46,6 +50,7 @@ public class KeelNetHelper {
         }
     }
 
+    @Nullable
     public String convertNumberToIPv4(long number) {
         //This converts an int representation of ip back to String
         try {
@@ -56,6 +61,7 @@ public class KeelNetHelper {
         }
     }
 
+    @Nonnull
     public byte[] convertIPv4ToAddressBytes(long ipv4AsLong) {
         return new byte[]{
                 (byte) (ipv4AsLong >> 24),
@@ -65,14 +71,17 @@ public class KeelNetHelper {
         };
     }
 
-    public byte[] convertIPv4ToAddressBytes(String ipv4) {
-        return convertIPv4ToAddressBytes(this.convertIPv4ToNumber(ipv4));
+    @Nonnull
+    public byte[] convertIPv4ToAddressBytes(@Nullable String ipv4) {
+        long x = Objects.requireNonNull(this.convertIPv4ToNumber(ipv4));
+        return convertIPv4ToAddressBytes(x);
     }
 
     /**
      * @return like "127.0.0.1"; If the local host name could not be resolved into an address, null.
      * @since 2.9.1
      */
+    @Nullable
     public String getLocalHostAddress() {
         try {
             InetAddress localHost = InetAddress.getLocalHost();
@@ -80,13 +89,13 @@ public class KeelNetHelper {
         } catch (UnknownHostException e) {
             return null;
         }
-
     }
 
     /**
      * @return like "SinriMacInLeqee.local"; If the local host name could not be resolved into an address, null.
      * @since 2.9.1
      */
+    @Nullable
     public String getLocalHostName() {
         try {
             InetAddress localHost = InetAddress.getLocalHost();
@@ -100,6 +109,7 @@ public class KeelNetHelper {
      * @return like "localhost"; If the local host name could not be resolved into an address, null.
      * @since 2.9.1
      */
+    @Nullable
     public String getLocalHostCanonicalName() {
         try {
             InetAddress localHost = InetAddress.getLocalHost();
@@ -113,7 +123,8 @@ public class KeelNetHelper {
      * @return List of Client IP, combined with X-Forwarded-For and remote address.
      * @since 2.9.2
      */
-    public List<String> parseWebClientIPChain(RoutingContext ctx) {
+    @Nonnull
+    public List<String> parseWebClientIPChain(@Nonnull RoutingContext ctx) {
         // X-Forwarded-For
         JsonArray clientIPChain = new JsonArray();
         String xForwardedFor = ctx.request().getHeader("X-Forwarded-For");

@@ -5,9 +5,9 @@ import io.github.sinri.keel.logger.event.logger.KeelSilentEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -34,15 +34,16 @@ public interface KeelEventLogger {
 
     String getPresetTopic();
 
+    @Nullable
     Handler<KeelEventLog> getPresetEventLogEditor();
 
-    KeelEventLogger setPresetEventLogEditor(Handler<KeelEventLog> editor);
+    KeelEventLogger setPresetEventLogEditor(@Nullable Handler<KeelEventLog> editor);
 
     /**
      * @since 3.0.10
      * Add a bypass logger to this logger.
      */
-    void addBypassLogger(KeelEventLogger bypassLogger);
+    void addBypassLogger(@Nonnull KeelEventLogger bypassLogger);
 
     /**
      * @since 3.0.10
@@ -118,7 +119,7 @@ public interface KeelEventLogger {
         });
     }
 
-    default void debug(String msg) {
+    default void debug(@Nullable String msg) {
         debug(eventLog -> eventLog.message(msg));
     }
 

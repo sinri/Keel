@@ -1,6 +1,7 @@
 package io.github.sinri.keel.excel.read;
 
 import com.alibaba.excel.context.AnalysisContext;
+import com.alibaba.excel.enums.CellDataTypeEnum;
 import com.alibaba.excel.metadata.data.ReadCellData;
 import com.alibaba.excel.read.listener.ReadListener;
 
@@ -31,12 +32,24 @@ public class SpreadSheetMatrixRowCollector implements ReadListener<Map<Integer, 
         this.matrix.addRow(rawRow);
     }
 
+    /**
+     * @since 3.0.10 fix bug with supporting pure number head
+     */
     @Override
     public void invokeHead(Map<Integer, ReadCellData<?>> headMap, AnalysisContext context) {
         //ReadListener.super.invokeHead(headMap, context);
         List<String> headerRow = new ArrayList<>();
         headMap.forEach((i, cell) -> {
-            String x = cell.getStringValue();
+            //System.out.println("SpreadSheetMatrixRowCollector::invokeHead -> " + cell.getData() + " as " + cell.getType());
+            CellDataTypeEnum type = cell.getType();
+            String x;
+            if (type == CellDataTypeEnum.NUMBER) {
+                x = String.valueOf(cell.getNumberValue());
+            } else if (type == CellDataTypeEnum.BOOLEAN) {
+                x = String.valueOf(cell.getBooleanValue());
+            } else {
+                x = cell.getStringValue();
+            }
             headerRow.add(x);
         });
         this.getMatrix().addHeaderRow(headerRow);

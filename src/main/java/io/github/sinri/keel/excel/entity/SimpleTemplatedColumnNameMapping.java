@@ -1,7 +1,7 @@
 package io.github.sinri.keel.excel.entity;
 
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 
@@ -10,11 +10,11 @@ import java.util.Map;
  */
 public class SimpleTemplatedColumnNameMapping extends AbstractTemplatedColumnNameMapping {
 
-    public SimpleTemplatedColumnNameMapping(@NotNull List<String> columnNameList) {
+    public SimpleTemplatedColumnNameMapping(@Nonnull List<String> columnNameList) {
         super(columnNameList);
     }
 
-    public SimpleTemplatedColumnNameMapping(@NotNull Map<String, Integer> columnNameMap) {
+    public SimpleTemplatedColumnNameMapping(@Nonnull Map<String, Integer> columnNameMap) {
         super(columnNameMap);
     }
 }

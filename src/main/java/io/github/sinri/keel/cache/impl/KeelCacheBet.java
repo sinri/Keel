@@ -4,6 +4,7 @@ import io.github.sinri.keel.cache.KeelAsyncCacheInterface;
 import io.github.sinri.keel.cache.ValueWrapper;
 import io.vertx.core.Future;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -16,13 +17,13 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
     }
 
     @Override
-    public Future<Void> save(K key, V value, long lifeInSeconds) {
+    public Future<Void> save(@Nonnull K key, V value, long lifeInSeconds) {
         this.map.put(key, new ValueWrapper<>(value, lifeInSeconds));
         return Future.succeededFuture();
     }
 
     @Override
-    public Future<V> read(K key) {
+    public Future<V> read(@Nonnull K key) {
         ValueWrapper<V> vw = this.map.get(key);
         if (vw == null || !vw.isAliveNow()) {
             return Future.failedFuture(new NotCached(key.toString()));
@@ -31,7 +32,7 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
     }
 
     @Override
-    public Future<V> read(K key, V fallbackValue) {
+    public Future<V> read(@Nonnull K key, V fallbackValue) {
         ValueWrapper<V> vw = this.map.get(key);
         if (vw == null) {
             return Future.succeededFuture(fallbackValue);
@@ -45,7 +46,7 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
     }
 
     @Override
-    public Future<V> read(K key, Function<K, Future<V>> generator, long lifeInSeconds) {
+    public Future<V> read(@Nonnull K key, Function<K, Future<V>> generator, long lifeInSeconds) {
         // i.e. computeIfAbsent
         ValueWrapper<V> vw = this.map.get(key);
         if (vw != null && vw.isAliveNow()) {
@@ -63,7 +64,7 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
     }
 
     @Override
-    public Future<Void> remove(K key) {
+    public Future<Void> remove(@Nonnull K key) {
         this.map.remove(key);
         return Future.succeededFuture();
     }

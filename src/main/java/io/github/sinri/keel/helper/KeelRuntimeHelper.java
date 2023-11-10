@@ -3,11 +3,13 @@ package io.github.sinri.keel.helper;
 import io.github.sinri.keel.helper.runtime.CPUTimeResult;
 import io.github.sinri.keel.helper.runtime.GCStatResult;
 import io.github.sinri.keel.helper.runtime.MemoryResult;
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.vertx.core.json.JsonObject;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 
+import javax.annotation.Nonnull;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.Objects;
@@ -26,10 +28,14 @@ public class KeelRuntimeHelper {
         return instance;
     }
 
+    @Nonnull
     public GCStatResult getGCSnapshot() {
         GCStatResult gcStat = new GCStatResult();
         for (GarbageCollectorMXBean gc : ManagementFactory.getGarbageCollectorMXBeans()) {
-            Objects.requireNonNull(gc);
+            //Objects.requireNonNull(gc);
+            if (gc == null) {
+                continue;
+            }
             if (Objects.equals("G1 Young Generation", gc.getName())) {
                 gcStat.addGCCountAsYoung(gc.getCollectionCount());
                 if (gc.getCollectionTime() >= 0) {
@@ -41,14 +47,16 @@ public class KeelRuntimeHelper {
                     gcStat.addGCTimeAsOld(gc.getCollectionTime());
                 }
             } else {
-                System.out.println("Found Unknown GarbageCollectorMXBean Name"
-                        + new JsonObject()
-                        .put("class", gc.getClass().getName())
-                        .put("name", gc.getName())
-                        .put("memoryPoolNames", KeelHelpers.stringHelper().joinStringArray(gc.getMemoryPoolNames(), ","))
-                        .put("objectName", gc.getObjectName())
-                        .put("collectionCount", gc.getCollectionCount())
-                        .put("collectionTime", gc.getCollectionTime())
+                KeelOutputEventLogCenter.instantLogger().error(log -> log
+                        .message("Found Unknown GarbageCollectorMXBean Name")
+                        .put("detail", new JsonObject()
+                                .put("class", gc.getClass().getName())
+                                .put("name", gc.getName())
+                                .put("memoryPoolNames", KeelHelpers.stringHelper().joinStringArray(gc.getMemoryPoolNames(), ","))
+                                .put("objectName", gc.getObjectName())
+                                .put("collectionCount", gc.getCollectionCount())
+                                .put("collectionTime", gc.getCollectionTime())
+                        )
                 );
             }
         }
@@ -58,6 +66,7 @@ public class KeelRuntimeHelper {
     /**
      * @since 2.9.4
      */
+    @Nonnull
     public CPUTimeResult getCPUTimeSnapshot() {
         SystemInfo systemInfo = new SystemInfo();
         CentralProcessor processor = systemInfo.getHardware().getProcessor();
@@ -77,6 +86,7 @@ public class KeelRuntimeHelper {
     /**
      * @since 2.9.4
      */
+    @Nonnull
     public MemoryResult getMemorySnapshot() {
         SystemInfo systemInfo = new SystemInfo();
         GlobalMemory memory = systemInfo.getHardware().getMemory();

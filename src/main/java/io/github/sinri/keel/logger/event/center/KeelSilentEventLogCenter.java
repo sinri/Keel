@@ -4,6 +4,8 @@ import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
 import io.vertx.core.Future;
 
+import javax.annotation.Nonnull;
+
 public class KeelSilentEventLogCenter implements KeelEventLogCenter {
     private final static KeelSilentEventLogCenter instance = new KeelSilentEventLogCenter();
 
@@ -16,7 +18,7 @@ public class KeelSilentEventLogCenter implements KeelEventLogCenter {
     }
 
     @Override
-    public void log(KeelEventLog eventLog) {
+    public void log(@Nonnull KeelEventLog eventLog) {
 
     }
 
@@ -26,6 +28,7 @@ public class KeelSilentEventLogCenter implements KeelEventLogCenter {
     }
 
     @Override
+    @Nonnull
     public Future<Void> gracefullyClose() {
         return Future.succeededFuture();
     }

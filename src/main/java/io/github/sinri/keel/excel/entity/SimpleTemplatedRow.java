@@ -1,7 +1,6 @@
 package io.github.sinri.keel.excel.entity;
 
 
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,7 +19,7 @@ public class SimpleTemplatedRow extends AbstractTemplatedRow<SimpleTemplatedColu
         super(rowAsList, columnNames == null ? null : new SimpleTemplatedColumnNameMapping(columnNames));
     }
 
-    public SimpleTemplatedRow(@Nonnull List<String> rowAsList, @NotNull Map<String, Integer> columnNameMap) {
+    public SimpleTemplatedRow(@Nonnull List<String> rowAsList, @Nonnull Map<String, Integer> columnNameMap) {
         super(rowAsList, new SimpleTemplatedColumnNameMapping(columnNameMap));
     }
 }

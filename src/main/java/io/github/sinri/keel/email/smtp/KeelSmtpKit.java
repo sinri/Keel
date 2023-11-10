@@ -8,6 +8,8 @@ import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.mail.MailMessage;
 import io.vertx.ext.mail.MailResult;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,7 +24,7 @@ public class KeelSmtpKit {
     /**
      * @since 3.0.6
      */
-    public KeelSmtpKit(MailConfig mailConfig, String poolName) {
+    public KeelSmtpKit(@Nonnull MailConfig mailConfig, @Nullable String poolName) {
         this.mailConfig = mailConfig;
         if (poolName != null) {
             this.mailClient = MailClient.createShared(Keel.getVertx(), this.mailConfig, poolName);
@@ -31,11 +33,11 @@ public class KeelSmtpKit {
         }
     }
 
-    public KeelSmtpKit(String smtpName, boolean shared) {
+    public KeelSmtpKit(@Nonnull String smtpName, boolean shared) {
         this(buildMailConfig(smtpName), shared ? Objects.requireNonNull(smtpName) : null);
     }
 
-    public KeelSmtpKit(String smtpName) {
+    public KeelSmtpKit(@Nonnull String smtpName) {
         this(smtpName, true);
     }
 
@@ -51,7 +53,7 @@ public class KeelSmtpKit {
     /**
      * As of 3.0.6, only five property keys supported.
      */
-    private static MailConfig buildMailConfig(String smtpName) {
+    private static MailConfig buildMailConfig(@Nonnull String smtpName) {
         KeelConfiguration smtpConfiguration = Keel.getConfiguration().extract("email", "smtp", smtpName);
 
         var mailConfig = new MailConfig();

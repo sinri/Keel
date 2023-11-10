@@ -2,8 +2,8 @@ package io.github.sinri.keel.core.json.scheme;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -48,7 +48,7 @@ public class JsonArrayScheme extends JsonValueScheme<JsonArray> {
     }
 
     @Override
-    public @NotNull JsonObject toJsonObject() {
+    public @Nonnull JsonObject toJsonObject() {
         JsonObject indexTypeMap = new JsonObject();
         indexedElementSchemeMap.forEach((index, schemeType) -> {
             indexTypeMap.put(String.valueOf(index), schemeType.toJsonObject());
@@ -66,7 +66,7 @@ public class JsonArrayScheme extends JsonValueScheme<JsonArray> {
     }
 
     @Override
-    public @NotNull JsonElementScheme<JsonArray> reloadDataFromJsonObject(JsonObject jsonObject) {
+    public @Nonnull JsonElementScheme<JsonArray> reloadDataFromJsonObject(@Nonnull JsonObject jsonObject) {
         super.reloadDataFromJsonObject(jsonObject);
 //        this.nullable = jsonObject.getBoolean("nullable", false);
 //        this.optional = jsonObject.getBoolean("optional", false);
