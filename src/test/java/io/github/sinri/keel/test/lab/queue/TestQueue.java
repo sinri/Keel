@@ -4,16 +4,17 @@ import io.github.sinri.keel.servant.queue.KeelQueue;
 import io.github.sinri.keel.servant.queue.KeelQueueNextTaskSeeker;
 import io.github.sinri.keel.servant.queue.QueueWorkerPoolManager;
 import io.vertx.core.Future;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 public class TestQueue extends KeelQueue {
-    @NotNull
+    @Nonnull
     @Override
     protected KeelQueueNextTaskSeeker getNextTaskSeeker() {
         return new TestQueueTaskSeeker();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     protected SignalReader getSignalReader() {
         return new SignalReader() {
@@ -24,7 +25,7 @@ public class TestQueue extends KeelQueue {
         };
     }
 
-    @NotNull
+    @Nonnull
     @Override
     protected QueueWorkerPoolManager getQueueWorkerPoolManager() {
         return new QueueWorkerPoolManager(3);

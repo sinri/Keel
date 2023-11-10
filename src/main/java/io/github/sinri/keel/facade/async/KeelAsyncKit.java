@@ -1,6 +1,8 @@
 package io.github.sinri.keel.facade.async;
 
 import io.github.sinri.keel.facade.Keel;
+import io.github.sinri.keel.verticles.KeelVerticleBase;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Promise;
@@ -139,5 +141,22 @@ public interface KeelAsyncKit {
                         return Future.failedFuture(e);
                     }
                 });
+    }
+
+    /**
+     * @since 3.0.10 Technical Preview: instead of Vertx::executeBlocking(Handler<Promise<T>> blockingCodeHandler)
+     */
+    @Nonnull
+    static <T> Future<T> executeBlocking(@Nonnull Handler<Promise<T>> blockingCodeHandler) {
+        Promise<T> promise = Promise.promise();
+        KeelVerticleBase verticle = new KeelVerticleBase() {
+            @Override
+            public void start() throws Exception {
+                blockingCodeHandler.handle(promise);
+                promise.future().onComplete(ar -> this.undeployMe());
+            }
+        };
+        return verticle.deployMe(new DeploymentOptions().setWorker(true))
+                .compose(deploymentId -> promise.future());
     }
 }

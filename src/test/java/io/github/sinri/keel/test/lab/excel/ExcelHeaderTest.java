@@ -9,8 +9,8 @@ import io.github.sinri.keel.tesuto.TestUnit;
 import io.github.sinri.keel.tesuto.TestUnitResult;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.List;
@@ -18,17 +18,17 @@ import java.util.List;
 public class ExcelHeaderTest extends KeelTest {
 
     @Override
-    protected @NotNull KeelEventLogger logger() {
+    protected @Nonnull KeelEventLogger logger() {
         return KeelOutputEventLogCenter.instantLogger();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     protected Future<Void> starting() {
         return Future.succeededFuture();
     }
 
-    @NotNull
+    @Nonnull
     @Override
     protected Future<Void> ending(List<TestUnitResult> testUnitResults) {
         return Future.succeededFuture();

@@ -25,7 +25,7 @@ public class AsyncFilesLoggerTest {
         return KeelAsyncKit.stepwiseCall(5, i -> {
             t1.info(event -> {
                 event.message("now: " + new Date());
-                event.context("t", "1");
+                event.put("t", "1");
             });
             return KeelAsyncKit.sleep(1000L);
         });
