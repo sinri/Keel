@@ -2,6 +2,7 @@ package io.github.sinri.keel.cache;
 
 import io.github.sinri.keel.cache.impl.KeelCacheVet;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Map;
 
@@ -18,14 +19,14 @@ public interface KeelEverlastingCacheInterface<K, V> {
     /**
      * Save the item to cache.
      */
-    void save(K k, V v);
+    void save(@Nonnull K k, V v);
 
-    void save(Map<K, V> appendEntries);
+    void save(@Nonnull Map<K, V> appendEntries);
 
     /**
      * @return cache value or null when not-existed
      */
-    default V read(K k) {
+    default V read(@Nonnull K k) {
         return read(k, null);
     }
 
@@ -34,16 +35,16 @@ public interface KeelEverlastingCacheInterface<K, V> {
      * @param v default value for the situation that key not existed
      * @return @return cache value or default when not-existed
      */
-    V read(K k, V v);
+    V read(@Nonnull K k, V v);
 
     /**
      * Remove the cached item with key.
      *
      * @param key key
      */
-    void remove(K key);
+    void remove(@Nonnull K key);
 
-    void remove(Collection<K> keys);
+    void remove(@Nonnull Collection<K> keys);
 
     /**
      * Remove all the cached items.
@@ -55,12 +56,13 @@ public interface KeelEverlastingCacheInterface<K, V> {
      *
      * @param newEntries new map of entries
      */
-    void replaceAll(Map<K, V> newEntries);
+    void replaceAll(@Nonnull Map<K, V> newEntries);
 
     /**
      * @return ConcurrentMap K → V alive value only
      * @since 1.14
      */
+    @Nonnull
     Map<K, V> getSnapshotMap();
 
 //    class LockedException extends Exception{

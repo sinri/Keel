@@ -1,5 +1,6 @@
 package io.github.sinri.keel.helper.encryption.aes;
 
+import javax.annotation.Nonnull;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.security.NoSuchAlgorithmException;
@@ -19,7 +20,7 @@ public interface KeelAes {
      */
     String ENCODING = "utf-8";
 
-    static KeelAes create(SupportedCipherAlgorithm cipherAlgorithm, String key) {
+    static @Nonnull KeelAes create(@Nonnull SupportedCipherAlgorithm cipherAlgorithm, @Nonnull String key) {
         Objects.requireNonNull(cipherAlgorithm);
         Objects.requireNonNull(key);
         switch (cipherAlgorithm) {
@@ -32,7 +33,7 @@ public interface KeelAes {
             case AesEcbPkcs7Padding:
                 return new KeelAesEcbPkcs7Padding(key);
         }
-        return null;
+        throw new IllegalArgumentException();
     }
 
     /**

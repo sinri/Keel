@@ -2,8 +2,9 @@ package io.github.sinri.keel.facade;
 
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -19,9 +20,17 @@ import java.util.*;
  */
 public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
 
-    private JsonObject data = new JsonObject();
+    private @Nonnull JsonObject data = new JsonObject();
 
     public KeelConfiguration() {
+    }
+
+    /**
+     * @param another
+     * @since 3.0.7
+     */
+    public KeelConfiguration(@Nonnull KeelConfiguration another) {
+        this(another.toJsonObject());
     }
 
     public KeelConfiguration(@Nonnull JsonObject jsonObject) {
@@ -32,7 +41,7 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
         this.data = KeelConfiguration.transformPropertiesToJsonObject(properties);
     }
 
-    static @Nonnull JsonObject transformPropertiesToJsonObject(Properties properties) {
+    static @Nonnull JsonObject transformPropertiesToJsonObject(@Nonnull Properties properties) {
         JsonObject jsonObject = new JsonObject();
 
         Set<String> plainKeySet = new HashSet<>();
@@ -41,51 +50,68 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
         for (var plainKey : plainKeySet) {
             String[] components = plainKey.split("\\.");
             List<Object> keychain = Arrays.asList(components);
-            KeelHelpers.jsonHelper()
-                    .writeIntoJsonObject(jsonObject, keychain, properties.getProperty(plainKey));
+            try {
+                KeelHelpers.jsonHelper().writeIntoJsonObject(jsonObject, keychain, properties.getProperty(plainKey));
+            } catch (Throwable throwable) {
+                KeelOutputEventLogCenter.instantLogger().exception(throwable, "io.github.sinri.keel.facade.KeelConfiguration.transformPropertiesToJsonObject Format Failed" + properties);
+
+            }
         }
         return jsonObject;
     }
 
-    static KeelConfiguration createFromPropertiesFile(String propertiesFileName) {
+    static @Nonnull KeelConfiguration createFromPropertiesFile(@Nonnull String propertiesFileName) {
         KeelConfiguration p = new KeelConfiguration();
         p.loadPropertiesFile(propertiesFileName);
         return p;
     }
 
-    static KeelConfiguration createFromProperties(Properties properties) {
+    static @Nonnull KeelConfiguration createFromProperties(@Nonnull Properties properties) {
         KeelConfiguration p = new KeelConfiguration();
         p.putAll(properties);
         return p;
     }
 
-    static KeelConfiguration createFromJsonObject(JsonObject jsonObject) {
+    static @Nonnull KeelConfiguration createFromJsonObject(@Nonnull JsonObject jsonObject) {
         KeelConfiguration p = new KeelConfiguration();
         p.putAll(jsonObject);
         return p;
     }
 
-    public KeelConfiguration putAll(KeelConfiguration keelConfiguration) {
+    public @Nonnull KeelConfiguration putAll(@Nonnull KeelConfiguration keelConfiguration) {
         return putAll(keelConfiguration.toJsonObject());
     }
 
-    public KeelConfiguration putAll(Properties properties) {
+    public @Nonnull KeelConfiguration putAll(@Nonnull Properties properties) {
         return putAll(KeelConfiguration.transformPropertiesToJsonObject(properties));
     }
 
-    public KeelConfiguration putAll(JsonObject jsonObject) {
+    public @Nonnull KeelConfiguration putAll(@Nonnull JsonObject jsonObject) {
         data.mergeIn(jsonObject);
         return this;
     }
 
     /**
+     * @since 3.0.10
+     */
+    public @Nonnull KeelConfiguration loadJsonObjectFile(@Nonnull String jsonObjectFileName) {
+        try {
+            byte[] bytes = KeelHelpers.fileHelper().readFileAsByteArray(jsonObjectFileName, true);
+            this.data = new JsonObject(Buffer.buffer(bytes));
+            return this;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * @since 3.0.1
      */
-    public KeelConfiguration loadPropertiesFile(String propertiesFileName) {
+    public @Nonnull KeelConfiguration loadPropertiesFile(@Nonnull String propertiesFileName) {
         return loadPropertiesFile(propertiesFileName, StandardCharsets.UTF_8);
     }
 
-    public KeelConfiguration loadPropertiesFile(String propertiesFileName, Charset charset) {
+    public @Nonnull KeelConfiguration loadPropertiesFile(@Nonnull String propertiesFileName, @Nonnull Charset charset) {
         Properties properties = new Properties();
         try {
             // here, the file named as `propertiesFileName` should be put along with JAR
@@ -105,7 +131,7 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
     /**
      * @since 3.0.6
      */
-    public KeelConfiguration loadPropertiesFileContent(String content) {
+    public @Nonnull KeelConfiguration loadPropertiesFileContent(@Nonnull String content) {
         Properties properties = new Properties();
         try {
             properties.load(new StringReader(content));
@@ -115,19 +141,9 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
         return putAll(properties);
     }
 
-    public KeelConfiguration extract(String... keychain) {
+    public @Nonnull KeelConfiguration extract(String... keychain) {
         JsonObject jsonObject = Objects.requireNonNullElse(readJsonObject(keychain), new JsonObject());
         return new KeelConfiguration(jsonObject);
-    }
-
-    /**
-     * @param dotJoinedKeyChain raw keychain in properties file, such as `a.b.c`
-     * @since 3.0.1
-     */
-    @Deprecated(since = "3.0.1")
-    public String fastRead(@NotNull String dotJoinedKeyChain) {
-        String[] split = dotJoinedKeyChain.split("\\.");
-        return readString(split);
     }
 
     public @Nullable Long readAsLong(String... keychain) {
@@ -149,12 +165,12 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
     }
 
     @Override
-    public @NotNull JsonObject toJsonObject() {
+    public @Nonnull JsonObject toJsonObject() {
         return this.data;
     }
 
     @Override
-    public @NotNull KeelConfiguration reloadDataFromJsonObject(JsonObject data) {
+    public @Nonnull KeelConfiguration reloadDataFromJsonObject(@Nonnull JsonObject data) {
         this.data = data;
         return this;
     }

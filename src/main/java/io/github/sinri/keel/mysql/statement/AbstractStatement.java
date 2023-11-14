@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * @since 1.7
  */
-abstract public class AbstractStatement {
+abstract public class AbstractStatement implements AnyStatement {
     protected static KeelEventLogger sqlAuditLogger = KeelEventLogger.silentLogger();
     protected static String SQL_COMPONENT_SEPARATOR = " ";//"\n";
     protected final String statement_uuid;
@@ -32,11 +32,6 @@ abstract public class AbstractStatement {
         SQL_COMPONENT_SEPARATOR = sqlComponentSeparator;
     }
 
-    /**
-     * @return The SQL Generated
-     */
-    public abstract String toString();
-
     protected String getRemarkAsComment() {
         return remarkAsComment;
     }
@@ -51,17 +46,12 @@ abstract public class AbstractStatement {
     }
 
     /**
-     * @param sql
-     * @return
      * @since 3.0.0
+     * @since 3.0.9 Moved to AnyStatement
      */
+    @Deprecated(since = "3.0.9")
     public static AbstractStatement buildWithRawSQL(String sql) {
-        return new AbstractStatement() {
-            @Override
-            public String toString() {
-                return sql;
-            }
-        };
+        return AnyStatement.raw(sql);
     }
 
     /**
@@ -73,6 +63,7 @@ abstract public class AbstractStatement {
      * @since 2.8 将整个运作体加入了try-catch，统一加入审计日志，出现异常时一律异步报错。
      * @since 3.0.0 removed try-catch
      */
+    @Override
     public final Future<ResultMatrix> execute(SqlConnection sqlConnection) {
         return Future.succeededFuture(this.toString())
                 .compose(sql -> {

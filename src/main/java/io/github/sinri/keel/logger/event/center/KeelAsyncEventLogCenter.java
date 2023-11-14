@@ -2,12 +2,14 @@ package io.github.sinri.keel.logger.event.center;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
 import io.github.sinri.keel.logger.event.adapter.KeelEventLoggerAdapter;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -17,13 +19,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @since 2.9.4 实验性设计
  */
 public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
-    private final KeelEventLoggerAdapter adapter;
-    private final Queue<KeelEventLog> queue;
+    private final @Nonnull KeelEventLoggerAdapter adapter;
+    private final @Nonnull Queue<KeelEventLog> queue;
     private final int bufferSize = 1000;
-    private final Promise<Void> closePromise;
+    private final @Nonnull Promise<Void> closePromise;
     private boolean toClose = false;
+    private KeelLogLevel visibleLogLevel = KeelLogLevel.INFO;
 
-    public KeelAsyncEventLogCenter(KeelEventLoggerAdapter adapter) {
+    public KeelAsyncEventLogCenter(@Nonnull KeelEventLoggerAdapter adapter) {
         this.queue = new ConcurrentLinkedQueue<>();
         this.adapter = adapter;
         this.closePromise = Promise.promise();
@@ -35,6 +38,7 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
         KeelAsyncKit.repeatedlyCall(routineResult -> {
                     return Future.succeededFuture()
                             .compose(v -> {
+                                // TODO: Now executeBlocking with promise is deprecated.
                                 return Keel.getVertx().executeBlocking(promise -> {
                                     List<KeelEventLog> buffer = new ArrayList<>();
                                     for (int i = 0; i < bufferSize; i++) {
@@ -62,7 +66,7 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
                             })
                             .compose(v -> {
                                 if (toClose) {
-                                    if (this.queue.size() == 0) {
+                                    if (this.queue.isEmpty()) {
                                         routineResult.stop();
                                     }
                                 }
@@ -74,19 +78,32 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
                 });
     }
 
+    @Nonnull
     public KeelEventLoggerAdapter getAdapter() {
         return adapter;
     }
 
+    @Nonnull
+    @Override
+    public KeelLogLevel getVisibleLevel() {
+        return visibleLogLevel;
+    }
 
     @Override
-    public void log(KeelEventLog eventLog) {
+    public void setVisibleLevel(@Nonnull KeelLogLevel level) {
+        this.visibleLogLevel = level;
+    }
+
+    @Override
+    public void log(@Nonnull KeelEventLog eventLog) {
         if (toClose) {
             System.out.println("[warning] " + getClass().getName() + " TO CLOSE, LOG WOULD NOT BE RECEIVED");
-            System.out.println(eventLog.toString());
+            System.out.println(eventLog);
             return;
         }
-        this.queue.add(eventLog);
+        if (eventLog.level().isEnoughSeriousAs(getVisibleLevel())) {
+            this.queue.add(eventLog);
+        }
     }
 
     @Override
@@ -95,6 +112,7 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
     }
 
     @Override
+    @Nonnull
     public Future<Void> gracefullyClose() {
         toClose = true;
         return this.closePromise.future().compose(v -> {

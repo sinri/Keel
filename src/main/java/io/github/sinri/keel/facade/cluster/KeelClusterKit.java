@@ -5,6 +5,7 @@ import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.spi.cluster.hazelcast.ConfigUtil;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
@@ -14,8 +15,8 @@ import java.util.List;
 public interface KeelClusterKit {
 
     static ClusterManager createClusterManagerForSAE(
-            String clusterName,
-            List<String> members,
+            @Nonnull String clusterName,
+            @Nonnull List<String> members,
             int port, int portCount
     ) {
         TcpIpConfig tcpIpConfig = new TcpIpConfig()

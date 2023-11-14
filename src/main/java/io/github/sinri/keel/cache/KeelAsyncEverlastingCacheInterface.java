@@ -3,6 +3,7 @@ package io.github.sinri.keel.cache;
 import io.github.sinri.keel.cache.impl.KeelCacheGimel;
 import io.vertx.core.Future;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Map;
 
@@ -23,15 +24,15 @@ public interface KeelAsyncEverlastingCacheInterface<K, V> {
     /**
      * Save the item to cache.
      */
-    Future<Void> save(K k, V v);
+    Future<Void> save(@Nonnull K k, V v);
 
-    Future<Void> save(Map<K, V> appendEntries);
+    Future<Void> save(@Nonnull Map<K, V> appendEntries);
 
     /**
      * @return cache value or null when not-existed
      * @since 2.9.4 return Future
      */
-    default Future<V> read(K k) {
+    default Future<V> read(@Nonnull K k) {
         return read(k, null);
     }
 
@@ -41,16 +42,16 @@ public interface KeelAsyncEverlastingCacheInterface<K, V> {
      * @return @return cache value or default when not-existed
      * @since 2.9.4 return Future
      */
-    Future<V> read(K k, V v);
+    Future<V> read(@Nonnull K k, V v);
 
     /**
      * Remove the cached item with key.
      *
      * @param key key
      */
-    Future<Void> remove(K key);
+    Future<Void> remove(@Nonnull K key);
 
-    Future<Void> remove(Collection<K> keys);
+    Future<Void> remove(@Nonnull Collection<K> keys);
 
     /**
      * Remove all the cached items.
@@ -62,11 +63,12 @@ public interface KeelAsyncEverlastingCacheInterface<K, V> {
      *
      * @param newEntries new map of entries
      */
-    Future<Void> replaceAll(Map<K, V> newEntries);
+    Future<Void> replaceAll(@Nonnull Map<K, V> newEntries);
 
     /**
      * @return ConcurrentMap K → V alive value only
      * @since 1.14
      */
+    @Nonnull
     Map<K, V> getSnapshotMap();
 }

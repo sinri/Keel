@@ -15,6 +15,9 @@ import java.util.function.Supplier;
  * @since 3.0.0
  */
 public class KeelFunnel extends KeelVerticleBase {
+    /**
+     * The interrupt, to stop sleeping when idle time ends (a new task comes).
+     */
     private final AtomicReference<Promise<Void>> interruptRef;
     private final Queue<Supplier<Future<Void>>> queue;
     private final AtomicLong sleepTimeRef;

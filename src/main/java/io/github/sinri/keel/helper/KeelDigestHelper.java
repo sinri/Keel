@@ -1,5 +1,6 @@
 package io.github.sinri.keel.helper;
 
+import javax.annotation.Nonnull;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -34,7 +35,8 @@ public class KeelDigestHelper {
      * @return md5 with lower digits
      * @since 1.1
      */
-    public String md5(String raw) {
+    @Nonnull
+    public String md5(@Nonnull String raw) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(raw.getBytes());
@@ -51,7 +53,8 @@ public class KeelDigestHelper {
      * @return MD5 with upper digits
      * @since 1.1
      */
-    public String MD5(String raw) {
+    @Nonnull
+    public String MD5(@Nonnull String raw) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(raw.getBytes());
@@ -64,7 +67,8 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    public String SHA1(String raw) {
+    @Nonnull
+    public String SHA1(@Nonnull String raw) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA");
             md.update(raw.getBytes());
@@ -77,7 +81,8 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    public String sha1(String raw) {
+    @Nonnull
+    public String sha1(@Nonnull String raw) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA");
             md.update(raw.getBytes());
@@ -90,12 +95,13 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    private byte[] compute_hmac_sha1(String raw, String key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+    @Nonnull
+    private byte[] compute_hmac_sha1(@Nonnull String raw, @Nonnull String key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         String MAC_NAME = "HmacSHA1";
         String ENCODING = "UTF-8";
 
         byte[] data = key.getBytes(ENCODING);
-        //根据给定的字节数组构造一个密钥,第二参数指定一个密钥算法的名称
+        //根据给定的字节数组构造一个密钥,第二个参数指定一个密钥算法的名称
         SecretKey secretKey = new SecretKeySpec(data, MAC_NAME);
         //生成一个指定 Mac 算法 的 Mac 对象
         Mac mac = Mac.getInstance(MAC_NAME);
@@ -110,7 +116,8 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    public String hmac_sha1_base64(String raw, String key) {
+    @Nonnull
+    public String hmac_sha1_base64(@Nonnull String raw, @Nonnull String key) {
         byte[] bytes;
         try {
             bytes = compute_hmac_sha1(raw, key);
@@ -123,7 +130,8 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    public String hmac_sha1_hex(String raw, String key) {
+    @Nonnull
+    public String hmac_sha1_hex(@Nonnull String raw, @Nonnull String key) {
         byte[] bytes;
         try {
             bytes = compute_hmac_sha1(raw, key);
@@ -136,7 +144,7 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    public String HMAC_SHA1_HEX(String raw, String key) {
+    public @Nonnull String HMAC_SHA1_HEX(@Nonnull String raw, @Nonnull String key) {
         byte[] bytes;
         try {
             bytes = compute_hmac_sha1(raw, key);
@@ -144,15 +152,5 @@ public class KeelDigestHelper {
             throw new RuntimeException(e);
         }
         return KeelHelpers.binaryHelper().encodeHexWithUpperDigits(bytes);
-    }
-
-    @Deprecated(since = "2.9.4")
-    public String php_password_hash(String password) {
-        return KeelHelpers.authenticationHelper().php_password_hash(password);
-    }
-
-    @Deprecated(since = "2.9.4")
-    public boolean php_password_verify(String password, String hash) {
-        return KeelHelpers.authenticationHelper().php_password_verify(password, hash);
     }
 }

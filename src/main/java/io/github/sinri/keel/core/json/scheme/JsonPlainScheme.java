@@ -1,7 +1,8 @@
 package io.github.sinri.keel.core.json.scheme;
 
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 public class JsonPlainScheme extends JsonValueScheme<Object> {
 
@@ -11,13 +12,13 @@ public class JsonPlainScheme extends JsonValueScheme<Object> {
     }
 
     @Override
-    public @NotNull JsonObject toJsonObject() {
+    public @Nonnull JsonObject toJsonObject() {
         return super.toJsonObject()
                 .put("scheme_type", getJsonElementSchemeType());
     }
 
     @Override
-    public @NotNull JsonPlainScheme reloadDataFromJsonObject(JsonObject jsonObject) {
+    public @Nonnull JsonPlainScheme reloadDataFromJsonObject(@Nonnull JsonObject jsonObject) {
         super.reloadDataFromJsonObject(jsonObject);
         return this;
     }

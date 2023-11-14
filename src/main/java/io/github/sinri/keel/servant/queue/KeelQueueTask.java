@@ -8,6 +8,11 @@ import io.vertx.core.Future;
  * @since 2.1
  */
 public abstract class KeelQueueTask extends KeelVerticleBase {
+    QueueWorkerPoolManager queueWorkerPoolManager;
+
+    final void setQueueWorkerPoolManager(QueueWorkerPoolManager queueWorkerPoolManager) {
+        this.queueWorkerPoolManager = queueWorkerPoolManager;
+    }
 
     abstract public String getTaskReference();
 
@@ -18,8 +23,11 @@ public abstract class KeelQueueTask extends KeelVerticleBase {
 
 
     /**
-     * 被设计在 seeker.get 方法中调用
+     * 被设计在 seeker.get 方法中调用。
+     *
+     * @since 3.0.9 实践中，这个设计因为太绕了，没怎么用上，不如灭了。
      */
+    @Deprecated(since = "3.0.9", forRemoval = true)
     public Future<Void> lockTaskBeforeDeployment() {
         // 如果需要就重载此方法
         return Future.succeededFuture();
@@ -28,8 +36,14 @@ public abstract class KeelQueueTask extends KeelVerticleBase {
     // as verticle
     public final void start() {
         setLogger(prepareLogger());
-        notifyAfterDeployed();
+
+        this.queueWorkerPoolManager.whenOneWorkerStarts();
+
         Future.succeededFuture()
+                .compose(v -> {
+                    notifyAfterDeployed();
+                    return Future.succeededFuture();
+                })
                 .compose(v -> run())
                 .recover(throwable -> {
                     getLogger().exception(throwable, "KeelQueueTask Caught throwable from Method run");
@@ -38,7 +52,9 @@ public abstract class KeelQueueTask extends KeelVerticleBase {
                 .eventually(v -> {
                     getLogger().info("KeelQueueTask to undeploy");
                     notifyBeforeUndeploy();
-                    return undeployMe();
+                    return undeployMe().onSuccess(done -> {
+                        this.queueWorkerPoolManager.whenOneWorkerEnds();
+                    });
                 });
     }
 

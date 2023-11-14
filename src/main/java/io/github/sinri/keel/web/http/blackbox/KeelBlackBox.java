@@ -16,7 +16,9 @@ import java.util.Date;
  *
  * @since 2.2
  * @since 3.0.0 TEST PASSED
+ * @since 3.0.10 As to read the local files is not a good thing.
  */
+@Deprecated(since = "3.0.10")
 public class KeelBlackBox {
 
     /**

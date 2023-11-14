@@ -2,6 +2,7 @@ package io.github.sinri.keel.cache.impl;
 
 import io.github.sinri.keel.cache.KeelCacheInterface;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -18,7 +19,7 @@ public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public void save(K key, V value, long lifeInSeconds) {
+    public void save(@Nonnull K key, V value, long lifeInSeconds) {
 
     }
 
@@ -28,12 +29,12 @@ public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public V read(K key, V fallbackValue) {
+    public V read(@Nonnull K key, V fallbackValue) {
         return fallbackValue;
     }
 
     @Override
-    public void remove(K key) {
+    public void remove(@Nonnull K key) {
 
     }
 

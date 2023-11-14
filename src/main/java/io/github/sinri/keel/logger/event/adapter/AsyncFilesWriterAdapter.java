@@ -6,6 +6,8 @@ import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -36,12 +38,13 @@ public class AsyncFilesWriterAdapter implements KeelEventLoggerAdapter {
 
 
     @Override
-    public void close(Promise<Void> promise) {
+    public void close(@Nonnull Promise<Void> promise) {
         promise.complete();
     }
 
+    @Nonnull
     @Override
-    public Future<Void> dealWithLogs(List<KeelEventLog> buffer) {
+    public Future<Void> dealWithLogs(@Nonnull List<KeelEventLog> buffer) {
         Map<String, List<KeelEventLog>> fileLogsMap = new HashMap<>();
 
         for (KeelEventLog eventLog : buffer) {
@@ -107,7 +110,8 @@ public class AsyncFilesWriterAdapter implements KeelEventLoggerAdapter {
     }
 
     @Override
-    public Object processThrowable(Throwable throwable) {
+    @Nullable
+    public Object processThrowable(@Nullable Throwable throwable) {
         return KeelHelpers.stringHelper().renderThrowableChain(throwable);
     }
 }

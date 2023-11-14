@@ -2,60 +2,46 @@ package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class KeelEventLogImpl implements KeelEventLog {
-    private JsonObject jsonObject;
+    private @Nonnull JsonObject jsonObject;
     private long timestamp;
-    private String topic;
-    private KeelLogLevel level;
+    private @Nonnull String topic;
+    private @Nonnull KeelLogLevel level;
 
-    public KeelEventLogImpl(KeelLogLevel level, String topic) {
+    public KeelEventLogImpl(@Nonnull KeelLogLevel level, @Nonnull String topic) {
         this.jsonObject = new JsonObject();
-        this.timestamp(System.currentTimeMillis());
-        this.level(level);
-        this.topic(topic);
+        this.timestamp = System.currentTimeMillis();
+        this.level = level;
+        this.topic = topic;
     }
 
-    @NotNull
+    @Nonnull
     @Override
     public JsonObject toJsonObject() {
         return jsonObject;
     }
 
-    @NotNull
+    @Nonnull
     @Override
-    public KeelEventLog reloadDataFromJsonObject(JsonObject jsonObject) {
+    public KeelEventLog reloadDataFromJsonObject(@Nonnull JsonObject jsonObject) {
         this.jsonObject = jsonObject;
         return this;
     }
 
-    @Override
-    @Deprecated
-    public KeelEventLog context(String key, Object value) {
-        JsonObject context = this.jsonObject.getJsonObject(KeelEventLog.RESERVED_KEY_CONTEXT);
-        if (context == null) {
-            context = new JsonObject();
-            this.jsonObject.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
-        }
-        context.put(key, value);
-        return this;
-    }
 
     @Override
-    @Deprecated
-    public Object context(String key) {
-        return this.readValue(KeelEventLog.RESERVED_KEY_CONTEXT, key);
-    }
-
-    @Override
-    public KeelEventLog put(String key, Object value) {
+    public KeelEventLog put(@Nonnull String key, @Nullable Object value) {
         this.jsonObject.put(key, value);
         return this;
     }
 
     @Override
-    public Object get(String key) {
+    @Nullable
+    public Object get(@Nonnull String key) {
         return this.jsonObject.getValue(key);
     }
 
@@ -71,13 +57,15 @@ public class KeelEventLogImpl implements KeelEventLog {
     }
 
     @Override
-    public KeelEventLog level(KeelLogLevel level) {
+    @Nullable
+    public KeelEventLog level(@Nonnull KeelLogLevel level) {
         this.level = level;
         return this;
         //return put(RESERVED_KEY_LEVEL, level.name());
     }
 
     @Override
+    @Nonnull
     public KeelLogLevel level() {
         return level;
         //return KeelLogLevel.valueOf(readString(RESERVED_KEY_LEVEL));
@@ -90,6 +78,7 @@ public class KeelEventLogImpl implements KeelEventLog {
     }
 
     @Override
+    @Nonnull
     public String topic() {
         return this.topic;
     }
@@ -100,6 +89,7 @@ public class KeelEventLogImpl implements KeelEventLog {
     }
 
     @Override
+    @Nullable
     public String message() {
         return readString(RESERVED_KEY_EVENT_MSG);
     }

@@ -10,8 +10,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.Promise;
 import io.vertx.mysqlclient.MySQLPool;
 import io.vertx.sqlclient.*;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -35,11 +35,9 @@ public class MySQLDataSource {
     }
 
     /**
-     * @param configuration
-     * @param connectionSetUpFunction
      * @since 3.0.2
      */
-    public MySQLDataSource(KeelMySQLConfiguration configuration, @NotNull Function<SqlConnection, Future<Void>> connectionSetUpFunction) {
+    public MySQLDataSource(KeelMySQLConfiguration configuration, @Nonnull Function<SqlConnection, Future<Void>> connectionSetUpFunction) {
         this.configuration = configuration;
         pool = MySQLPool.pool(
                 Keel.getVertx(),
@@ -77,7 +75,10 @@ public class MySQLDataSource {
         pool.getConnection(ar -> {
             if (ar.failed()) {
                 promise.fail(new KeelMySQLConnectionException(
-                        "MySQLDataSource Failed to get SqlConnection From Pool (available: " + connectionAvailableCounter.get() + "): " + ar.cause(),
+                        "MySQLDataSource Failed to get SqlConnection From Pool " +
+                                "`" + this.getConfiguration().getDataSourceName() + "` " +
+                                "(available: " + connectionAvailableCounter.get() + "): " +
+                                ar.cause(),
                         ar.cause()
                 ));
             } else {
@@ -293,7 +294,7 @@ public class MySQLDataSource {
             this.iteratorOverCursor = new IteratorOverCursor(cursor, batchSize);
         }
 
-        @NotNull
+        @Nonnull
         @Override
         public Iterator<Row> iterator() {
             return this.iteratorOverCursor;

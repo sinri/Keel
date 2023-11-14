@@ -3,6 +3,7 @@ package io.github.sinri.keel.redis;
 import io.github.sinri.keel.cache.KeelAsyncCacheInterface;
 import io.vertx.core.Future;
 
+import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -18,17 +19,17 @@ public class KeelAsyncCacheWithRedis implements KeelAsyncCacheInterface<String, 
     }
 
     @Override
-    public Future<Void> save(String key, String value, long lifeInSeconds) {
+    public Future<Void> save(@Nonnull String key, String value, long lifeInSeconds) {
         return this.redisKit.setScalarToKeyForSeconds(key, value, Math.toIntExact(lifeInSeconds));
     }
 
     @Override
-    public Future<String> read(String key) {
+    public Future<String> read(@Nonnull String key) {
         return this.redisKit.getString(key);
     }
 
     @Override
-    public Future<String> read(String key, String fallbackValue) {
+    public Future<String> read(@Nonnull String key, String fallbackValue) {
         return this.read(key).compose(s -> {
             return Future.succeededFuture(Objects.requireNonNullElse(s, fallbackValue));
         }, throwable -> {
@@ -37,7 +38,7 @@ public class KeelAsyncCacheWithRedis implements KeelAsyncCacheInterface<String, 
     }
 
     @Override
-    public Future<String> read(String key, Function<String, Future<String>> generator, long lifeInSeconds) {
+    public Future<String> read(@Nonnull String key, Function<String, Future<String>> generator, long lifeInSeconds) {
         return this.read(key).compose(s -> {
                     Objects.requireNonNull(s);
                     return Future.succeededFuture(s);
@@ -57,7 +58,7 @@ public class KeelAsyncCacheWithRedis implements KeelAsyncCacheInterface<String, 
     }
 
     @Override
-    public Future<Void> remove(String key) {
+    public Future<Void> remove(@Nonnull String key) {
         return redisKit.deleteKey(key).compose(x -> {
             return Future.succeededFuture();
         });

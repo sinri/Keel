@@ -5,7 +5,8 @@ import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
-import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nonnull;
 
 /**
  * 标准的队列服务实现。
@@ -15,6 +16,9 @@ import org.jetbrains.annotations.NotNull;
  * @since 2.1
  */
 public abstract class KeelQueue extends KeelVerticleBase {
+    private KeelQueueNextTaskSeeker nextTaskSeeker;
+    private QueueWorkerPoolManager queueWorkerPoolManager;
+    private SignalReader signalReader;
     private QueueStatus queueStatus = QueueStatus.INIT;
 
     public QueueStatus getQueueStatus() {
@@ -26,13 +30,27 @@ public abstract class KeelQueue extends KeelVerticleBase {
         return this;
     }
 
-
-    abstract protected KeelQueueNextTaskSeeker getNextTaskSeeker();
+    /**
+     * Create a new instance of QueueWorkerPoolManager when routine starts.
+     * By default, it uses an unlimited pool, this could be override if needed.
+     *
+     * @since 3.0.9
+     */
+    protected @Nonnull QueueWorkerPoolManager getQueueWorkerPoolManager() {
+        return new QueueWorkerPoolManager(0);
+    }
 
     /**
+     * Create a new instance of KeelQueueNextTaskSeeker when routine starts.
+     */
+    abstract protected @Nonnull KeelQueueNextTaskSeeker getNextTaskSeeker();
+
+    /**
+     * Create a new instance of SignalReader when routine starts.
+     *
      * @since 3.0.1
      */
-    abstract protected @NotNull SignalReader getSignalReader();
+    abstract protected @Nonnull SignalReader getSignalReader();
 
     public void start() {
         this.queueStatus = QueueStatus.RUNNING;
@@ -47,8 +65,9 @@ public abstract class KeelQueue extends KeelVerticleBase {
 
     protected final void routine() {
         getLogger().debug("KeelQueue::routine start");
-        var signalReader = getSignalReader();
-        KeelQueueNextTaskSeeker nextTaskSeeker = getNextTaskSeeker();
+        this.signalReader = getSignalReader();
+        this.queueWorkerPoolManager = getQueueWorkerPoolManager();
+        this.nextTaskSeeker = getNextTaskSeeker();
 
         Future.succeededFuture()
                 .compose(v -> {
@@ -92,6 +111,10 @@ public abstract class KeelQueue extends KeelVerticleBase {
         this.queueStatus = QueueStatus.RUNNING;
 
         return KeelAsyncKit.repeatedlyCall(routineResult -> {
+                    if (this.queueWorkerPoolManager.isBusy()) {
+                        return KeelAsyncKit.sleep(1_000L);
+                    }
+
                     return Future.succeededFuture()
                             .compose(v -> nextTaskSeeker.get())
                             .compose(task -> {
@@ -101,25 +124,30 @@ public abstract class KeelQueue extends KeelVerticleBase {
                                     // 通知 FutureUntil 结束
                                     routineResult.stop();
                                     return Future.succeededFuture();
-                                } else {
-                                    // 队列里找出来一个task, deploy it (至于能不能跑起来有没有锁就不管了)
-                                    getLogger().info("To run task: " + task.getTaskReference());
-                                    getLogger().info("Trusted that task is already locked by seeker: " + task.getTaskReference());
-                                    return Future.succeededFuture()
-                                            .compose(v -> task.deployMe(new DeploymentOptions().setWorker(true)))
-                                            .compose(
-                                                    deploymentID -> {
-                                                        getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);
-                                                        // 通知 FutureUntil 继续下一轮
-                                                        return Future.succeededFuture();
-                                                    },
-                                                    throwable -> {
-                                                        getLogger().exception(throwable, "CANNOT DEPLOY TASK [" + task.getTaskReference() + "] VERTICLE");
-                                                        // 通知 FutureUntil 继续下一轮
-                                                        return Future.succeededFuture();
-                                                    }
-                                            );
                                 }
+
+                                // 队列里找出来一个task, deploy it (至于能不能跑起来有没有锁就不管了)
+                                getLogger().info("To run task: " + task.getTaskReference());
+                                getLogger().info("Trusted that task is already locked by seeker: " + task.getTaskReference());
+
+                                // since 3.0.9
+                                task.setQueueWorkerPoolManager(this.queueWorkerPoolManager);
+
+                                return Future.succeededFuture()
+                                        .compose(v -> task.deployMe(new DeploymentOptions().setWorker(true)))
+                                        .compose(
+                                                deploymentID -> {
+                                                    getLogger().info("TASK [" + task.getTaskReference() + "] VERTICLE DEPLOYED: " + deploymentID);
+                                                    // 通知 FutureUntil 继续下一轮
+                                                    return Future.succeededFuture();
+                                                },
+                                                throwable -> {
+                                                    getLogger().exception(throwable, "CANNOT DEPLOY TASK [" + task.getTaskReference() + "] VERTICLE");
+                                                    // 通知 FutureUntil 继续下一轮
+                                                    return Future.succeededFuture();
+                                                }
+                                        );
+
                             });
                 })
                 .recover(throwable -> {
@@ -131,8 +159,6 @@ public abstract class KeelQueue extends KeelVerticleBase {
     @Override
     public void stop() {
         this.queueStatus = QueueStatus.STOPPED;
-
-//        Keel.unregisterDeployedKeelVerticle(this.deploymentID());
     }
 
     public enum QueueSignal {

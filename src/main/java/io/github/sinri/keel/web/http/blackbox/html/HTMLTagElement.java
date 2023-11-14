@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @since 2.2
  */
+@Deprecated(since = "3.0.10")
 public class HTMLTagElement {
     private final String tag;
     private final boolean paired;

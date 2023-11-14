@@ -5,6 +5,8 @@ import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -21,7 +23,7 @@ public class SingleFileWriterAdapter implements KeelEventLoggerAdapter {
     }
 
     @Override
-    public void close(Promise<Void> promise) {
+    public void close(@Nonnull Promise<Void> promise) {
         try {
             fileWriter.close();
             promise.complete();
@@ -33,7 +35,8 @@ public class SingleFileWriterAdapter implements KeelEventLoggerAdapter {
     }
 
     @Override
-    public Future<Void> dealWithLogs(List<KeelEventLog> buffer) {
+    @Nonnull
+    public Future<Void> dealWithLogs(@Nonnull List<KeelEventLog> buffer) {
         if (fileWriter != null) {
             buffer.forEach(eventLog -> {
                 try {
@@ -48,7 +51,8 @@ public class SingleFileWriterAdapter implements KeelEventLoggerAdapter {
     }
 
     @Override
-    public Object processThrowable(Throwable throwable) {
+    @Nullable
+    public Object processThrowable(@Nullable Throwable throwable) {
         return KeelHelpers.stringHelper().renderThrowableChain(throwable);
     }
 

@@ -20,4 +20,7 @@ abstract public class KeelVerticleBase extends AbstractVerticle implements KeelV
     final public void setLogger(@Nonnull KeelEventLogger logger) {
         this.logger = logger;
     }
+
+    @Override
+    abstract public void start() throws Exception;
 }

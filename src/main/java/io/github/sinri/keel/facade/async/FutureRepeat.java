@@ -4,6 +4,7 @@ import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
+import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 
@@ -13,11 +14,11 @@ import java.util.function.Function;
 public class FutureRepeat {
     private final Function<RoutineResult, Future<Void>> routineFunction;
 
-    private FutureRepeat(Function<RoutineResult, Future<Void>> routineFunction) {
+    private FutureRepeat(@Nonnull Function<RoutineResult, Future<Void>> routineFunction) {
         this.routineFunction = routineFunction;
     }
 
-    static Future<Void> call(Function<RoutineResult, Future<Void>> routineFunction) {
+    static Future<Void> call(@Nonnull Function<RoutineResult, Future<Void>> routineFunction) {
         Promise<Void> promise = Promise.promise();
         RoutineResult routineResult = new RoutineResult(false);
         new FutureRepeat(routineFunction).routine(routineResult, promise);

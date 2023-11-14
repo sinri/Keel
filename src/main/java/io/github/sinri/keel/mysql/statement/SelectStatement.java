@@ -6,8 +6,8 @@ import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.MySQLCondition;
 import io.github.sinri.keel.mysql.condition.RawCondition;
 import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -142,7 +142,7 @@ public class SelectStatement extends AbstractReadStatement {
         return this;
     }
 
-    public SelectStatement setLockMode(@NotNull String lockMode) {
+    public SelectStatement setLockMode(@Nonnull String lockMode) {
         Objects.requireNonNull(lockMode);
         this.lockMode = lockMode;
         return this;

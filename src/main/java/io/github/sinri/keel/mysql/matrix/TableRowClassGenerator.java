@@ -41,6 +41,10 @@ public class TableRowClassGenerator {
      */
     private boolean supportLooseEnum;
 
+    private boolean provideConstSchema = true;
+    private boolean provideConstTable = true;
+    private boolean provideConstSchemaAndTable = false;
+
     public TableRowClassGenerator(SqlConnection sqlConnection) {
         this.sqlConnection = sqlConnection;
         this.schema = null;
@@ -75,6 +79,36 @@ public class TableRowClassGenerator {
 
     public TableRowClassGenerator setSupportLooseEnum(boolean supportLooseEnum) {
         this.supportLooseEnum = supportLooseEnum;
+        return this;
+    }
+
+    /**
+     * @param provideConstSchema
+     * @return
+     * @since 3.0.10
+     */
+    public TableRowClassGenerator setProvideConstSchema(boolean provideConstSchema) {
+        this.provideConstSchema = provideConstSchema;
+        return this;
+    }
+
+    /**
+     * @param provideConstSchemaAndTable
+     * @return
+     * @since 3.0.10
+     */
+    public TableRowClassGenerator setProvideConstSchemaAndTable(boolean provideConstSchemaAndTable) {
+        this.provideConstSchemaAndTable = provideConstSchemaAndTable;
+        return this;
+    }
+
+    /**
+     * @param provideConstTable
+     * @return
+     * @since 3.0.10
+     */
+    public TableRowClassGenerator setProvideConstTable(boolean provideConstTable) {
+        this.provideConstTable = provideConstTable;
         return this;
     }
 
@@ -337,10 +371,17 @@ public class TableRowClassGenerator {
                             .append(" */\n")
                             .append("public class ").append(className).append(" extends AbstractTableRow {").append("\n");
                     if (this.schema != null && !this.schema.isEmpty() && !this.schema.isBlank()) {
-                        classContent.append("\tpublic static final String SCHEMA = \"").append(schema).append("\";\n");
+                        if (this.provideConstSchema) {
+                            classContent.append("\tpublic static final String SCHEMA = \"").append(schema).append("\";\n");
+                        }
+                        if (this.provideConstSchemaAndTable) {
+                            classContent.append("\tpublic static final String SCHEMA_AND_TABLE = \"").append(schema).append(".").append(table).append("\";\n");
+                        }
                     }
-                    classContent.append("\n")
-                            .append("\tpublic static final String TABLE = \"").append(table).append("\";\n")
+                    if (this.provideConstTable) {
+                        classContent.append("\tpublic static final String TABLE = \"").append(table).append("\";\n");
+                    }
+                    classContent
                             .append("\n")
                             .append("\t").append("public ").append(className).append("(JsonObject tableRow) {\n")
                             .append("\t\tsuper(tableRow);\n")
@@ -348,12 +389,12 @@ public class TableRowClassGenerator {
                             .append("\n")
                             .append("\t@Override\n")
                             .append("\tpublic String sourceTableName() {\n")
-                            .append("\t\treturn TABLE;\n")
+                            .append("\t\treturn ").append(this.provideConstTable ? "TABLE" : "\"" + table + "\"").append(";\n")
                             .append("\t}\n")
                             .append("\n");
                     if (this.schema != null) {
                         classContent.append("\tpublic String sourceSchemaName(){\n")
-                                .append("\t\treturn SCHEMA;\n")
+                                .append("\t\treturn ").append(this.provideConstSchema ? "SCHEMA" : "\"" + schema + "\"").append(";\n")
                                 .append("\t}\n");
                     }
 

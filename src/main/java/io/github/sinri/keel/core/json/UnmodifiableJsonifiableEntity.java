@@ -305,6 +305,7 @@ public interface UnmodifiableJsonifiableEntity extends Iterable<Map.Entry<String
     }
 
     @Override
+    @Nonnull
     default Iterator<Map.Entry<String, Object>> iterator() {
         return toJsonObject().iterator();
     }

@@ -4,6 +4,8 @@ import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -22,17 +24,19 @@ public final class SilentAdapter implements KeelEventLoggerAdapter {
     }
 
     @Override
-    public void close(Promise<Void> promise) {
+    public void close(@Nonnull Promise<Void> promise) {
         promise.complete();
     }
 
     @Override
-    public Future<Void> dealWithLogs(List<KeelEventLog> buffer) {
+    @Nonnull
+    public Future<Void> dealWithLogs(@Nonnull List<KeelEventLog> buffer) {
         return Future.succeededFuture();
     }
 
     @Override
-    public Object processThrowable(Throwable throwable) {
+    @Nullable
+    public Object processThrowable(@Nullable Throwable throwable) {
         return null;
     }
 }

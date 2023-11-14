@@ -1,8 +1,8 @@
 package io.github.sinri.keel.core.json;
 
 import io.vertx.core.json.JsonObject;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.Objects;
 
 /**
@@ -23,7 +23,7 @@ public class SimpleJsonifiableEntity implements JsonifiableEntity<SimpleJsonifia
     }
 
     @Override
-    public @NotNull JsonObject toJsonObject() {
+    public @Nonnull JsonObject toJsonObject() {
         return jsonObject;
     }
 
@@ -31,7 +31,7 @@ public class SimpleJsonifiableEntity implements JsonifiableEntity<SimpleJsonifia
      * @since 2.8 allow jsonObject as null (treated as empty json object)
      */
     @Override
-    public @NotNull SimpleJsonifiableEntity reloadDataFromJsonObject(JsonObject jsonObject) {
+    public @Nonnull SimpleJsonifiableEntity reloadDataFromJsonObject(@Nonnull JsonObject jsonObject) {
         // Objects.requireNonNull(jsonObject);
         this.jsonObject = Objects.requireNonNullElseGet(jsonObject, JsonObject::new);
         return this;

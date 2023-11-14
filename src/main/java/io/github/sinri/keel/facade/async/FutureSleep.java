@@ -4,6 +4,8 @@ import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
+import javax.annotation.Nullable;
+
 /**
  * 将延时执行转换成Future供compose使用。
  * Promise 真是个好东西！
@@ -19,7 +21,7 @@ public class FutureSleep {
         return call(time, null);
     }
 
-    static Future<Void> call(long time, Promise<Void> interrupter) {
+    static Future<Void> call(long time, @Nullable Promise<Void> interrupter) {
         Promise<Void> promise = Promise.promise();
         if (time < 1) time = 1;
         long timer_id = Keel.getVertx().setTimer(time, timerID -> {
