@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 /**
  * @since 3.0.10
  */
-@TechnicalPreview
+@TechnicalPreview(since = "3.0.10")
 public interface KeelLauncherAdapter extends VertxLifecycleHooks {
 
     /**

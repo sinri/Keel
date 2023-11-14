@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 /**
  * @since 3.0.10
  */
-@TechnicalPreview
+@TechnicalPreview(since = "3.0.10")
 public final class KeelLauncher extends Launcher {
 
     private final KeelLauncherAdapter adapter;

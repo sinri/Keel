@@ -145,10 +145,10 @@ public interface KeelAsyncKit {
     }
 
     /**
-     * @since 3.0.10 Technical Preview: instead of Vertx::executeBlocking(Handler<Promise<T>> blockingCodeHandler)
+     * @since 3.0.10 Technical Preview: instead of Vertx::executeBlocking(Handler&lt;Promise&lt;T&gt;&gt; blockingCodeHandler)
      */
     @Nonnull
-    @TechnicalPreview
+    @TechnicalPreview(since = "3.0.10", notice = "Replace Vertx::executeBlocking(Handler(Promise))")
     static <T> Future<T> executeBlocking(@Nonnull Handler<Promise<T>> blockingCodeHandler) {
         Promise<T> promise = Promise.promise();
         KeelVerticleBase verticle = new KeelVerticleBase() {

@@ -14,6 +14,7 @@ import java.lang.annotation.*;
         ElementType.ANNOTATION_TYPE, ElementType.TYPE_USE, ElementType.TYPE_PARAMETER
 })
 public @interface TechnicalPreview {
-    String since = "";
-    String notice = "";
+    String since() default "";
+
+    String notice() default "";
 }
