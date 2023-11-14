@@ -16,8 +16,6 @@ public class BlockingVerticlePlanB {
         KeelVerticleBase verticle = new KeelVerticleBase() {
             @Override
             public void start() throws Exception {
-                super.start();
-
                 this.setLogger(logger);
 
                 getLogger().info("in verticle " + deploymentID());

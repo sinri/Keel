@@ -81,7 +81,6 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
 
     @Override
     public void start() throws Exception {
-        super.start();
         this.setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
     }
 

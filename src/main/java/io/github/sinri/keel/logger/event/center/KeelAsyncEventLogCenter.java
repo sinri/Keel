@@ -2,6 +2,7 @@ package io.github.sinri.keel.logger.event.center;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
 import io.github.sinri.keel.logger.event.adapter.KeelEventLoggerAdapter;
@@ -23,6 +24,7 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
     private final int bufferSize = 1000;
     private final @Nonnull Promise<Void> closePromise;
     private boolean toClose = false;
+    private KeelLogLevel visibleLogLevel = KeelLogLevel.INFO;
 
     public KeelAsyncEventLogCenter(@Nonnull KeelEventLoggerAdapter adapter) {
         this.queue = new ConcurrentLinkedQueue<>();
@@ -81,6 +83,16 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
         return adapter;
     }
 
+    @Nonnull
+    @Override
+    public KeelLogLevel getVisibleLevel() {
+        return visibleLogLevel;
+    }
+
+    @Override
+    public void setVisibleLevel(@Nonnull KeelLogLevel level) {
+        this.visibleLogLevel = level;
+    }
 
     @Override
     public void log(@Nonnull KeelEventLog eventLog) {
@@ -89,7 +101,9 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
             System.out.println(eventLog);
             return;
         }
-        this.queue.add(eventLog);
+        if (eventLog.level().isEnoughSeriousAs(getVisibleLevel())) {
+            this.queue.add(eventLog);
+        }
     }
 
     @Override

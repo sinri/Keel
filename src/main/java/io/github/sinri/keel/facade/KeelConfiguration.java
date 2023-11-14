@@ -3,6 +3,7 @@ package io.github.sinri.keel.facade;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
@@ -88,6 +89,19 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
     public @Nonnull KeelConfiguration putAll(@Nonnull JsonObject jsonObject) {
         data.mergeIn(jsonObject);
         return this;
+    }
+
+    /**
+     * @since 3.0.10
+     */
+    public @Nonnull KeelConfiguration loadJsonObjectFile(@Nonnull String jsonObjectFileName) {
+        try {
+            byte[] bytes = KeelHelpers.fileHelper().readFileAsByteArray(jsonObjectFileName, true);
+            this.data = new JsonObject(Buffer.buffer(bytes));
+            return this;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

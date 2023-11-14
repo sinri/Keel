@@ -21,7 +21,6 @@ public abstract class KeelSundial extends KeelVerticleBase {
     @Override
 
     public void start() throws Exception {
-        super.start();
         setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
 
         long delaySeconds = 60 - (System.currentTimeMillis() / 1000) % 60;

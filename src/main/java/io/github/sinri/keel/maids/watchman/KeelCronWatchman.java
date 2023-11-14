@@ -3,7 +3,6 @@ package io.github.sinri.keel.maids.watchman;
 import io.github.sinri.keel.core.KeelCronExpression;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -96,7 +95,7 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
                                 HashSet<Object> toAddHashSet = new HashSet<>(newKeys);
                                 toAddHashSet.removeAll(oldKeys);
 
-                                return CompositeFuture.all(
+                                return Future.all(
                                         KeelAsyncKit.iterativelyCall(
                                                 toDeleteHashSet,
                                                 hash -> asyncMap.remove(String.valueOf(hash))

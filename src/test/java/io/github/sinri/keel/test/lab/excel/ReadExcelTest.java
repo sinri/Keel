@@ -26,8 +26,6 @@ public class ReadExcelTest extends KeelVerticleBase {
 
     @Override
     public void start() throws Exception {
-        super.start();
-
         Future.succeededFuture()
                 .compose(v -> {
                     return new KeelSpreadSheetReader("/Users/leqee/code/Keel/src/test/resources/excel/excel_1.xlsx")

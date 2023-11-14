@@ -15,14 +15,6 @@ import java.util.Objects;
 public interface KeelEventLog extends JsonifiableEntity<KeelEventLog> {
     String RESERVED_KEY_EVENT_MSG = "msg";
     String RESERVED_KEY_EVENT_EXCEPTION = "exception";
-    //    String RESERVED_KEY_TIMESTAMP = "timestamp";
-    String RESERVED_KEY_LEVEL = "level";
-//    String RESERVED_KEY_THREAD_ID = "thread_id";
-//    String RESERVED_KEY_CLUSTER_NODE_ID = "cluster_node_id";
-//    String RESERVED_KEY_CLUSTER_NODE_ADDRESS = "cluster_node_address";
-
-//    String RESERVED_KEY_TOPIC = "topic";
-
     static KeelEventLog create(@Nonnull KeelLogLevel level, @Nonnull String topic) {
         return new KeelEventLogImpl(level, topic);
     }

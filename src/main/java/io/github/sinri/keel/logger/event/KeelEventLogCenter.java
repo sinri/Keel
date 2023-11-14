@@ -1,5 +1,6 @@
 package io.github.sinri.keel.logger.event;
 
+import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -10,6 +11,19 @@ import javax.annotation.Nullable;
  * @since 2.9.4 实验性设计
  */
 public interface KeelEventLogCenter {
+
+    /**
+     * @return Logs of this level or higher are visible.
+     * @since 3.0.10
+     */
+    @Nonnull
+    KeelLogLevel getVisibleLevel();
+
+    /**
+     * @param level Logs of this level or higher are visible.
+     * @since 3.0.10
+     */
+    void setVisibleLevel(@Nonnull KeelLogLevel level);
 
     void log(@Nonnull KeelEventLog eventLog);
 
