@@ -32,6 +32,7 @@ public class TableRowClassGenerator {
 
     private final SqlConnection sqlConnection;
     private final Set<String> tableSet;
+    private final Set<String> excludedTableSet;
     private String schema;
     private boolean rewrite;
     /**
@@ -49,6 +50,7 @@ public class TableRowClassGenerator {
         this.sqlConnection = sqlConnection;
         this.schema = null;
         this.tableSet = new HashSet<>();
+        this.excludedTableSet = new HashSet<>();
         this.rewrite = false;
         this.supportLooseEnum = false;
     }
@@ -69,6 +71,14 @@ public class TableRowClassGenerator {
 
     public TableRowClassGenerator forTable(String table) {
         this.tableSet.add(table);
+        return this;
+    }
+
+    /**
+     * @since 3.0.11
+     */
+    public TableRowClassGenerator excludeTables(Collection<String> tables) {
+        this.excludedTableSet.addAll(tables);
         return this;
     }
 
@@ -143,6 +153,9 @@ public class TableRowClassGenerator {
             }
         } else {
             tables.addAll(this.tableSet);
+            if (!this.excludedTableSet.isEmpty()) {
+                tables.removeAll(this.excludedTableSet);
+            }
             return Future.succeededFuture(tables);
         }
     }
