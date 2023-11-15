@@ -65,14 +65,62 @@ public class KeelDigestHelper {
     }
 
     /**
+     * @param algorithm
+     * @param raw
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @since 3.0.11
+     */
+    public String digestToLower(@Nonnull String algorithm, @Nonnull String raw) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance(algorithm);
+        md.update(raw.getBytes());
+        return KeelHelpers.binaryHelper().encodeHexWithLowerDigits(md.digest());
+    }
+
+    /**
+     * @param algorithm
+     * @param raw
+     * @return
+     * @throws NoSuchAlgorithmException
+     * @since 3.0.11
+     */
+    public String digestToUpper(@Nonnull String algorithm, @Nonnull String raw) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance(algorithm);
+        md.update(raw.getBytes());
+        return KeelHelpers.binaryHelper().encodeHexWithUpperDigits(md.digest());
+    }
+
+    /**
+     * @since 3.0.11
+     */
+    @Nonnull
+    public String SHA512(@Nonnull String raw) {
+        try {
+            return digestToUpper("SHA-512", raw);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @since 3.0.11
+     */
+    @Nonnull
+    public String sha512(@Nonnull String raw) {
+        try {
+            return digestToLower("SHA-512", raw);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * @since 2.8
      */
     @Nonnull
     public String SHA1(@Nonnull String raw) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA");
-            md.update(raw.getBytes());
-            return KeelHelpers.binaryHelper().encodeHexWithUpperDigits(md.digest());
+            return digestToUpper("SHA", raw);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -84,9 +132,7 @@ public class KeelDigestHelper {
     @Nonnull
     public String sha1(@Nonnull String raw) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA");
-            md.update(raw.getBytes());
-            return KeelHelpers.binaryHelper().encodeHexWithLowerDigits(md.digest());
+            return digestToLower("SHA", raw);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
