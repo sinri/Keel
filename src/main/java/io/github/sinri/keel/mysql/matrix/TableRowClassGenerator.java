@@ -138,6 +138,9 @@ public class TableRowClassGenerator {
                                 String tableName = row.getString(0);
                                 tables.add(tableName);
                             });
+                            if (!this.excludedTableSet.isEmpty()) {
+                                tables.removeAll(this.excludedTableSet);
+                            }
                             return Future.succeededFuture(tables);
                         });
             } else {
@@ -148,6 +151,9 @@ public class TableRowClassGenerator {
                                 String tableName = row.getString(0);
                                 tables.add(tableName);
                             });
+                            if (!this.excludedTableSet.isEmpty()) {
+                                tables.removeAll(this.excludedTableSet);
+                            }
                             return Future.succeededFuture(tables);
                         });
             }
