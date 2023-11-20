@@ -26,12 +26,7 @@ public class MySQLDataSource {
     private final AtomicInteger connectionAvailableCounter = new AtomicInteger(0);
 
     public MySQLDataSource(KeelMySQLConfiguration configuration) {
-        this(configuration, new Function<SqlConnection, Future<Void>>() {
-            @Override
-            public Future<Void> apply(SqlConnection sqlConnection) {
-                return Future.succeededFuture();
-            }
-        });
+        this(configuration, sqlConnection -> Future.succeededFuture());
     }
 
     /**
