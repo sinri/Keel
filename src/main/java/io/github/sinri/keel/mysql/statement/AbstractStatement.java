@@ -6,6 +6,7 @@ import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @since 1.7
@@ -65,8 +66,10 @@ abstract public class AbstractStatement implements AnyStatement {
      */
     @Override
     public final Future<ResultMatrix> execute(SqlConnection sqlConnection) {
+        AtomicReference<String> theSql = new AtomicReference<>();
         return Future.succeededFuture(this.toString())
                 .compose(sql -> {
+                    theSql.set(sql);
                     getSqlAuditLogger().info(statement_uuid + " sql: " + sql);
                     return sqlConnection.preparedQuery(sql).execute()
                             .compose(rows -> {
@@ -75,14 +78,19 @@ abstract public class AbstractStatement implements AnyStatement {
                             });
                 })
                 .compose(resultMatrix -> {
-                    getSqlAuditLogger().info(
-                            event -> event.message(statement_uuid + " done")
-                                    .put("TotalAffectedRows", resultMatrix.getTotalAffectedRows())
-                                    .put("TotalFetchedRows", resultMatrix.getTotalFetchedRows())
+                    getSqlAuditLogger().info(event -> event
+                            .message(statement_uuid + " done")
+                            .put("TotalAffectedRows", resultMatrix.getTotalAffectedRows())
+                            .put("TotalFetchedRows", resultMatrix.getTotalFetchedRows())
+                            .put("sql", theSql.get())
                     );
                     return Future.succeededFuture(resultMatrix);
                 }, throwable -> {
-                    getSqlAuditLogger().exception(throwable, statement_uuid + " execute failed");
+                    getSqlAuditLogger().exception(throwable, log -> log
+                            .message("keel mysql statement execute failed")
+                            .put("statement_uuid", statement_uuid)
+                            .put("sql", theSql.get())
+                    );
                     return Future.failedFuture(throwable);
                 });
     }

@@ -1,5 +1,6 @@
 package io.github.sinri.keel.logger.event.logger;
 
+import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
@@ -16,6 +17,17 @@ public class KeelSilentEventLogger implements KeelEventLogger {
 
     public static KeelSilentEventLogger getInstance() {
         return instance;
+    }
+
+    @Nonnull
+    @Override
+    public KeelLogLevel getVisibleLevel() {
+        return KeelLogLevel.SILENT;
+    }
+
+    @Override
+    public void setVisibleLevel(@Nonnull KeelLogLevel level) {
+
     }
 
     @Override
