@@ -49,4 +49,9 @@ public class KeelMySQLDataSourceProvider {
         KeelMySQLConfiguration mySQLConfigure = new KeelMySQLConfiguration(dataSourceName, configuration);
         return new NamedMySQLDataSource<>(mySQLConfigure, sqlConnectionWrapper);
     }
+
+    @TechnicalPreview(since = "3.0.11")
+    public static NamedMySQLDataSource<DynamicNamedMySQLConnection> initializeDynamicNamedMySQLDataSource(@Nonnull String dataSourceName) {
+        return initializeNamedMySQLDataSource(dataSourceName, sqlConnection -> new DynamicNamedMySQLConnection(sqlConnection, dataSourceName));
+    }
 }
