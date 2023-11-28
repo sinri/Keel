@@ -5,10 +5,8 @@ import io.vertx.core.buffer.Buffer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -329,5 +327,29 @@ public class KeelStringHelper {
             blankParamGroups.add(patternForSpacedArgumentMatcher.group(group));
         }
         return blankParamGroups;
+    }
+
+    /**
+     * @since 3.0.11
+     */
+    private static final Map<String, String> HttpEntityEscapeDictionary = new LinkedHashMap<>();
+
+    static {
+        HttpEntityEscapeDictionary.put("&", "&amp;");
+        HttpEntityEscapeDictionary.put("@", "&commat;");
+        HttpEntityEscapeDictionary.put("<", "&lt;");
+        HttpEntityEscapeDictionary.put(">", "&gt;");
+    }
+
+    /**
+     * @see <a href="https://www.freeformatter.com/html-entities.html">HTTP Entities</a>
+     * @since 3.0.11
+     */
+    public String escapeForHttpEntity(String raw) {
+        AtomicReference<String> x = new AtomicReference<>(raw);
+        HttpEntityEscapeDictionary.forEach((k, v) -> {
+            x.set(x.get().replace(k, v));
+        });
+        return x.get();
     }
 }

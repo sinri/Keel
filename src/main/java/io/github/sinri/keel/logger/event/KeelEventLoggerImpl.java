@@ -1,5 +1,6 @@
 package io.github.sinri.keel.logger.event;
 
+import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
@@ -13,6 +14,8 @@ public class KeelEventLoggerImpl implements KeelEventLogger {
     private final String presetTopic;
 
     private @Nullable Handler<KeelEventLog> presetEventLogEditor = null;
+
+    private KeelLogLevel visibleLogLevel = KeelLogLevel.INFO;
 
     public KeelEventLoggerImpl(
             String presetTopic,
@@ -29,6 +32,17 @@ public class KeelEventLoggerImpl implements KeelEventLogger {
         this.presetTopic = presetTopic;
         this.eventLogCenterSupplier = eventLogCenterSupplier;
         this.presetEventLogEditor = presetEventLogEditor;
+    }
+
+    @Nonnull
+    @Override
+    public KeelLogLevel getVisibleLevel() {
+        return visibleLogLevel;
+    }
+
+    @Override
+    public void setVisibleLevel(@Nonnull KeelLogLevel level) {
+        this.visibleLogLevel = level;
     }
 
     @Override

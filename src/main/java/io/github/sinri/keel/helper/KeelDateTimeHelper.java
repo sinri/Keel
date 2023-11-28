@@ -1,5 +1,7 @@
 package io.github.sinri.keel.helper;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -145,5 +147,20 @@ public class KeelDateTimeHelper {
     public String toMySQLDatetime(LocalDateTime localDateTime, String formatPattern) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(formatPattern);
         return localDateTime.format(dateTimeFormatter);
+    }
+
+    /**
+     * @param dateStr   A string expressing date time.
+     * @param formatStr The format pattern. Consider to use provided pattern constants.
+     * @return Date instance.
+     * @since 3.0.11
+     */
+    public @Nullable Date parseExpressionToDateInstance(@Nonnull String dateStr, @Nonnull String formatStr) {
+        try {
+            SimpleDateFormat format = new SimpleDateFormat(formatStr);
+            return format.parse(dateStr);
+        } catch (Throwable e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 }

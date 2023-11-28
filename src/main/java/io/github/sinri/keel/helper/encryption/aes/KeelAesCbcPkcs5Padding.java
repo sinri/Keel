@@ -3,7 +3,6 @@ package io.github.sinri.keel.helper.encryption.aes;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -59,7 +58,7 @@ public class KeelAesCbcPkcs5Padding extends KeelAesUsingPkcs5Padding {
             byte[] encryptedMessageBytes = encryptionCipher.doFinal(source.getBytes(ENCODING));
             //System.out.println("encrypt output bytes: "+encryptedMessageBytes.length);
             return Base64.getEncoder().encodeToString(encryptedMessageBytes);
-        } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | UnsupportedEncodingException |
+        } catch (InvalidAlgorithmParameterException | NoSuchPaddingException |
                  IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
@@ -76,7 +75,7 @@ public class KeelAesCbcPkcs5Padding extends KeelAesUsingPkcs5Padding {
             decryptionCipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(keyBytes, KEY_ALGORITHM), parameterSpec);
             byte[] decryptedMessageBytes = decryptionCipher.doFinal(encryptedBase64);
             return new String(decryptedMessageBytes, ENCODING);
-        } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | UnsupportedEncodingException |
+        } catch (InvalidAlgorithmParameterException | NoSuchPaddingException |
                  IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }

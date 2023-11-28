@@ -18,6 +18,11 @@ public class TemplateArgumentMapping extends HashMap<String, TemplateArgument> {
         return this;
     }
 
+    /**
+     * @param argumentName
+     * @param numbers      Ensure not empty or use with bindLineCommentStarting
+     * @return
+     */
     public TemplateArgumentMapping bindNumbers(@Nonnull String argumentName, @Nonnull Collection<? extends Number> numbers) {
         this.put(argumentName, TemplateArgument.forNumbers(numbers));
         return this;
@@ -28,6 +33,11 @@ public class TemplateArgumentMapping extends HashMap<String, TemplateArgument> {
         return this;
     }
 
+    /**
+     * @param argumentName
+     * @param strings      Ensure not empty or use with bindLineCommentStarting
+     * @return
+     */
     public TemplateArgumentMapping bindStrings(@Nonnull String argumentName, @Nonnull Collection<String> strings) {
         this.put(argumentName, TemplateArgument.forStrings(strings));
         return this;
@@ -38,8 +48,21 @@ public class TemplateArgumentMapping extends HashMap<String, TemplateArgument> {
         return this;
     }
 
+    /**
+     * @param argumentName
+     * @param expressions  Ensure not empty or use with bindLineCommentStarting
+     * @return
+     */
     public TemplateArgumentMapping bindExpressions(@Nonnull String argumentName, @Nonnull Collection<String> expressions) {
         this.put(argumentName, TemplateArgument.forExpressions(expressions));
+        return this;
+    }
+
+    /**
+     * @since 3.0.11
+     */
+    public TemplateArgumentMapping bindLineCommentStarting(@Nonnull String argumentName, boolean commentFromHere) {
+        this.put(argumentName, TemplateArgument.forExpression((commentFromHere ? "-- " : " ")));
         return this;
     }
 }

@@ -1,12 +1,15 @@
 package io.github.sinri.keel.mysql;
 
+import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.KeelConfiguration;
+import io.vertx.sqlclient.SqlConnection;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public class KeelMySQLDataSourceProvider {
 
@@ -31,5 +34,24 @@ public class KeelMySQLDataSourceProvider {
     @Nonnull
     public static String defaultMySQLDataSourceName() {
         return Objects.requireNonNullElse(Keel.getConfiguration().readString("mysql", "default_data_source_name"), "default");
+    }
+
+    /**
+     * @since 3.0.11 Technical Preview
+     */
+    @TechnicalPreview(since = "3.0.11")
+    public static <C extends NamedMySQLConnection> NamedMySQLDataSource<C> initializeNamedMySQLDataSource(
+            @Nonnull String dataSourceName,
+            Function<SqlConnection, C> sqlConnectionWrapper
+    ) {
+        KeelConfiguration configuration = Keel.getConfiguration().extract("mysql", dataSourceName);
+        Objects.requireNonNull(configuration);
+        KeelMySQLConfiguration mySQLConfigure = new KeelMySQLConfiguration(dataSourceName, configuration);
+        return new NamedMySQLDataSource<>(mySQLConfigure, sqlConnectionWrapper);
+    }
+
+    @TechnicalPreview(since = "3.0.11")
+    public static NamedMySQLDataSource<DynamicNamedMySQLConnection> initializeDynamicNamedMySQLDataSource(@Nonnull String dataSourceName) {
+        return initializeNamedMySQLDataSource(dataSourceName, sqlConnection -> new DynamicNamedMySQLConnection(sqlConnection, dataSourceName));
     }
 }

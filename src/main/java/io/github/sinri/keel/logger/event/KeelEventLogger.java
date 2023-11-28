@@ -21,6 +21,19 @@ public interface KeelEventLogger {
     }
 
     /**
+     * @return Logs of this level or higher are visible.
+     * @since 3.0.11
+     */
+    @Nonnull
+    KeelLogLevel getVisibleLevel();
+
+    /**
+     * @param level Logs of this level or higher are visible.
+     * @since 3.0.11
+     */
+    void setVisibleLevel(@Nonnull KeelLogLevel level);
+
+    /**
      * Note: it is better to keep log center stable.
      */
     Supplier<KeelEventLogCenter> getEventLogCenterSupplier();
@@ -59,10 +72,12 @@ public interface KeelEventLogger {
             presetEventLogEditor.handle(eventLog);
         }
         eventLogHandler.handle(eventLog);
-        getEventLogCenterSupplier().get().log(eventLog);
 
-        // since 3.0.10, log to registered bypass loggers.
-        getBypassLoggers().forEach(bypassLogger -> bypassLogger.log(eventLogHandler));
+        if (eventLog.level().isEnoughSeriousAs(getVisibleLevel())) {
+            getEventLogCenterSupplier().get().log(eventLog);
+            // since 3.0.10, log to registered bypass loggers.
+            getBypassLoggers().forEach(bypassLogger -> bypassLogger.log(eventLogHandler));
+        }
     }
 
     default void debug(@Nonnull Handler<KeelEventLog> eventLogHandler) {

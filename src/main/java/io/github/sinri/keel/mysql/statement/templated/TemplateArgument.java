@@ -62,8 +62,13 @@ public class TemplateArgument {
         return new TemplateArgument(string);
     }
 
+    /**
+     * @param strings
+     * @return
+     * @since 3.0.11 the provided collection could be empty, leave the error to Database.
+     */
     public static TemplateArgument forExpressions(@Nonnull Collection<String> strings) {
-        if (strings.isEmpty()) throw new IllegalArgumentException();
+        // if (strings.isEmpty()) throw new IllegalArgumentException();
         return new TemplateArgument(strings);
     }
 

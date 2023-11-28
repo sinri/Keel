@@ -5,7 +5,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -63,7 +62,7 @@ public class KeelAesEcbPkcs7Padding extends KeelAesUsingPkcs7Padding {
             cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
             byte[] decrypted = cipher.doFinal(sourceBytes);
             return Base64.getEncoder().encodeToString(decrypted);
-        } catch (UnsupportedEncodingException | NoSuchPaddingException | IllegalBlockSizeException |
+        } catch (NoSuchPaddingException | IllegalBlockSizeException |
                  NoSuchAlgorithmException | BadPaddingException | NoSuchProviderException |
                  InvalidKeyException e) {
             throw new RuntimeException(e);
@@ -85,7 +84,7 @@ public class KeelAesEcbPkcs7Padding extends KeelAesUsingPkcs7Padding {
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] decoded = cipher.doFinal(sourceBytes);
             return new String(decoded, ENCODING);
-        } catch (UnsupportedEncodingException | NoSuchPaddingException | IllegalBlockSizeException |
+        } catch (NoSuchPaddingException | IllegalBlockSizeException |
                  NoSuchAlgorithmException | BadPaddingException | NoSuchProviderException |
                  InvalidKeyException e) {
             throw new RuntimeException(e);

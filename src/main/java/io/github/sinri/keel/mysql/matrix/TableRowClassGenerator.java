@@ -3,7 +3,6 @@ package io.github.sinri.keel.mysql.matrix;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
-import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.sqlclient.SqlConnection;
@@ -21,6 +20,7 @@ import java.util.regex.Pattern;
  * 为安全起见，默认不打开覆盖开关。
  *
  * @since 2.8
+ * @since 3.0.11 Escape the comment for JAVA API DOC.
  */
 public class TableRowClassGenerator {
 
@@ -32,6 +32,7 @@ public class TableRowClassGenerator {
 
     private final SqlConnection sqlConnection;
     private final Set<String> tableSet;
+    private final Set<String> excludedTableSet;
     private String schema;
     private boolean rewrite;
     /**
@@ -49,6 +50,7 @@ public class TableRowClassGenerator {
         this.sqlConnection = sqlConnection;
         this.schema = null;
         this.tableSet = new HashSet<>();
+        this.excludedTableSet = new HashSet<>();
         this.rewrite = false;
         this.supportLooseEnum = false;
     }
@@ -69,6 +71,14 @@ public class TableRowClassGenerator {
 
     public TableRowClassGenerator forTable(String table) {
         this.tableSet.add(table);
+        return this;
+    }
+
+    /**
+     * @since 3.0.11
+     */
+    public TableRowClassGenerator excludeTables(Collection<String> tables) {
+        this.excludedTableSet.addAll(tables);
         return this;
     }
 
@@ -128,6 +138,9 @@ public class TableRowClassGenerator {
                                 String tableName = row.getString(0);
                                 tables.add(tableName);
                             });
+                            if (!this.excludedTableSet.isEmpty()) {
+                                tables.removeAll(this.excludedTableSet);
+                            }
                             return Future.succeededFuture(tables);
                         });
             } else {
@@ -138,11 +151,17 @@ public class TableRowClassGenerator {
                                 String tableName = row.getString(0);
                                 tables.add(tableName);
                             });
+                            if (!this.excludedTableSet.isEmpty()) {
+                                tables.removeAll(this.excludedTableSet);
+                            }
                             return Future.succeededFuture(tables);
                         });
             }
         } else {
             tables.addAll(this.tableSet);
+            if (!this.excludedTableSet.isEmpty()) {
+                tables.removeAll(this.excludedTableSet);
+            }
             return Future.succeededFuture(tables);
         }
     }
@@ -257,7 +276,8 @@ public class TableRowClassGenerator {
         if (enum_name == null) {
             getter_string.append("\t/*\n");
             if (comment != null) {
-                getter_string.append("\t * ").append(comment).append("\n\t * \n");
+                String escapedComment = KeelHelpers.stringHelper().escapeForHttpEntity(comment);
+                getter_string.append("\t * ").append(escapedComment).append("\n\t * \n");
             }
             getter_string.append("\t * Field `").append(field).append("` of type `").append(type).append("`.\n")
                     .append("\t */\n")
@@ -306,6 +326,7 @@ public class TableRowClassGenerator {
                         if (comment == null || comment.isEmpty() || comment.isBlank()) {
                             comment = null;
                         }
+
                         getters.append(this.buildFieldGetter(field, type, comment)).append("\n");
                     });
                     return Future.succeededFuture();
@@ -333,7 +354,7 @@ public class TableRowClassGenerator {
     }
 
     private Future<String> generateClassCodeForOneTable(String schema, String table, String packageName, String className) {
-        return CompositeFuture.all(
+        return Future.all(
                         this.getCommentOfTable(table, schema),// comment of table
                         this.buildAllFieldGetters(table, schema), // getters
                         this.getCreationOfTable(table, schema)// creation
@@ -355,7 +376,8 @@ public class TableRowClassGenerator {
                     if (table_comment == null || table_comment.isEmpty() || table_comment.isBlank()) {
                         classContent.append(" * Table ").append(table).append(" has no table comment.\n");
                     } else {
-                        classContent.append(" * ").append(table_comment).append("\n");
+                        String escapedComment = KeelHelpers.stringHelper().escapeForHttpEntity(table_comment);
+                        classContent.append(" * ").append(escapedComment).append("\n");
                     }
                     classContent.append(" * (´^ω^`)\n");
                     if (schema != null && !schema.isEmpty() && !schema.isBlank()) {

@@ -1,5 +1,7 @@
 package io.github.sinri.keel.mysql.statement;
 
+import io.github.sinri.keel.core.TechnicalPreview;
+import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.github.sinri.keel.mysql.matrix.ResultRow;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
@@ -13,6 +15,34 @@ import java.util.function.Function;
  * @since 1.10
  */
 public abstract class AbstractReadStatement extends AbstractStatement {
+
+    @TechnicalPreview(since = "3.0.11")
+    public <T extends ResultRow> Future<T> queryForOneRow(NamedMySQLConnection namedMySQLConnection, Class<T> classT) {
+        return queryForOneRow(namedMySQLConnection.getSqlConnection(), classT);
+    }
+
+    @TechnicalPreview(since = "3.0.11")
+    public <T extends ResultRow> Future<List<T>> queryForRowList(NamedMySQLConnection namedMySQLConnection, Class<T> classT) {
+        return queryForRowList(namedMySQLConnection.getSqlConnection(), classT);
+    }
+
+    @TechnicalPreview(since = "3.0.11")
+    public <K, T extends ResultRow> Future<Map<K, List<T>>> queryForCategorizedMap(
+            NamedMySQLConnection namedMySQLConnection,
+            Class<T> classT,
+            Function<T, K> categoryGenerator
+    ) {
+        return queryForCategorizedMap(namedMySQLConnection.getSqlConnection(), classT, categoryGenerator);
+    }
+
+    @TechnicalPreview(since = "3.0.11")
+    public <K, T extends ResultRow> Future<Map<K, T>> queryForUniqueKeyBoundMap(
+            NamedMySQLConnection namedMySQLConnection,
+            Class<T> classT,
+            Function<T, K> uniqueKeyGenerator
+    ) {
+        return queryForUniqueKeyBoundMap(namedMySQLConnection.getSqlConnection(), classT, uniqueKeyGenerator);
+    }
 
     /**
      * @param sqlConnection SqlConnection
