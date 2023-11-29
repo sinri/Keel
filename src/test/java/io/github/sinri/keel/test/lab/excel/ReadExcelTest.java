@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class ReadExcelTest extends KeelVerticleBase {
+    static String file = "/Users/leqee/code/Keel/src/test/resources/excel/excel_1.xlsx";
     public static void main(String[] args) {
         Keel.initializeVertx(new VertxOptions())
                 .onSuccess(v -> {
@@ -28,7 +29,7 @@ public class ReadExcelTest extends KeelVerticleBase {
     public void start() throws Exception {
         Future.succeededFuture()
                 .compose(v -> {
-                    return new KeelSpreadSheetReader("/Users/leqee/code/Keel/src/test/resources/excel/excel_1.xlsx")
+                    return new KeelSpreadSheetReader(file)
                             .readEntireSheet(SheetReadOptions.forIndex(0));
                 })
                 .compose(spreadSheetMatrix -> {
