@@ -20,6 +20,12 @@ public class WriteHugeExcelTest extends KeelTest {
 
     @Nonnull
     @Override
+    protected KeelEventLogger logger() {
+        return logger;
+    }
+
+    @Nonnull
+    @Override
     protected Future<Void> starting() {
         this.logger = KeelOutputEventLogCenter.getInstance().createLogger(getClass().getSimpleName());
         return Future.succeededFuture();
