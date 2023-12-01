@@ -284,7 +284,7 @@ public class KeelStringHelper {
      */
     @Nonnull
     public String renderThrowableChain(@Nullable Throwable throwable) {
-        return renderThrowableChain(throwable, Set.of());
+        return renderThrowableChain(throwable, KeelRuntimeHelper.ignorableCallStackPackage);
     }
 
     /**

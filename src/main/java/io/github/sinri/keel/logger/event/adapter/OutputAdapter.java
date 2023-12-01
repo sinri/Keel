@@ -2,6 +2,7 @@ package io.github.sinri.keel.logger.event.adapter;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.helper.KeelRuntimeHelper;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -65,6 +66,6 @@ public class OutputAdapter implements KeelEventLoggerAdapter {
     @Override
     @Nullable
     public Object processThrowable(@Nullable Throwable throwable) {
-        return KeelHelpers.stringHelper().renderThrowableChain(throwable);
+        return KeelHelpers.stringHelper().renderThrowableChain(throwable, KeelRuntimeHelper.ignorableCallStackPackage);
     }
 }
