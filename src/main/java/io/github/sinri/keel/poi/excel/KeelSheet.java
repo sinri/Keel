@@ -194,6 +194,51 @@ public class KeelSheet {
         blockWriteAllRows(rowData, 0, 0);
     }
 
+    public void blockWriteMatrix(@Nonnull KeelSheetMatrix matrix) {
+        if (matrix.getHeaderRow().isEmpty()) {
+            blockWriteAllRows(matrix.getRawRowList(), 0, 0);
+        } else {
+            blockWriteAllRows(List.of(matrix.getHeaderRow()), 0, 0);
+            blockWriteAllRows(matrix.getRawRowList(), 1, 0);
+        }
+    }
+
+    public Future<Void> writeMatrix(@Nonnull KeelSheetMatrix matrix) {
+        AtomicInteger rowIndexRef = new AtomicInteger(0);
+        if (!matrix.getHeaderRow().isEmpty()) {
+            blockWriteAllRows(List.of(matrix.getHeaderRow()), 0, 0);
+            rowIndexRef.incrementAndGet();
+        }
+
+        return KeelAsyncKit.iterativelyBatchCall(matrix.getRawRowList().iterator(), rawRows -> {
+            blockWriteAllRows(matrix.getRawRowList(), rowIndexRef.get(), 0);
+            rowIndexRef.addAndGet(rawRows.size());
+            return Future.succeededFuture();
+        }, 1000);
+    }
+
+    public void blockWriteTemplatedMatrix(@Nonnull KeelSheetTemplatedMatrix templatedMatrix) {
+        AtomicInteger rowIndexRef = new AtomicInteger(0);
+        blockWriteAllRows(List.of(templatedMatrix.getTemplate().getColumnNames()), 0, 0);
+        rowIndexRef.incrementAndGet();
+        templatedMatrix.getRows().forEach(templatedRow -> {
+            blockWriteAllRows(List.of(templatedRow.getRawRow()), rowIndexRef.get(), 0);
+        });
+    }
+
+    public Future<Void> writeTemplatedMatrix(@Nonnull KeelSheetTemplatedMatrix templatedMatrix) {
+        AtomicInteger rowIndexRef = new AtomicInteger(0);
+        blockWriteAllRows(List.of(templatedMatrix.getTemplate().getColumnNames()), 0, 0);
+        rowIndexRef.incrementAndGet();
+
+        return KeelAsyncKit.iterativelyBatchCall(templatedMatrix.getRawRows().iterator(), rawRows -> {
+            blockWriteAllRows(rawRows, rowIndexRef.get(), 0);
+            rowIndexRef.addAndGet(rawRows.size());
+            return Future.succeededFuture();
+        }, 1000);
+    }
+
+
     private void writeToRow(Row row, List<String> rowDatum, int sinceCellIndex) {
         for (int cellIndex = 0; cellIndex < rowDatum.size(); cellIndex++) {
             var cellDatum = rowDatum.get(cellIndex);

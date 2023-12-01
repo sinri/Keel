@@ -1,9 +1,12 @@
 package io.github.sinri.keel.poi.excel.entity;
 
+import io.github.sinri.keel.core.TechnicalPreview;
+
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
+@TechnicalPreview(since = "3.0.13")
 public class KeelSheetTemplatedMatrixImpl implements KeelSheetTemplatedMatrix {
     private final KeelSheetMatrixRowTemplate template;
     private final List<List<String>> rawRows;
@@ -13,6 +16,11 @@ public class KeelSheetTemplatedMatrixImpl implements KeelSheetTemplatedMatrix {
         this.template = template;
         this.rawRows = new ArrayList<>();
 //        this.templatedRows = new ArrayList<>();
+    }
+
+    @Override
+    public List<List<String>> getRawRows() {
+        return rawRows;
     }
 
     @Override

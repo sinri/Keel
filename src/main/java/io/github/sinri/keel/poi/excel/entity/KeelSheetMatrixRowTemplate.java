@@ -1,12 +1,16 @@
 package io.github.sinri.keel.poi.excel.entity;
 
+import io.github.sinri.keel.core.TechnicalPreview;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
 /**
  * The columns definition of rows in a templated matrix.
+ *
  */
+@TechnicalPreview(since = "3.0.13")
 public interface KeelSheetMatrixRowTemplate {
     static KeelSheetMatrixRowTemplate create(@Nonnull List<String> headerRow) {
         return new KeelSheetMatrixRowTemplateImpl(headerRow);

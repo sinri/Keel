@@ -42,4 +42,12 @@ public class KeelSheetMatrix {
     public List<List<String>> getRawRowList() {
         return rows;
     }
+
+    public KeelSheetTemplatedMatrix transformToTemplatedMatrix() {
+        List<String> x = getHeaderRow();
+        if (x.isEmpty()) throw new RuntimeException("Columns not defined");
+        KeelSheetTemplatedMatrix templatedMatrix = KeelSheetTemplatedMatrix.create(KeelSheetMatrixRowTemplate.create(x));
+        templatedMatrix.addRawRows(getRawRowList());
+        return templatedMatrix;
+    }
 }

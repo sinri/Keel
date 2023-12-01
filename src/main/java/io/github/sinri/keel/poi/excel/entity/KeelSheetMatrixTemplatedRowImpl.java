@@ -1,11 +1,13 @@
 package io.github.sinri.keel.poi.excel.entity;
 
+import io.github.sinri.keel.core.TechnicalPreview;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
+@TechnicalPreview(since = "3.0.13")
 public class KeelSheetMatrixTemplatedRowImpl implements KeelSheetMatrixTemplatedRow {
     private final KeelSheetMatrixRowTemplate template;
     private final List<String> rawRow;
@@ -29,6 +31,11 @@ public class KeelSheetMatrixTemplatedRowImpl implements KeelSheetMatrixTemplated
     public String getColumnValue(String name) {
         Integer columnIndex = getTemplate().getColumnIndex(name);
         return this.rawRow.get(Objects.requireNonNull(columnIndex));
+    }
+
+    @Override
+    public List<String> getRawRow() {
+        return getRawRow();
     }
 
     @Override
