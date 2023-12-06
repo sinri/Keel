@@ -1,10 +1,14 @@
 package io.github.sinri.keel.tesuto;
 
+/**
+ * @since 3.0.14 add skip.
+ */
 public class TestUnitResult {
     private final String testName;
     private Long spentTime;
     private Boolean done;
     private Throwable cause;
+    private Boolean skipped;
 
     public TestUnitResult(String name) {
         this.testName = name;
@@ -17,6 +21,11 @@ public class TestUnitResult {
     public void declareFailed(Throwable cause) {
         this.done = false;
         this.cause = cause;
+        this.skipped = false;
+    }
+
+    public void declareSkipped() {
+        this.skipped = true;
     }
 
     public String getTestName() {
@@ -32,12 +41,20 @@ public class TestUnitResult {
         return this;
     }
 
-    public Boolean isFailed() {
-        return !done;
+    public boolean isDone() {
+        return done != null && done;
+    }
+
+    public boolean isFailed() {
+        return done != null && !done;
     }
 
 
     public Throwable getCause() {
         return cause;
+    }
+
+    public boolean isSkipped() {
+        return skipped != null && skipped;
     }
 }

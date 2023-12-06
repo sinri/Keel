@@ -10,6 +10,9 @@ import io.vertx.core.Promise;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -34,6 +37,50 @@ public interface KeelAsyncKit {
      */
     static <T> Future<Void> iterativelyCall(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
         return FutureForEach.call(collection, itemProcessor);
+    }
+
+    /**
+     * @since 3.0.13
+     */
+    static <T> Future<Void> iterativelyCall(@Nonnull Iterator<T> iterator, @Nonnull Function<T, Future<Void>> itemProcessor) {
+        return repeatedlyCall(routineResult -> {
+            if (iterator.hasNext()) {
+                T t = iterator.next();
+                return itemProcessor.apply(t);
+            } else {
+                routineResult.stop();
+                return Future.succeededFuture();
+            }
+        });
+    }
+
+    /**
+     * @since 3.0.13
+     */
+    static <T> Future<Void> iterativelyBatchCall(@Nonnull Iterator<T> iterator, @Nonnull Function<List<T>, Future<Void>> itemsProcessor, int batchSize) {
+        if (batchSize < 1) throw new IllegalArgumentException("BATCH SIZE IS AT LEAST 1.");
+        return repeatedlyCall(routineResult -> {
+            List<T> buffer = new ArrayList<>();
+            boolean hasNext = iterator.hasNext();
+            while (hasNext) {
+                T t = iterator.next();
+                buffer.add(t);
+                hasNext = iterator.hasNext();
+
+                if (!hasNext) {
+                    routineResult.stop();
+                }
+
+                if (buffer.size() >= batchSize) {
+                    break;
+                }
+            }
+            if (!buffer.isEmpty()) {
+                return itemsProcessor.apply(buffer);
+            } else {
+                return Future.succeededFuture();
+            }
+        });
     }
 
     /**

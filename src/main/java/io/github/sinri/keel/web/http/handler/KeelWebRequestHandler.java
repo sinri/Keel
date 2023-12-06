@@ -15,6 +15,7 @@ import io.vertx.ext.web.RoutingContext;
  * @since 2.9.2 Remove Property `RoutingContext`.
  * @since 3.0.0 TEST PASSED
  */
+@Deprecated(since = "3.0.12")
 abstract public class KeelWebRequestHandler implements Handler<RoutingContext> {
     protected static final String KEEL_REQUEST_LOGGER = "KEEL_REQUEST_LOGGER";
 

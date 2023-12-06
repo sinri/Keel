@@ -18,6 +18,9 @@ import java.util.concurrent.atomic.AtomicReference;
 abstract public class KeelIntravenousBase<T> extends KeelVerticleBase {
     private final Queue<T> queue;
     private final AtomicReference<Promise<Void>> interruptRef;
+    protected long sleepTime = 1_000L;
+    protected int batchSize = 1;
+    private boolean queueAcceptTask = false;
 
     public KeelIntravenousBase() {
         this.queue = new ConcurrentLinkedQueue<>();
@@ -26,13 +29,11 @@ abstract public class KeelIntravenousBase<T> extends KeelVerticleBase {
 
     abstract protected Future<Void> process(List<T> list);
 
-    private int getConfiguredBatchSize() {
-        var x = config().getInteger("batch_size", 1);
-        if (x < 1) x = 1;
-        return x;
-    }
-
     public void add(T t) {
+        if (!queueAcceptTask) {
+            throw new IllegalStateException("shutdown declared");
+        }
+
         queue.add(t);
         Promise<Void> currentInterrupt = getCurrentInterrupt();
         if (currentInterrupt != null) {
@@ -46,7 +47,9 @@ abstract public class KeelIntravenousBase<T> extends KeelVerticleBase {
 
     @Override
     public void start() throws Exception {
-        int configuredBatchSize = getConfiguredBatchSize();
+        queueAcceptTask = true;
+
+        int configuredBatchSize = getBatchSize();
         KeelAsyncKit.endless(promise -> {
             this.interruptRef.set(null);
 
@@ -90,7 +93,39 @@ abstract public class KeelIntravenousBase<T> extends KeelVerticleBase {
         });
     }
 
+    protected int getBatchSize() {
+        return batchSize;
+    }
+
     protected long sleptTime() {
-        return 1_000L;
+        return sleepTime;
+    }
+
+    /**
+     * @since 3.0.12
+     */
+    public void declareShutdown() {
+        // declare shutdown, to avoid new tasks coming.
+        this.queueAcceptTask = false;
+    }
+
+    /**
+     * @return Async result is done after this intravenous instance undeploy.
+     * @since 3.0.12
+     */
+    public Future<Void> shutdown() {
+        declareShutdown();
+        // waiting for the queue clear
+        return KeelAsyncKit.repeatedlyCall(routineResult -> {
+                    if (this.queue.isEmpty()) {
+                        routineResult.stop();
+                        return Future.succeededFuture();
+                    } else {
+                        return KeelAsyncKit.sleep(100L);
+                    }
+                })
+                .compose(allTasksInQueueIsConsumed -> {
+                    return this.undeployMe();
+                });
     }
 }

@@ -96,21 +96,43 @@ public class KeelStringHelper {
 
 
     /**
-     * @since 2.7
+     * Make `apple_pie` to `ApplePie` or `applePie`.
+     *
+     * @since 3.0.12
      */
     @Nullable
-    public String fromUnderScoreCaseToCamelCase(@Nullable String underScoreCase) {
+    public String fromUnderScoreCaseToCamelCase(@Nullable String underScoreCase, boolean firstCharLower) {
         if (underScoreCase == null) {
             return null;
         }
+        if (underScoreCase.isEmpty()) {
+            return "";
+        }
         String[] parts = underScoreCase.toLowerCase().split("[\\s_]");
         List<String> camel = new ArrayList<>();
+
+        boolean isFirst = true;
         for (var part : parts) {
             if (part != null && !part.isEmpty() && !part.isBlank()) {
-                camel.add(part.substring(0, 1).toUpperCase() + part.substring(1));
+                if (isFirst && firstCharLower) {
+                    camel.add(part);
+                    isFirst = false;
+                } else {
+                    camel.add(part.substring(0, 1).toUpperCase() + part.substring(1));
+                }
             }
         }
+
         return KeelHelpers.stringHelper().joinStringArray(camel, "");
+    }
+
+    /**
+     * Make `apple_pie` to `ApplePie`.
+     *
+     * @since 2.7
+     */
+    public String fromUnderScoreCaseToCamelCase(@Nullable String underScoreCase) {
+        return fromUnderScoreCaseToCamelCase(underScoreCase, false);
     }
 
     /**
@@ -262,7 +284,7 @@ public class KeelStringHelper {
      */
     @Nonnull
     public String renderThrowableChain(@Nullable Throwable throwable) {
-        return renderThrowableChain(throwable, Set.of());
+        return renderThrowableChain(throwable, KeelRuntimeHelper.ignorableCallStackPackage);
     }
 
     /**

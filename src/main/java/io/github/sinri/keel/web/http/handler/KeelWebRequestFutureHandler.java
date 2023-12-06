@@ -7,6 +7,7 @@ import io.vertx.ext.web.RoutingContext;
  * @since 2.9
  * @since 3.0.0 TEST PASSED
  */
+@Deprecated(since = "3.0.12")
 public abstract class KeelWebRequestFutureHandler extends KeelWebRequestHandler {
 
 

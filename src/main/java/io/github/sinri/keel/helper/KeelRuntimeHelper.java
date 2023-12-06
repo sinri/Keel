@@ -13,12 +13,26 @@ import javax.annotation.Nonnull;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @since 2.9.3
  */
 public class KeelRuntimeHelper {
     private static final KeelRuntimeHelper instance = new KeelRuntimeHelper();
+
+    public static final Set<String> ignorableCallStackPackage;
+
+    static {
+        ignorableCallStackPackage = Set.of(
+                "io.github.sinri.keel.facade.async.",
+                "io.github.sinri.keel.tesuto.",
+                "io.vertx.core.",
+                "io.netty.",
+                "java.lang.",
+                "jdk.internal."
+        );
+    }
 
     private KeelRuntimeHelper() {
 

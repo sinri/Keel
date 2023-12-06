@@ -69,28 +69,29 @@ public abstract class KeelWebReceptionist {
         }
     }
 
+    /**
+     * @since 3.0.12 add request_id to output json object
+     */
     protected void respondOnSuccess(Object data) {
         JsonObject resp = new JsonObject()
+                .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                 .put("code", "OK")
                 .put("data", data);
-        logger.info(event -> event
-                        .message("RESPOND SUCCESS")
-                //.put("request_id", readRequestID())
-                //.put("response", resp)
-        );
+        logger.info(event -> event.message("RESPOND SUCCESS"));
         respondWithJsonObject(resp);
     }
 
+    /**
+     * @since 3.0.12 add request_id to output json object
+     */
     protected void respondOnFailure(Throwable throwable) {
         var resp = new JsonObject()
+                .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
         String error = KeelHelpers.stringHelper().renderThrowableChain(throwable);
         resp.put("throwable", error);
-        logger.exception(throwable, event -> event
-                        .message("RESPOND FAILURE")
-                //.put("request_id", readRequestID())
-        );
+        logger.exception(throwable, event -> event.message("RESPOND FAILURE"));
         respondWithJsonObject(resp);
     }
 
@@ -110,7 +111,6 @@ public abstract class KeelWebReceptionist {
 
     public List<String> readRequestIPChain() {
         return KeelHelpers.netHelper().parseWebClientIPChain(routingContext);
-//        return routingContext.get(KeelPlatformHandler.KEEL_REQUEST_CLIENT_IP_CHAIN);
     }
 
     public User readRequestUser() {

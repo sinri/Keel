@@ -24,6 +24,7 @@ import java.util.Set;
  * @since 2.9
  * @since 3.0.0 TEST PASSED
  */
+@Deprecated(since = "3.0.12")
 public class KeelWebRequestRouteKit<S extends KeelWebRequestHandler> {
     private final Router router;
     private final Class<S> classOfService;

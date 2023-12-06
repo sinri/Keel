@@ -48,7 +48,7 @@ abstract public class KeelTest {
             if (!method.getReturnType().isAssignableFrom(Future.class)) {
                 continue;
             }
-            testUnits.add(new TestUnitWrapper(method));
+            testUnits.add(new TestUnitWrapper(method, annotation));
         }
 
         if (testUnits.isEmpty()) {
@@ -78,16 +78,22 @@ abstract public class KeelTest {
                                         });
                             })
                             .onComplete(vv -> {
+                                AtomicInteger totalNonSkippedRef = new AtomicInteger(0);
                                 testUnitResults.forEach(testUnitResult -> {
-                                    if (!testUnitResult.isFailed()) {
-                                        totalPassedRef.incrementAndGet();
-                                        logger.info("○\tUNIT [" + testUnitResult.getTestName() + "] PASSED. Spent " + testUnitResult.getSpentTime() + " ms;");
+                                    if (testUnitResult.isSkipped()) {
+                                        logger.info("☐\tUNIT [" + testUnitResult.getTestName() + "] SKIPPED. Spent " + testUnitResult.getSpentTime() + " ms;");
                                     } else {
-                                        logger.error("×\tUNIT [" + testUnitResult.getTestName() + "] FAILED. Spent " + testUnitResult.getSpentTime() + " ms;");
-                                        logger.exception(testUnitResult.getCause());
+                                        totalNonSkippedRef.incrementAndGet();
+                                        if (!testUnitResult.isFailed()) {
+                                            totalPassedRef.incrementAndGet();
+                                            logger.info("☑︎\tUNIT [" + testUnitResult.getTestName() + "] PASSED. Spent " + testUnitResult.getSpentTime() + " ms;");
+                                        } else {
+                                            logger.error("☒\tUNIT [" + testUnitResult.getTestName() + "] FAILED. Spent " + testUnitResult.getSpentTime() + " ms;");
+                                            logger.exception(testUnitResult.getCause());
+                                        }
                                     }
                                 });
-                                logger.notice("PASSED RATE: " + totalPassedRef.get() + " / " + testUnits.size() + " i.e. " + (100.0 * totalPassedRef.get() / testUnits.size()) + "%");
+                                logger.notice("PASSED RATE: " + totalPassedRef.get() + " / " + totalNonSkippedRef.get() + " i.e. " + (100.0 * totalPassedRef.get() / totalNonSkippedRef.get()) + "%");
                             });
                 })
                 .onFailure(throwable -> {

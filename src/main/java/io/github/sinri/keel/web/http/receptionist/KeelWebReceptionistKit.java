@@ -88,9 +88,9 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
             }
         }
 
-        if (apiMeta.virtualHost() != null && !apiMeta.virtualHost().equals("")) {
+        if (apiMeta.virtualHost() != null && !apiMeta.virtualHost().isEmpty()) {
             route.virtualHost(apiMeta.virtualHost());
-        } else if (this.virtualHost != null && !this.virtualHost.equals("")) {
+        } else if (this.virtualHost != null && !this.virtualHost.isEmpty()) {
             route.virtualHost(this.virtualHost);
         }
 
