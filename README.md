@@ -10,7 +10,7 @@ A Java framework with VERT.X eco, for projects for web, job and more.
 <dependency>
     <groupId>io.github.sinri</groupId>
     <artifactId>Keel</artifactId>
-  <version>3.0.11</version>
+  <version>3.0.14</version>
 </dependency>
 ```
 
@@ -24,8 +24,8 @@ A Java framework with VERT.X eco, for projects for web, job and more.
 * [com.warrenstrange:googleauth](https://github.com/wstrange/GoogleAuth) ![GitHub](https://img.shields.io/github/license/wstrange/GoogleAuth)
 * [com.github.oshi:oshi-core](https://github.com/oshi/oshi) ![GitHub](https://img.shields.io/github/license/oshi/oshi)
   6.4.0
-* [com.alibaba:easyexcel](https://github.com/alibaba/easyexcel) ![GitHub](https://img.shields.io/github/license/alibaba/easyexcel)
-  3.3.2
+* [org.apache.poi:poi](https://github.com/apache/poi) ![GitHub](https://img.shields.io/github/license/apache/poi)
+  5.2.5
 
 ## Dry Dock of Keel
 
