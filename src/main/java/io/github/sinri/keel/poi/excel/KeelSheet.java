@@ -12,9 +12,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -47,7 +49,12 @@ public class KeelSheet {
         return getSheet().rowIterator();
     }
 
-    private static String dumpCellToString(Cell cell) {
+    /**
+     * @since 3.0.14 add nullable to cell, and nonnull to return.
+     */
+    @Nonnull
+    private static String dumpCellToString(@Nullable Cell cell) {
+        if (cell == null) return "";
         CellType cellType = cell.getCellType();
         String s;
         if (cellType == CellType.NUMERIC) {
@@ -56,14 +63,14 @@ public class KeelSheet {
         } else {
             s = cell.getStringCellValue();
         }
-        return s;
+        return Objects.requireNonNull(s);
     }
 
-    private static List<String> dumpRowToRawRow(Row row, int maxColumns) {
+    private static List<String> dumpRowToRawRow(@Nonnull Row row, int maxColumns) {
         List<String> rowDatum = new ArrayList<>();
 
         for (int i = 0; i < maxColumns; i++) {
-            var cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
+            @Nullable Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
             String s = dumpCellToString(cell);
             rowDatum.add(s);
         }
