@@ -3,6 +3,7 @@ package io.github.sinri.keel.mysql.matrix;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
+import io.github.sinri.keel.mysql.dev.TableRowClassSourceCodeGenerator;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.sqlclient.SqlConnection;
@@ -19,15 +20,20 @@ import java.util.regex.Pattern;
  * 用于快速根据数据库中的表结构生成AbstractTableRow的实现类的代码生成工具。
  * 为安全起见，默认不打开覆盖开关。
  *
+ * @see TableRowClassSourceCodeGenerator
  * @since 2.8
  * @since 3.0.11 Escape the comment for JAVA API DOC.
+ * @deprecated since 3.0.16, use io.github.sinri.keel.mysql.dev.TableRowClassSourceCodeGenerator instead.
  */
+@Deprecated(since = "3.0.16")
 public class TableRowClassGenerator {
 
     private static final Pattern patternForLooseEnum;
+    private static final Pattern patternForStrictEnum;
 
     static {
         patternForLooseEnum = Pattern.compile("Enum\\{([A-Za-z0-9_, ]+)}");
+        patternForStrictEnum = Pattern.compile("Enum<([A-Za-z0-9_.]+)>");
     }
 
     private final SqlConnection sqlConnection;
@@ -40,7 +46,14 @@ public class TableRowClassGenerator {
      * Loose Enum means that, you use a String field in table, but you defined some values in Java as Enum.
      * Values other than the enum defined ones may be treated as null in JAVA.
      */
-    private boolean supportLooseEnum;
+    private boolean supportLooseEnum = false;
+    /**
+     * Generate an Enum in the class and let the getter return the enum.
+     * Strict Enum means that, an Enum is defined independent, a reference declared here.
+     * Values other than the enum defined ones may be treated as null in JAVA.
+     */
+    private boolean supportStrictEnum = false;
+    private String strictEnumPackage = "";
 
     private boolean provideConstSchema = true;
     private boolean provideConstTable = true;
@@ -52,7 +65,6 @@ public class TableRowClassGenerator {
         this.tableSet = new HashSet<>();
         this.excludedTableSet = new HashSet<>();
         this.rewrite = false;
-        this.supportLooseEnum = false;
     }
 
     public TableRowClassGenerator forSchema(String schema) {
@@ -87,8 +99,31 @@ public class TableRowClassGenerator {
         return this;
     }
 
+    /**
+     * @param supportLooseEnum supportLooseEnum
+     * @deprecated since 3.0.15 use
+     */
+    @Deprecated(since = "3.0.15")
     public TableRowClassGenerator setSupportLooseEnum(boolean supportLooseEnum) {
         this.supportLooseEnum = supportLooseEnum;
+        return this;
+    }
+
+    /**
+     * @since 3.0.15
+     */
+    public TableRowClassGenerator supportLooseEnum() {
+        this.supportLooseEnum = true;
+        return this;
+    }
+
+    /**
+     * @param strictEnumPackage the package name, either ending with a dot, or just empty.
+     * @since 3.0.15
+     */
+    public TableRowClassGenerator supportStrictEnum(String strictEnumPackage) {
+        this.supportStrictEnum = true;
+        this.strictEnumPackage = strictEnumPackage;
         return this;
     }
 
@@ -250,25 +285,42 @@ public class TableRowClassGenerator {
         StringBuilder getter_string = new StringBuilder();
 
         String enum_name = null;
+        if (type.contains("char") && comment != null) {
+            if (supportLooseEnum) {
+                Matcher matcher = patternForLooseEnum.matcher(comment);
+                if (matcher.find()) {
+                    String enumValuesString = matcher.group(1);
+                    String[] enumValueArray = enumValuesString.split("[, ]+");
+                    if (enumValueArray.length > 0) {
+                        // to build enum
+                        enum_name = KeelHelpers.stringHelper().fromUnderScoreCaseToCamelCase(field) + "Enum";
 
-        if (type.contains("char") && comment != null && supportLooseEnum) {
-            Matcher matcher = patternForLooseEnum.matcher(comment);
-            if (matcher.find()) {
-                String enumValuesString = matcher.group(1);
-                String[] enumValueArray = enumValuesString.split("[, ]+");
-                if (enumValueArray.length > 0) {
-                    // to build enum
-                    enum_name = KeelHelpers.stringHelper().fromUnderScoreCaseToCamelCase(field) + "Enum";
-
-                    getter_string
-                            .append("\t/**\n")
-                            .append("\t * Enum for Field `").append(field).append("` \n")
-                            .append("\t */\n")
-                            .append("\tpublic enum ").append(enum_name).append(" {\n");
-                    for (var enumValue : enumValueArray) {
-                        getter_string.append("\t\t").append(enumValue).append(",\n");
+                        getter_string
+                                .append("\t/**\n")
+                                .append("\t * Enum for Field `").append(field).append("` \n")
+                                .append("\t */\n")
+                                .append("\tpublic enum ").append(enum_name).append(" {\n");
+                        for (var enumValue : enumValueArray) {
+                            getter_string.append("\t\t").append(enumValue).append(",\n");
+                        }
+                        getter_string.append("\t}\n");
                     }
-                    getter_string.append("\t}\n");
+                }
+            }
+            if (supportStrictEnum) {
+                Matcher matcher = patternForStrictEnum.matcher(comment);
+                if (matcher.find()) {
+                    String enumClassPathTail = matcher.group(1);
+                    String enumClassPath = this.strictEnumPackage + enumClassPathTail;
+                    try {
+                        Class<?> enumClass = Class.forName(enumClassPath);
+                        if (!enumClass.isEnum()) {
+                            throw new RuntimeException("Defined Enum Class not enum in Strict Mode");
+                        }
+                        enum_name = enumClassPath;
+                    } catch (ClassNotFoundException e) {
+                        throw new RuntimeException("Defined Enum Class not found in Strict Mode", e);
+                    }
                 }
             }
         }
