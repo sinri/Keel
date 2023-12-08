@@ -31,10 +31,27 @@ public class KeelSheet {
     }
 
     /**
-     * @return @return Raw Apache POI Sheet instance.
+     * @param row the POI row containing cells.
+     * @return The number of cells from index zero to the last non-zero cell. If no cells, return 0.
+     * @since 3.0.17 support auto detect column count
      */
-    public Sheet getSheet() {
-        return sheet;
+    public static int autoDetectNonBlankColumnCountInOneRow(Row row) {
+        short firstCellNum = row.getFirstCellNum();
+        if (firstCellNum < 0) {
+            return 0;
+        }
+        int i;
+        for (i = 0; i < row.getLastCellNum(); i++) {
+            Cell cell = row.getCell(i);
+            if (cell == null) {
+                break;
+            }
+            if (cell.getCellType() != CellType.NUMERIC) {
+                String stringCellValue = cell.getStringCellValue();
+                if (stringCellValue == null || stringCellValue.isBlank()) break;
+            }
+        }
+        return i;
     }
 
     public String getName() {
@@ -87,16 +104,40 @@ public class KeelSheet {
         }
     }
 
+    /**
+     * @return Raw Apache POI Sheet instance.
+     */
+    public Sheet getSheet() {
+        return sheet;
+    }
 
+    /**
+     * Fetch the matrix, the rows before header row would be thrown!
+     *
+     * @param headerRowIndex 0 for first row, etc.
+     * @param maxColumns     For predictable, one or more columns; if auto-detection is needed, zero or less.
+     * @since 3.0.17 support auto detect column count
+     */
     public final KeelSheetMatrix blockReadAllRowsToMatrix(int headerRowIndex, int maxColumns) {
+        if (headerRowIndex < 0) throw new IllegalArgumentException("headerRowIndex less than zero");
+
         KeelSheetMatrix keelSheetMatrix = new KeelSheetMatrix();
         AtomicInteger rowIndex = new AtomicInteger(0);
+
+        AtomicInteger checkColumnsRef = new AtomicInteger();
+        if (maxColumns > 0) {
+            checkColumnsRef.set(maxColumns);
+        }
+
         blockReadAllRows(row -> {
             int currentRowIndex = rowIndex.get();
             if (headerRowIndex == currentRowIndex) {
-                keelSheetMatrix.setHeaderRow(dumpRowToRawRow(row, maxColumns));
+                if (checkColumnsRef.get() == 0) {
+                    checkColumnsRef.set(autoDetectNonBlankColumnCountInOneRow(row));
+                }
+                keelSheetMatrix.setHeaderRow(dumpRowToRawRow(row, checkColumnsRef.get()));
             } else if (headerRowIndex < currentRowIndex) {
-                keelSheetMatrix.addRow(dumpRowToRawRow(row, maxColumns));
+                keelSheetMatrix.addRow(dumpRowToRawRow(row, checkColumnsRef.get()));
             }
 
             rowIndex.incrementAndGet();
@@ -105,18 +146,38 @@ public class KeelSheet {
         return keelSheetMatrix;
     }
 
+    /**
+     * Fetch the templated matrix, the rows before header row would be thrown!
+     *
+     * @param headerRowIndex 0 for first row, etc.
+     * @param maxColumns     For predictable, one or more columns; if auto-detection is needed, zero or less.
+     * @since 3.0.17 support auto detect column count
+     */
     public final KeelSheetTemplatedMatrix blockReadAllRowsToTemplatedMatrix(int headerRowIndex, int maxColumns) {
+        if (headerRowIndex < 0) throw new IllegalArgumentException("headerRowIndex less than zero");
+
+        AtomicInteger checkColumnsRef = new AtomicInteger();
+        if (maxColumns > 0) {
+            checkColumnsRef.set(maxColumns);
+        }
+
         AtomicInteger rowIndex = new AtomicInteger(0);
         AtomicReference<KeelSheetTemplatedMatrix> templatedMatrixRef = new AtomicReference<>();
+
+
         blockReadAllRows(row -> {
             int currentRowIndex = rowIndex.get();
             if (currentRowIndex == headerRowIndex) {
-                var rowDatum = dumpRowToRawRow(row, maxColumns);
+                if (checkColumnsRef.get() == 0) {
+                    checkColumnsRef.set(autoDetectNonBlankColumnCountInOneRow(row));
+                }
+
+                var rowDatum = dumpRowToRawRow(row, checkColumnsRef.get());
                 KeelSheetMatrixRowTemplate rowTemplate = KeelSheetMatrixRowTemplate.create(rowDatum);
                 KeelSheetTemplatedMatrix templatedMatrix = KeelSheetTemplatedMatrix.create(rowTemplate);
                 templatedMatrixRef.set(templatedMatrix);
             } else if (currentRowIndex > headerRowIndex) {
-                var rowDatum = dumpRowToRawRow(row, maxColumns);
+                var rowDatum = dumpRowToRawRow(row, checkColumnsRef.get());
                 templatedMatrixRef.get().addRawRow(rowDatum);
             }
             rowIndex.incrementAndGet();
@@ -139,7 +200,21 @@ public class KeelSheet {
         return KeelAsyncKit.iterativelyBatchCall(getRowIterator(), rowsFunc, batchSize);
     }
 
+    /**
+     * Fetch the  matrix, the rows before header row would be thrown!
+     *
+     * @param headerRowIndex 0 for first row, etc.
+     * @param maxColumns     For predictable, one or more columns; if auto-detection is needed, zero or less.
+     * @since 3.0.17 support auto detect column count
+     */
     public final Future<KeelSheetMatrix> readAllRowsToMatrix(int headerRowIndex, int maxColumns) {
+        if (headerRowIndex < 0) throw new IllegalArgumentException("headerRowIndex less than zero");
+
+        AtomicInteger checkColumnsRef = new AtomicInteger();
+        if (maxColumns > 0) {
+            checkColumnsRef.set(maxColumns);
+        }
+
         KeelSheetMatrix keelSheetMatrix = new KeelSheetMatrix();
         AtomicInteger rowIndex = new AtomicInteger(0);
 
@@ -147,9 +222,12 @@ public class KeelSheet {
             rows.forEach(row -> {
                 int currentRowIndex = rowIndex.get();
                 if (headerRowIndex == currentRowIndex) {
-                    keelSheetMatrix.setHeaderRow(dumpRowToRawRow(row, maxColumns));
+                    if (checkColumnsRef.get() == 0) {
+                        checkColumnsRef.set(autoDetectNonBlankColumnCountInOneRow(row));
+                    }
+                    keelSheetMatrix.setHeaderRow(dumpRowToRawRow(row, checkColumnsRef.get()));
                 } else if (headerRowIndex < currentRowIndex) {
-                    keelSheetMatrix.addRow(dumpRowToRawRow(row, maxColumns));
+                    keelSheetMatrix.addRow(dumpRowToRawRow(row, checkColumnsRef.get()));
                 }
                 rowIndex.incrementAndGet();
             });
@@ -160,7 +238,21 @@ public class KeelSheet {
                 });
     }
 
+    /**
+     * Fetch the templated matrix, the rows before header row would be thrown!
+     *
+     * @param headerRowIndex 0 for first row, etc.
+     * @param maxColumns     For predictable, one or more columns; if auto-detection is needed, zero or less.
+     * @since 3.0.17 support auto detect column count
+     */
     public final Future<KeelSheetTemplatedMatrix> readAllRowsToTemplatedMatrix(int headerRowIndex, int maxColumns) {
+        if (headerRowIndex < 0) throw new IllegalArgumentException("headerRowIndex less than zero");
+
+        AtomicInteger checkColumnsRef = new AtomicInteger();
+        if (maxColumns > 0) {
+            checkColumnsRef.set(maxColumns);
+        }
+
         AtomicInteger rowIndex = new AtomicInteger(0);
         AtomicReference<KeelSheetTemplatedMatrix> templatedMatrixRef = new AtomicReference<>();
 
@@ -168,12 +260,16 @@ public class KeelSheet {
             rows.forEach(row -> {
                 int currentRowIndex = rowIndex.get();
                 if (currentRowIndex == headerRowIndex) {
-                    var rowDatum = dumpRowToRawRow(row, maxColumns);
+                    if (checkColumnsRef.get() == 0) {
+                        checkColumnsRef.set(autoDetectNonBlankColumnCountInOneRow(row));
+                    }
+
+                    var rowDatum = dumpRowToRawRow(row, checkColumnsRef.get());
                     KeelSheetMatrixRowTemplate rowTemplate = KeelSheetMatrixRowTemplate.create(rowDatum);
                     KeelSheetTemplatedMatrix templatedMatrix = KeelSheetTemplatedMatrix.create(rowTemplate);
                     templatedMatrixRef.set(templatedMatrix);
                 } else if (currentRowIndex > headerRowIndex) {
-                    var rowDatum = dumpRowToRawRow(row, maxColumns);
+                    var rowDatum = dumpRowToRawRow(row, checkColumnsRef.get());
                     templatedMatrixRef.get().addRawRow(rowDatum);
                 }
                 rowIndex.incrementAndGet();
