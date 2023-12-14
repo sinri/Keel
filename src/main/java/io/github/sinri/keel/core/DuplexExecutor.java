@@ -8,6 +8,7 @@ import io.vertx.core.Future;
  * @param <S>
  * @since 1.13
  */
+@Deprecated(since = "3.0.17", forRemoval = true)
 public class DuplexExecutor<T, A, S, E extends Throwable> {
     protected AsyncExecutor<T, A> asyncExecutor;
     protected SyncExecutor<T, S, E> syncExecutor;
