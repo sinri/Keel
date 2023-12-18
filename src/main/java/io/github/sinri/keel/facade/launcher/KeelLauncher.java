@@ -1,6 +1,5 @@
 package io.github.sinri.keel.facade.launcher;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.DeploymentOptions;
@@ -12,9 +11,9 @@ import io.vertx.core.json.JsonObject;
 import javax.annotation.Nonnull;
 
 /**
- * @since 3.0.10
+ * @since 3.0.10 Technical Preview
+ * @since 3.0.18 Finished Technical Preview.
  */
-@TechnicalPreview(since = "3.0.10")
 public final class KeelLauncher extends Launcher {
 
     private final KeelLauncherAdapter adapter;

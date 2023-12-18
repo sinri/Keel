@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.github.sinri.keel.mysql.matrix.ResultRow;
 import io.vertx.core.Future;
@@ -16,17 +15,40 @@ import java.util.function.Function;
  */
 public abstract class AbstractReadStatement extends AbstractStatement {
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedMySQLConnection
+     * @param classT
+     * @param <T>
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     public <T extends ResultRow> Future<T> queryForOneRow(NamedMySQLConnection namedMySQLConnection, Class<T> classT) {
         return queryForOneRow(namedMySQLConnection.getSqlConnection(), classT);
     }
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedMySQLConnection
+     * @param classT
+     * @param <T>
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     public <T extends ResultRow> Future<List<T>> queryForRowList(NamedMySQLConnection namedMySQLConnection, Class<T> classT) {
         return queryForRowList(namedMySQLConnection.getSqlConnection(), classT);
     }
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedMySQLConnection
+     * @param classT
+     * @param categoryGenerator
+     * @param <K>
+     * @param <T>
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     public <K, T extends ResultRow> Future<Map<K, List<T>>> queryForCategorizedMap(
             NamedMySQLConnection namedMySQLConnection,
             Class<T> classT,
@@ -35,7 +57,16 @@ public abstract class AbstractReadStatement extends AbstractStatement {
         return queryForCategorizedMap(namedMySQLConnection.getSqlConnection(), classT, categoryGenerator);
     }
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedMySQLConnection
+     * @param classT
+     * @param uniqueKeyGenerator
+     * @param <K>
+     * @param <T>
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     public <K, T extends ResultRow> Future<Map<K, T>> queryForUniqueKeyBoundMap(
             NamedMySQLConnection namedMySQLConnection,
             Class<T> classT,

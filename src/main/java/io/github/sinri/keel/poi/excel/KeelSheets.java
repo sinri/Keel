@@ -1,6 +1,5 @@
 package io.github.sinri.keel.poi.excel;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -10,7 +9,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import javax.annotation.Nonnull;
 import java.io.*;
 
-@TechnicalPreview(since = "3.0.13")
+/**
+ * @since 3.0.13
+ * @since 3.0.18 Finished Technical Preview.
+ */
 public class KeelSheets implements AutoCloseable {
     protected @Nonnull Workbook autoWorkbook;
 

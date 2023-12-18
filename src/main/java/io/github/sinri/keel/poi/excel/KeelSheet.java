@@ -1,6 +1,5 @@
 package io.github.sinri.keel.poi.excel;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.poi.excel.entity.KeelSheetMatrix;
 import io.github.sinri.keel.poi.excel.entity.KeelSheetMatrixRowTemplate;
@@ -22,7 +21,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-@TechnicalPreview(since = "3.0.13")
+/**
+ * @since 3.0.13
+ * @since 3.0.18 Finished Technical Preview.
+ */
 public class KeelSheet {
     private final Sheet sheet;
 

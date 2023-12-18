@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.helper.KeelHelpers;
 
 import javax.annotation.Nonnull;
@@ -9,7 +8,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@TechnicalPreview(since = "3.0.15")
+/**
+ * @since 3.0.15
+ * @since 3.0.18 Finished Technical Preview.
+ */
 class TableRowClassBuilder {
     private final @Nonnull String packageName;
     private final @Nullable String schema;

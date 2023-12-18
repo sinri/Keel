@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
@@ -16,8 +15,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @since 3.0.15
+ * @since 3.0.18 Finished Technical Preview.
  */
-@TechnicalPreview(since = "3.0.15")
 public class TableRowClassSourceCodeGenerator {
     private final SqlConnection sqlConnection;
     private final Set<String> tableSet;

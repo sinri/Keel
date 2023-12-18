@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.github.sinri.keel.mysql.statement.templated.TemplateArgumentMapping;
@@ -86,7 +85,12 @@ public interface AnyStatement {
 
     Future<ResultMatrix> execute(SqlConnection sqlConnection);
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedSqlConnection
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     default Future<ResultMatrix> execute(NamedMySQLConnection namedSqlConnection) {
         return execute(namedSqlConnection.getSqlConnection());
     }

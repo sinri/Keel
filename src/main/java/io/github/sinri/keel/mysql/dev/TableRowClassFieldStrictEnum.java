@@ -1,12 +1,13 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.core.TechnicalPreview;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-@TechnicalPreview(since = "3.0.15")
+/**
+ * @since 3.0.15
+ * @since 3.0.18 Finished Technical Preview.
+ */
 public class TableRowClassFieldStrictEnum {
     private final String fieldName;
     private final String enumPackage;

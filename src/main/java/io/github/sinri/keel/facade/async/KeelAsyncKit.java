@@ -1,6 +1,5 @@
 package io.github.sinri.keel.facade.async;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
@@ -197,9 +196,9 @@ public interface KeelAsyncKit {
 
     /**
      * @since 3.0.10 Technical Preview: instead of Vertx::executeBlocking(Handler&lt;Promise&lt;T&gt;&gt; blockingCodeHandler)
+     * @since 3.0.18 Finished Technical Preview.
      */
     @Nonnull
-    @TechnicalPreview(since = "3.0.10", notice = "Replace Vertx::executeBlocking(Handler(Promise))")
     static <T> Future<T> executeBlocking(@Nonnull Handler<Promise<T>> blockingCodeHandler) {
         Promise<T> promise = Promise.promise();
         KeelVerticleBase verticle = new KeelVerticleBase() {

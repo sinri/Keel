@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.helper.KeelHelpers;
 
 import javax.annotation.Nonnull;
@@ -9,7 +8,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@TechnicalPreview(since = "3.0.15")
+/**
+ * @since 3.0.15
+ * @since 3.0.18 Finished Technical Preview.
+ */
 class TableRowClassField {
     private static final Pattern patternForLooseEnum;
     private static final Pattern patternForStrictEnum;

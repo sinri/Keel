@@ -1,6 +1,5 @@
 package io.github.sinri.keel.facade.launcher;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
@@ -9,9 +8,9 @@ import io.vertx.core.impl.launcher.VertxLifecycleHooks;
 import javax.annotation.Nullable;
 
 /**
- * @since 3.0.10
+ * @since 3.0.10 Technical Preview
+ * @since 3.0.18 Finished Technical Preview.
  */
-@TechnicalPreview(since = "3.0.10")
 public interface KeelLauncherAdapter extends VertxLifecycleHooks {
 
     /**
