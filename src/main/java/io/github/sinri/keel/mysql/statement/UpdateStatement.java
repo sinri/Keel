@@ -12,6 +12,7 @@ public class UpdateStatement extends AbstractModifyStatement {
     final List<String> assignments = new ArrayList<>();
     //    final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
     final ConditionsComponent whereConditionsComponent = new ConditionsComponent();
+    final SetComponent setComponent = new SetComponent();
     final List<String> sortRules = new ArrayList<>();
     /**
      * UPDATE [LOW_PRIORITY] [IGNORE] table_reference
@@ -27,7 +28,7 @@ public class UpdateStatement extends AbstractModifyStatement {
     long limit = 0;
 
     public UpdateStatement() {
-
+        setComponent.setAssignments(assignments);
     }
 
     public UpdateStatement ignore() {
@@ -44,6 +45,11 @@ public class UpdateStatement extends AbstractModifyStatement {
     public UpdateStatement table(String schema, String table) {
         this.schema = schema;
         this.table = table;
+        return this;
+    }
+
+    public UpdateStatement set(Function<SetComponent, SetComponent> function) {
+        function.apply(setComponent);
         return this;
     }
 
@@ -93,7 +99,7 @@ public class UpdateStatement extends AbstractModifyStatement {
             sql += " " + schema + ".";
         }
         sql += table;
-        sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "SET " + KeelHelpers.stringHelper().joinStringArray(assignments, ",");
+        sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "SET " + setComponent;
         if (!whereConditionsComponent.isEmpty()) {
             sql += AbstractStatement.SQL_COMPONENT_SEPARATOR + "WHERE " + whereConditionsComponent;
         }
