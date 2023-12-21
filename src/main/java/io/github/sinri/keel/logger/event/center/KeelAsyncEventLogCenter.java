@@ -1,6 +1,5 @@
 package io.github.sinri.keel.logger.event.center;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
@@ -38,8 +37,8 @@ public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
         KeelAsyncKit.repeatedlyCall(routineResult -> {
                     return Future.succeededFuture()
                             .compose(v -> {
-                                // TODO: Now executeBlocking with promise is deprecated.
-                                return Keel.getVertx().executeBlocking(promise -> {
+                                // done: Now executeBlocking with promise is deprecated, use KeelAsyncKit instead.
+                                return KeelAsyncKit.executeBlocking(promise -> {
                                     List<KeelEventLog> buffer = new ArrayList<>();
                                     for (int i = 0; i < bufferSize; i++) {
                                         KeelEventLog eventLog = this.queue.poll();

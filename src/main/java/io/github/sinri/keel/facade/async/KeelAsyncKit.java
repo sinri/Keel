@@ -2,10 +2,7 @@ package io.github.sinri.keel.facade.async;
 
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
-import io.vertx.core.Handler;
-import io.vertx.core.Promise;
+import io.vertx.core.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -208,7 +205,10 @@ public interface KeelAsyncKit {
                 promise.future().onComplete(ar -> this.undeployMe());
             }
         };
-        return verticle.deployMe(new DeploymentOptions().setWorker(true))
+        return verticle.deployMe(new DeploymentOptions()
+                                .setThreadingModel(ThreadingModel.WORKER)
+                        //.setWorker(true)
+                )
                 .compose(deploymentId -> promise.future());
     }
 }

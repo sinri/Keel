@@ -38,14 +38,6 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
 
     protected abstract void configureRoutes(Router router);
 
-//    /**
-//     * @since 2.4
-//     */
-//    public void setWebSocketHandlerToServer(Class<? extends KeelWebSocketHandler> handlerClass, DeploymentOptions deploymentOptions) {
-//        // todo 魔改中
-//        //this.server.webSocketHandler(websocket -> KeelWebSocketHandler.handle(websocket, handlerClass, getLogger(), deploymentOptions));
-//    }
-
     public KeelHttpServer setGracefulCloseHandler(Handler<Promise<Object>> gracefulCloseHandler) {
         this.gracefulCloseHandler = gracefulCloseHandler;
         return this;
