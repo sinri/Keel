@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.KeelConfiguration;
 import io.vertx.sqlclient.SqlConnection;
@@ -37,9 +36,9 @@ public class KeelMySQLDataSourceProvider {
     }
 
     /**
-     * @since 3.0.11 Technical Preview
+     * @since 3.0.11 Technical Preview.
+     * @since 3.0.18 Finished Technical Preview.
      */
-    @TechnicalPreview(since = "3.0.11")
     public static <C extends NamedMySQLConnection> NamedMySQLDataSource<C> initializeNamedMySQLDataSource(
             @Nonnull String dataSourceName,
             Function<SqlConnection, C> sqlConnectionWrapper
@@ -50,7 +49,12 @@ public class KeelMySQLDataSourceProvider {
         return new NamedMySQLDataSource<>(mySQLConfigure, sqlConnectionWrapper);
     }
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param dataSourceName
+     * @return
+     * @since 3.0.11 Technical Preview.
+     * @since 3.0.18 Finished Technical Preview.
+     */
     public static NamedMySQLDataSource<DynamicNamedMySQLConnection> initializeDynamicNamedMySQLDataSource(@Nonnull String dataSourceName) {
         return initializeNamedMySQLDataSource(dataSourceName, sqlConnection -> new DynamicNamedMySQLConnection(sqlConnection, dataSourceName));
     }

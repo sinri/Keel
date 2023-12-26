@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.github.sinri.keel.mysql.Quoter;
@@ -351,7 +350,12 @@ public class WriteIntoStatement extends AbstractModifyStatement {
                 .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getLastInsertedID()));
     }
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedMySQLConnection
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     public Future<Long> executeForLastInsertedID(NamedMySQLConnection namedMySQLConnection) {
         return executeForLastInsertedID(namedMySQLConnection.getSqlConnection());
     }

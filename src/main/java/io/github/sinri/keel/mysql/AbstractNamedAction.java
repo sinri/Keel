@@ -1,8 +1,10 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.core.TechnicalPreview;
-
-@TechnicalPreview(since = "3.0.11")
+/**
+ * @param <C>
+ * @since 3.0.11 Technical Preview
+ * @since 3.0.18 Finished Technical Preview.
+ */
 public class AbstractNamedAction<C extends NamedMySQLConnection> {
     private final C namedSqlConnection;
 

@@ -44,7 +44,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
         return Future.succeededFuture();
     }
 
-    @TestUnit
+    @TestUnit(skip = true)
     public Future<Void> test1() {
         try (KeelSheets keelSheets = new KeelSheets(file)) {
             KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
@@ -64,11 +64,11 @@ public class ReadTemplatedExcelTest extends KeelTest {
         return Future.succeededFuture();
     }
 
-    @TestUnit(skip = true)
+    @TestUnit(skip = false)
     public Future<Void> test2() {
         KeelSheets keelSheets = new KeelSheets(file);
         KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
-        return keelSheet.readAllRowsToMatrix(1, 6)
+        return keelSheet.readAllRowsToMatrix(1, 0)
                 .compose(keelSheetMatrix -> {
                     keelSheetMatrix.getRawRowList().forEach(row -> {
                         this.logger.info(log -> log.message("ASYNC: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));

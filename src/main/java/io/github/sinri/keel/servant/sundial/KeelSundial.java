@@ -40,43 +40,27 @@ public abstract class KeelSundial extends KeelVerticleBase {
         // refresh plan, pfs {0: not-fetching, more: fetching}
         if (planFetchingSemaphore.get() == 0) {
             planFetchingSemaphore.incrementAndGet();
-
-            Supplier<Collection<KeelSundialPlan>> syncSupplier = plansSupplier();
-            if (syncSupplier != null) {
-                // todo since 3.0.1 to be compatible with 3.0.0, remove this code block later
-                Set<String> toDelete = new HashSet<>(planMap.keySet());
-                syncSupplier.get().forEach(plan -> {
-                    toDelete.remove(plan.key());
-                    planMap.put(plan.key(), plan);
-                });
-                if (!toDelete.isEmpty()) {
-                    toDelete.forEach(planMap::remove);
-                }
-
-                planFetchingSemaphore.decrementAndGet();
-            } else {
-                // since 3.0.1
-                fetchPlans()
-                        .compose(plans -> {
-                            if (plans == null) {
-                                // treat null as NOT MODIFIED
-                                return Future.succeededFuture();
-                            }
-                            Set<String> toDelete = new HashSet<>(planMap.keySet());
-                            plans.forEach(plan -> {
-                                toDelete.remove(plan.key());
-                                planMap.put(plan.key(), plan);
-                            });
-                            if (!toDelete.isEmpty()) {
-                                toDelete.forEach(planMap::remove);
-                            }
+            fetchPlans()
+                    .compose(plans -> {
+                        if (plans == null) {
+                            // treat null as NOT MODIFIED
                             return Future.succeededFuture();
-                        })
-                        .eventually(v -> {
-                            planFetchingSemaphore.decrementAndGet();
-                            return Future.succeededFuture();
+                        }
+                        Set<String> toDelete = new HashSet<>(planMap.keySet());
+                        plans.forEach(plan -> {
+                            toDelete.remove(plan.key());
+                            planMap.put(plan.key(), plan);
                         });
-            }
+                        if (!toDelete.isEmpty()) {
+                            toDelete.forEach(planMap::remove);
+                        }
+                        return Future.succeededFuture();
+                    })
+                    .eventually(() -> {
+                        planFetchingSemaphore.decrementAndGet();
+                        return Future.succeededFuture();
+                    });
+
         }
 
     }

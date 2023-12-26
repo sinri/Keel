@@ -1,7 +1,5 @@
 package io.github.sinri.keel.poi.excel.entity;
 
-import io.github.sinri.keel.core.TechnicalPreview;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -11,8 +9,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Excel → Matrix of Cells' String values → Customized Row Readers.
+ * @since 3.0.13
+ * @since 3.0.18 Finished Technical Preview.
  */
-@TechnicalPreview(since = "3.0.13")
 public class KeelSheetMatrix {
     private final List<String> headerRow;
     private final List<List<String>> rows;
@@ -62,7 +61,10 @@ public class KeelSheetMatrix {
         return new RowReaderIterator<>(rClass, rows);
     }
 
-    @TechnicalPreview(since = "3.0.14")
+    /**
+     * @since 3.0.14
+     * @since 3.0.18 Finished Technical Preview.
+     */
     public static class RowReaderIterator<R extends KeelSheetMatrixRow> implements Iterator<R> {
         //private final Class<R> rClass;
         private final Constructor<R> constructor;

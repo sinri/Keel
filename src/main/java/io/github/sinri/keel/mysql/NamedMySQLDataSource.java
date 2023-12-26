@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.mysql.exception.KeelMySQLConnectionException;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
@@ -20,8 +19,8 @@ import java.util.function.Function;
  *
  * @param <C>
  * @since 3.0.11
+ * @since 3.0.18 Finished Technical Preview.
  */
-@TechnicalPreview(since = "3.0.11")
 public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
 
     private final MySQLPool pool;

@@ -1,7 +1,5 @@
 package io.github.sinri.keel.poi.excel.entity;
 
-import io.github.sinri.keel.core.TechnicalPreview;
-
 import javax.annotation.Nonnull;
 import java.util.List;
 
@@ -9,8 +7,8 @@ import java.util.List;
  * It is designed to be overridden for customized row reader.
  *
  * @since 3.0.14
+ * @since 3.0.18 Finished Technical Preview.
  */
-@TechnicalPreview(since = "3.0.14")
 abstract public class KeelSheetMatrixRow {
     private final List<String> rawRow;
 

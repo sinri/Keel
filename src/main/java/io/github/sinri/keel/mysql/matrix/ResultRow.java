@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
@@ -19,8 +18,17 @@ import java.util.function.Function;
  * @since 2.7
  */
 public interface ResultRow extends JsonifiableEntity<ResultRow> {
-
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedSqlConnection
+     * @param readStatement
+     * @param classOfTableRow
+     * @param categoryGenerator
+     * @param <K>
+     * @param <T>
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     static <K, T extends ResultRow> Future<Map<K, List<T>>> fetchResultRowsToCategorizedMap(
             NamedMySQLConnection namedSqlConnection,
             AbstractReadStatement readStatement,
@@ -30,7 +38,17 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
         return fetchResultRowsToCategorizedMap(namedSqlConnection.getSqlConnection(), readStatement, classOfTableRow, categoryGenerator);
     }
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedMySQLConnection
+     * @param readStatement
+     * @param classOfTableRow
+     * @param uniqueKeyGenerator
+     * @param <K>
+     * @param <T>
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     static <K, T extends ResultRow> Future<Map<K, T>> fetchResultRowsToUniqueKeyBoundMap(
             NamedMySQLConnection namedMySQLConnection,
             AbstractReadStatement readStatement,
@@ -40,7 +58,15 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
         return fetchResultRowsToUniqueKeyBoundMap(namedMySQLConnection.getSqlConnection(), readStatement, classOfTableRow, uniqueKeyGenerator);
     }
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedMySQLConnection
+     * @param readStatement
+     * @param classOfTableRow
+     * @param <T>
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     static <T extends ResultRow> Future<List<T>> fetchResultRows(
             NamedMySQLConnection namedMySQLConnection,
             AbstractReadStatement readStatement,
@@ -49,7 +75,15 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
         return fetchResultRows(namedMySQLConnection.getSqlConnection(), readStatement, classOfTableRow);
     }
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedMySQLConnection
+     * @param readStatement
+     * @param classOfTableRow
+     * @param <T>
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     static <T extends ResultRow> Future<T> fetchResultRow(
             NamedMySQLConnection namedMySQLConnection,
             AbstractReadStatement readStatement,

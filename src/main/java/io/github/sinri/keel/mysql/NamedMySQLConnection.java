@@ -1,11 +1,13 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.vertx.sqlclient.SqlConnection;
 
 import javax.annotation.Nonnull;
 
-@TechnicalPreview(since = "3.0.11", notice = "To avoid mix in multi-data-sources")
+/**
+ * @since 3.0.11 Technical Preview. To avoid mix in multi-data-sources.
+ * @since 3.0.18 Finished Technical Preview.
+ */
 abstract public class NamedMySQLConnection {
     private final SqlConnection sqlConnection;
 

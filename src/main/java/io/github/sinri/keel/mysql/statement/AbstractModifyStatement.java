@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
@@ -24,7 +23,12 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
                 });
     }
 
-    @TechnicalPreview(since = "3.0.11")
+    /**
+     * @param namedMySQLConnection
+     * @return
+     * @since 3.0.11
+     * @since 3.0.18 Finished Technical Preview.
+     */
     public Future<Integer> executeForAffectedRows(NamedMySQLConnection namedMySQLConnection) {
         return executeForAffectedRows(namedMySQLConnection.getSqlConnection());
     }

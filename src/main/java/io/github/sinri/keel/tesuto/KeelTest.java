@@ -4,7 +4,6 @@ import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
-import io.github.sinri.keel.logger.event.logger.KeelSilentEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.VertxOptions;
 
@@ -115,9 +114,10 @@ abstract public class KeelTest {
      * Default as silent logger, override it to provide another implementation.
      *
      * @return the logger used in test process.
+     * @since 3.0.17 the default test logger is to write into standard output.
      */
     protected @Nonnull KeelEventLogger logger() {
-        return KeelSilentEventLogger.getInstance();
+        return KeelOutputEventLogCenter.getInstance().createLogger(this.getClass().getName());
     }
 
     abstract protected @Nonnull Future<Void> starting();

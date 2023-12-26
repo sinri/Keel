@@ -1,7 +1,5 @@
 package io.github.sinri.keel.poi.excel.entity;
 
-import io.github.sinri.keel.core.TechnicalPreview;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
@@ -9,7 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-@TechnicalPreview(since = "3.0.13")
+/**
+ * @since 3.0.13
+ * @since 3.0.18 Finished Technical Preview.
+ */
 public class KeelSheetMatrixRowTemplateImpl implements KeelSheetMatrixRowTemplate {
     private final List<String> headerRow;
     private final Map<String, Integer> headerMap;
