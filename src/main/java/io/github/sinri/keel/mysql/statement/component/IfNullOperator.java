@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
  * {@code IFNULL(expr1,expr2)}
  * <p>
  * If expr1 is not NULL, IFNULL() returns expr1; otherwise it returns expr2.
+ * </p>
  *
  * @since 3.0.19
  */
