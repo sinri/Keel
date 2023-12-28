@@ -1,5 +1,6 @@
 package io.github.sinri.keel.poi.excel;
 
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -14,12 +15,12 @@ import java.io.*;
  * @since 3.0.18 Finished Technical Preview.
  */
 public class KeelSheets implements AutoCloseable {
-    protected @Nonnull Workbook autoWorkbook;
-
+    @Deprecated(since = "3.0.20", forRemoval = true)
     public KeelSheets(@Nonnull String file) {
         this(new File(file));
     }
 
+    @Deprecated(since = "3.0.20", forRemoval = true)
     public KeelSheets(@Nonnull File file) {
         try {
             autoWorkbook = WorkbookFactory.create(file);
@@ -28,12 +29,69 @@ public class KeelSheets implements AutoCloseable {
         }
     }
 
+    @Deprecated(since = "3.0.20", forRemoval = true)
     public KeelSheets(@Nonnull InputStream inputStream) {
         try {
             autoWorkbook = WorkbookFactory.create(inputStream);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * @param workbook The generated POI Workbook Implementation.
+     * @since 3.0.20
+     */
+    public KeelSheets(@Nonnull Workbook workbook) {
+        autoWorkbook = workbook;
+    }
+
+    protected @Nonnull Workbook autoWorkbook;
+
+    /**
+     * @since 3.0.20
+     */
+    public static KeelSheets factory(@Nonnull String file) {
+        return factory(new File(file));
+    }
+
+    /**
+     * @since 3.0.20
+     */
+    public static KeelSheets factory(@Nonnull File file) {
+        try {
+            return new KeelSheets(WorkbookFactory.create(file));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @since 3.0.20
+     */
+    public static KeelSheets factory(@Nonnull InputStream inputStream) {
+        try {
+            return new KeelSheets(WorkbookFactory.create(inputStream));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @since 3.0.20 The great DAN and HONG discovered an issue with POI Factory Mode.
+     */
+    public static KeelSheets autoGenerate(@Nonnull InputStream inputStream) {
+        Workbook workbook;
+        try {
+            workbook = new XSSFWorkbook(inputStream);
+        } catch (IOException e) {
+            try {
+                workbook = new HSSFWorkbook(inputStream);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+        return new KeelSheets(workbook);
     }
 
     /**

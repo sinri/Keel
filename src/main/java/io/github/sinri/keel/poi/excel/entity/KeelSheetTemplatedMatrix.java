@@ -20,9 +20,9 @@ public interface KeelSheetTemplatedMatrix {
 
     List<List<String>> getRawRows();
 
-    KeelSheetTemplatedMatrix addRawRow(List<String> rawRow);
+    KeelSheetTemplatedMatrix addRawRow(@Nonnull List<String> rawRow);
 
-    default KeelSheetTemplatedMatrix addRawRows(List<List<String>> rawRows) {
+    default KeelSheetTemplatedMatrix addRawRows(@Nonnull List<List<String>> rawRows) {
         rawRows.forEach(this::addRawRow);
         return this;
     }

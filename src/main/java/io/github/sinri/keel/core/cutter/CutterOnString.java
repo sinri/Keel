@@ -64,6 +64,9 @@ public class CutterOnString implements Cutter<String> {
                 });
     }
 
+    /**
+     * If there are double NewLine chars, cut!
+     */
     private Future<Void> cut() {
         AtomicReference<String> component = new AtomicReference<>();
         return KeelAsyncKit.exclusivelyCall(this.cutterId, (Supplier<Future<Void>>) () -> {
