@@ -10,13 +10,13 @@ A Java framework with VERT.X eco, for projects for web, job and more.
 <dependency>
     <groupId>io.github.sinri</groupId>
     <artifactId>Keel</artifactId>
-  <version>3.0.19</version>
+  <version>3.0.20</version>
 </dependency>
 ```
 
 ## Third Party Integration
 
-* [Vert.x](https://vertx.io) 4.4.6
+* [Vert.x](https://vertx.io) 4.5.1
 * [org.commonmark:commonmark](https://github.com/commonmark/commonmark-java) ![GitHub](https://img.shields.io/github/license/commonmark/commonmark-java)
   0.21.0
 * [org.reflections:reflections](https://github.com/ronmamo/reflections) ![GitHub](https://img.shields.io/github/license/ronmamo/reflections)
