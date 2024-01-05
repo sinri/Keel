@@ -1,11 +1,12 @@
 package io.github.sinri.keel.facade.async;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
 import javax.annotation.Nonnull;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 
 /**
@@ -33,7 +34,7 @@ public class FutureRepeat {
                         if (routineResult.isToStop()) {
                             finalPromise.complete();
                         } else {
-                            Keel.getVertx().setTimer(1L, x -> routine(routineResult, finalPromise));
+                            keel.getVertx().setTimer(1L, x -> routine(routineResult, finalPromise));
                         }
                     } else {
                         finalPromise.fail(shouldStopAR.cause());

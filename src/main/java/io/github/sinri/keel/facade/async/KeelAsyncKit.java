@@ -1,6 +1,5 @@
 package io.github.sinri.keel.facade.async;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
 
@@ -13,6 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * @since 3.0.0
@@ -127,7 +128,7 @@ public interface KeelAsyncKit {
      * @since 3.0.11 not only Void!
      */
     static <T> Future<T> exclusivelyCall(@Nonnull String lockName, @Nonnull Supplier<Future<T>> exclusiveSupplier) {
-        return Keel.getVertx().sharedData()
+        return keel.getVertx().sharedData()
                 .getLock(lockName)
                 .compose(lock -> Future.succeededFuture()
                         .compose(v -> exclusiveSupplier.get())
@@ -143,7 +144,7 @@ public interface KeelAsyncKit {
         Promise<Void> promise = Promise.promise();
         promiseHandler.handle(promise);
         promise.future()
-                .andThen(ar -> Keel.getVertx()
+                .andThen(ar -> keel.getVertx()
                         .setTimer(1L, timerID -> endless(promiseHandler)));
     }
 
@@ -154,7 +155,7 @@ public interface KeelAsyncKit {
     static void endless(@Nonnull Supplier<Future<Void>> supplier) {
         KeelAsyncKit.repeatedlyCall(routineResult -> Future.succeededFuture()
                 .compose(v -> supplier.get())
-                .eventually(v -> Future.succeededFuture()));
+                .eventually(() -> Future.succeededFuture()));
     }
 
     /**

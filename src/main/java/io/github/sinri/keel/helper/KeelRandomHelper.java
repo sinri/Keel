@@ -1,7 +1,8 @@
 package io.github.sinri.keel.helper;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.ext.auth.VertxContextPRNG;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * @since 3.0.1
@@ -11,7 +12,7 @@ public class KeelRandomHelper {
     private final VertxContextPRNG prng;
 
     private KeelRandomHelper() {
-        this.prng = VertxContextPRNG.current(Keel.getVertx());
+        this.prng = VertxContextPRNG.current(keel.getVertx());
     }
 
     static KeelRandomHelper getInstance() {

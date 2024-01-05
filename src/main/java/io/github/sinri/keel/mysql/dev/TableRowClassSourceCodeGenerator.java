@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
@@ -12,6 +11,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * @since 3.0.15
@@ -150,7 +151,7 @@ public class TableRowClassSourceCodeGenerator {
                     return KeelAsyncKit.iterativelyCall(writeMap.entrySet(), entry -> {
                         var classFile = entry.getKey();
                         var code = entry.getValue();
-                        return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
+                        return keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                     });
                 });
     }

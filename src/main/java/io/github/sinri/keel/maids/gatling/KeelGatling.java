@@ -1,6 +1,5 @@
 package io.github.sinri.keel.maids.gatling;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
@@ -10,6 +9,8 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * Gatling Gun with multi barrels, for parallel tasks in clustered vertx runtime.
@@ -29,7 +30,7 @@ public class KeelGatling extends KeelVerticleBase {
         Options options = new Options(gatlingName);
         optionHandler.handle(options);
         KeelGatling keelGatling = new KeelGatling(options);
-        return Keel.getVertx().deployVerticle(keelGatling, new DeploymentOptions().setWorker(true));
+        return keel.getVertx().deployVerticle(keelGatling, new DeploymentOptions().setWorker(true));
     }
 
     protected Future<Void> rest() {
@@ -85,7 +86,7 @@ public class KeelGatling extends KeelVerticleBase {
      * @return Future of a runnable bullet, or null.
      */
     private Future<Bullet> loadOneBullet() {
-        return Keel.getVertx().sharedData()
+        return keel.getVertx().sharedData()
                 .getLock("KeelGatling-" + this.options.getGatlingName() + "-Load")
                 .compose(lock -> this.options.getBulletLoader().get().andThen(ar -> lock.release()));
     }
@@ -97,7 +98,7 @@ public class KeelGatling extends KeelVerticleBase {
                             bullet.exclusiveLockSet(),
                             exclusiveLock -> {
                                 String exclusiveLockName = "KeelGatling-Bullet-Exclusive-Lock-" + exclusiveLock;
-                                return Keel.getVertx().sharedData()
+                                return keel.getVertx().sharedData()
                                         .getCounter(exclusiveLockName)
                                         .compose(Counter::incrementAndGet)
                                         .compose(increased -> {
@@ -123,7 +124,7 @@ public class KeelGatling extends KeelVerticleBase {
         if (bullet.exclusiveLockSet() != null && !bullet.exclusiveLockSet().isEmpty()) {
             return KeelAsyncKit.iterativelyCall(bullet.exclusiveLockSet(), exclusiveLock -> {
                 String exclusiveLockName = "KeelGatling-Bullet-Exclusive-Lock-" + exclusiveLock;
-                return Keel.getVertx().sharedData().getCounter(exclusiveLockName)
+                return keel.getVertx().sharedData().getCounter(exclusiveLockName)
                         .compose(counter -> counter.decrementAndGet()
                                 .compose(x -> Future.succeededFuture()));
             });

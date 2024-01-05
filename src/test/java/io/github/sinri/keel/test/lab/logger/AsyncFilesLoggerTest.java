@@ -1,6 +1,5 @@
 package io.github.sinri.keel.test.lab.logger;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.adapter.AsyncFilesWriterAdapter;
@@ -10,13 +9,15 @@ import io.vertx.core.VertxOptions;
 
 import java.util.Date;
 
+import static io.github.sinri.keel.facade.KeelInstance.keel;
+
 public class AsyncFilesLoggerTest {
     public static void main(String[] args) {
-        Keel.initializeVertx(new VertxOptions())
+        keel.initializeVertx(new VertxOptions())
                 .compose(v -> {
                     return test();
                 })
-                .eventually(v -> Keel.getVertx().close());
+                .eventually(() -> keel.getVertx().close());
     }
 
     private static Future<Void> test() {

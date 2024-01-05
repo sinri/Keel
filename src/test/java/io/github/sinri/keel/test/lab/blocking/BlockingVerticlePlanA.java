@@ -1,10 +1,11 @@
 package io.github.sinri.keel.test.lab.blocking;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * 这个解决方案的问题是只能有一个Verticle在worker模式跑，如果有多个异步任务，无法以池模式运行，只能排队。
@@ -24,13 +25,13 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
     }
 
     public static void main(String[] args) {
-        Keel.initializeVertx(new VertxOptions())
+        keel.initializeVertx(new VertxOptions())
                 .compose(done -> {
                     KeelEventLogger loggerInEventLoopContext = KeelOutputEventLogCenter.getInstance().createLogger("Sample");
 
                     BlockingVerticlePlanA futureForBlocking = new BlockingVerticlePlanA();
                     return futureForBlocking.deployMe(new DeploymentOptions()
-                                    .setWorker(true)
+                                    .setThreadingModel(ThreadingModel.WORKER)
                             )
                             .compose(deploymentId -> {
                                 loggerInEventLoopContext.info(log -> log
@@ -59,8 +60,8 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
                 .onFailure(throwable -> {
                     throwable.printStackTrace();
                 })
-                .eventually(v -> {
-                    return Keel.close();
+                .eventually(() -> {
+                    return keel.close();
                 });
     }
 

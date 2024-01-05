@@ -12,6 +12,7 @@ import java.util.Objects;
 /**
  * It is the facade of Keel, i.e. itself, provides Vertx Instance.
  */
+@Deprecated(since = "3.1.0")
 public class Keel {
     private final static KeelConfiguration configuration = KeelConfiguration.createFromJsonObject(new JsonObject());
     private static @Nullable Vertx vertx;

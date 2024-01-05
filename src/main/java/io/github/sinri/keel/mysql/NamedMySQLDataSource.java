@@ -1,18 +1,20 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.mysql.exception.KeelMySQLConnectionException;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.mysqlclient.MySQLPool;
+import io.vertx.mysqlclient.MySQLBuilder;
+import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.TransactionRollbackException;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * Pair data source to a named mysql connection.
@@ -23,7 +25,8 @@ import java.util.function.Function;
  */
 public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
 
-    private final MySQLPool pool;
+    //    private final MySQLPool pool;
+    private final Pool pool;
     private final KeelMySQLConfiguration configuration;
     /**
      * @since 3.0.2
@@ -49,18 +52,30 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
     ) {
         this.configuration = configuration;
         this.sqlConnectionWrapper = sqlConnectionWrapper;
-        pool = MySQLPool.pool(
-                Keel.getVertx(),
-                configuration.getConnectOptions(),
-                configuration.getPoolOptions()
-        );
-        pool.connectHandler(sqlConnection -> {
-            connectionSetUpFunction.apply(sqlConnection)
-                    .onComplete(ar -> {
-                        connectionAvailableCounter.incrementAndGet();
-                        sqlConnection.close();
-                    });
-        });
+        pool = MySQLBuilder.pool()
+                .with(configuration.getPoolOptions())
+                .connectingTo(configuration.getConnectOptions())
+                .using(keel.getVertx())
+                .withConnectHandler(sqlConnection -> {
+                    connectionSetUpFunction.apply(sqlConnection)
+                            .onComplete(ar -> {
+                                connectionAvailableCounter.incrementAndGet();
+                                sqlConnection.close();
+                            });
+                })
+                .build();
+//        pool = MySQLPool.pool(
+//                keel.getVertx(),
+//                configuration.getConnectOptions(),
+//                configuration.getPoolOptions()
+//        );
+//        pool.connectHandler(sqlConnection -> {
+//            connectionSetUpFunction.apply(sqlConnection)
+//                    .onComplete(ar -> {
+//                        connectionAvailableCounter.incrementAndGet();
+//                        sqlConnection.close();
+//                    });
+//        });
     }
 
     public KeelMySQLConfiguration getConfiguration() {

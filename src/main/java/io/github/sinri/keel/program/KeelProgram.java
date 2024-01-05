@@ -1,6 +1,5 @@
 package io.github.sinri.keel.program;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.cli.CLI;
@@ -10,6 +9,8 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * @since 2.0
@@ -61,7 +62,7 @@ public abstract class KeelProgram {
                     getLogger().exception(throwable, "FAILED");
                     returnCode.set(generateReturnCode(throwable));
                 })
-                .eventually(v -> Keel.gracefullyClose(promise -> {
+                .eventually(() -> keel.gracefullyClose(promise -> {
                     // do nothing
                 }))
                 .onComplete(v -> {

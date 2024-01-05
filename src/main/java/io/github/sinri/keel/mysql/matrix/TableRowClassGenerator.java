@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.dev.TableRowClassSourceCodeGenerator;
@@ -15,6 +14,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * 用于快速根据数据库中的表结构生成AbstractTableRow的实现类的代码生成工具。
@@ -210,20 +211,20 @@ public class TableRowClassGenerator {
                     return this.generateClassCodeForOneTable(schema, table, packageName, className)
                             .compose(code -> {
                                 if (this.rewrite) {
-                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
+                                    return keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                                 } else {
-                                    return Keel.getVertx().fileSystem().exists(classFile)
+                                    return keel.getVertx().fileSystem().exists(classFile)
                                             .compose(existed -> {
                                                 if (existed) {
-                                                    return Keel.getVertx().fileSystem().readFile(classFile)
+                                                    return keel.getVertx().fileSystem().readFile(classFile)
                                                             .compose(existedContentBuffer -> {
-                                                                return Keel.getVertx().fileSystem().writeFile(
+                                                                return keel.getVertx().fileSystem().writeFile(
                                                                         classFile,
                                                                         existedContentBuffer.appendString("\n\n").appendString(code)
                                                                 );
                                                             });
                                                 } else {
-                                                    return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
+                                                    return keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                                                 }
                                             });
                                 }

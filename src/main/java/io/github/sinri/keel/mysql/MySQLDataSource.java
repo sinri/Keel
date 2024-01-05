@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.mysql.exception.KeelMySQLConnectionException;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
@@ -16,6 +15,8 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 public class MySQLDataSource {
     private final MySQLPool pool;
@@ -35,7 +36,7 @@ public class MySQLDataSource {
     public MySQLDataSource(KeelMySQLConfiguration configuration, @Nonnull Function<SqlConnection, Future<Void>> connectionSetUpFunction) {
         this.configuration = configuration;
         pool = MySQLPool.pool(
-                Keel.getVertx(),
+                keel.getVertx(),
                 configuration.getConnectOptions(),
                 configuration.getPoolOptions()
         );

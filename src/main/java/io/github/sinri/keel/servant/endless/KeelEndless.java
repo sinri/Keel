@@ -1,11 +1,12 @@
 package io.github.sinri.keel.servant.endless;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 
 import java.util.function.Supplier;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * 任务定期触发器，隔一段时间调用任务供应商获取任务执行。
@@ -49,7 +50,7 @@ public class KeelEndless extends KeelVerticleBase {
      * @since 2.8 如果alive显示false，则不再策划下一波触发
      */
     private void routineWrapper() {
-        Keel.getVertx().setTimer(
+        keel.getVertx().setTimer(
                 restMS,
                 currentTimerID -> routine().onComplete(done -> routineWrapper())
         );

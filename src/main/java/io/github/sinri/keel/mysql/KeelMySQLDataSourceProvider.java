@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.KeelConfiguration;
 import io.vertx.sqlclient.SqlConnection;
 
@@ -9,6 +8,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 public class KeelMySQLDataSourceProvider {
 
@@ -21,7 +22,7 @@ public class KeelMySQLDataSourceProvider {
 
     public static MySQLDataSource getMySQLDataSource(@Nonnull String dataSourceName) {
         if (!mySQLDataSourceMap.containsKey(dataSourceName)) {
-            KeelConfiguration configuration = Keel.getConfiguration().extract("mysql", dataSourceName);
+            KeelConfiguration configuration = keel.getConfiguration().extract("mysql", dataSourceName);
             Objects.requireNonNull(configuration);
             KeelMySQLConfiguration mySQLConfigure = new KeelMySQLConfiguration(dataSourceName, configuration);
             MySQLDataSource mySQLDataSource = new MySQLDataSource(mySQLConfigure);
@@ -32,7 +33,7 @@ public class KeelMySQLDataSourceProvider {
 
     @Nonnull
     public static String defaultMySQLDataSourceName() {
-        return Objects.requireNonNullElse(Keel.getConfiguration().readString("mysql", "default_data_source_name"), "default");
+        return Objects.requireNonNullElse(keel.getConfiguration().readString("mysql", "default_data_source_name"), "default");
     }
 
     /**
@@ -43,15 +44,13 @@ public class KeelMySQLDataSourceProvider {
             @Nonnull String dataSourceName,
             Function<SqlConnection, C> sqlConnectionWrapper
     ) {
-        KeelConfiguration configuration = Keel.getConfiguration().extract("mysql", dataSourceName);
+        KeelConfiguration configuration = keel.getConfiguration().extract("mysql", dataSourceName);
         Objects.requireNonNull(configuration);
         KeelMySQLConfiguration mySQLConfigure = new KeelMySQLConfiguration(dataSourceName, configuration);
         return new NamedMySQLDataSource<>(mySQLConfigure, sqlConnectionWrapper);
     }
 
     /**
-     * @param dataSourceName
-     * @return
      * @since 3.0.11 Technical Preview.
      * @since 3.0.18 Finished Technical Preview.
      */

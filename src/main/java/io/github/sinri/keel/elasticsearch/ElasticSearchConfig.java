@@ -1,11 +1,12 @@
 package io.github.sinri.keel.elasticsearch;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.KeelConfiguration;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * @since 3.0.7
@@ -17,7 +18,7 @@ public class ElasticSearchConfig extends KeelConfiguration {
     }
 
     public ElasticSearchConfig(String esKey) {
-        this(Keel.getConfiguration().extract("es", esKey));
+        this(keel.getConfiguration().extract("es", esKey));
     }
 
     /*

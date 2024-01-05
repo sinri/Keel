@@ -1,7 +1,6 @@
 package io.github.sinri.keel.test.lab.unit;
 
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
@@ -11,11 +10,13 @@ import io.vertx.core.Future;
 import javax.annotation.Nonnull;
 import java.util.List;
 
+import static io.github.sinri.keel.facade.KeelInstance.keel;
+
 public class KeelUnitTest extends KeelTest {
 
     @Override
     protected @Nonnull Future<Void> starting() {
-        Keel.getConfiguration().loadPropertiesFile("config.properties");
+        keel.getConfiguration().loadPropertiesFile("config.properties");
         System.out.println("prepared");
         return Future.succeededFuture();
     }

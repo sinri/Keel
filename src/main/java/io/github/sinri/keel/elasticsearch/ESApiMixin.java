@@ -1,6 +1,5 @@
 package io.github.sinri.keel.elasticsearch;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
@@ -14,6 +13,8 @@ import io.vertx.ext.web.client.WebClient;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 
+import static io.github.sinri.keel.facade.KeelInstance.keel;
+
 /**
  * Developed with ES version 8.9.
  *
@@ -25,7 +26,7 @@ public interface ESApiMixin {
     KeelEventLogger getLogger();
 
     default Future<JsonObject> call(HttpMethod httpMethod, String endpoint, ESApiQueries queries, @Nullable JsonObject requestBody) {
-        WebClient webClient = WebClient.create(Keel.getVertx());
+        WebClient webClient = WebClient.create(keel.getVertx());
         String url = this.getEsConfig().clusterApiUrl(endpoint);
         HttpRequest<Buffer> bufferHttpRequest = webClient.requestAbs(httpMethod, url);
 

@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.http.blackbox;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.web.http.blackbox.html.HTMLElement;
 import io.github.sinri.keel.web.http.blackbox.html.HTMLTagElement;
@@ -10,6 +9,8 @@ import io.vertx.ext.web.RoutingContext;
 
 import java.io.File;
 import java.util.Date;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * A simple online log viewer
@@ -64,7 +65,7 @@ public class KeelBlackBox {
     }
 
     private static void handleDir(RoutingContext routingContext, File dir, String logDirPath, String routeRootPathWithTailSplash) {
-        Keel.getVertx().fileSystem().readDir(dir.getAbsolutePath())
+        keel.getVertx().fileSystem().readDir(dir.getAbsolutePath())
                 .compose(children -> {
                     String relativeDirPath = dir.getAbsolutePath().substring(logDirPath.length());
 

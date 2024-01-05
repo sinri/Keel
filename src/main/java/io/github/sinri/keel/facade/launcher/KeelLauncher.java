@@ -1,6 +1,5 @@
 package io.github.sinri.keel.facade.launcher;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Launcher;
@@ -9,6 +8,8 @@ import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
+
+import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 /**
  * @since 3.0.10 Technical Preview
@@ -47,7 +48,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void afterStartingVertx(Vertx vertx) {
-        Keel.setVertx(vertx);
+        keel.setVertx(vertx);
         logger().debug(log -> log
                 .message("afterStartingVertx")
         );
