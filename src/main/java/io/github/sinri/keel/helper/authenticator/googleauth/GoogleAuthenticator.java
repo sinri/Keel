@@ -33,8 +33,6 @@ package io.github.sinri.keel.helper.authenticator.googleauth;
 //import org.apache.commons.codec.binary.Base32;
 //import org.apache.commons.codec.binary.Base64;
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
@@ -42,6 +40,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * This class implements the functionality described in RFC 6238 (TOTP: Time

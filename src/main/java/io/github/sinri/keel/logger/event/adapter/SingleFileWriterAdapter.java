@@ -1,6 +1,5 @@
 package io.github.sinri.keel.logger.event.adapter;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -10,6 +9,8 @@ import javax.annotation.Nullable;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class SingleFileWriterAdapter implements KeelEventLoggerAdapter {
     private FileWriter fileWriter;

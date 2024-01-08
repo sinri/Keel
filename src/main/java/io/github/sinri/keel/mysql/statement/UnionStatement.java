@@ -1,10 +1,10 @@
 package io.github.sinri.keel.mysql.statement;
 
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class UnionStatement extends AbstractReadStatement {
     final List<String> selections = new ArrayList<>();

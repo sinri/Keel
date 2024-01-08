@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.condition.CompareCondition;
 import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.MySQLCondition;
@@ -12,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class SelectStatement extends AbstractReadStatement {
     //    private final List<KeelMySQLCondition> whereConditions = new ArrayList<>();

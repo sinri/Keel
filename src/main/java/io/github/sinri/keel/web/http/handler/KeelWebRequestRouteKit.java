@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.http.handler;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.web.http.ApiMeta;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @param <S>

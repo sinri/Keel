@@ -7,6 +7,9 @@ import io.github.sinri.keel.core.TechnicalPreview;
  */
 @TechnicalPreview(since = "3.1.0")
 public interface KeelHelpersInterface {
+    KeelHelpersInterface KeelHelpers = new KeelHelpersInterface() {
+    };
+
     default KeelBinaryHelper binaryHelper() {
         return KeelBinaryHelper.getInstance();
     }

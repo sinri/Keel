@@ -1,12 +1,13 @@
 package io.github.sinri.keel.web.http.handler;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * 这个类是个针对某一类RoutingContext的handler，而不是针对某一个RoutingContext的handler！！！

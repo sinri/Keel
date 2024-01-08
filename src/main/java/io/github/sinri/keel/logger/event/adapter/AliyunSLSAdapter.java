@@ -1,13 +1,14 @@
 package io.github.sinri.keel.logger.event.adapter;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.0

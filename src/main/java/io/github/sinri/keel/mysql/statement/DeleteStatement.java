@@ -1,11 +1,11 @@
 package io.github.sinri.keel.mysql.statement;
 
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class DeleteStatement extends AbstractModifyStatement {
     // final List<KeelMySQLCondition> whereConditions = new ArrayList<>();

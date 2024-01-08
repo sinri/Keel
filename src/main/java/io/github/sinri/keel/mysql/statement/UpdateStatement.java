@@ -1,7 +1,6 @@
 package io.github.sinri.keel.mysql.statement;
 
 import io.github.sinri.keel.core.TechnicalPreview;
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.statement.component.UpdateSetAssignmentComponent;
 
 import java.util.ArrayList;
@@ -9,6 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class UpdateStatement extends AbstractModifyStatement {
     /**

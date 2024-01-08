@@ -1,12 +1,12 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.15

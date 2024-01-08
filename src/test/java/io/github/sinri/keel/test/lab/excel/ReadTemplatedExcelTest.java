@@ -1,6 +1,5 @@
 package io.github.sinri.keel.test.lab.excel;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.poi.excel.KeelSheet;
@@ -18,6 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class ReadTemplatedExcelTest extends KeelTest {
     private static final String file = "/Users/leqee/code/Keel/src/test/resources/excel/excel_1.xlsx";
@@ -46,9 +47,9 @@ public class ReadTemplatedExcelTest extends KeelTest {
 
     @TestUnit(skip = true)
     public Future<Void> test1() {
-        try (KeelSheets keelSheets = new KeelSheets(file)) {
+        try (KeelSheets keelSheets = KeelSheets.factory(file)) {
             KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
-            KeelSheetMatrix keelSheetMatrix = keelSheet.blockReadAllRowsToMatrix(1, 6);
+            KeelSheetMatrix keelSheetMatrix = keelSheet.blockReadAllRowsToMatrix(1, 6, null);
             keelSheetMatrix.getRawRowList().forEach(row -> {
                 this.logger.info(log -> log.message("BLOCK: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
             });
@@ -66,9 +67,9 @@ public class ReadTemplatedExcelTest extends KeelTest {
 
     @TestUnit(skip = false)
     public Future<Void> test2() {
-        KeelSheets keelSheets = new KeelSheets(file);
+        KeelSheets keelSheets = KeelSheets.factory(file);
         KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
-        return keelSheet.readAllRowsToMatrix(1, 0)
+        return keelSheet.readAllRowsToMatrix(1, 0, null)
                 .compose(keelSheetMatrix -> {
                     keelSheetMatrix.getRawRowList().forEach(row -> {
                         this.logger.info(log -> log.message("ASYNC: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
@@ -85,9 +86,9 @@ public class ReadTemplatedExcelTest extends KeelTest {
 
     @TestUnit(skip = true)
     public Future<Void> test3() {
-        try (KeelSheets keelSheets = new KeelSheets(file)) {
+        try (KeelSheets keelSheets = KeelSheets.factory(file)) {
             KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
-            KeelSheetTemplatedMatrix templatedMatrix = keelSheet.blockReadAllRowsToTemplatedMatrix(0, 6);
+            KeelSheetTemplatedMatrix templatedMatrix = keelSheet.blockReadAllRowsToTemplatedMatrix(0, 6, null);
             templatedMatrix.getRows().forEach(row -> {
                 this.logger.info(log -> log.message("BLOCK TEMPLATED: " + row.toJsonObject()));
             });
@@ -97,9 +98,9 @@ public class ReadTemplatedExcelTest extends KeelTest {
 
     @TestUnit(skip = true)
     public Future<Void> test4() {
-        KeelSheets keelSheets = new KeelSheets(file);
+        KeelSheets keelSheets = KeelSheets.factory(file);
         KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
-        return keelSheet.readAllRowsToTemplatedMatrix(0, 7)
+        return keelSheet.readAllRowsToTemplatedMatrix(0, 7, null)
                 .compose(templatedMatrix -> {
                     templatedMatrix.getRows().forEach(row -> {
                         this.logger.info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));
@@ -124,9 +125,9 @@ public class ReadTemplatedExcelTest extends KeelTest {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        KeelSheets keelSheets = new KeelSheets(fileInputStream);
+        KeelSheets keelSheets = KeelSheets.factory(fileInputStream);
         KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
-        return keelSheet.readAllRowsToTemplatedMatrix(0, 128)
+        return keelSheet.readAllRowsToTemplatedMatrix(0, 128, null)
                 .compose(templatedMatrix -> {
                     templatedMatrix.getRows().forEach(row -> {
                         this.logger.info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));

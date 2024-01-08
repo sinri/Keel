@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.statement;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.github.sinri.keel.mysql.Quoter;
 import io.vertx.core.Future;
@@ -12,6 +11,8 @@ import io.vertx.sqlclient.SqlConnection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class WriteIntoStatement extends AbstractModifyStatement {
     /**

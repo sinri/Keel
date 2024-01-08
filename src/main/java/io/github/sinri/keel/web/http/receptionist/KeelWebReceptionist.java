@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.http.receptionist;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
@@ -12,6 +11,8 @@ import io.vertx.ext.web.RoutingContext;
 
 import javax.annotation.Nullable;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 2.9.2

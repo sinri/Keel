@@ -1,7 +1,6 @@
 package io.github.sinri.keel.facade;
 
 import io.github.sinri.keel.core.json.JsonifiableEntity;
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
@@ -14,6 +13,8 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.0

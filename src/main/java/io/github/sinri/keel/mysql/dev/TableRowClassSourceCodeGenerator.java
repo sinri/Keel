@@ -1,7 +1,6 @@
 package io.github.sinri.keel.mysql.dev;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
@@ -13,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.15

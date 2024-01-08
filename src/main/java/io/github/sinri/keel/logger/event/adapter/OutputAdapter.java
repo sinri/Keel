@@ -1,7 +1,6 @@
 package io.github.sinri.keel.logger.event.adapter;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.helper.KeelRuntimeHelper;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
@@ -11,6 +10,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * 本类无需Keel实例。

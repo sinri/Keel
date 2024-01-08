@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.http.prehandler;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.Future;
 import io.vertx.core.shareddata.Counter;
 import io.vertx.ext.web.RoutingContext;
@@ -10,6 +9,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 2.9.2

@@ -1,13 +1,14 @@
 package io.github.sinri.keel.mysql.statement.templated;
 
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.Quoter;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.8
