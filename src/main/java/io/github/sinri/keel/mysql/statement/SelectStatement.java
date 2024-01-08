@@ -25,13 +25,19 @@ public class SelectStatement extends AbstractReadStatement {
     private long offset = 0;
     private long limit = 0;
     private String lockMode = "";
+    /**
+     * For MySQL 5.7 ,8.0 or higher, in Select, to limit the max execution time in millisecond.
+     *
+     * @since 3.1.0
+     */
+    private Long maxExecutionTime = null;
 
     public SelectStatement from(String tableExpression) {
         return from(tableExpression, null);
     }
 
     public SelectStatement from(String tableExpression, String alias) {
-        if (tableExpression == null || tableExpression.trim().equals("")) {
+        if (tableExpression == null || tableExpression.trim().isEmpty()) {
             throw new KeelSQLGenerateError("Select from null");
         }
         String x = tableExpression;
@@ -148,9 +154,28 @@ public class SelectStatement extends AbstractReadStatement {
         return this;
     }
 
+    /**
+     * Available in MySQL 5.7, 8.0 or higher.
+     *
+     * @since 3.1.0
+     */
+    public SelectStatement setMaxExecutionTime(long maxExecutionTime) {
+        this.maxExecutionTime = maxExecutionTime;
+        return this;
+    }
+
     public String toString() {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ");
+
+        // since 3.1.0: The Max Statement Execution Time
+        //  MYSQL 5.7, 8.0+ /*+ MAX_EXECUTION_TIME(1000) */
+        //  MYSQL 5.6 /*+ MAX_STATEMENT_TIME(1000) */ THIS IS NOT FOR ONE STATEMENT.
+        if (this.maxExecutionTime != null) {
+            sql.append("/*+ MAX_EXECUTION_TIME(").append(maxExecutionTime).append(") */ ")
+                    .append(AbstractStatement.SQL_COMPONENT_SEPARATOR);
+        }
+
         if (columns.isEmpty()) {
             sql.append("*");
         } else {

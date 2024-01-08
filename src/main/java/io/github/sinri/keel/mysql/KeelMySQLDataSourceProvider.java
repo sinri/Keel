@@ -4,32 +4,12 @@ import io.github.sinri.keel.facade.KeelConfiguration;
 import io.vertx.sqlclient.SqlConnection;
 
 import javax.annotation.Nonnull;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.keel;
 
 public class KeelMySQLDataSourceProvider {
-
-    private static final Map<String, MySQLDataSource> mySQLDataSourceMap = new ConcurrentHashMap<>();
-
-    public static MySQLDataSource getMySQLDataSource() {
-        String defaultName = defaultMySQLDataSourceName();
-        return getMySQLDataSource(defaultName);
-    }
-
-    public static MySQLDataSource getMySQLDataSource(@Nonnull String dataSourceName) {
-        if (!mySQLDataSourceMap.containsKey(dataSourceName)) {
-            KeelConfiguration configuration = keel.getConfiguration().extract("mysql", dataSourceName);
-            Objects.requireNonNull(configuration);
-            KeelMySQLConfiguration mySQLConfigure = new KeelMySQLConfiguration(dataSourceName, configuration);
-            MySQLDataSource mySQLDataSource = new MySQLDataSource(mySQLConfigure);
-            mySQLDataSourceMap.put(dataSourceName, mySQLDataSource);
-        }
-        return mySQLDataSourceMap.get(dataSourceName);
-    }
 
     @Nonnull
     public static String defaultMySQLDataSourceName() {

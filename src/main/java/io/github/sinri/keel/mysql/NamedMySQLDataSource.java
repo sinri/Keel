@@ -1,17 +1,21 @@
 package io.github.sinri.keel.mysql;
 
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.mysql.exception.KeelMySQLConnectionException;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 import io.vertx.mysqlclient.MySQLBuilder;
 import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.TransactionRollbackException;
 
-import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.keel;
@@ -25,7 +29,6 @@ import static io.github.sinri.keel.facade.KeelInstance.keel;
  */
 public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
 
-    //    private final MySQLPool pool;
     private final Pool pool;
     private final KeelMySQLConfiguration configuration;
     /**
@@ -34,6 +37,8 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
     private final AtomicInteger connectionAvailableCounter = new AtomicInteger(0);
 
     private final Function<SqlConnection, C> sqlConnectionWrapper;
+
+    private final AtomicReference<String> fullVersionRef = new AtomicReference<>(null);
 
     public NamedMySQLDataSource(
             KeelMySQLConfiguration configuration,
@@ -47,7 +52,7 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
      */
     public NamedMySQLDataSource(
             KeelMySQLConfiguration configuration,
-            @Nonnull Function<SqlConnection, Future<Void>> connectionSetUpFunction,
+            @Nullable Function<SqlConnection, Future<Void>> connectionSetUpFunction,
             Function<SqlConnection, C> sqlConnectionWrapper
     ) {
         this.configuration = configuration;
@@ -57,25 +62,33 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
                 .connectingTo(configuration.getConnectOptions())
                 .using(keel.getVertx())
                 .withConnectHandler(sqlConnection -> {
-                    connectionSetUpFunction.apply(sqlConnection)
+                    Future.succeededFuture()
+                            .compose(v -> {
+                                if (connectionSetUpFunction != null) {
+                                    return connectionSetUpFunction.apply(sqlConnection);
+                                } else {
+                                    return Future.succeededFuture();
+                                }
+                            })
+                            .compose(v -> {
+                                if (this.fullVersionRef.get() == null) {
+                                    return checkMySQLVersion(sqlConnection)
+                                            .compose(ver -> {
+                                                if (ver != null) {
+                                                    this.fullVersionRef.set(ver);
+                                                }
+                                                return Future.succeededFuture();
+                                            });
+                                } else {
+                                    return Future.succeededFuture();
+                                }
+                            })
                             .onComplete(ar -> {
                                 connectionAvailableCounter.incrementAndGet();
                                 sqlConnection.close();
                             });
                 })
                 .build();
-//        pool = MySQLPool.pool(
-//                keel.getVertx(),
-//                configuration.getConnectOptions(),
-//                configuration.getPoolOptions()
-//        );
-//        pool.connectHandler(sqlConnection -> {
-//            connectionSetUpFunction.apply(sqlConnection)
-//                    .onComplete(ar -> {
-//                        connectionAvailableCounter.incrementAndGet();
-//                        sqlConnection.close();
-//                    });
-//        });
     }
 
     public KeelMySQLConfiguration getConfiguration() {
@@ -90,21 +103,33 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
         return connectionAvailableCounter.get();
     }
 
-    protected Future<C> fetchMySQLConnection() {
-        return pool.getConnection()
-                .compose(sqlConnection -> {
-                    connectionAvailableCounter.decrementAndGet();
-                    C c = this.sqlConnectionWrapper.apply(sqlConnection);
-                    return Future.succeededFuture(c);
-                }, throwable -> {
-                    return Future.failedFuture(new KeelMySQLConnectionException(
-                            "MySQLDataSource Failed to get SqlConnection From Pool " +
-                                    "`" + this.getConfiguration().getDataSourceName() + "` " +
-                                    "(available: " + connectionAvailableCounter.get() + "): " +
-                                    throwable,
-                            throwable
-                    ));
+    /**
+     * @since 3.1.0
+     */
+    private static Future<String> checkMySQLVersion(SqlConnection sqlConnection) {
+        return sqlConnection.preparedQuery("SELECT VERSION() as v; ")
+                .execute()
+                .compose(rows -> {
+                    return Future.succeededFuture(ResultMatrix.create(rows));
+                })
+                .compose(resultMatrix -> {
+                    try {
+                        JsonObject firstRow = resultMatrix.getFirstRow();
+                        String versionExp = firstRow.getString("v");
+                        return Future.succeededFuture(versionExp);
+                    } catch (Throwable e) {
+                        KeelOutputEventLogCenter.instantLogger().exception(e);
+                        return Future.succeededFuture(null);
+                    }
                 });
+
+    }
+
+    /**
+     * @since 3.1.0
+     */
+    public @Nullable String getFullVersionRef() {
+        return fullVersionRef.get();
     }
 
     public <T> Future<T> withConnection(Function<C, Future<T>> function) {
@@ -168,5 +193,26 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
      */
     public void close(Handler<AsyncResult<Void>> ar) {
         this.pool.close(ar);
+    }
+
+    protected Future<C> fetchMySQLConnection() {
+        return pool.getConnection()
+                .compose(sqlConnection -> {
+                    connectionAvailableCounter.decrementAndGet();
+                    C c = this.sqlConnectionWrapper.apply(sqlConnection);
+
+                    // since 3.1.0: add mysql version to c;
+                    c.setMysqlVersion(this.fullVersionRef.get());
+
+                    return Future.succeededFuture(c);
+                }, throwable -> {
+                    return Future.failedFuture(new KeelMySQLConnectionException(
+                            "MySQLDataSource Failed to get SqlConnection From Pool " +
+                                    "`" + this.getConfiguration().getDataSourceName() + "` " +
+                                    "(available: " + connectionAvailableCounter.get() + "): " +
+                                    throwable,
+                            throwable
+                    ));
+                });
     }
 }

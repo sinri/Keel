@@ -86,8 +86,6 @@ public interface AnyStatement {
     Future<ResultMatrix> execute(SqlConnection sqlConnection);
 
     /**
-     * @param namedSqlConnection
-     * @return
      * @since 3.0.11
      * @since 3.0.18 Finished Technical Preview.
      */
