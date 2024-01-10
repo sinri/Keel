@@ -3,6 +3,7 @@ package io.github.sinri.keel.mysql.statement.component;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.Quoter;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -28,7 +29,7 @@ public class NullIfOperator {
         return this;
     }
 
-    public NullIfOperator setBaseExpression(String baseExpression) {
+    public NullIfOperator setBaseExpression(@Nonnull String baseExpression) {
         this.baseExpression = baseExpression;
         return this;
     }
@@ -43,7 +44,7 @@ public class NullIfOperator {
         return this;
     }
 
-    public NullIfOperator setNullRefExpression(String nullRefExpression) {
+    public NullIfOperator setNullRefExpression(@Nonnull String nullRefExpression) {
         this.nullRefExpression = nullRefExpression;
         return this;
     }

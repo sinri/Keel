@@ -13,7 +13,7 @@ import io.vertx.ext.web.client.WebClient;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * Developed with ES version 8.9.
@@ -26,7 +26,7 @@ public interface ESApiMixin {
     KeelEventLogger getLogger();
 
     default Future<JsonObject> call(HttpMethod httpMethod, String endpoint, ESApiQueries queries, @Nullable JsonObject requestBody) {
-        WebClient webClient = WebClient.create(keel.getVertx());
+        WebClient webClient = WebClient.create(Keel.getVertx());
         String url = this.getEsConfig().clusterApiUrl(endpoint);
         HttpRequest<Buffer> bufferHttpRequest = webClient.requestAbs(httpMethod, url);
 

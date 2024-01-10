@@ -7,7 +7,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Verticle;
 import io.vertx.core.json.JsonObject;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 1.14
@@ -47,14 +47,14 @@ public interface KeelVerticle extends Verticle {
 
 
     default Future<String> deployMe(DeploymentOptions deploymentOptions) {
-        return keel.getVertx().deployVerticle(this, deploymentOptions);
+        return Keel.getVertx().deployVerticle(this, deploymentOptions);
     }
 
     /**
      * @since 2.8 add default implementation
      */
     default Future<Void> undeployMe() {
-        return keel.getVertx().undeploy(deploymentID());
+        return Keel.getVertx().undeploy(deploymentID());
     }
 
 }

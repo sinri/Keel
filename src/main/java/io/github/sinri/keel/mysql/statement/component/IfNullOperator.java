@@ -3,6 +3,7 @@ package io.github.sinri.keel.mysql.statement.component;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.Quoter;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -44,7 +45,7 @@ public class IfNullOperator {
         return this;
     }
 
-    public IfNullOperator setExpressionForNull(String expressionForNull) {
+    public IfNullOperator setExpressionForNull(@Nonnull String expressionForNull) {
         this.expressionForNull = expressionForNull;
         return this;
     }

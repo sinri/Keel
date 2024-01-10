@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
@@ -151,7 +151,7 @@ public class TableRowClassSourceCodeGenerator {
                     return KeelAsyncKit.iterativelyCall(writeMap.entrySet(), entry -> {
                         var classFile = entry.getKey();
                         var code = entry.getValue();
-                        return keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
+                        return Keel.getVertx().fileSystem().writeFile(classFile, Buffer.buffer(code));
                     });
                 });
     }

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 2.6
@@ -114,6 +114,6 @@ public class KeelFileHelper {
      * @since 3.0.0
      */
     public Future<String> crateTempFile(@Nullable String prefix, @Nullable String suffix) {
-        return keel.getVertx().fileSystem().createTempFile(prefix, suffix);
+        return Keel.getVertx().fileSystem().createTempFile(prefix, suffix);
     }
 }

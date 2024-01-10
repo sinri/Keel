@@ -9,12 +9,12 @@ import io.vertx.core.VertxOptions;
 import java.util.Date;
 import java.util.List;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class RedisTest {
     public static void main(String[] args) {
-        keel.getConfiguration().loadPropertiesFile("config.properties");
-        keel.initializeVertxStandalone(new VertxOptions());
+        Keel.getConfiguration().loadPropertiesFile("config.properties");
+        Keel.initializeVertxStandalone(new VertxOptions());
 
         RedisKit kit = new RedisKit("test");
         Future.succeededFuture()
@@ -25,7 +25,7 @@ public class RedisTest {
                     throwable.printStackTrace();
                 })
                 .eventually(() -> {
-                    return keel.gracefullyClose(Promise::complete);
+                    return Keel.gracefullyClose(Promise::complete);
                 });
     }
 

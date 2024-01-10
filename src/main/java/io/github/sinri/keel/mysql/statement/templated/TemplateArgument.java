@@ -17,12 +17,12 @@ public class TemplateArgument {
     private final boolean asScalar;
     private final Collection<String> expressions;
 
-    private TemplateArgument(String expression) {
+    private TemplateArgument(@Nonnull String expression) {
         this.asScalar = true;
         this.expressions = List.of(expression);
     }
 
-    private TemplateArgument(Collection<String> expressions) {
+    private TemplateArgument(@Nonnull Collection<String> expressions) {
         this.asScalar = false;
         this.expressions = expressions;
     }
@@ -64,8 +64,6 @@ public class TemplateArgument {
     }
 
     /**
-     * @param strings
-     * @return
      * @since 3.0.11 the provided collection could be empty, leave the error to Database.
      */
     public static TemplateArgument forExpressions(@Nonnull Collection<String> strings) {

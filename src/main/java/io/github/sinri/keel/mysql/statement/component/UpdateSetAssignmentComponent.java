@@ -4,14 +4,15 @@ import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.Quoter;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @since 3.0.19
  */
 @TechnicalPreview(since = "3.0.19")
 public class UpdateSetAssignmentComponent {
-    private final String fieldName;
-    private String expression;
+    private final @Nonnull String fieldName;
+    private @Nonnull String expression;
 
     public UpdateSetAssignmentComponent(@Nonnull String fieldName) {
         this.fieldName = fieldName;
@@ -22,13 +23,14 @@ public class UpdateSetAssignmentComponent {
         return this;
     }
 
-    public UpdateSetAssignmentComponent assignmentToValue(@Nonnull String expression) {
-        this.expression = new Quoter(expression).toString();
-        return this;
-    }
-
-    public UpdateSetAssignmentComponent assignmentToValue(@Nonnull Number expression) {
-        this.expression = expression.toString();
+    public UpdateSetAssignmentComponent assignmentToValue(@Nullable Object expression) {
+        if(expression==null){
+            this.expression = "NULL";
+        }else if (expression instanceof Number){
+            this.expression = expression.toString();
+        }else{
+            this.expression = new Quoter(expression.toString()).toString();
+        }
         return this;
     }
 

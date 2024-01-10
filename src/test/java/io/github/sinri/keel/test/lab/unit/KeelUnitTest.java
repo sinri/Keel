@@ -10,13 +10,13 @@ import io.vertx.core.Future;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class KeelUnitTest extends KeelTest {
 
     @Override
     protected @Nonnull Future<Void> starting() {
-        keel.getConfiguration().loadPropertiesFile("config.properties");
+        Keel.getConfiguration().loadPropertiesFile("config.properties");
         System.out.println("prepared");
         return Future.succeededFuture();
     }

@@ -9,7 +9,7 @@ import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 3.0.10 Technical Preview
@@ -48,7 +48,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void afterStartingVertx(Vertx vertx) {
-        keel.setVertx(vertx);
+        Keel.setVertx(vertx);
         logger().debug(log -> log
                 .message("afterStartingVertx")
         );

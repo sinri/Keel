@@ -13,7 +13,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 3.0.0
@@ -128,7 +128,7 @@ public interface KeelAsyncKit {
      * @since 3.0.11 not only Void!
      */
     static <T> Future<T> exclusivelyCall(@Nonnull String lockName, @Nonnull Supplier<Future<T>> exclusiveSupplier) {
-        return keel.getVertx().sharedData()
+        return Keel.getVertx().sharedData()
                 .getLock(lockName)
                 .compose(lock -> Future.succeededFuture()
                         .compose(v -> exclusiveSupplier.get())
@@ -144,7 +144,7 @@ public interface KeelAsyncKit {
         Promise<Void> promise = Promise.promise();
         promiseHandler.handle(promise);
         promise.future()
-                .andThen(ar -> keel.getVertx()
+                .andThen(ar -> Keel.getVertx()
                         .setTimer(1L, timerID -> endless(promiseHandler)));
     }
 

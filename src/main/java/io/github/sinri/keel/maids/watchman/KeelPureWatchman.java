@@ -5,7 +5,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.ThreadingModel;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * It might be used like KeelEndless in standalone mode with Promise and clustered lock.
@@ -25,7 +25,7 @@ public class KeelPureWatchman extends KeelWatchmanImpl {
         Options options = new Options();
         optionsHandler.handle(options);
         KeelPureWatchman keelPureWatchman = new KeelPureWatchman(watchmanName, options);
-        return keel.getVertx().deployVerticle(keelPureWatchman, new DeploymentOptions()
+        return Keel.getVertx().deployVerticle(keelPureWatchman, new DeploymentOptions()
                 .setThreadingModel(ThreadingModel.WORKER)
         );
     }

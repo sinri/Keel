@@ -6,13 +6,13 @@ import io.vertx.core.VertxOptions;
 
 import java.util.concurrent.TimeUnit;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class SharedTestBootstrap {
 
     public static void bootstrap(Handler<Void> handler) {
-        keel.getConfiguration().loadPropertiesFile("config.properties");
-        keel.initializeVertx(new VertxOptions()
+        Keel.getConfiguration().loadPropertiesFile("config.properties");
+        Keel.initializeVertx(new VertxOptions()
                         .setEventLoopPoolSize(4) // default 2 * number of cores on the machine
                         .setWorkerPoolSize(2)//default 20
                         .setMaxWorkerExecuteTime(60_000_000_000L) // 1s;  default 60_000_000_000 ns = 60s

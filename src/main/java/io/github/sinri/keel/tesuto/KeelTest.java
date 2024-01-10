@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 3.0.10
@@ -57,7 +57,7 @@ abstract public class KeelTest {
         }
 
         VertxOptions vertxOptions = ((KeelTest) testInstance).buildVertxOptions();
-        keel.initializeVertxStandalone(vertxOptions);
+        Keel.initializeVertxStandalone(vertxOptions);
 
         AtomicInteger totalPassedRef = new AtomicInteger();
         List<TestUnitResult> testUnitResults = new ArrayList<>();
@@ -103,7 +103,7 @@ abstract public class KeelTest {
                     return ((KeelTest) testInstance).ending(testUnitResults);
                 })
                 .eventually(() -> {
-                    return keel.getVertx().close();
+                    return Keel.getVertx().close();
                 });
     }
 

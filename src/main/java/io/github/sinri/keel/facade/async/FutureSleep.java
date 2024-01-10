@@ -5,7 +5,7 @@ import io.vertx.core.Promise;
 
 import javax.annotation.Nullable;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * 将延时执行转换成Future供compose使用。
@@ -25,12 +25,12 @@ public class FutureSleep {
     static Future<Void> call(long time, @Nullable Promise<Void> interrupter) {
         Promise<Void> promise = Promise.promise();
         if (time < 1) time = 1;
-        long timer_id = keel.getVertx().setTimer(time, timerID -> {
+        long timer_id = Keel.getVertx().setTimer(time, timerID -> {
             promise.complete();
         });
         if (interrupter != null) {
             interrupter.future().onSuccess(interrupted -> {
-                keel.getVertx().cancelTimer(timer_id);
+                Keel.getVertx().cancelTimer(timer_id);
                 promise.tryComplete();
             });
         }

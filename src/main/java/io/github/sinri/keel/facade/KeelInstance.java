@@ -16,7 +16,7 @@ import java.util.Objects;
  */
 @TechnicalPreview(since = "3.1.0")
 public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
-    public static KeelInstance keel = new KeelInstance();
+    public static KeelInstance Keel = new KeelInstance();
 
     private final @Nonnull KeelConfiguration configuration;
     private @Nullable Vertx vertx;

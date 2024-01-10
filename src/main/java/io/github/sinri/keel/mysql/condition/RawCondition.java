@@ -1,17 +1,19 @@
 package io.github.sinri.keel.mysql.condition;
 
+import javax.annotation.Nonnull;
+
 public class RawCondition implements MySQLCondition {
-    private String rawConditionExpression;
+    @Nonnull private String rawConditionExpression;
 
     public RawCondition() {
         this.rawConditionExpression = "";
     }
 
-    public RawCondition(String rawConditionExpression) {
+    public RawCondition(@Nonnull String rawConditionExpression) {
         this.rawConditionExpression = rawConditionExpression;
     }
 
-    public void setRawConditionExpression(String rawConditionExpression) {
+    public void setRawConditionExpression(@Nonnull String rawConditionExpression) {
         this.rawConditionExpression = rawConditionExpression;
     }
 

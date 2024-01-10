@@ -7,13 +7,13 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class KeelMySQLDataSourceProvider {
 
     @Nonnull
     public static String defaultMySQLDataSourceName() {
-        return Objects.requireNonNullElse(keel.getConfiguration().readString("mysql", "default_data_source_name"), "default");
+        return Objects.requireNonNullElse(Keel.getConfiguration().readString("mysql", "default_data_source_name"), "default");
     }
 
     /**
@@ -24,7 +24,7 @@ public class KeelMySQLDataSourceProvider {
             @Nonnull String dataSourceName,
             Function<SqlConnection, C> sqlConnectionWrapper
     ) {
-        KeelConfiguration configuration = keel.getConfiguration().extract("mysql", dataSourceName);
+        KeelConfiguration configuration = Keel.getConfiguration().extract("mysql", dataSourceName);
         Objects.requireNonNull(configuration);
         KeelMySQLConfiguration mySQLConfigure = new KeelMySQLConfiguration(dataSourceName, configuration);
         return new NamedMySQLDataSource<>(mySQLConfigure, sqlConnectionWrapper);

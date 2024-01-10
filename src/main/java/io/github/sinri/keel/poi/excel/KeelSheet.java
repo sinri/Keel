@@ -64,8 +64,35 @@ public class KeelSheet {
         return getSheet().getRow(i);
     }
 
+    /**
+     * @since 3.1.0
+     */
+    public List<String> readRawRow(int i,int maxColumns, @Nullable SheetRowFilter sheetRowFilter) {
+        var row=readRow(i);
+        return dumpRowToRawRow(row,maxColumns,sheetRowFilter);
+    }
+
     public Iterator<Row> getRowIterator() {
         return getSheet().rowIterator();
+    }
+
+    /**
+     * @since 3.1.0
+     */
+    public Iterator<List<String>> getRawRowIterator(int maxColumns, @Nullable SheetRowFilter sheetRowFilter) {
+        Iterator<Row> rowIterator = getRowIterator();
+        return new Iterator<>() {
+            @Override
+            public boolean hasNext() {
+                return rowIterator.hasNext();
+            }
+
+            @Override
+            public List<String> next() {
+                Row row = rowIterator.next();
+                return dumpRowToRawRow(row, maxColumns, sheetRowFilter);
+            }
+        };
     }
 
     /**

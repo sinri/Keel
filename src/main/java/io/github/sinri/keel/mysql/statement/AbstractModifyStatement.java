@@ -4,6 +4,8 @@ import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
 
+import javax.annotation.Nonnull;
+
 /**
  * @since 1.10
  */
@@ -15,7 +17,7 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
      * @since 1.7
      * @since 1.10 removed recover
      */
-    public Future<Integer> executeForAffectedRows(SqlConnection sqlConnection) {
+    public Future<Integer> executeForAffectedRows(@Nonnull SqlConnection sqlConnection) {
         return execute(sqlConnection)
                 .compose(resultMatrix -> {
                     var afx = resultMatrix.getTotalAffectedRows();
@@ -24,19 +26,17 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
     }
 
     /**
-     * @param namedMySQLConnection
-     * @return
      * @since 3.0.11
      * @since 3.0.18 Finished Technical Preview.
      */
-    public Future<Integer> executeForAffectedRows(NamedMySQLConnection namedMySQLConnection) {
+    public Future<Integer> executeForAffectedRows(@Nonnull NamedMySQLConnection namedMySQLConnection) {
         return executeForAffectedRows(namedMySQLConnection.getSqlConnection());
     }
 
     /**
      * @since 3.0.0
      */
-    public static AbstractModifyStatement buildWithRawSQL(String sql) {
+    public static AbstractModifyStatement buildWithRawSQL(@Nonnull String sql) {
         return new AbstractModifyStatement() {
             @Override
             public String toString() {

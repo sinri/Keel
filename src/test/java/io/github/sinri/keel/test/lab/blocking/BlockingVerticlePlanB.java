@@ -5,7 +5,7 @@ import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * 可以多线程运行。
@@ -36,7 +36,7 @@ public class BlockingVerticlePlanB {
     }
 
     public static void main(String[] args) {
-        keel.initializeVertx(new VertxOptions())
+        Keel.initializeVertx(new VertxOptions())
                 .compose(done -> {
                     KeelEventLogger loggerInEventLoopContext = KeelOutputEventLogCenter.getInstance().createLogger("Sample");
 
@@ -59,7 +59,7 @@ public class BlockingVerticlePlanB {
                     throwable.printStackTrace();
                 })
                 .eventually(() -> {
-                    return keel.close();
+                    return Keel.close();
                 });
     }
 

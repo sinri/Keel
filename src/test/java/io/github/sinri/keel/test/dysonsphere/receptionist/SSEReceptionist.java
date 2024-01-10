@@ -7,7 +7,7 @@ import io.github.sinri.keel.web.http.receptionist.KeelWebReceptionist;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 @ApiMeta(routePath = "/receptionist/sse", allowMethods = {"GET", "POST"}, timeout = 0)
 public class SSEReceptionist extends KeelWebReceptionist {
@@ -23,13 +23,13 @@ public class SSEReceptionist extends KeelWebReceptionist {
                 .putHeader("Cache-Control", "no-cache")
                 .setChunked(true);
 
-        long timer = keel.getVertx().setPeriodic(1000L, x -> {
+        long timer = Keel.getVertx().setPeriodic(1000L, x -> {
             response.write("event: update\n");
             response.write("data: " + ("Now is " + System.currentTimeMillis()) + "\n\n");
         });
 
         response.endHandler(v -> {
-            keel.getVertx().cancelTimer(timer);
+            Keel.getVertx().cancelTimer(timer);
         });
     }
 

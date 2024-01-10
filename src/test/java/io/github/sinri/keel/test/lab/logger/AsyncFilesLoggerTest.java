@@ -9,15 +9,15 @@ import io.vertx.core.VertxOptions;
 
 import java.util.Date;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class AsyncFilesLoggerTest {
     public static void main(String[] args) {
-        keel.initializeVertx(new VertxOptions())
+        Keel.initializeVertx(new VertxOptions())
                 .compose(v -> {
                     return test();
                 })
-                .eventually(() -> keel.getVertx().close());
+                .eventually(() -> Keel.getVertx().close());
     }
 
     private static Future<Void> test() {

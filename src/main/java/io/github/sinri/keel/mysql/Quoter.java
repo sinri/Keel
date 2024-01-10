@@ -1,11 +1,13 @@
 package io.github.sinri.keel.mysql;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class Quoter {
-    private final String quoted;
+    private final @Nonnull String quoted;
 
-    public Quoter(String x, Boolean withWildcards) {
+    public Quoter(@Nullable String x, boolean withWildcards) {
         if (x == null) {
             quoted = "NULL";
         } else {
@@ -17,7 +19,7 @@ public class Quoter {
         }
     }
 
-    public Quoter(Number number) {
+    public Quoter(@Nullable Number number) {
         if (number == null) {
             quoted = "NULL";
         } else {
@@ -25,14 +27,14 @@ public class Quoter {
         }
     }
 
-    public Quoter(Boolean b) {
+    public Quoter(boolean b) {
         if (b)
             quoted = "TRUE";
         else
             quoted = "FALSE";
     }
 
-    public Quoter(String s) {
+    public Quoter(@Nullable String s) {
         if (s == null) {
             quoted = "NULL";
         } else {
@@ -41,7 +43,7 @@ public class Quoter {
         }
     }
 
-    public Quoter(List<?> list) {
+    public Quoter(@Nonnull List<?> list) {
         StringBuilder q = new StringBuilder();
         for (Object y : list) {
             if (q.length() > 0) {
@@ -56,7 +58,7 @@ public class Quoter {
         quoted = "(" + q + ")";
     }
 
-    public static String escapeString(String s) {
+    public static @Nonnull String escapeString(@Nonnull String s) {
         return s.replace("\\", "\\\\")
                 .replace("\b", "\\b")
                 .replace("\n", "\\n")
@@ -68,13 +70,13 @@ public class Quoter {
                 .replace("\"", "\\\"");
     }
 
-    public static String escapeStringWithWildcards(String s) {
+    public static @Nonnull String escapeStringWithWildcards(@Nonnull String s) {
         return escapeString(s)
                 .replace("%", "\\%")
                 .replace("_", "\\_");
     }
 
-    public static String quoteEscapedString(String s) {
+    public static @Nonnull String quoteEscapedString(@Nonnull String s) {
         return "'" + s + "'";
     }
 

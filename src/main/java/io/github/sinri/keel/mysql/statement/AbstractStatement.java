@@ -5,6 +5,7 @@ import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -12,35 +13,37 @@ import java.util.concurrent.atomic.AtomicReference;
  * @since 1.7
  */
 abstract public class AbstractStatement implements AnyStatement {
-    protected static KeelEventLogger sqlAuditLogger = KeelEventLogger.silentLogger();
-    protected static String SQL_COMPONENT_SEPARATOR = " ";//"\n";
-    protected final String statement_uuid;
-    private String remarkAsComment = "";
+    protected static @Nonnull KeelEventLogger sqlAuditLogger = KeelEventLogger.silentLogger();
+    protected static @Nonnull String SQL_COMPONENT_SEPARATOR = " ";//"\n";
+    protected final @Nonnull String statement_uuid;
+    private @Nonnull String remarkAsComment = "";
 
     public AbstractStatement() {
         this.statement_uuid = UUID.randomUUID().toString();
     }
 
+    @Nonnull
     public static KeelEventLogger getSqlAuditLogger() {
         return sqlAuditLogger;
     }
 
-    public static void setSqlAuditLogger(KeelEventLogger sqlAuditLogger) {
+    public static void setSqlAuditLogger(@Nonnull KeelEventLogger sqlAuditLogger) {
         AbstractStatement.sqlAuditLogger = sqlAuditLogger;
     }
 
-    public static void setSqlComponentSeparator(String sqlComponentSeparator) {
+    public static void setSqlComponentSeparator(@Nonnull String sqlComponentSeparator) {
         SQL_COMPONENT_SEPARATOR = sqlComponentSeparator;
     }
 
+    @Nonnull
     protected String getRemarkAsComment() {
         return remarkAsComment;
     }
 
-    public AbstractStatement setRemarkAsComment(String remarkAsComment) {
-        if (remarkAsComment == null) {
-            remarkAsComment = "";
-        }
+    public AbstractStatement setRemarkAsComment(@Nonnull String remarkAsComment) {
+//        if (remarkAsComment == null) {
+//            remarkAsComment = "";
+//        }
         remarkAsComment = remarkAsComment.replaceAll("[\\r\\n]+", "¦");
         this.remarkAsComment = remarkAsComment;
         return this;
@@ -65,7 +68,7 @@ abstract public class AbstractStatement implements AnyStatement {
      * @since 3.0.0 removed try-catch
      */
     @Override
-    public final Future<ResultMatrix> execute(SqlConnection sqlConnection) {
+    public final Future<ResultMatrix> execute(@Nonnull SqlConnection sqlConnection) {
         AtomicReference<String> theSql = new AtomicReference<>();
         return Future.succeededFuture(this.toString())
                 .compose(sql -> {

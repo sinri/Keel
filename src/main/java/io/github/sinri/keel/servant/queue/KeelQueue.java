@@ -7,7 +7,7 @@ import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * 标准的队列服务实现。
@@ -94,7 +94,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
                 .eventually(() -> {
                     long waitingMs = nextTaskSeeker.waitingMs();
                     getLogger().debug("set timer for next routine after " + waitingMs + " ms");
-                    keel.getVertx().setTimer(waitingMs, timerID -> routine());
+                    Keel.getVertx().setTimer(waitingMs, timerID -> routine());
                     return Future.succeededFuture();
                 })
         ;

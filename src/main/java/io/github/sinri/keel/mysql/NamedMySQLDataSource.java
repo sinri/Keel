@@ -13,12 +13,13 @@ import io.vertx.sqlclient.Pool;
 import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.TransactionRollbackException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * Pair data source to a named mysql connection.
@@ -41,8 +42,8 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
     private final AtomicReference<String> fullVersionRef = new AtomicReference<>(null);
 
     public NamedMySQLDataSource(
-            KeelMySQLConfiguration configuration,
-            Function<SqlConnection, C> sqlConnectionWrapper
+            @Nonnull KeelMySQLConfiguration configuration,
+            @Nonnull Function<SqlConnection, C> sqlConnectionWrapper
     ) {
         this(configuration, sqlConnection -> Future.succeededFuture(), sqlConnectionWrapper);
     }
@@ -51,16 +52,16 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
      * @since 3.0.2
      */
     public NamedMySQLDataSource(
-            KeelMySQLConfiguration configuration,
+            @Nonnull KeelMySQLConfiguration configuration,
             @Nullable Function<SqlConnection, Future<Void>> connectionSetUpFunction,
-            Function<SqlConnection, C> sqlConnectionWrapper
+            @Nonnull Function<SqlConnection, C> sqlConnectionWrapper
     ) {
         this.configuration = configuration;
         this.sqlConnectionWrapper = sqlConnectionWrapper;
         pool = MySQLBuilder.pool()
                 .with(configuration.getPoolOptions())
                 .connectingTo(configuration.getConnectOptions())
-                .using(keel.getVertx())
+                .using(Keel.getVertx())
                 .withConnectHandler(sqlConnection -> {
                     Future.succeededFuture()
                             .compose(v -> {
@@ -106,7 +107,7 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
     /**
      * @since 3.1.0
      */
-    private static Future<String> checkMySQLVersion(SqlConnection sqlConnection) {
+    private static Future<String> checkMySQLVersion(@Nonnull SqlConnection sqlConnection) {
         return sqlConnection.preparedQuery("SELECT VERSION() as v; ")
                 .execute()
                 .compose(rows -> {
@@ -122,7 +123,6 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
                         return Future.succeededFuture(null);
                     }
                 });
-
     }
 
     /**
@@ -132,7 +132,7 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
         return fullVersionRef.get();
     }
 
-    public <T> Future<T> withConnection(Function<C, Future<T>> function) {
+    public <T> Future<T> withConnection(@Nonnull Function<C, Future<T>> function) {
         return fetchMySQLConnection()
                 .compose(sqlConnectionWrapper -> {
                     return Future.succeededFuture()
@@ -152,7 +152,7 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
                 });
     }
 
-    public <T> Future<T> withTransaction(Function<C, Future<T>> function) {
+    public <T> Future<T> withTransaction(@Nonnull Function<C, Future<T>> function) {
         return withConnection(c -> {
             return c.getSqlConnection().begin()
                     .compose(transaction -> {
@@ -188,10 +188,9 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
     }
 
     /**
-     * @param ar
      * @since 3.0.5
      */
-    public void close(Handler<AsyncResult<Void>> ar) {
+    public void close(@Nonnull Handler<AsyncResult<Void>> ar) {
         this.pool.close(ar);
     }
 

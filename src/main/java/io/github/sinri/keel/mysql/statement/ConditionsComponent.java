@@ -4,6 +4,7 @@ import io.github.sinri.keel.mysql.condition.*;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -24,7 +25,7 @@ public class ConditionsComponent {
         return this.conditions.isEmpty();
     }
 
-    public ConditionsComponent comparison(Function<CompareCondition, CompareCondition> function) {
+    public ConditionsComponent comparison(@Nonnull Function<CompareCondition, CompareCondition> function) {
         CompareCondition condition = function.apply(new CompareCondition());
         if (condition != null) {
             conditions.add(condition);
@@ -32,7 +33,7 @@ public class ConditionsComponent {
         return this;
     }
 
-    public ConditionsComponent comparison(String operator, Function<CompareCondition, CompareCondition> function) {
+    public ConditionsComponent comparison(@Nonnull String operator, @Nonnull Function<CompareCondition, CompareCondition> function) {
         CompareCondition condition = function.apply(new CompareCondition(operator));
         if (condition != null) {
             conditions.add(condition);
@@ -40,7 +41,7 @@ public class ConditionsComponent {
         return this;
     }
 
-    public ConditionsComponent among(Function<AmongstCondition, AmongstCondition> function) {
+    public ConditionsComponent among(@Nonnull Function<AmongstCondition, AmongstCondition> function) {
         AmongstCondition condition = function.apply(new AmongstCondition());
         if (condition != null) {
             conditions.add(condition);
@@ -48,7 +49,7 @@ public class ConditionsComponent {
         return this;
     }
 
-    public ConditionsComponent intersection(Function<GroupCondition, GroupCondition> function) {
+    public ConditionsComponent intersection(@Nonnull Function<GroupCondition, GroupCondition> function) {
         GroupCondition condition = function.apply(new GroupCondition(GroupCondition.JUNCTION_FOR_AND));
         if (condition != null) {
             conditions.add(condition);
@@ -56,7 +57,7 @@ public class ConditionsComponent {
         return this;
     }
 
-    public ConditionsComponent union(Function<GroupCondition, GroupCondition> function) {
+    public ConditionsComponent union(@Nonnull Function<GroupCondition, GroupCondition> function) {
         GroupCondition condition = function.apply(new GroupCondition(GroupCondition.JUNCTION_FOR_OR));
         if (condition != null) {
             conditions.add(condition);
@@ -64,8 +65,8 @@ public class ConditionsComponent {
         return this;
     }
 
-    public ConditionsComponent raw(String raw) {
-        if (raw != null && !raw.isEmpty()) {
+    public ConditionsComponent raw(@Nonnull String raw) {
+        if (!raw.isBlank()) {
             conditions.add(new RawCondition(raw));
         }
         return this;
@@ -76,7 +77,7 @@ public class ConditionsComponent {
      * @return this
      * @since 1.13
      */
-    public ConditionsComponent withCatholicQueryCriteria(CatholicQueryCriteria catholicQueryCriteria) {
+    public ConditionsComponent withCatholicQueryCriteria(@Nonnull CatholicQueryCriteria catholicQueryCriteria) {
         return catholicQueryCriteria.mergeIntoConditionsComponent(this);
     }
 
@@ -89,6 +90,7 @@ public class ConditionsComponent {
     /**
      * @since 2.0
      */
+    @Deprecated(since = "3.1.0")
     public final ConditionsComponent quickMapping(JsonObject mapping) {
         mapping.forEach(entry -> quickMapping(entry.getKey(), entry.getValue()));
         return this;
@@ -97,6 +99,7 @@ public class ConditionsComponent {
     /**
      * @since 2.0
      */
+    @Deprecated(since = "3.1.0")
     public final ConditionsComponent quickMapping(String key, Object value) {
         if (key != null && !key.isEmpty()) {
             if (value == null) {

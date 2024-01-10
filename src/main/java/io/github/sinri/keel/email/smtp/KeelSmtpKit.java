@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 1.10
@@ -28,9 +28,9 @@ public class KeelSmtpKit {
     public KeelSmtpKit(@Nonnull MailConfig mailConfig, @Nullable String poolName) {
         this.mailConfig = mailConfig;
         if (poolName != null) {
-            this.mailClient = MailClient.createShared(keel.getVertx(), this.mailConfig, poolName);
+            this.mailClient = MailClient.createShared(Keel.getVertx(), this.mailConfig, poolName);
         } else {
-            this.mailClient = MailClient.create(keel.getVertx(), this.mailConfig);
+            this.mailClient = MailClient.create(Keel.getVertx(), this.mailConfig);
         }
     }
 
@@ -45,7 +45,7 @@ public class KeelSmtpKit {
     public KeelSmtpKit() {
         this(
                 Objects.requireNonNull(
-                        keel.config("email.smtp.default_smtp_name"),
+                        Keel.config("email.smtp.default_smtp_name"),
                         "email.smtp.default_smtp_name is not configured"
                 )
         );
@@ -55,7 +55,7 @@ public class KeelSmtpKit {
      * As of 3.0.6, only five property keys supported.
      */
     private static MailConfig buildMailConfig(@Nonnull String smtpName) {
-        KeelConfiguration smtpConfiguration = keel.getConfiguration().extract("email", "smtp", smtpName);
+        KeelConfiguration smtpConfiguration = Keel.getConfiguration().extract("email", "smtp", smtpName);
 
         var mailConfig = new MailConfig();
         mailConfig.setHostname(smtpConfiguration.readString("hostname"));

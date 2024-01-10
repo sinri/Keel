@@ -8,7 +8,7 @@ import io.vertx.ext.web.handler.PlatformHandler;
 import java.util.Random;
 import java.util.UUID;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
@@ -26,7 +26,7 @@ public class KeelPlatformHandler implements PlatformHandler {
         // BEFORE ASYNC PAUSE
         routingContext.request().pause();
         // START !
-        keel.getVertx().sharedData()
+        Keel.getVertx().sharedData()
                 .getCounter("KeelPlatformHandler-RequestID-Counter")
                 .compose(Counter::incrementAndGet)
                 .recover(throwable -> {

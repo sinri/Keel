@@ -10,7 +10,7 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 2.0
@@ -62,7 +62,7 @@ public abstract class KeelProgram {
                     getLogger().exception(throwable, "FAILED");
                     returnCode.set(generateReturnCode(throwable));
                 })
-                .eventually(() -> keel.gracefullyClose(promise -> {
+                .eventually(() -> Keel.gracefullyClose(promise -> {
                     // do nothing
                 }))
                 .onComplete(v -> {

@@ -6,7 +6,7 @@ import io.vertx.core.Promise;
 import javax.annotation.Nonnull;
 import java.util.function.Function;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 
 /**
@@ -34,7 +34,7 @@ public class FutureRepeat {
                         if (routineResult.isToStop()) {
                             finalPromise.complete();
                         } else {
-                            keel.getVertx().setTimer(1L, x -> routine(routineResult, finalPromise));
+                            Keel.getVertx().setTimer(1L, x -> routine(routineResult, finalPromise));
                         }
                     } else {
                         finalPromise.fail(shouldStopAR.cause());

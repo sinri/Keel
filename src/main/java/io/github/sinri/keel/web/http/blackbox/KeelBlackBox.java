@@ -10,7 +10,7 @@ import io.vertx.ext.web.RoutingContext;
 import java.io.File;
 import java.util.Date;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * A simple online log viewer
@@ -65,7 +65,7 @@ public class KeelBlackBox {
     }
 
     private static void handleDir(RoutingContext routingContext, File dir, String logDirPath, String routeRootPathWithTailSplash) {
-        keel.getVertx().fileSystem().readDir(dir.getAbsolutePath())
+        Keel.getVertx().fileSystem().readDir(dir.getAbsolutePath())
                 .compose(children -> {
                     String relativeDirPath = dir.getAbsolutePath().substring(logDirPath.length());
 

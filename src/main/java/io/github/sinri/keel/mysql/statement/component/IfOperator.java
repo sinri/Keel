@@ -27,7 +27,7 @@ public class IfOperator {
         return this;
     }
 
-    public IfOperator setConditionExpression(String conditionExpression) {
+    public IfOperator setConditionExpression(@Nonnull String conditionExpression) {
         this.conditionExpression = conditionExpression;
         return this;
     }

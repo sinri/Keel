@@ -10,7 +10,7 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 abstract public class KeelHttpServer extends KeelVerticleBase {
     public static final String CONFIG_HTTP_SERVER_PORT = "http_server_port";
@@ -52,9 +52,9 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
     public void start() throws Exception {
         setLogger(createLogger());
 
-        this.server = keel.getVertx().createHttpServer(getHttpServerOptions());
+        this.server = Keel.getVertx().createHttpServer(getHttpServerOptions());
 
-        Router router = Router.router(keel.getVertx());
+        Router router = Router.router(Keel.getVertx());
         this.configureRoutes(router);
 
         server.requestHandler(router)
@@ -72,7 +72,7 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
                         getLogger().exception(throwable, "Listen failed");
 
                         if (this.isMainService()) {
-                            keel.gracefullyClose(Promise::complete);
+                            Keel.gracefullyClose(Promise::complete);
                         }
                     }
                 })
@@ -88,7 +88,7 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
             }
 
             if (this.isMainService()) {
-                keel.gracefullyClose(Promise::complete);
+                Keel.gracefullyClose(Promise::complete);
             }
         });
     }

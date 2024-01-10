@@ -10,7 +10,7 @@ import io.vertx.redis.client.RedisOptions;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static io.github.sinri.keel.facade.KeelInstance.keel;
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 3.0.5
@@ -23,9 +23,9 @@ public class RedisKit implements RedisApiMixin, RedisScalarMixin, RedisListMixin
         /*
          * URL should be redis://[:password@]host[:port][/db-number]
          */
-        String url = keel.getConfiguration().readString("redis", redisInstanceKey, "url");
+        String url = Keel.getConfiguration().readString("redis", redisInstanceKey, "url");
         Objects.requireNonNull(url);
-        this.client = Redis.createClient(keel.getVertx(), new RedisOptions()
+        this.client = Redis.createClient(Keel.getVertx(), new RedisOptions()
                 .setConnectionString(url)
                 .setMaxPoolSize(16)
                 .setMaxWaitingHandlers(32)
