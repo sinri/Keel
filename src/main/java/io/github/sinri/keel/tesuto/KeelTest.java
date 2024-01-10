@@ -121,8 +121,12 @@ abstract public class KeelTest {
         return KeelOutputEventLogCenter.getInstance().createLogger(this.getClass().getName());
     }
 
-    abstract protected @Nonnull Future<Void> starting();
+    protected @Nonnull Future<Void> starting() {
+        return Future.succeededFuture();
+    }
 
-    abstract protected @Nonnull Future<Void> ending(List<TestUnitResult> testUnitResults);
+    protected @Nonnull Future<Void> ending(List<TestUnitResult> testUnitResults) {
+        return Future.succeededFuture();
+    }
 
 }

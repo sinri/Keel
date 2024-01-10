@@ -55,6 +55,7 @@ public class KeelEventLoggerImpl implements KeelEventLogger {
         return presetTopic;
     }
 
+    @Nullable
     @Override
     public Handler<KeelEventLog> getPresetEventLogEditor() {
         return presetEventLogEditor;

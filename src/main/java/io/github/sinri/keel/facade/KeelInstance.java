@@ -26,6 +26,7 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
         this.configuration = KeelConfiguration.createFromJsonObject(new JsonObject());
     }
 
+    @Nonnull
     public KeelConfiguration getConfiguration() {
         return configuration;
     }
@@ -78,6 +79,7 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     }
 
     public void initializeVertxStandalone(@Nonnull VertxOptions vertxOptions) {
+        // todo: remove legacy code, follow vertx
         if (vertxOptions.getClusterManager() != null) {
             vertxOptions.setClusterManager(null);
         }

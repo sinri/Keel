@@ -26,7 +26,7 @@ public class FutureRepeat {
         return promise.future();
     }
 
-    private void routine(RoutineResult routineResult, Promise<Void> finalPromise) {
+    private void routine(@Nonnull RoutineResult routineResult, @Nonnull Promise<Void> finalPromise) {
         Future.succeededFuture()
                 .compose(v -> routineFunction.apply(routineResult))
                 .andThen(shouldStopAR -> {
