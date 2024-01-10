@@ -4,16 +4,12 @@ import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.github.sinri.keel.mysql.Quoter;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
@@ -325,7 +321,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         /**
          * @since 3.1.0
          */
-        public RowToWrite putScalar(@Nonnull String columnName, @Nullable Object value) {
+        public RowToWrite put(@Nonnull String columnName, @Nullable Object value) {
             if (value == null) return this.putExpression(columnName, "NULL");
             else if (value instanceof Number) {
                 return putExpression(columnName, String.valueOf(value));
