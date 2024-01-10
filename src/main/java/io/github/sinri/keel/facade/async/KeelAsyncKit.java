@@ -125,15 +125,22 @@ public interface KeelAsyncKit {
     }
 
     /**
-     * @since 3.0.11 not only Void!
+     * @since 3.1.0
      */
-    static <T> Future<T> exclusivelyCall(@Nonnull String lockName, @Nonnull Supplier<Future<T>> exclusiveSupplier) {
+    static <T> Future<T> exclusivelyCall(@Nonnull String lockName, long waitTimeForLock, @Nonnull Supplier<Future<T>> exclusiveSupplier) {
         return Keel.getVertx().sharedData()
-                .getLock(lockName)
+                .getLockWithTimeout(lockName, waitTimeForLock)
                 .compose(lock -> Future.succeededFuture()
                         .compose(v -> exclusiveSupplier.get())
                         .andThen(ar -> lock.release())
                 );
+    }
+
+    /**
+     * @since 3.0.11 not only Void!
+     */
+    static <T> Future<T> exclusivelyCall(@Nonnull String lockName, @Nonnull Supplier<Future<T>> exclusiveSupplier) {
+        return exclusivelyCall(lockName, 1000L, exclusiveSupplier);
     }
 
     /**
