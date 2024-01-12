@@ -88,6 +88,8 @@ class TableRowClassBuilder {
                 .append("import io.github.sinri.keel.mysql.matrix.AbstractTableRow;\n")
                 .append("import io.vertx.core.json.JsonObject;\n")
                 .append("\n")
+                .append("import javax.annotation.Nonnull;\n")
+                .append("\n")
                 .append("/**\n")
                 .append(" * ").append(parsedTableComment()).append("\n")
                 .append(" * (´^ω^`)\n");
@@ -123,6 +125,7 @@ class TableRowClassBuilder {
                 .append("\t}\n")
                 .append("\n")
                 .append("\t@Override\n")
+                .append("\t@Nonnull\n")
                 .append("\tpublic String sourceTableName() {\n")
                 .append("\t\treturn ").append(this.provideConstTable ? "TABLE" : "\"" + table + "\"").append(";\n")
                 .append("\t}\n")

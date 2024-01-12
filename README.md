@@ -35,3 +35,15 @@ Consider to use [Dry Dock of Keel](https://github.com/sinri/DryDockOfKeel) to bu
 
 * latest: the latest pushed version of Keel, may not be released yet.
 * p3: the latest released version of Keel 3.x.
+
+## Migration
+
+### From 3.0.x to 3.1.x
+
+* The `KeelHelpers` becomes a static member of class `KeelHelpersInterface`.
+* The `Keel` becomes a static member of class `KeelInstance` as its instance. Originally it was a class.
+  * The `Keel` now also inherits the class `KeelHelpersInterface`. So you may not need `KeelHelpers` while `Keel` used.
+* MySQL
+  * Data source should be defined as `NamedMySQLDataSource`.
+  * The raw `SqlConnection` instance should be used in a defined `NamedMySQLConnection`.
+  * `DynamicNamedMySQLConnection` is also available for convenience.
