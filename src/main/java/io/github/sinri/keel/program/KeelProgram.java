@@ -16,7 +16,10 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @since 2.0
  * @since 2.7 Rename back to KeelProgram from KeelProgramAsVerticle.
  * @since 2.9 Greatly changed. No longer using Verticle with vertx cmd usage.
+ * @since 3.1.0 deprecated, use `io.github.sinri.keel.facade.launcher.KeelLauncher`.
+ * @see io.github.sinri.keel.facade.launcher.KeelLauncher
  */
+@Deprecated(since = "3.1.0", forRemoval = true)
 public abstract class KeelProgram {
     private KeelEventLogger logger;
     private JsonObject optionMap;

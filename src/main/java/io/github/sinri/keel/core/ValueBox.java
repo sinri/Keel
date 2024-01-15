@@ -79,6 +79,13 @@ public class ValueBox<T> {
         return this;
     }
 
+    /**
+     * Set value without expiration.
+     */
+    public ValueBox<T> setValue(@Nullable T value) {
+        return this.setValue(value, 0);
+    }
+
     public boolean isValueSetToNull() {
         return this.isValueAlreadySet() && this.getValue() == null;
     }

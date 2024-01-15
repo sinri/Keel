@@ -28,6 +28,7 @@ public class TableRowClassSourceCodeGenerator {
     private boolean provideConstTable = true;
     private boolean provideConstSchemaAndTable = false;
     private @Nullable String strictEnumPackage = null;
+    private @Nullable String envelopePackage = null;
 
     public TableRowClassSourceCodeGenerator(SqlConnection sqlConnection) {
         this.sqlConnection = sqlConnection;
@@ -87,6 +88,15 @@ public class TableRowClassSourceCodeGenerator {
      */
     public TableRowClassSourceCodeGenerator setStrictEnumPackage(@Nonnull String strictEnumPackage) {
         this.strictEnumPackage = strictEnumPackage;
+        return this;
+    }
+
+    /**
+     * @param envelopePackage empty or a package path. No dot in tail.
+     * @since 3.1.0
+     */
+    public TableRowClassSourceCodeGenerator setEnvelopePackage(@Nonnull String envelopePackage) {
+        this.envelopePackage = envelopePackage;
         return this;
     }
 
@@ -216,7 +226,7 @@ public class TableRowClassSourceCodeGenerator {
                             comment = null;
                         }
 
-                        fields.add(new TableRowClassField(field, type, comment, strictEnumPackage));
+                        fields.add(new TableRowClassField(field, type, comment, strictEnumPackage, envelopePackage));
                     });
                     return Future.succeededFuture(fields);
                 });
