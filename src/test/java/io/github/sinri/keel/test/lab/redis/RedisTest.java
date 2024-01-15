@@ -1,6 +1,5 @@
 package io.github.sinri.keel.test.lab.redis;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.redis.RedisKit;
 import io.vertx.core.Future;
@@ -9,6 +8,8 @@ import io.vertx.core.VertxOptions;
 
 import java.util.Date;
 import java.util.List;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class RedisTest {
     public static void main(String[] args) {
@@ -23,7 +24,7 @@ public class RedisTest {
                 .onFailure(throwable -> {
                     throwable.printStackTrace();
                 })
-                .eventually(v -> {
+                .eventually(() -> {
                     return Keel.gracefullyClose(Promise::complete);
                 });
     }

@@ -1,12 +1,13 @@
 package io.github.sinri.keel.verticles;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Verticle;
 import io.vertx.core.json.JsonObject;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 1.14

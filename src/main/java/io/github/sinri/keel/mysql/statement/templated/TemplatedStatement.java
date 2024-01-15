@@ -1,11 +1,11 @@
 package io.github.sinri.keel.mysql.statement.templated;
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.8 Technical Preview

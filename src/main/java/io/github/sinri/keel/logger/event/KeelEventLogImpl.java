@@ -72,7 +72,7 @@ public class KeelEventLogImpl implements KeelEventLog {
     }
 
     @Override
-    public KeelEventLog topic(String topic) {
+    public KeelEventLog topic(@Nonnull String topic) {
         this.topic = topic;
         return this;
     }
@@ -84,7 +84,7 @@ public class KeelEventLogImpl implements KeelEventLog {
     }
 
     @Override
-    public KeelEventLog message(String msg) {
+    public KeelEventLog message(@Nullable String msg) {
         return put(RESERVED_KEY_EVENT_MSG, msg);
     }
 

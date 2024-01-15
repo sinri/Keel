@@ -1,6 +1,5 @@
 package io.github.sinri.keel.helper;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
@@ -16,6 +15,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 2.6

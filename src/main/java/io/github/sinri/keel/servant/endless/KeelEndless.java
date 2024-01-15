@@ -1,11 +1,12 @@
 package io.github.sinri.keel.servant.endless;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 
 import java.util.function.Supplier;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * 任务定期触发器，隔一段时间调用任务供应商获取任务执行。

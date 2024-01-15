@@ -9,9 +9,9 @@ import javax.annotation.Nonnull;
  * @since 3.0.18 Finished Technical Preview.
  */
 public class DynamicNamedMySQLConnection extends NamedMySQLConnection {
-    private final String dataSourceName;
+    private final @Nonnull  String dataSourceName;
 
-    public DynamicNamedMySQLConnection(SqlConnection sqlConnection, String dataSourceName) {
+    public DynamicNamedMySQLConnection(@Nonnull SqlConnection sqlConnection, @Nonnull String dataSourceName) {
         super(sqlConnection);
         this.dataSourceName = dataSourceName;
     }

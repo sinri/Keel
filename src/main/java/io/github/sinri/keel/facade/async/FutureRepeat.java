@@ -1,11 +1,12 @@
 package io.github.sinri.keel.facade.async;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
 import javax.annotation.Nonnull;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 
 /**
@@ -25,7 +26,7 @@ public class FutureRepeat {
         return promise.future();
     }
 
-    private void routine(RoutineResult routineResult, Promise<Void> finalPromise) {
+    private void routine(@Nonnull RoutineResult routineResult, @Nonnull Promise<Void> finalPromise) {
         Future.succeededFuture()
                 .compose(v -> routineFunction.apply(routineResult))
                 .andThen(shouldStopAR -> {

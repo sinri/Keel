@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.http.fastdocs.page;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -15,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.jar.JarEntry;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class CataloguePageBuilder implements FastDocsContentResponder {
     private static String catalogueDivContentCache = null;

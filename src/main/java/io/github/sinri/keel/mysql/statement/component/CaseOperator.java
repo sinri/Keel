@@ -51,7 +51,7 @@ public class CaseOperator {
         return this;
     }
 
-    public CaseOperator addWhenThenPair(CaseOperatorPair caseOperatorPair) {
+    public CaseOperator addWhenThenPair(@Nonnull CaseOperatorPair caseOperatorPair) {
         this.whenThenPairs.add(caseOperatorPair);
         return this;
     }

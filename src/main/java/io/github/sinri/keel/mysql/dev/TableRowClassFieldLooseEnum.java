@@ -1,8 +1,8 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
 import java.util.Collection;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.15

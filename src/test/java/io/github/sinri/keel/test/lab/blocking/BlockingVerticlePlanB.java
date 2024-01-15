@@ -1,10 +1,11 @@
 package io.github.sinri.keel.test.lab.blocking;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * 可以多线程运行。
@@ -57,7 +58,7 @@ public class BlockingVerticlePlanB {
                 .onFailure(throwable -> {
                     throwable.printStackTrace();
                 })
-                .eventually(v -> {
+                .eventually(() -> {
                     return Keel.close();
                 });
     }

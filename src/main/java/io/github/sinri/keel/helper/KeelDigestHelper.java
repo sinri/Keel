@@ -10,6 +10,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
+
+
 /**
  * 校验用加密（摘要）。
  * 特征是不可解密。

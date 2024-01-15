@@ -1,10 +1,11 @@
 package io.github.sinri.keel.maids.watchman;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
 import io.vertx.core.shareddata.Lock;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 2.9.3

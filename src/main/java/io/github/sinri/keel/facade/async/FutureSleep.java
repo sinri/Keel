@@ -1,10 +1,11 @@
 package io.github.sinri.keel.facade.async;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
 import javax.annotation.Nullable;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * 将延时执行转换成Future供compose使用。

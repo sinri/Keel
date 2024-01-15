@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.tcp;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.servant.funnel.KeelFunnel;
 import io.vertx.core.DeploymentOptions;
@@ -10,6 +9,8 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
 
 import java.util.UUID;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 2.8

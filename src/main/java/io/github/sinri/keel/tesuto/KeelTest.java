@@ -1,6 +1,5 @@
 package io.github.sinri.keel.tesuto;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
@@ -14,6 +13,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 3.0.10
@@ -98,10 +99,10 @@ abstract public class KeelTest {
                 .onFailure(throwable -> {
                     logger.exception(throwable, "ERROR OCCURRED DURING TESTING");
                 })
-                .eventually(v -> {
+                .eventually(() -> {
                     return ((KeelTest) testInstance).ending(testUnitResults);
                 })
-                .eventually(v -> {
+                .eventually(() -> {
                     return Keel.getVertx().close();
                 });
     }
@@ -120,8 +121,12 @@ abstract public class KeelTest {
         return KeelOutputEventLogCenter.getInstance().createLogger(this.getClass().getName());
     }
 
-    abstract protected @Nonnull Future<Void> starting();
+    protected @Nonnull Future<Void> starting() {
+        return Future.succeededFuture();
+    }
 
-    abstract protected @Nonnull Future<Void> ending(List<TestUnitResult> testUnitResults);
+    protected @Nonnull Future<Void> ending(List<TestUnitResult> testUnitResults) {
+        return Future.succeededFuture();
+    }
 
 }

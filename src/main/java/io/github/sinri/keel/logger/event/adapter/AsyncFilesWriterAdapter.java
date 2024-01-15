@@ -1,7 +1,6 @@
 package io.github.sinri.keel.logger.event.adapter;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -13,6 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.0

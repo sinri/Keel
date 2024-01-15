@@ -1,24 +1,27 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
+
 /**
  * @since 3.0.15
  * @since 3.0.18 Finished Technical Preview.
+ * @since 3.1.0 Add support for AES encryption.
  */
 class TableRowClassField {
     private static final Pattern patternForLooseEnum;
     private static final Pattern patternForStrictEnum;
+    private static final Pattern patternForAESEnvelope;
 
     static {
         patternForLooseEnum = Pattern.compile("Enum\\{([A-Za-z0-9_, ]+)}");
         patternForStrictEnum = Pattern.compile("Enum<([A-Za-z0-9_.]+)>");
+        patternForAESEnvelope = Pattern.compile("AES<([A-Za-z0-9_.]+)>");
     }
 
     private final String field;
@@ -30,11 +33,21 @@ class TableRowClassField {
     private @Nullable TableRowClassFieldLooseEnum looseEnum;
     private @Nullable TableRowClassFieldStrictEnum strictEnum;
 
-    public TableRowClassField(@Nonnull String field, @Nonnull String type, @Nullable String comment, @Nullable String strictEnumPackage) {
+    private final @Nullable String aesEnvelopePackage;
+    private @Nullable TableRowClassFieldAesEncryption aesEncryption;
+
+    public TableRowClassField(
+            @Nonnull String field,
+            @Nonnull String type,
+            @Nullable String comment,
+            @Nullable String strictEnumPackage,
+            String aesEnvelopePackage
+    ) {
         this.field = field;
         this.type = type;
         this.comment = comment;
         this.strictEnumPackage = strictEnumPackage;
+        this.aesEnvelopePackage = aesEnvelopePackage;
 
         parseType();
         parseComment();
@@ -93,6 +106,13 @@ class TableRowClassField {
                 String enumClassPathTail = matcherForStrict.group(1);
                 strictEnum = new TableRowClassFieldStrictEnum(field, strictEnumPackage, enumClassPathTail);
             }
+
+            // AES Envelope
+            Matcher matcherForAESEnvelope = patternForAESEnvelope.matcher(comment);
+            if (matcherForAESEnvelope.find()) {
+                String aes = matcherForAESEnvelope.group(1);
+                aesEncryption = new TableRowClassFieldAesEncryption(aes, this.aesEnvelopePackage);
+            }
         }
     }
 
@@ -131,6 +151,20 @@ class TableRowClassField {
                     .append("\t */\n")
                     .append("\tpublic ").append(returnType).append(" ").append(getter).append("() {\n")
                     .append("\t\treturn ").append(readMethod).append("(\"").append(field).append("\");\n")
+                    .append("\t}\n");
+        }
+
+        if (aesEncryption != null) {
+            code.append("\t/*\n")
+                    .append("\t * AES DECRYPTED VALUE.\n");
+            if (comment != null) {
+                String escapedComment = KeelHelpers.stringHelper().escapeForHttpEntity(comment);
+                code.append("\t * ").append(escapedComment).append("\n\t * \n");
+            }
+            code.append("\t */\n")
+                    .append("\t@Nullable\n")
+                    .append("\tpublic ").append("String").append(" ").append(getter).append("Decrypted() {\n")
+                    .append("\t\treturn ").append(aesEncryption.buildCallClassMethodCode(readMethod + "(\"" + field + "\")")).append("\n")
                     .append("\t}\n");
         }
 

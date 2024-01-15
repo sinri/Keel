@@ -1,13 +1,14 @@
 package io.github.sinri.keel.mysql.statement.templated;
 
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.Quoter;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.8
@@ -16,12 +17,12 @@ public class TemplateArgument {
     private final boolean asScalar;
     private final Collection<String> expressions;
 
-    private TemplateArgument(String expression) {
+    private TemplateArgument(@Nonnull String expression) {
         this.asScalar = true;
         this.expressions = List.of(expression);
     }
 
-    private TemplateArgument(Collection<String> expressions) {
+    private TemplateArgument(@Nonnull Collection<String> expressions) {
         this.asScalar = false;
         this.expressions = expressions;
     }
@@ -63,8 +64,6 @@ public class TemplateArgument {
     }
 
     /**
-     * @param strings
-     * @return
      * @since 3.0.11 the provided collection could be empty, leave the error to Database.
      */
     public static TemplateArgument forExpressions(@Nonnull Collection<String> strings) {

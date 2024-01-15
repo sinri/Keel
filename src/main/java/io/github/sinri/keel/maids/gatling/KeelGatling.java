@@ -1,6 +1,5 @@
 package io.github.sinri.keel.maids.gatling;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
@@ -10,6 +9,8 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * Gatling Gun with multi barrels, for parallel tasks in clustered vertx runtime.

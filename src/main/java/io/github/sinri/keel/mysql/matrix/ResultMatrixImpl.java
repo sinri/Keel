@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -12,6 +11,8 @@ import io.vertx.sqlclient.data.Numeric;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 1.8

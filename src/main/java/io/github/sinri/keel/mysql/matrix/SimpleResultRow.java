@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 public class SimpleResultRow implements ResultRow {
     private JsonObject row;
 
-    public SimpleResultRow(JsonObject tableRow) {
+    public SimpleResultRow(@Nonnull JsonObject tableRow) {
         this.reloadDataFromJsonObject(tableRow);
     }
 

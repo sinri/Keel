@@ -2,7 +2,6 @@ package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.helper.KeelDateTimeHelper;
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -11,6 +10,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.Objects;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public interface KeelEventLog extends JsonifiableEntity<KeelEventLog> {
     String RESERVED_KEY_EVENT_MSG = "msg";

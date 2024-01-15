@@ -1,6 +1,5 @@
 package io.github.sinri.keel.redis;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.redis.mixin.*;
 import io.vertx.core.Future;
 import io.vertx.redis.client.Redis;
@@ -10,6 +9,8 @@ import io.vertx.redis.client.RedisOptions;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 3.0.5

@@ -1,11 +1,13 @@
 package io.github.sinri.keel.mysql.statement;
 
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class DeleteStatement extends AbstractModifyStatement {
     // final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
@@ -19,21 +21,21 @@ public class DeleteStatement extends AbstractModifyStatement {
      * [LIMIT row_count]
      */
 
-    String schema;
-    String table;
+    @Nullable String schema;
+    @Nonnull String table="NOT-SET";
     long limit = 0;
 
     public DeleteStatement() {
 
     }
 
-    public DeleteStatement from(String table) {
+    public DeleteStatement from(@Nonnull String table) {
         this.schema = null;
         this.table = table;
         return this;
     }
 
-    public DeleteStatement from(String schema, String table) {
+    public DeleteStatement from(@Nullable String schema, @Nonnull String table) {
         this.schema = schema;
         this.table = table;
         return this;
@@ -44,17 +46,17 @@ public class DeleteStatement extends AbstractModifyStatement {
      * @return this
      * @since 1.4
      */
-    public DeleteStatement where(Function<ConditionsComponent, ConditionsComponent> function) {
+    public DeleteStatement where(@Nonnull Function<ConditionsComponent, ConditionsComponent> function) {
         function.apply(whereConditionsComponent);
         return this;
     }
 
-    public DeleteStatement orderByAsc(String x) {
+    public DeleteStatement orderByAsc(@Nonnull String x) {
         sortRules.add(x);
         return this;
     }
 
-    public DeleteStatement orderByDesc(String x) {
+    public DeleteStatement orderByDesc(@Nonnull String x) {
         sortRules.add(x + " DESC");
         return this;
     }

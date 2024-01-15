@@ -20,9 +20,9 @@ import java.util.concurrent.TimeUnit;
  * tcpKeepAlive=false;
  */
 public class KeelMySQLConfiguration extends KeelConfiguration {
-    private final String dataSourceName;
+    private final @Nonnull String dataSourceName;
 
-    public KeelMySQLConfiguration(String dataSourceName, KeelConfiguration keelConfiguration) {
+    public KeelMySQLConfiguration(@Nonnull String dataSourceName, @Nonnull KeelConfiguration keelConfiguration) {
         this.dataSourceName = dataSourceName;
         this.reloadDataFromJsonObject(keelConfiguration.toJsonObject());
     }
@@ -40,29 +40,13 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
 //                + "&allowPublicKeyRetrieval="+(ssl ? "true" : "false");
 //    }
 
-    public static @Nullable KeelMySQLConfiguration loadConfigurationForDataSource(@Nonnull KeelConfiguration keelConfiguration, @Nonnull String dataSourceName) {
+    @Nonnull
+    public static KeelMySQLConfiguration loadConfigurationForDataSource(@Nonnull KeelConfiguration keelConfiguration, @Nonnull String dataSourceName) {
         KeelConfiguration configuration = keelConfiguration.extract("mysql", dataSourceName);
-        if (configuration == null) return null;
         return new KeelMySQLConfiguration(dataSourceName, configuration);
     }
 
-    public static void main(String[] args) {
-        MySQLConnectOptions mySQLConnectOptions = new MySQLConnectOptions()
-                .setHost("H")
-                .setPort(3306)
-//                .setCharset("utf8")
-                .setDatabase("D")
-                .setUser("U")
-                .setPassword("P")
-                .setConnectTimeout(5000);
-        System.out.println("mySQLConnectOptions: " + mySQLConnectOptions.toJson().encodePrettily());
-
-        PoolOptions poolOptions = new PoolOptions()
-                .setConnectionTimeout(2)
-                .setConnectionTimeoutUnit(TimeUnit.SECONDS);
-        System.out.println("poolOptions: " + poolOptions.toJson().encodePrettily());
-    }
-
+    @Nonnull
     public MySQLConnectOptions getConnectOptions() {
         // mysql.XXX.connect::database,host,password,port,user,charset,useAffectedRows,connectionTimeout
         MySQLConnectOptions mySQLConnectOptions = new MySQLConnectOptions()
@@ -86,6 +70,7 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
         return mySQLConnectOptions;
     }
 
+    @Nonnull
     public PoolOptions getPoolOptions() {
         // mysql.XXX.pool::poolConnectionTimeout
         PoolOptions poolOptions = new PoolOptions();
@@ -139,6 +124,7 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
         return readAsInteger("poolMaxSize");
     }
 
+    @Nonnull
     public String getDataSourceName() {
         return dataSourceName;
     }
@@ -166,12 +152,11 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
 
     /**
      * @since 3.0.9
-     * You can share an pool between multiple verticles or instances of the same verticle.
+     * You can share a pool between multiple verticles or instances of the same verticle.
      * Such pool should be created outside a verticle otherwise it will be closed when the verticle
      * that created it is undeployed.
      */
     public boolean getPoolShared() {
-        //return "YES".equals(readString("poolShared"));
         return !("NO".equals(readString("poolShared")));
     }
 }

@@ -1,6 +1,5 @@
 package io.github.sinri.keel.elasticsearch;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
@@ -13,6 +12,8 @@ import io.vertx.ext.web.client.WebClient;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * Developed with ES version 8.9.

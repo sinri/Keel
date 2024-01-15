@@ -1,12 +1,13 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * 标准的队列服务实现。
@@ -90,7 +91,7 @@ public abstract class KeelQueue extends KeelVerticleBase {
                         return Future.failedFuture("Unknown Signal");
                     }
                 })
-                .eventually(v -> {
+                .eventually(() -> {
                     long waitingMs = nextTaskSeeker.waitingMs();
                     getLogger().debug("set timer for next routine after " + waitingMs + " ms");
                     Keel.getVertx().setTimer(waitingMs, timerID -> routine());

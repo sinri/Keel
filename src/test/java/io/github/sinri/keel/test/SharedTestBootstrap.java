@@ -1,11 +1,12 @@
 package io.github.sinri.keel.test;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.vertx.core.Handler;
 import io.vertx.core.VertxOptions;
 
 import java.util.concurrent.TimeUnit;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class SharedTestBootstrap {
 

@@ -18,7 +18,7 @@ public class TemplatedReadStatement extends AbstractReadStatement implements Tem
         this.argumentMapping = new TemplateArgumentMapping();
     }
 
-    public TemplatedReadStatement bindArguments(Handler<TemplateArgumentMapping> binder) {
+    public TemplatedReadStatement bindArguments(@Nonnull Handler<TemplateArgumentMapping> binder) {
         binder.handle(this.argumentMapping);
         return this;
     }

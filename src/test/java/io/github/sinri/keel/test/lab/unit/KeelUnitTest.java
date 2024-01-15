@@ -1,7 +1,6 @@
 package io.github.sinri.keel.test.lab.unit;
 
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
@@ -10,6 +9,8 @@ import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
 import java.util.List;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class KeelUnitTest extends KeelTest {
 

@@ -1,12 +1,12 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.15
@@ -88,6 +88,9 @@ class TableRowClassBuilder {
                 .append("import io.github.sinri.keel.mysql.matrix.AbstractTableRow;\n")
                 .append("import io.vertx.core.json.JsonObject;\n")
                 .append("\n")
+                .append("import javax.annotation.Nonnull;\n")
+                .append("import javax.annotation.Nullable;\n")
+                .append("\n")
                 .append("/**\n")
                 .append(" * ").append(parsedTableComment()).append("\n")
                 .append(" * (´^ω^`)\n");
@@ -123,6 +126,7 @@ class TableRowClassBuilder {
                 .append("\t}\n")
                 .append("\n")
                 .append("\t@Override\n")
+                .append("\t@Nonnull\n")
                 .append("\tpublic String sourceTableName() {\n")
                 .append("\t\treturn ").append(this.provideConstTable ? "TABLE" : "\"" + table + "\"").append(";\n")
                 .append("\t}\n")

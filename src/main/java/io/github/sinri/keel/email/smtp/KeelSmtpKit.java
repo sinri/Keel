@@ -1,6 +1,5 @@
 package io.github.sinri.keel.email.smtp;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.KeelConfiguration;
 import io.vertx.core.Future;
 import io.vertx.ext.mail.MailClient;
@@ -12,6 +11,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 1.10

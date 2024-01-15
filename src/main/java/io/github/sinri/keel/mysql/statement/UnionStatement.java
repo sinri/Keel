@@ -1,10 +1,11 @@
 package io.github.sinri.keel.mysql.statement;
 
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class UnionStatement extends AbstractReadStatement {
     final List<String> selections = new ArrayList<>();
@@ -13,11 +14,11 @@ public class UnionStatement extends AbstractReadStatement {
 
     }
 
-    public UnionStatement(String firstSelection) {
+    public UnionStatement(@Nonnull String firstSelection) {
         selections.add("(" + AbstractStatement.SQL_COMPONENT_SEPARATOR + firstSelection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
     }
 
-    public UnionStatement union(String selection) {
+    public UnionStatement union(@Nonnull String selection) {
         if (this.selections.isEmpty()) {
             selections.add("(" + AbstractStatement.SQL_COMPONENT_SEPARATOR + selection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
         } else {
@@ -26,7 +27,7 @@ public class UnionStatement extends AbstractReadStatement {
         return this;
     }
 
-    public UnionStatement unionAll(String selection) {
+    public UnionStatement unionAll(@Nonnull String selection) {
         if (this.selections.isEmpty()) {
             selections.add("(" + AbstractStatement.SQL_COMPONENT_SEPARATOR + selection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
         } else {
@@ -35,14 +36,14 @@ public class UnionStatement extends AbstractReadStatement {
         return this;
     }
 
-    public UnionStatement union(List<String> list) {
+    public UnionStatement union(@Nonnull List<String> list) {
         for (String selection : list) {
             union(selection);
         }
         return this;
     }
 
-    public UnionStatement unionAll(List<String> list) {
+    public UnionStatement unionAll(@Nonnull List<String> list) {
         for (String selection : list) {
             unionAll(selection);
         }

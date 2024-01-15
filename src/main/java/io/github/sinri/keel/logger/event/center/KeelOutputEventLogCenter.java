@@ -1,6 +1,5 @@
 package io.github.sinri.keel.logger.event.center;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.adapter.OutputAdapter;
@@ -12,6 +11,8 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.function.Function;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.0

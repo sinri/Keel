@@ -1,8 +1,6 @@
 package io.github.sinri.keel.mysql.dev;
 
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
@@ -12,6 +10,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.15
@@ -27,6 +28,7 @@ public class TableRowClassSourceCodeGenerator {
     private boolean provideConstTable = true;
     private boolean provideConstSchemaAndTable = false;
     private @Nullable String strictEnumPackage = null;
+    private @Nullable String envelopePackage = null;
 
     public TableRowClassSourceCodeGenerator(SqlConnection sqlConnection) {
         this.sqlConnection = sqlConnection;
@@ -86,6 +88,15 @@ public class TableRowClassSourceCodeGenerator {
      */
     public TableRowClassSourceCodeGenerator setStrictEnumPackage(@Nonnull String strictEnumPackage) {
         this.strictEnumPackage = strictEnumPackage;
+        return this;
+    }
+
+    /**
+     * @param envelopePackage empty or a package path. No dot in tail.
+     * @since 3.1.0
+     */
+    public TableRowClassSourceCodeGenerator setEnvelopePackage(@Nonnull String envelopePackage) {
+        this.envelopePackage = envelopePackage;
         return this;
     }
 
@@ -215,7 +226,7 @@ public class TableRowClassSourceCodeGenerator {
                             comment = null;
                         }
 
-                        fields.add(new TableRowClassField(field, type, comment, strictEnumPackage));
+                        fields.add(new TableRowClassField(field, type, comment, strictEnumPackage, envelopePackage));
                     });
                     return Future.succeededFuture(fields);
                 });

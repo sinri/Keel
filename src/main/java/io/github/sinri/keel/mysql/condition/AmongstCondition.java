@@ -1,12 +1,13 @@
 package io.github.sinri.keel.mysql.condition;
 
-import io.github.sinri.keel.helper.KeelHelpers;
 import io.github.sinri.keel.mysql.Quoter;
 import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class AmongstCondition implements MySQLCondition {
     public static final String OP_IN = "IN";

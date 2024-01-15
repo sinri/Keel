@@ -1,9 +1,9 @@
 package io.github.sinri.keel.test.lab.helper;
 
 
-import io.github.sinri.keel.helper.KeelHelpers;
-
 import java.net.UnknownHostException;
+
+import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class IpTest {
     public static void main(String[] args) throws UnknownHostException {

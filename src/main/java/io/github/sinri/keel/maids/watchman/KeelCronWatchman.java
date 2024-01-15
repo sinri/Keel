@@ -1,7 +1,6 @@
 package io.github.sinri.keel.maids.watchman;
 
 import io.github.sinri.keel.core.KeelCronExpression;
-import io.github.sinri.keel.facade.Keel;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -12,6 +11,8 @@ import io.vertx.core.shareddata.AsyncMap;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * It is designed as KeelSundial, to perform crontab in cluster.

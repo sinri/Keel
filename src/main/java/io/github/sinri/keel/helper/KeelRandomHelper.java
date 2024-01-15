@@ -1,7 +1,8 @@
 package io.github.sinri.keel.helper;
 
-import io.github.sinri.keel.facade.Keel;
 import io.vertx.ext.auth.VertxContextPRNG;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 3.0.1
