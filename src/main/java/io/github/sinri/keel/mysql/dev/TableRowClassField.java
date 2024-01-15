@@ -162,6 +162,7 @@ class TableRowClassField {
                 code.append("\t * ").append(escapedComment).append("\n\t * \n");
             }
             code.append("\t */\n")
+                    .append("\t@Nullable\n")
                     .append("\tpublic ").append("String").append(" ").append(getter).append("Decrypted() {\n")
                     .append("\t\treturn ").append(aesEncryption.buildCallClassMethodCode(readMethod + "(\"" + field + "\")")).append("\n")
                     .append("\t}\n");

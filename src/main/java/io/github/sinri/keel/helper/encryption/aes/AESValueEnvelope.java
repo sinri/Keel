@@ -2,6 +2,8 @@ package io.github.sinri.keel.helper.encryption.aes;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 
+import javax.annotation.Nullable;
+
 /**
  * @since 3.1.0 Technical Preview
  */
@@ -12,10 +14,12 @@ public interface AESValueEnvelope {
      *
      * @param raw The raw string value.
      */
-    void encrypt(String raw);
+    @Nullable
+    String encrypt(@Nullable String raw);
 
     /**
      * Decrypt the stored value and return the raw string.
      */
-    String decrypt(String decrypted);
+    @Nullable
+    String decrypt(@Nullable String decrypted);
 }

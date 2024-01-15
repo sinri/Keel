@@ -89,6 +89,7 @@ class TableRowClassBuilder {
                 .append("import io.vertx.core.json.JsonObject;\n")
                 .append("\n")
                 .append("import javax.annotation.Nonnull;\n")
+                .append("import javax.annotation.Nullable;\n")
                 .append("\n")
                 .append("/**\n")
                 .append(" * ").append(parsedTableComment()).append("\n")
