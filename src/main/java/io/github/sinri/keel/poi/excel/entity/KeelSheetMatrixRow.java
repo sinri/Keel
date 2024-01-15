@@ -1,6 +1,8 @@
 package io.github.sinri.keel.poi.excel.entity;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -8,6 +10,7 @@ import java.util.List;
  *
  * @since 3.0.14
  * @since 3.0.18 Finished Technical Preview.
+ * @since 3.1.1 Use BigDecimal to handle the number value of cells.
  */
 abstract public class KeelSheetMatrixRow {
     private final List<String> rawRow;
@@ -21,17 +24,44 @@ abstract public class KeelSheetMatrixRow {
         return rawRow.get(i);
     }
 
-    public int readValueToInteger(int i) {
-        double v = readValueToDouble(i);
-        return (int) v;
+    /**
+     * @since 3.1.1
+     */
+    public BigDecimal readValueToBigDecimal(int i) {
+        return new BigDecimal(readValue(i));
     }
 
-    public long readValueToLong(int i) {
-        double v = readValueToDouble(i);
-        return (long) v;
+    /**
+     * @since 3.1.1
+     */
+    public BigDecimal readValueToBigDecimalStrippedTrailingZeros(int i) {
+        return new BigDecimal(readValue(i)).stripTrailingZeros();
+    }
+
+    @Nullable
+    public Integer readValueToInteger(int i) {
+        try {
+            return readValueToBigDecimal(i).intValueExact();
+        } catch (ArithmeticException arithmeticException) {
+            return null;
+        }
+//        double v = readValueToDouble(i);
+//        return (int) v;
+    }
+
+    @Nullable
+    public Long readValueToLong(int i) {
+        try {
+            return readValueToBigDecimal(i).longValueExact();
+        } catch (ArithmeticException arithmeticException) {
+            return null;
+        }
+//        double v = readValueToDouble(i);
+//        return (long) v;
     }
 
     public double readValueToDouble(int i) {
-        return Double.parseDouble(readValue(i));
+        return readValueToBigDecimal(i).doubleValue();
+//        return Double.parseDouble(readValue(i));
     }
 }

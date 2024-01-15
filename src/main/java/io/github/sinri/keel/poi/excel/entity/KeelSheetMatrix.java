@@ -1,14 +1,15 @@
 package io.github.sinri.keel.poi.excel.entity;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 /**
  * Excel → Matrix of Cells' String values → Customized Row Readers.
+ *
  * @since 3.0.13
  * @since 3.0.18 Finished Technical Preview.
  */
@@ -62,23 +63,42 @@ public class KeelSheetMatrix {
     }
 
     /**
+     * @since 3.1.1
+     */
+    public Iterator<KeelSheetMatrixRow> getRowIterator() {
+        return new RowReaderIterator<>(strings -> new KeelSheetMatrixRow(strings) {
+        }, rows);
+    }
+
+    /**
      * @since 3.0.14
      * @since 3.0.18 Finished Technical Preview.
      */
     public static class RowReaderIterator<R extends KeelSheetMatrixRow> implements Iterator<R> {
-        //private final Class<R> rClass;
-        private final Constructor<R> constructor;
         private final List<List<String>> rows;
         private final AtomicInteger ptr = new AtomicInteger(0);
+        private final Function<List<String>, R> rawRow2row;
 
         public RowReaderIterator(Class<R> rClass, List<List<String>> rows) {
-            this.rows = rows;
+            this(strings -> {
+                try {
+                    var constructor = rClass.getConstructor(List.class);
+                    return constructor.newInstance(strings);
+                } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                         IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }, rows);
+        }
 
-            try {
-                this.constructor = rClass.getConstructor(List.class);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
+        /**
+         * @param rawRow2row A function to transform a Raw Row to a KeelSheetMatrixRow instance.
+         * @param rows       the raw rows
+         * @since 3.1.1
+         */
+        public RowReaderIterator(Function<List<String>, R> rawRow2row, List<List<String>> rows) {
+            this.rawRow2row = rawRow2row;
+            this.rows = rows;
         }
 
         @Override
@@ -90,11 +110,7 @@ public class KeelSheetMatrix {
         public R next() {
             List<String> rawRow = this.rows.get(ptr.get());
             ptr.incrementAndGet();
-            try {
-                return this.constructor.newInstance(rawRow);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
+            return this.rawRow2row.apply(rawRow);
         }
     }
 }

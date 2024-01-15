@@ -83,15 +83,31 @@ public class KeelSheets implements AutoCloseable {
     public static KeelSheets autoGenerate(@Nonnull InputStream inputStream) {
         Workbook workbook;
         try {
+            // XLSX
             workbook = new XSSFWorkbook(inputStream);
         } catch (IOException e) {
             try {
+                // XLS
                 workbook = new HSSFWorkbook(inputStream);
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         }
         return new KeelSheets(workbook);
+    }
+
+    /**
+     * @since 3.1.1
+     */
+    public static KeelSheets autoGenerateXLSX() {
+        return new KeelSheets(new XSSFWorkbook());
+    }
+
+    /**
+     * @since 3.1.1
+     */
+    public static KeelSheets autoGenerateXLS() {
+        return new KeelSheets(new HSSFWorkbook());
     }
 
     /**
