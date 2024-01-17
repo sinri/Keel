@@ -49,7 +49,7 @@ public abstract class KeelQueueTask extends KeelVerticleBase {
                     getLogger().exception(throwable, "KeelQueueTask Caught throwable from Method run");
                     return Future.succeededFuture();
                 })
-                .eventually(v -> {
+                .eventually(() -> {
                     getLogger().info("KeelQueueTask to undeploy");
                     notifyBeforeUndeploy();
                     return undeployMe().onSuccess(done -> {

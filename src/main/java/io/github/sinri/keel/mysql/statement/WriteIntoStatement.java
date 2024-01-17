@@ -4,6 +4,8 @@ import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.github.sinri.keel.mysql.Quoter;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
 
 import javax.annotation.Nonnull;
@@ -328,6 +330,49 @@ public class WriteIntoStatement extends AbstractModifyStatement {
             } else {
                 return putExpression(columnName, new Quoter(value.toString()).toString());
             }
+        }
+
+        /**
+         * @param jsonObject One row as a JsonObject
+         * @since 3.1.2
+         */
+        public static RowToWrite fromJsonObject(@Nonnull JsonObject jsonObject) {
+            RowToWrite rowToWrite = new RowToWrite();
+            jsonObject.forEach(entry -> {
+                rowToWrite.put(entry.getKey(), entry.getValue());
+            });
+            return rowToWrite;
+        }
+
+        /**
+         * @param jsonArray Rows in a JsonArray; each item of the array should be a JsonObject to be a row.
+         * @since 3.1.2
+         */
+        public static Collection<RowToWrite> fromJsonObjectArray(@Nonnull JsonArray jsonArray) {
+            Collection<RowToWrite> rows = new ArrayList<>();
+            jsonArray.forEach(item -> {
+                Objects.requireNonNull(item);
+                if (item instanceof JsonObject) {
+                    JsonObject o = (JsonObject) item;
+                    rows.add(fromJsonObject(o));
+                } else {
+                    throw new IllegalArgumentException("JsonArray contains non JsonObject item.");
+                }
+            });
+            return rows;
+        }
+
+        /**
+         * @param jsonObjects each item to be a row.
+         * @since 3.1.2
+         */
+        public static Collection<RowToWrite> fromJsonObjectArray(@Nonnull List<JsonObject> jsonObjects) {
+            Collection<RowToWrite> rows = new ArrayList<>();
+            jsonObjects.forEach(item -> {
+                Objects.requireNonNull(item);
+                rows.add(fromJsonObject(item));
+            });
+            return rows;
         }
     }
 }
