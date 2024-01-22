@@ -5,10 +5,7 @@ import io.github.sinri.keel.poi.excel.entity.KeelSheetMatrix;
 import io.github.sinri.keel.poi.excel.entity.KeelSheetMatrixRowTemplate;
 import io.github.sinri.keel.poi.excel.entity.KeelSheetTemplatedMatrix;
 import io.vertx.core.Future;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -27,9 +24,23 @@ import java.util.function.Function;
  */
 public class KeelSheet {
     private final Sheet sheet;
+    /**
+     * @since 3.1.3
+     */
+    private final @Nullable FormulaEvaluator formulaEvaluator;
 
-    public KeelSheet(Sheet sheet) {
+    public KeelSheet(@Nonnull Sheet sheet) {
+        this(sheet, null);
+    }
+
+    /**
+     * @param sheet
+     * @param formulaEvaluator
+     * @since 3.1.3
+     */
+    public KeelSheet(@Nonnull Sheet sheet, @Nullable FormulaEvaluator formulaEvaluator) {
         this.sheet = sheet;
+        this.formulaEvaluator = formulaEvaluator;
     }
 
     /**
@@ -67,9 +78,9 @@ public class KeelSheet {
     /**
      * @since 3.1.0
      */
-    public List<String> readRawRow(int i,int maxColumns, @Nullable SheetRowFilter sheetRowFilter) {
-        var row=readRow(i);
-        return dumpRowToRawRow(row,maxColumns,sheetRowFilter);
+    public List<String> readRawRow(int i, int maxColumns, @Nullable SheetRowFilter sheetRowFilter) {
+        var row = readRow(i);
+        return dumpRowToRawRow(row, maxColumns, sheetRowFilter);
     }
 
     public Iterator<Row> getRowIterator() {
@@ -95,17 +106,42 @@ public class KeelSheet {
         };
     }
 
+
     /**
      * @since 3.0.14 add nullable to cell, and nonnull to return.
+     * @since 3.1.3 return computed value for formula cells.
      */
     @Nonnull
-    private static String dumpCellToString(@Nullable Cell cell) {
+    private String dumpCellToString(@Nullable Cell cell) {
         if (cell == null) return "";
         CellType cellType = cell.getCellType();
         String s;
         if (cellType == CellType.NUMERIC) {
             double numericCellValue = cell.getNumericCellValue();
             s = String.valueOf(numericCellValue);
+        } else if (cellType == CellType.FORMULA) {
+            CellType formulaResultType;
+            if (this.formulaEvaluator == null) {
+                formulaResultType = cell.getCachedFormulaResultType();
+            } else {
+                formulaResultType = this.formulaEvaluator.evaluateFormulaCell(cell);
+            }
+            switch (formulaResultType) {
+                case BOOLEAN:
+                    s = String.valueOf(cell.getBooleanCellValue());
+                    break;
+                case NUMERIC:
+                    s = String.valueOf(cell.getNumericCellValue());
+                    break;
+                case STRING:
+                    s = String.valueOf(cell.getStringCellValue());
+                    break;
+                case ERROR:
+                    s = String.valueOf(cell.getErrorCellValue());
+                    break;
+                default:
+                    throw new RuntimeException("FormulaResultType unknown");
+            }
         } else {
             s = cell.getStringCellValue();
         }
@@ -116,7 +152,7 @@ public class KeelSheet {
      * @param sheetRowFilter added since 3.0.20
      * @since 3.0.20 add SheetRowFilter, and may return null if the row should be thrown.
      */
-    private static @Nullable List<String> dumpRowToRawRow(@Nonnull Row row, int maxColumns, @Nullable SheetRowFilter sheetRowFilter) {
+    private @Nullable List<String> dumpRowToRawRow(@Nonnull Row row, int maxColumns, @Nullable SheetRowFilter sheetRowFilter) {
         List<String> rowDatum = new ArrayList<>();
 
         for (int i = 0; i < maxColumns; i++) {

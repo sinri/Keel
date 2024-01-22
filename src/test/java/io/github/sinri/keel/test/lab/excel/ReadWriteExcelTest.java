@@ -40,7 +40,7 @@ public class ReadWriteExcelTest extends KeelTest {
     public Future<Void> read() {
         KeelSheets keelSheets = KeelSheets.factory(file);
         KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
-        return keelSheet.readAllRowsToMatrix(1, 2, null)
+        return keelSheet.readAllRowsToMatrix(1, 3, null)
                 .compose(matrix -> {
 //                    matrix.getRawRowList().forEach(row -> {
 //                        logger().info(log -> log.message("ROW")
@@ -57,7 +57,13 @@ public class ReadWriteExcelTest extends KeelTest {
                         Long l = rowModel.readValueToLong(1);
                         BigDecimal b = rowModel.readValueToBigDecimal(1);
                         BigDecimal s = rowModel.readValueToBigDecimalStrippedTrailingZeros(1);
-                        logger().info("Row [" + name + "]=" + raw + " d=" + d + " i=" + i + " l=" + l + " b=" + b.toPlainString() + " s=" + s.toPlainString());
+
+                        BigDecimal f = rowModel.readValueToBigDecimalStrippedTrailingZeros(2);
+
+                        logger().info(log -> log.message("Row [" + name + "]=" + raw)
+                                .put("number", "d=" + d + " i=" + i + " l=" + l + " b=" + b.toPlainString() + " s=" + s.toPlainString())
+                                .put("formula", f.toPlainString())
+                        );
                     }
                     keelSheets.close();
                     return Future.succeededFuture();

@@ -1,6 +1,7 @@
 package io.github.sinri.keel.poi.excel;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
@@ -15,28 +16,6 @@ import java.io.*;
  * @since 3.0.18 Finished Technical Preview.
  */
 public class KeelSheets implements AutoCloseable {
-    @Deprecated(since = "3.0.20", forRemoval = true)
-    public KeelSheets(@Nonnull String file) {
-        this(new File(file));
-    }
-
-    @Deprecated(since = "3.0.20", forRemoval = true)
-    public KeelSheets(@Nonnull File file) {
-        try {
-            autoWorkbook = WorkbookFactory.create(file);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Deprecated(since = "3.0.20", forRemoval = true)
-    public KeelSheets(@Nonnull InputStream inputStream) {
-        try {
-            autoWorkbook = WorkbookFactory.create(inputStream);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     /**
      * @param workbook The generated POI Workbook Implementation.
@@ -111,11 +90,26 @@ public class KeelSheets implements AutoCloseable {
     }
 
     /**
+     * @since 3.1.3
+     */
+    private FormulaEvaluator formulaEvaluator;
+
+    public KeelSheets() {
+        this(false);
+    }
+
+    /**
      * Create a new Sheets.
      * Not use stream-write mode by default.
+     * @since 3.1.3
      */
-    public KeelSheets() {
+    public KeelSheets(boolean withFormulaEvaluator) {
         autoWorkbook = new XSSFWorkbook();
+        if (withFormulaEvaluator) {
+            formulaEvaluator = autoWorkbook.getCreationHelper().createFormulaEvaluator();
+        } else {
+            formulaEvaluator = null;
+        }
     }
 
     public KeelSheets useStreamWrite() {
@@ -129,12 +123,12 @@ public class KeelSheets implements AutoCloseable {
 
     public KeelSheet generateReaderForSheet(@Nonnull String sheetName) {
         var sheet = this.getWorkbook().getSheet(sheetName);
-        return new KeelSheet(sheet);
+        return new KeelSheet(sheet, this.formulaEvaluator);
     }
 
     public KeelSheet generateReaderForSheet(int sheetIndex) {
         var sheet = this.getWorkbook().getSheetAt(sheetIndex);
-        return new KeelSheet(sheet);
+        return new KeelSheet(sheet, this.formulaEvaluator);
     }
 
     public KeelSheet generateWriterForSheet(@Nonnull String sheetName, Integer pos) {
@@ -142,7 +136,7 @@ public class KeelSheets implements AutoCloseable {
         if (pos != null) {
             this.getWorkbook().setSheetOrder(sheetName, pos);
         }
-        return new KeelSheet(sheet);
+        return new KeelSheet(sheet, this.formulaEvaluator);
     }
 
     public KeelSheet generateWriterForSheet(@Nonnull String sheetName) {

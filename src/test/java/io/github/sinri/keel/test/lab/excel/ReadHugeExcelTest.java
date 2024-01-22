@@ -54,7 +54,7 @@ public class ReadHugeExcelTest extends KeelTest {
      */
     @TestUnit
     public Future<Void> test1() {
-        var excelStreamReader = new KeelSheets(file);
+        var excelStreamReader = KeelSheets.factory(file);
         KeelSheet excelSheetReader = excelStreamReader.generateReaderForSheet(0);
         AtomicInteger x = new AtomicInteger(0);
         excelSheetReader.blockReadAllRows(row -> {
@@ -76,7 +76,7 @@ public class ReadHugeExcelTest extends KeelTest {
      */
     @TestUnit
     public Future<Void> test2() {
-        var excelStreamReader = new KeelSheets(file);
+        var excelStreamReader = KeelSheets.factory(file);
         KeelSheet excelSheetReader = excelStreamReader.generateReaderForSheet(0);
         AtomicInteger x = new AtomicInteger(0);
         return excelSheetReader.readAllRows(rows -> {
