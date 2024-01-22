@@ -3,6 +3,8 @@ package io.github.sinri.keel.facade;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.cluster.KeelClusterKit;
 import io.github.sinri.keel.helper.KeelHelpersInterface;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -22,8 +24,11 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     private @Nullable Vertx vertx;
     private @Nullable ClusterManager clusterManager;
 
+    private KeelEventLogger logger;
+
     private KeelInstance() {
         this.configuration = KeelConfiguration.createFromJsonObject(new JsonObject());
+        this.logger = KeelOutputEventLogCenter.getInstance().createLogger("Keel");
     }
 
     @Nonnull
@@ -93,6 +98,15 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
 
     public boolean isRunningInVertxCluster() {
         return isVertxInitialized() && getVertx().isClustered();
+    }
+
+    public KeelEventLogger getLogger() {
+        return logger;
+    }
+
+    public KeelInstance setLogger(KeelEventLogger logger) {
+        this.logger = logger;
+        return this;
     }
 
     public Future<Void> gracefullyClose(@Nonnull Handler<Promise<Void>> promiseHandler) {

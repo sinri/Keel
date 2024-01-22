@@ -3,7 +3,6 @@ package io.github.sinri.keel.helper;
 import io.github.sinri.keel.helper.runtime.CPUTimeResult;
 import io.github.sinri.keel.helper.runtime.GCStatResult;
 import io.github.sinri.keel.helper.runtime.MemoryResult;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.vertx.core.json.JsonObject;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -15,10 +14,12 @@ import java.lang.management.ManagementFactory;
 import java.util.Objects;
 import java.util.Set;
 
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 2.9.3
+ * @since 3.1.3 Add more GarbageCollectorMXBean.
  */
 public class KeelRuntimeHelper {
     private static final KeelRuntimeHelper instance = new KeelRuntimeHelper();
@@ -52,18 +53,26 @@ public class KeelRuntimeHelper {
             if (gc == null) {
                 continue;
             }
-            if (Objects.equals("G1 Young Generation", gc.getName())) {
+            if (Objects.equals("G1 Young Generation", gc.getName())
+                    || Objects.equals("Copy", gc.getName())
+                    || Objects.equals("ParNew", gc.getName())
+                    || Objects.equals("PSScavenge", gc.getName())
+            ) {
                 gcStat.addGCCountAsYoung(gc.getCollectionCount());
                 if (gc.getCollectionTime() >= 0) {
                     gcStat.addGCTimeAsYoung(gc.getCollectionTime());
                 }
-            } else if (Objects.equals("G1 Old Generation", gc.getName())) {
+            } else if (Objects.equals("G1 Old Generation", gc.getName())
+                    || Objects.equals("MarkSweepCompact", gc.getName())
+                    || Objects.equals("PSMarkSweep", gc.getName())
+                    || Objects.equals("ConcurrentMarkSweep", gc.getName())
+            ) {
                 gcStat.addGCCountAsOld(gc.getCollectionCount());
                 if (gc.getCollectionTime() >= 0) {
                     gcStat.addGCTimeAsOld(gc.getCollectionTime());
                 }
             } else {
-                KeelOutputEventLogCenter.instantLogger().error(log -> log
+                Keel.getLogger().error(log -> log
                         .message("Found Unknown GarbageCollectorMXBean Name")
                         .put("detail", new JsonObject()
                                 .put("class", gc.getClass().getName())
