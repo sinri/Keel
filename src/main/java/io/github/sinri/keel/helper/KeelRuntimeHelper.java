@@ -3,19 +3,13 @@ package io.github.sinri.keel.helper;
 import io.github.sinri.keel.helper.runtime.CPUTimeResult;
 import io.github.sinri.keel.helper.runtime.GCStatResult;
 import io.github.sinri.keel.helper.runtime.MemoryResult;
-import io.vertx.core.json.JsonObject;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 
 import javax.annotation.Nonnull;
-import java.lang.management.GarbageCollectorMXBean;
-import java.lang.management.ManagementFactory;
-import java.util.Objects;
+import java.lang.management.*;
 import java.util.Set;
-
-import static io.github.sinri.keel.facade.KeelInstance.Keel;
-import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 2.9.3
@@ -37,12 +31,25 @@ public class KeelRuntimeHelper {
         );
     }
 
+
     private KeelRuntimeHelper() {
 
     }
 
     static KeelRuntimeHelper getInstance() {
         return instance;
+    }
+
+    private OperatingSystemMXBean osMX() {
+        return ManagementFactory.getOperatingSystemMXBean();
+    }
+
+    private MemoryMXBean memoryMX() {
+        return ManagementFactory.getMemoryMXBean();
+    }
+
+    private Runtime runtime() {
+        return Runtime.getRuntime();
     }
 
     @Nonnull
@@ -53,37 +60,7 @@ public class KeelRuntimeHelper {
             if (gc == null) {
                 continue;
             }
-            if (Objects.equals("G1 Young Generation", gc.getName())
-                    || Objects.equals("Copy", gc.getName())
-                    || Objects.equals("ParNew", gc.getName())
-                    || Objects.equals("PSScavenge", gc.getName())
-            ) {
-                gcStat.addGCCountAsYoung(gc.getCollectionCount());
-                if (gc.getCollectionTime() >= 0) {
-                    gcStat.addGCTimeAsYoung(gc.getCollectionTime());
-                }
-            } else if (Objects.equals("G1 Old Generation", gc.getName())
-                    || Objects.equals("MarkSweepCompact", gc.getName())
-                    || Objects.equals("PSMarkSweep", gc.getName())
-                    || Objects.equals("ConcurrentMarkSweep", gc.getName())
-            ) {
-                gcStat.addGCCountAsOld(gc.getCollectionCount());
-                if (gc.getCollectionTime() >= 0) {
-                    gcStat.addGCTimeAsOld(gc.getCollectionTime());
-                }
-            } else {
-                Keel.getLogger().error(log -> log
-                        .message("Found Unknown GarbageCollectorMXBean Name")
-                        .put("detail", new JsonObject()
-                                .put("class", gc.getClass().getName())
-                                .put("name", gc.getName())
-                                .put("memoryPoolNames", KeelHelpers.stringHelper().joinStringArray(gc.getMemoryPoolNames(), ","))
-                                .put("objectName", gc.getObjectName())
-                                .put("collectionCount", gc.getCollectionCount())
-                                .put("collectionTime", gc.getCollectionTime())
-                        )
-                );
-            }
+            gcStat.refreshWithGC(gc);
         }
         return gcStat;
     }
@@ -109,10 +86,11 @@ public class KeelRuntimeHelper {
     }
 
     /**
-     * @since 2.9.4
+     * @since 2.9.4 named as getMemorySnapshot
+     * @since 3.1.4 renamed to getHardwareMemorySnapshot
      */
     @Nonnull
-    public MemoryResult getMemorySnapshot() {
+    public MemoryResult getHardwareMemorySnapshot() {
         SystemInfo systemInfo = new SystemInfo();
         GlobalMemory memory = systemInfo.getHardware().getMemory();
         long totalByte = memory.getTotal();
@@ -123,4 +101,67 @@ public class KeelRuntimeHelper {
                 .setAvailableByte(availableByte);
     }
 
+    /**
+     * @since 3.1.4
+     */
+    @Nonnull
+    public MemoryResult getJVMMemorySnapshot() {
+        Runtime runtime = runtime();
+        long totalMemory = runtime.totalMemory(); // JVM总内存量
+        long freeMemory = runtime.freeMemory(); // JVM空闲内存量
+        // long usedMemory = totalMemory - freeMemory; // 使用的内存量
+        return new MemoryResult()
+                .setTotalByte(totalMemory)
+                .setAvailableByte(freeMemory);
+    }
+
+    /**
+     * @return
+     * @since 3.1.4
+     */
+    @Nonnull
+    public MemoryResult getJVMHeapMemorySnapshot() {
+        MemoryUsage heapMemoryUsage = getHeapMemoryUsage();
+        //long initMemory = heapMemoryUsage.getInit();  // 初始的总内存
+        long usedMemory = heapMemoryUsage.getUsed();  // 已使用的内存
+        //long committedMemory = heapMemoryUsage.getCommitted();  // 已申请的内存
+        long maxMemory = heapMemoryUsage.getMax();  // 最大可用内存
+
+        return new MemoryResult()
+                .setTotalByte(maxMemory)
+                .setAvailableByte(maxMemory - usedMemory);
+    }
+
+    /**
+     * Returns the system load average for the last minute. The system load average is the sum of the number of runnable entities queued to the available processors and the number of runnable entities running on the available processors averaged over a period of time. The way in which the load average is calculated is operating system specific but is typically a damped time-dependent average.
+     * If the load average is not available, a negative value is returned.
+     * This method is designed to provide a hint about the system load and may be queried frequently. The load average may be unavailable on some platform where it is expensive to implement this method.
+     *
+     * @return the system load average; or a negative value if not available.
+     * @since 3.1.4
+     */
+    public double getSystemLoadAverage() {
+        return this.osMX().getSystemLoadAverage();
+    }
+
+    /**
+     * @since 3.1.4
+     */
+    public MemoryUsage getHeapMemoryUsage() {
+        return this.memoryMX().getHeapMemoryUsage();
+    }
+
+    /**
+     * @since 3.1.4
+     */
+    public MemoryUsage getNonHeapMemoryUsage() {
+        return this.memoryMX().getNonHeapMemoryUsage();
+    }
+
+    /**
+     * @since 3.1.4
+     */
+    public int getObjectPendingFinalizationCount() {
+        return this.memoryMX().getObjectPendingFinalizationCount();
+    }
 }

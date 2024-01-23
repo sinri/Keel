@@ -6,7 +6,15 @@ package io.github.sinri.keel.helper.runtime;
 public class MonitorSnapshot {
     private GCStatResult GCStat;
     private CPUTimeResult CPUTime;
-    private MemoryResult memory;
+    private MemoryResult hardwareMemory;
+    /**
+     * @since 3.1.4
+     */
+    private MemoryResult jvmMemory;
+    /**
+     * @since 3.1.4
+     */
+    private MemoryResult jvmHeapMemory;
 
     public CPUTimeResult getCPUTime() {
         return CPUTime;
@@ -26,12 +34,48 @@ public class MonitorSnapshot {
         return this;
     }
 
-    public MemoryResult getMemory() {
-        return memory;
+    /**
+     * @since 3.1.4
+     */
+    public MemoryResult getHardwareMemory() {
+        return hardwareMemory;
     }
 
-    public MonitorSnapshot setMemory(MemoryResult memory) {
-        this.memory = memory;
+    /**
+     * @since 3.1.4
+     */
+    public MonitorSnapshot setHardwareMemory(MemoryResult memory) {
+        this.hardwareMemory = memory;
+        return this;
+    }
+
+    /**
+     * @since 3.1.4
+     */
+    public MemoryResult getJvmHeapMemory() {
+        return jvmHeapMemory;
+    }
+
+    /**
+     * @since 3.1.4
+     */
+    public MonitorSnapshot setJvmHeapMemory(MemoryResult jvmHeapMemory) {
+        this.jvmHeapMemory = jvmHeapMemory;
+        return this;
+    }
+
+    /**
+     * @since 3.1.4
+     */
+    public MemoryResult getJvmMemory() {
+        return jvmMemory;
+    }
+
+    /**
+     * @since 3.1.4
+     */
+    public MonitorSnapshot setJvmMemory(MemoryResult jvmMemory) {
+        this.jvmMemory = jvmMemory;
         return this;
     }
 }

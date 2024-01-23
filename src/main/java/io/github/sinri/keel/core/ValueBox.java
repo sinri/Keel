@@ -54,6 +54,7 @@ public class ValueBox<T> {
         return false;
     }
 
+    @Nullable
     public T getValue() {
         if (isValueAlreadySet()) return value;
         else throw new IllegalStateException("Value is not set yet");
@@ -63,7 +64,8 @@ public class ValueBox<T> {
      * @param fallbackForInvalid it would be return when the value is not set yet.
      * @since 3.1.0
      */
-    public T getValueOrElse(T fallbackForInvalid) {
+    @Nullable
+    public T getValueOrElse(@Nullable T fallbackForInvalid) {
         if (isValueAlreadySet()) return value;
         else return fallbackForInvalid;
     }

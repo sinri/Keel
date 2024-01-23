@@ -9,6 +9,7 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 3.0.0
+ * @since 3.1.4 add JVM and Heap Memory Monitoring
  */
 public class KeelRuntimeMonitor {
     private final AtomicReference<GCStatResult> _lastGCRef = new AtomicReference<>();
@@ -21,7 +22,9 @@ public class KeelRuntimeMonitor {
 
             GCStatResult gcSnapshot = KeelHelpers.runtimeHelper().getGCSnapshot();
             CPUTimeResult cpuTimeSnapshot = KeelHelpers.runtimeHelper().getCPUTimeSnapshot();
-            MemoryResult memorySnapshot = KeelHelpers.runtimeHelper().getMemorySnapshot();
+            MemoryResult hardwareMemorySnapshot = KeelHelpers.runtimeHelper().getHardwareMemorySnapshot();
+            MemoryResult jvmMemorySnapshot = KeelHelpers.runtimeHelper().getJVMMemorySnapshot();
+            MemoryResult jvmHeapMemorySnapshot = KeelHelpers.runtimeHelper().getJVMHeapMemorySnapshot();
 
             GCStatResult lastGC = _lastGCRef.get();
             if (lastGC != null) {
@@ -41,7 +44,9 @@ public class KeelRuntimeMonitor {
                 monitorSnapshot.setCPUTime(cpuTimeDiff);
             }
 
-            monitorSnapshot.setMemory(memorySnapshot);
+            monitorSnapshot.setHardwareMemory(hardwareMemorySnapshot);
+            monitorSnapshot.setJvmMemory(jvmMemorySnapshot);
+            monitorSnapshot.setJvmHeapMemory(jvmHeapMemorySnapshot);
 
             handler.handle(monitorSnapshot);
         });
