@@ -11,12 +11,13 @@ import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MemTest extends KeelTest {
     private final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
 
-    @TestUnit
-    public Future<Void> test() {
+    @TestUnit(skip = true)
+    public Future<Void> test1() {
         List<MemoryBlock> list = new ArrayList<>();
         return KeelAsyncKit.stepwiseCall(100, i -> {
             list.add(new MemoryBlock());
@@ -26,6 +27,23 @@ public class MemTest extends KeelTest {
                         return Future.succeededFuture();
                     });
         });
+    }
+
+    @TestUnit
+    public Future<Void> test2() {
+        double a = 1.3;
+        double b = a * 2;
+        double c = new Random().nextDouble();
+        double x = 1.0 / ((b - a) * c - a * c);
+        logger().info("result", new JsonObject()
+                .put("x", x)
+                .put("isFinite", Double.isFinite(x))
+                .put("isInfinite", Double.isInfinite(x))
+                .put("isNaN", Double.isNaN(x))
+        );
+
+
+        return Future.succeededFuture();
     }
 
     private void printMemoryUsage() {

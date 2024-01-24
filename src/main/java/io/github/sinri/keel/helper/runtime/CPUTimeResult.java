@@ -2,6 +2,7 @@ package io.github.sinri.keel.helper.runtime;
 
 import io.vertx.core.json.JsonObject;
 
+import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 
 /**
@@ -151,20 +152,28 @@ public class CPUTimeResult implements RuntimeStatResult<CPUTimeResult> {
     }
 
     public double getCpuUsage() {
-        return 1.0 - 1.0 * spentInIdleState / (
-                this.spentInUserState
-                        + this.spentInNiceState
-                        + this.spentInSystemState
-                        + this.spentInIdleState
-                        + this.spentInIOWaitState
-                        + this.spentInIRQState
-                        + this.spentInSoftIRQState
-                        + this.spentInStealState
-        );
+        long total = this.spentInUserState
+                + this.spentInNiceState
+                + this.spentInSystemState
+                + this.spentInIdleState
+                + this.spentInIOWaitState
+                + this.spentInIRQState
+                + this.spentInSoftIRQState
+                + this.spentInStealState;
+        if (total == 0) return 0;
+        return 1.0 - 1.0 * spentInIdleState / total;
     }
 
+    /**
+     * @since 3.1.5 if the usage is not finite, null would be returned.
+     */
+    @Nullable
     public String getCpuUsagePercent() {
-        return new DecimalFormat("#.##").format(getCpuUsage() * 100);
+        double cpuUsage = getCpuUsage();
+        if (Double.isInfinite(cpuUsage) || Double.isNaN(cpuUsage)) {
+            return null;
+        }
+        return new DecimalFormat("#.##").format(cpuUsage * 100);
     }
 
     public JsonObject toJsonObject() {
