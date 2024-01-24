@@ -59,7 +59,6 @@ public abstract class KeelWebReceptionist {
         } catch (Throwable throwable) {
             logger.exception(throwable, event -> event
                     .message("RoutingContext has been dealt by others")
-                    //.put("request_id", readRequestID())
                     .put("response", new JsonObject()
                             .put("code", routingContext.response().getStatusCode())
                             .put("message", routingContext.response().getStatusMessage())

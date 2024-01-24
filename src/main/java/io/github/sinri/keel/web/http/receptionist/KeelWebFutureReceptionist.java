@@ -16,6 +16,9 @@ abstract public class KeelWebFutureReceptionist extends KeelWebReceptionist {
 
     @Override
     public void handle() {
+        // since 3.1.5 add a starting log
+        getLogger().info(log -> log.message("TO HANDLE REQUEST"));
+
         Future.succeededFuture()
                 .compose(v -> handleForFuture())
                 .andThen(ar -> {
