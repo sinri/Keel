@@ -4,11 +4,13 @@ import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.helper.KeelDateTimeHelper;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
@@ -17,6 +19,8 @@ public interface KeelEventLog extends JsonifiableEntity<KeelEventLog> {
     String RESERVED_KEY_EVENT_MSG = "msg";
     String RESERVED_KEY_EVENT_EXCEPTION = "exception";
     String RESERVED_KEY_CONTEXT = "context";
+    String RESERVED_KEY_CLASSIFICATION = "classification";
+
     static KeelEventLog create(@Nonnull KeelLogLevel level, @Nonnull String topic) {
         return new KeelEventLogImpl(level, topic);
     }
@@ -76,4 +80,28 @@ public interface KeelEventLog extends JsonifiableEntity<KeelEventLog> {
 
     @Nullable
     String message();
+
+    /**
+     * @since 3.1.7
+     * Under one topic, designed a detail-able event classification method, to determine each event stands for.
+     */
+    default KeelEventLog classification(@Nonnull List<String> classification) {
+        if (!classification.isEmpty()) {
+            this.put(RESERVED_KEY_CLASSIFICATION, new JsonArray(classification));
+        }
+        return this;
+    }
+
+    /**
+     * @since 3.1.7
+     * Under one topic, designed a detail-able event classification method, to determine each event stands for.
+     */
+    default KeelEventLog classification(@Nonnull String... classificationItems) {
+        var classification = new JsonArray();
+        for (var c : classificationItems) {
+            classification.add(c);
+        }
+        this.put(RESERVED_KEY_CLASSIFICATION, classification);
+        return this;
+    }
 }

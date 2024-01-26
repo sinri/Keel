@@ -4,6 +4,7 @@ import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 
 import java.lang.management.ManagementFactory;
@@ -12,6 +13,9 @@ import java.lang.management.MemoryUsage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class MemTest extends KeelTest {
     private final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
@@ -29,7 +33,7 @@ public class MemTest extends KeelTest {
         });
     }
 
-    @TestUnit
+    @TestUnit(skip = true)
     public Future<Void> test2() {
         double a = 1.3;
         double b = a * 2;
@@ -71,5 +75,23 @@ public class MemTest extends KeelTest {
         public byte[] getData() {
             return data;
         }
+    }
+
+    @TestUnit
+    public Future<Void> test3() {
+        logger().info("point 1");
+        AtomicInteger iRef = new AtomicInteger(2);
+        Promise<Void> promise = Promise.promise();
+        Keel.getVertx().setPeriodic(3000L, 2000L, timer -> {
+            logger().info("point 2");
+            if (iRef.decrementAndGet() <= 0) {
+                if (Keel.getVertx().cancelTimer(timer)) {
+                    promise.complete();
+                } else {
+                    promise.fail("???");
+                }
+            }
+        });
+        return promise.future();
     }
 }

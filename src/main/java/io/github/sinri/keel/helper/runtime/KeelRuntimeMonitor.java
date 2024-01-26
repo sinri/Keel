@@ -2,6 +2,7 @@ package io.github.sinri.keel.helper.runtime;
 
 import io.vertx.core.Handler;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
@@ -16,7 +17,8 @@ public class KeelRuntimeMonitor {
     private final AtomicReference<CPUTimeResult> _lastCPUTimeRef = new AtomicReference<>();
 
 
-    public void startRuntimeMonitor(long interval, Handler<MonitorSnapshot> handler) {
+    public void startRuntimeMonitor(long interval, @Nonnull Handler<MonitorSnapshot> handler) {
+        // after [interval] waiting, actual snapshots would be taken.
         Keel.getVertx().setPeriodic(interval, timer -> {
             MonitorSnapshot monitorSnapshot = new MonitorSnapshot();
 
