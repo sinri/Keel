@@ -1,13 +1,18 @@
 package io.github.sinri.keel.mysql;
 
+import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.KeelConfiguration;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
+import io.vertx.core.Future;
+import io.vertx.mysqlclient.MySQLBuilder;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * KeelMySQLConfigure for connections and pool.
@@ -158,5 +163,28 @@ public class KeelMySQLConfiguration extends KeelConfiguration {
      */
     public boolean getPoolShared() {
         return !("NO".equals(readString("poolShared")));
+    }
+
+
+    /**
+     * With Client to run SQL on target MySQL Database one-time.
+     * The client is to be created, and then soon closed after the sql queried.
+     *
+     * @since 3.1.6
+     */
+    @TechnicalPreview(since = "3.1.6")
+    public Future<ResultMatrix> instantQuery(String sql) {
+        var sqlClient = MySQLBuilder.client()
+                .with(this.getPoolOptions())
+                .connectingTo(this.getConnectOptions())
+                .using(Keel.getVertx())
+                .build();
+        return Future.succeededFuture()
+                .compose(v -> sqlClient.preparedQuery(sql)
+                        .execute()
+                        .compose(rows -> {
+                            return Future.succeededFuture(ResultMatrix.create(rows));
+                        }))
+                .andThen(ar -> sqlClient.close());
     }
 }
