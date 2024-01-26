@@ -181,7 +181,7 @@ public interface KeelEventLogger {
     default void exception(@Nonnull Throwable throwable, @Nonnull String msg, @Nullable JsonObject context) {
         exception(throwable, eventLog -> {
             eventLog.message(msg);
-            if (context != null) eventLog.put("context", context);
+            if (context != null) eventLog.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
         });
     }
 
@@ -198,7 +198,7 @@ public interface KeelEventLogger {
     default void debug(String msg, JsonObject context) {
         debug(event -> {
             event.message(msg);
-            if (context != null) event.put("context", context);
+            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
         });
     }
 
@@ -208,7 +208,7 @@ public interface KeelEventLogger {
     default void info(String msg, JsonObject context) {
         info(event -> {
             event.message(msg);
-            if (context != null) event.put("context", context);
+            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
         });
     }
 
@@ -218,7 +218,7 @@ public interface KeelEventLogger {
     default void notice(String msg, JsonObject context) {
         notice(event -> {
             event.message(msg);
-            if (context != null) event.put("context", context);
+            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
         });
     }
 
@@ -228,7 +228,7 @@ public interface KeelEventLogger {
     default void warning(String msg, JsonObject context) {
         warning(event -> {
             event.message(msg);
-            if (context != null) event.put("context", context);
+            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
         });
     }
 
@@ -238,7 +238,7 @@ public interface KeelEventLogger {
     default void error(String msg, JsonObject context) {
         error(event -> {
             event.message(msg);
-            if (context != null) event.put("context", context);
+            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
         });
     }
 
@@ -248,7 +248,7 @@ public interface KeelEventLogger {
     default void fatal(String msg, JsonObject context) {
         fatal(event -> {
             event.message(msg);
-            if (context != null) event.put("context", context);
+            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
         });
     }
 }

@@ -16,6 +16,7 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 public interface KeelEventLog extends JsonifiableEntity<KeelEventLog> {
     String RESERVED_KEY_EVENT_MSG = "msg";
     String RESERVED_KEY_EVENT_EXCEPTION = "exception";
+    String RESERVED_KEY_CONTEXT = "context";
     static KeelEventLog create(@Nonnull KeelLogLevel level, @Nonnull String topic) {
         return new KeelEventLogImpl(level, topic);
     }
