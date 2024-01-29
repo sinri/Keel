@@ -11,6 +11,7 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 /**
  * @since 3.0.15
  * @since 3.0.18 Finished Technical Preview.
+ * @since 3.1.7 Add deprecated table annotation.
  */
 class TableRowClassBuilder {
     private final @Nonnull String packageName;
@@ -25,6 +26,10 @@ class TableRowClassBuilder {
     private @Nullable String ddl;
 
     private final @Nonnull List<TableRowClassField> fields = new ArrayList<>();
+    /**
+     * @since 3.1.7
+     */
+    private boolean tableDeprecated = false;
 
     public TableRowClassBuilder(@Nonnull String table, @Nullable String schema, @Nonnull String packageName) {
         this.table = table;
@@ -71,7 +76,15 @@ class TableRowClassBuilder {
         if (tableComment == null || tableComment.isEmpty() || tableComment.isBlank()) {
             return "Table comment is empty.";
         } else {
-            return KeelHelpers.stringHelper().escapeForHttpEntity(tableComment);
+            // since 3.1.7
+            String[] split = tableComment.split("@[Dd]eprecated", 2);
+            if (split.length > 1) {
+                // this table is deprecated
+                this.tableDeprecated = true;
+                return KeelHelpers.stringHelper().escapeForHttpEntity(split[1]);
+            } else {
+                return KeelHelpers.stringHelper().escapeForHttpEntity(tableComment);
+            }
         }
     }
 
@@ -104,8 +117,11 @@ class TableRowClassBuilder {
                 .append(" * \tTo avoid being rewritten, do not modify this file manually, unless editable confirmed.\n")
                 .append(" * \tIt was auto-generated on ").append(new Date()).append(".\n")
                 .append(" * @see ").append(TableRowClassSourceCodeGenerator.class.getName()).append("\n")
-                .append(" */\n")
-                .append("public class ").append(className).append(" extends AbstractTableRow {").append("\n");
+                .append(" */\n");
+        if (tableDeprecated) {
+            code.append("@Deprecated\n");
+        }
+        code.append("public class ").append(className).append(" extends AbstractTableRow {").append("\n");
 
         if (this.schema != null && !this.schema.isEmpty() && !this.schema.isBlank()) {
             if (this.provideConstSchema) {

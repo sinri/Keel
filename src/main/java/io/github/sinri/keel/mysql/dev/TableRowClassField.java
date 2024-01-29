@@ -3,6 +3,7 @@ package io.github.sinri.keel.mysql.dev;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,6 +13,7 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
  * @since 3.0.15
  * @since 3.0.18 Finished Technical Preview.
  * @since 3.1.0 Add support for AES encryption.
+ * @since 3.1.7 Add deprecated field annotation.
  */
 class TableRowClassField {
     private static final Pattern patternForLooseEnum;
@@ -36,12 +38,18 @@ class TableRowClassField {
     private final @Nullable String aesEnvelopePackage;
     private @Nullable TableRowClassFieldAesEncryption aesEncryption;
 
+    /**
+     * @since 3.1.7
+     */
+    private boolean fieldDeprecated = false;
+    private String actualComment;
+
     public TableRowClassField(
             @Nonnull String field,
             @Nonnull String type,
             @Nullable String comment,
             @Nullable String strictEnumPackage,
-            String aesEnvelopePackage
+            @Nullable String aesEnvelopePackage
     ) {
         this.field = field;
         this.type = type;
@@ -111,8 +119,21 @@ class TableRowClassField {
             Matcher matcherForAESEnvelope = patternForAESEnvelope.matcher(comment);
             if (matcherForAESEnvelope.find()) {
                 String aes = matcherForAESEnvelope.group(1);
-                aesEncryption = new TableRowClassFieldAesEncryption(aes, this.aesEnvelopePackage);
+                aesEncryption = new TableRowClassFieldAesEncryption(aes, Objects.requireNonNull(this.aesEnvelopePackage));
             }
+        }
+
+        if (comment != null) {
+            String[] split = comment.split("@[Dd]eprecated", 2);
+            if (split.length > 1) {
+                // this table is deprecated
+                this.fieldDeprecated = true;
+                actualComment = KeelHelpers.stringHelper().escapeForHttpEntity(split[1]);
+            } else {
+                actualComment = KeelHelpers.stringHelper().escapeForHttpEntity(comment);
+            }
+        } else {
+            actualComment = "";
         }
     }
 
@@ -123,9 +144,13 @@ class TableRowClassField {
         if (looseEnum != null) {
             code.append(looseEnum.build()).append("\n");
             code.append("\t/*\n")
-                    .append("\t * ").append(comment).append("\n\t * \n")
+                    .append("\t * ").append(actualComment).append("\n\t * \n")
                     .append("\t * Loose Enum of Field `").append(field).append("` of type `").append(type).append("`.\n")
-                    .append("\t */\n")
+                    .append("\t */\n");
+            if (fieldDeprecated) {
+                code.append("\t@Deprecated\n");
+            }
+            code
                     .append("\tpublic ").append(looseEnum.looseEnumName()).append(" ").append(getter).append("() {\n")
                     .append("\t\treturn ").append(looseEnum.looseEnumName()).append(".valueOf(\n")
                     .append("\t\t\t").append(readMethod).append("(\"").append(field).append("\")\n")
@@ -133,9 +158,13 @@ class TableRowClassField {
                     .append("\t}\n");
         } else if (strictEnum != null) {
             code.append("\t/*\n")
-                    .append("\t * ").append(comment).append("\n\t * \n")
+                    .append("\t * ").append(actualComment).append("\n\t * \n")
                     .append("\t * Strict Enum of Field `").append(field).append("` of type `").append(type).append("`.\n")
-                    .append("\t */\n")
+                    .append("\t */\n");
+            if (fieldDeprecated) {
+                code.append("\t@Deprecated\n");
+            }
+            code
                     .append("\tpublic ").append(strictEnum.fullEnumRef()).append(" ").append(getter).append("() {\n")
                     .append("\t\treturn ").append(strictEnum.fullEnumRef()).append(".valueOf(\n")
                     .append("\t\t\t").append(readMethod).append("(\"").append(field).append("\")\n")
@@ -144,12 +173,14 @@ class TableRowClassField {
         } else {
             code.append("\t/*\n");
             if (comment != null) {
-                String escapedComment = KeelHelpers.stringHelper().escapeForHttpEntity(comment);
-                code.append("\t * ").append(escapedComment).append("\n\t * \n");
+                code.append("\t * ").append(actualComment).append("\n\t * \n");
             }
             code.append("\t * Field `").append(field).append("` of type `").append(type).append("`.\n")
-                    .append("\t */\n")
-                    .append("\tpublic ").append(returnType).append(" ").append(getter).append("() {\n")
+                    .append("\t */\n");
+            if (fieldDeprecated) {
+                code.append("\t@Deprecated\n");
+            }
+            code.append("\tpublic ").append(returnType).append(" ").append(getter).append("() {\n")
                     .append("\t\treturn ").append(readMethod).append("(\"").append(field).append("\");\n")
                     .append("\t}\n");
         }
@@ -158,8 +189,7 @@ class TableRowClassField {
             code.append("\t/*\n")
                     .append("\t * AES DECRYPTED VALUE.\n");
             if (comment != null) {
-                String escapedComment = KeelHelpers.stringHelper().escapeForHttpEntity(comment);
-                code.append("\t * ").append(escapedComment).append("\n\t * \n");
+                code.append("\t * ").append(actualComment).append("\n\t * \n");
             }
             code.append("\t */\n")
                     .append("\t@Nullable\n")

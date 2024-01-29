@@ -15,6 +15,7 @@ public interface KeelLauncherAdapter extends VertxLifecycleHooks {
 
     /**
      * Run this in main.
+     * Do not override this.
      *
      * @param args refer to the main.
      */
@@ -24,6 +25,7 @@ public interface KeelLauncherAdapter extends VertxLifecycleHooks {
 
     /**
      * Create a launcher.
+     * Do not override this.
      */
     default KeelLauncher launcher() {
         return new KeelLauncher(this);

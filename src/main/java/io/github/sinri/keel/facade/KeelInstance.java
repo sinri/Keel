@@ -47,6 +47,7 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     }
 
     public void setVertx(@Nonnull Vertx outsideVertx) {
+        logger.debug("KeelInstance::setVertx is called with outsideVertx " + outsideVertx + " while currently vertx is " + vertx);
         if (vertx == null) {
             vertx = outsideVertx;
         } else {
