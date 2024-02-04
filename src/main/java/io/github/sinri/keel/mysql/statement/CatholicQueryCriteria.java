@@ -12,11 +12,12 @@ import java.util.Map;
 /**
  * @since 1.13
  */
+@Deprecated(since = "3.1.8")
 public class CatholicQueryCriteria {
     protected final Map<String, JsonArray> inclusiveCriteria = new HashMap<>();
     protected final Map<String, JsonArray> exclusiveCriteria = new HashMap<>();
 
-    public <T> CatholicQueryCriteria include(@Nonnull String name,@Nullable T value) {
+    public <T> CatholicQueryCriteria include(@Nonnull String name, @Nullable T value) {
         if (value == null) return this;
         inclusiveCriteria.computeIfAbsent(name, x -> new JsonArray());
         inclusiveCriteria.get(name).add(value);
@@ -39,14 +40,14 @@ public class CatholicQueryCriteria {
         return this;
     }
 
-    public <T> CatholicQueryCriteria exclude(@Nonnull String name,@Nullable T value) {
+    public <T> CatholicQueryCriteria exclude(@Nonnull String name, @Nullable T value) {
         if (value == null) return this;
         exclusiveCriteria.computeIfAbsent(name, x -> new JsonArray());
         exclusiveCriteria.get(name).add(value);
         return this;
     }
 
-    public <T> CatholicQueryCriteria exclude(@Nonnull String name,@Nullable Collection<T> values) {
+    public <T> CatholicQueryCriteria exclude(@Nonnull String name, @Nullable Collection<T> values) {
         if (values == null) return this;
         exclusiveCriteria.computeIfAbsent(name, x -> new JsonArray());
         JsonArray jsonArray = new JsonArray();
@@ -55,7 +56,7 @@ public class CatholicQueryCriteria {
         return this;
     }
 
-    public CatholicQueryCriteria exclude(@Nonnull String name,@Nullable JsonArray values) {
+    public CatholicQueryCriteria exclude(@Nonnull String name, @Nullable JsonArray values) {
         if (values == null) return this;
         exclusiveCriteria.computeIfAbsent(name, x -> new JsonArray());
         exclusiveCriteria.get(name).addAll(values);

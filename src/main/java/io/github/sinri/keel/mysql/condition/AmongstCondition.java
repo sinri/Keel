@@ -3,9 +3,13 @@ package io.github.sinri.keel.mysql.condition;
 import io.github.sinri.keel.mysql.Quoter;
 import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
@@ -31,7 +35,8 @@ public class AmongstCondition implements MySQLCondition {
      * @return AmongstCondition
      * @since 1.4
      */
-    public AmongstCondition element(Object element, Boolean needQuoting) {
+    @Deprecated(since = "3.1.8")
+    public AmongstCondition element(@Nonnull Object element, boolean needQuoting) {
         if (needQuoting) {
             if (element instanceof Number) {
                 return elementAsValue((Number) element);
@@ -48,21 +53,22 @@ public class AmongstCondition implements MySQLCondition {
      * @return AmongstCondition
      * @since 1.4
      */
-    public AmongstCondition element(Object element) {
+    @Deprecated(since = "3.1.8")
+    public AmongstCondition element(@Nonnull Object element) {
         return element(element, false);
     }
 
-    public AmongstCondition elementAsExpression(String element) {
+    public AmongstCondition elementAsExpression(@Nonnull String element) {
         this.element = element;
         return this;
     }
 
-    public AmongstCondition elementAsValue(String element) {
+    public AmongstCondition elementAsValue(@Nullable String element) {
         this.element = new Quoter(element).toString();
         return this;
     }
 
-    public AmongstCondition elementAsValue(Number element) {
+    public AmongstCondition elementAsValue(@Nullable Number element) {
         this.element = new Quoter(element).toString();
         return this;
     }
@@ -70,7 +76,8 @@ public class AmongstCondition implements MySQLCondition {
     /**
      * @since 1.4
      */
-    public AmongstCondition amongst(Collection<?> targetSet, boolean needQuoting) {
+    @Deprecated(since = "3.1.8")
+    public AmongstCondition amongst(@Nonnull Collection<?> targetSet, boolean needQuoting) {
         if (needQuoting) {
             return amongstValueList(targetSet);
         } else {
@@ -85,41 +92,96 @@ public class AmongstCondition implements MySQLCondition {
     /**
      * @since 1.4
      */
-    public AmongstCondition amongst(Collection<?> targetSet) {
+    @Deprecated(since = "3.1.8")
+    public AmongstCondition amongst(@Nonnull Collection<?> targetSet) {
         return amongst(targetSet, true);
     }
 
-    public AmongstCondition amongstValueList(Collection<?> targetSet) {
+    @Deprecated(since = "3.1.8")
+    public AmongstCondition amongstValueList(@Nonnull Collection<?> targetSet) {
         for (Object next : targetSet) {
             this.targetSet.add(new Quoter(String.valueOf(next)).toString());
         }
         return this;
     }
 
-    public AmongstCondition amongstValueArray(Object[] targetSet) {
+    /**
+     * @since 3.1.8
+     */
+    public AmongstCondition amongstLiteralValueList(@Nonnull Collection<?> targetSet) {
+        for (Object next : targetSet) {
+            //this.targetSet.add(new Quoter(String.valueOf(next)).toString());
+            this.amongstLiteralValue(next);
+        }
+        return this;
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public AmongstCondition amongstNumericValueList(@Nonnull Collection<? extends Number> targetSet) {
+        for (Number next : targetSet) {
+            //this.targetSet.add(new Quoter(String.valueOf(next)).toString());
+            this.amongstNumericValue(next);
+        }
+        return this;
+    }
+
+    @Deprecated(since = "3.1.8")
+    public AmongstCondition amongstValueArray(@Nonnull Object[] targetSet) {
         for (Object next : targetSet) {
             this.targetSet.add(new Quoter(String.valueOf(next)).toString());
         }
         return this;
     }
 
-    public AmongstCondition amongstValue(String value) {
+    @Deprecated(since = "3.1.8")
+    public AmongstCondition amongstValue(@Nullable String value) {
         this.targetSet.add(new Quoter(value).toString());
         return this;
     }
 
-    public AmongstCondition amongstValue(Number value) {
+    /**
+     * @since 3.1.8
+     */
+    public AmongstCondition amongstLiteralValue(@Nullable Object value) {
+        if (value == null) {
+            this.targetSet.add("NULL");
+        } else {
+            this.targetSet.add(new Quoter(String.valueOf(value)).toString());
+        }
+        return this;
+    }
+
+    @Deprecated(since = "3.1.8")
+    public AmongstCondition amongstValue(@Nullable Number value) {
         this.targetSet.add(new Quoter(value).toString());
         return this;
     }
 
-    public AmongstCondition amongstExpression(String value) {
+    /**
+     * @since 3.1.8
+     */
+    public AmongstCondition amongstNumericValue(@Nullable Number value) {
+        if (value == null) {
+            this.targetSet.add("NULL");
+        } else {
+            if (value instanceof BigDecimal) {
+                this.targetSet.add(((BigDecimal) value).toPlainString());
+            } else {
+                this.targetSet.add(value.toString());
+            }
+        }
+        return this;
+    }
+
+    public AmongstCondition amongstExpression(@Nonnull String value) {
         this.targetSet.add(value);
         return this;
     }
 
-    public AmongstCondition amongstExpression(List<String> value) {
-        this.targetSet.addAll(value);
+    public AmongstCondition amongstExpression(@Nonnull List<String> value) {
+        value.forEach(x -> this.amongstExpression(Objects.requireNonNull(x)));
         return this;
     }
 

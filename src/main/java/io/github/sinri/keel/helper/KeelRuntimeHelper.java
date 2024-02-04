@@ -103,6 +103,7 @@ public class KeelRuntimeHelper {
 
     /**
      * @since 3.1.4
+     * 这里的口径似乎是JVM内实际申请占用的内存。
      */
     @Nonnull
     public MemoryResult getJVMMemorySnapshot() {
@@ -116,8 +117,8 @@ public class KeelRuntimeHelper {
     }
 
     /**
-     * @return
      * @since 3.1.4
+     * 这里的口径似乎是JVM内名义上占用的内存。
      */
     @Nonnull
     public MemoryResult getJVMHeapMemorySnapshot() {

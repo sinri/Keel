@@ -2,6 +2,10 @@ package io.github.sinri.keel.mysql.condition;
 
 import io.github.sinri.keel.mysql.Quoter;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.math.BigDecimal;
+
 public class CompareCondition implements MySQLCondition {
     public static final String OP_EQ = "=";
     public static final String OP_NEQ = "<>";
@@ -27,7 +31,7 @@ public class CompareCondition implements MySQLCondition {
         this.inverseOperator = false;
     }
 
-    public CompareCondition(String operator) {
+    public CompareCondition(@Nonnull String operator) {
         this.leftSide = null;
         this.operator = operator;
         this.rightSide = null;
@@ -45,7 +49,8 @@ public class CompareCondition implements MySQLCondition {
      * @return CompareCondition
      * @since 1.4
      */
-    public CompareCondition compare(Object leftSide, Boolean needQuoting) {
+    @Deprecated(since = "3.1.8")
+    public CompareCondition compare(@Nonnull Object leftSide, boolean needQuoting) {
         if (needQuoting) {
             return compareValue(leftSide);
         } else {
@@ -58,21 +63,22 @@ public class CompareCondition implements MySQLCondition {
      * @return CompareCondition
      * @since 1.4
      */
-    public CompareCondition compare(Object leftSide) {
+    @Deprecated(since = "3.1.8")
+    public CompareCondition compare(@Nonnull Object leftSide) {
         return compareExpression(leftSide);
     }
 
-    public CompareCondition compareExpression(Object leftSide) {
+    public CompareCondition compareExpression(@Nonnull Object leftSide) {
         this.leftSide = leftSide.toString();
         return this;
     }
 
-    public CompareCondition compareValue(Object leftSide) {
+    public CompareCondition compareValue(@Nullable Object leftSide) {
         this.leftSide = String.valueOf(new Quoter(String.valueOf(leftSide)));
         return this;
     }
 
-    public CompareCondition operator(String operator) {
+    public CompareCondition operator(@Nonnull String operator) {
         this.operator = operator;
         return this;
     }
@@ -83,6 +89,7 @@ public class CompareCondition implements MySQLCondition {
      * @return CompareCondition
      * @since 1.4
      */
+    @Deprecated(since = "3.1.8")
     public CompareCondition against(Object rightSide, Boolean needQuoting) {
         if (needQuoting) {
             return againstValue(rightSide);
@@ -96,17 +103,40 @@ public class CompareCondition implements MySQLCondition {
      * @return CompareCondition
      * @since 1.4
      */
+    @Deprecated(since = "3.1.8")
     public CompareCondition against(Object rightSide) {
         return againstValue(rightSide);
     }
 
-    public CompareCondition againstExpression(Object rightSide) {
+    public CompareCondition againstExpression(@Nonnull Object rightSide) {
         this.rightSide = rightSide.toString();
         return this;
     }
 
-    public CompareCondition againstValue(Object rightSide) {
+    @Deprecated(since = "3.1.8")
+    public CompareCondition againstValue(@Nullable Object rightSide) {
+        //this.rightSide = String.valueOf(new Quoter(String.valueOf(rightSide)));
+        //return this;
+        return this.againstLiteralValue(rightSide);
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition againstLiteralValue(@Nullable Object rightSide) {
         this.rightSide = String.valueOf(new Quoter(String.valueOf(rightSide)));
+        return this;
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition againstNumericValue(@Nonnull Number rightSide) {
+        if (rightSide instanceof BigDecimal) {
+            this.rightSide = ((BigDecimal) rightSide).toPlainString();
+        } else {
+            this.rightSide = rightSide.toString();
+        }
         return this;
     }
 
@@ -134,21 +164,21 @@ public class CompareCondition implements MySQLCondition {
         return this;
     }
 
-    public CompareCondition contains(String rightSide) {
+    public CompareCondition contains(@Nonnull String rightSide) {
         this.operator = OP_LIKE;
         String x = Quoter.escapeStringWithWildcards(rightSide);
         this.rightSide = "'%" + x + "%'";
         return this;
     }
 
-    public CompareCondition hasPrefix(String rightSide) {
+    public CompareCondition hasPrefix(@Nonnull String rightSide) {
         this.operator = "like";
         String x = Quoter.escapeStringWithWildcards(rightSide);
         this.rightSide = "'" + x + "%'";
         return this;
     }
 
-    public CompareCondition hasSuffix(String rightSide) {
+    public CompareCondition hasSuffix(@Nonnull String rightSide) {
         this.operator = "like";
         String x = Quoter.escapeStringWithWildcards(rightSide);
         this.rightSide = "'%" + x + "'";
@@ -163,7 +193,8 @@ public class CompareCondition implements MySQLCondition {
      * @return this class instance
      * @since 1.4
      */
-    public CompareCondition filedEqualsValue(String fieldName, Object value) {
+    @Deprecated(since = "3.1.8")
+    public CompareCondition filedEqualsValue(@Nonnull String fieldName, @Nullable Object value) {
         if (value == null) {
             return this.isNull().compareExpression(fieldName);
         }
