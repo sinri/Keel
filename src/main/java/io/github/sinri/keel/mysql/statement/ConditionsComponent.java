@@ -121,10 +121,48 @@ public class ConditionsComponent {
      * @param values     Be quoted each, as number or string.
      * @since 3.1.8
      */
-    public ConditionsComponent expressionAmongValues(@Nonnull String expression, @Nonnull Collection<?> values) {
+    public ConditionsComponent expressionAmongLiteralValues(@Nonnull String expression, @Nonnull Collection<?> values) {
         return this.among(amongstCondition -> amongstCondition
                 .elementAsExpression(expression)
-                .amongstValueList(values)
+                .amongstLiteralValueList(values)
+        );
+    }
+
+    /**
+     * @param expression Not be quoted, may be fields, functions, etc.
+     * @param values     Be quoted each, as number or string.
+     * @since 3.1.8
+     */
+    public ConditionsComponent expressionAmongNumericValues(@Nonnull String expression, @Nonnull Collection<? extends Number> values) {
+        return this.among(amongstCondition -> amongstCondition
+                .elementAsExpression(expression)
+                .amongstNumericValueList(values)
+        );
+    }
+
+    /**
+     * @param expression Not be quoted, may be fields, functions, etc.
+     * @param values     Be quoted each, as number or string.
+     * @since 3.1.8
+     */
+    public ConditionsComponent expressionNotAmongLiteralValues(@Nonnull String expression, @Nonnull Collection<?> values) {
+        return this.among(amongstCondition -> amongstCondition
+                .elementAsExpression(expression)
+                .not()
+                .amongstLiteralValueList(values)
+        );
+    }
+
+    /**
+     * @param expression Not be quoted, may be fields, functions, etc.
+     * @param values     Be quoted each, as number or string.
+     * @since 3.1.8
+     */
+    public ConditionsComponent expressionNotAmongNumericValues(@Nonnull String expression, @Nonnull Collection<? extends Number> values) {
+        return this.among(amongstCondition -> amongstCondition
+                .elementAsExpression(expression)
+                .not()
+                .amongstNumericValueList(values)
         );
     }
 
