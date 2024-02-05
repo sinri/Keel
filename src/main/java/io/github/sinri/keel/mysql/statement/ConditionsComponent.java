@@ -34,6 +34,7 @@ public class ConditionsComponent {
     public ConditionsComponent expressionEqualsLiteralValue(@Nonnull String expression, @Nonnull Object value) {
         return this.comparison(compareCondition -> compareCondition
                 .compareExpression(expression)
+                .operator(CompareCondition.OP_EQ)
                 .againstLiteralValue(value)
         );
     }
@@ -46,7 +47,7 @@ public class ConditionsComponent {
     public ConditionsComponent expressionNotEqualsLiteralValue(@Nonnull String expression, @Nonnull Object value) {
         return this.comparison(compareCondition -> compareCondition
                 .compareExpression(expression)
-                .not()
+                .operator(CompareCondition.OP_NEQ)
                 .againstLiteralValue(value)
         );
     }
@@ -59,6 +60,7 @@ public class ConditionsComponent {
     public ConditionsComponent expressionEqualsNumericValue(@Nonnull String expression, @Nonnull Number value) {
         return this.comparison(compareCondition -> compareCondition
                 .compareExpression(expression)
+                .operator(CompareCondition.OP_EQ)
                 .againstNumericValue(value)
         );
     }
@@ -71,7 +73,7 @@ public class ConditionsComponent {
     public ConditionsComponent expressionNotEqualsNumericValue(@Nonnull String expression, @Nonnull Number value) {
         return this.comparison(compareCondition -> compareCondition
                 .compareExpression(expression)
-                .not()
+                .operator(CompareCondition.OP_NEQ)
                 .againstNumericValue(value)
         );
     }
