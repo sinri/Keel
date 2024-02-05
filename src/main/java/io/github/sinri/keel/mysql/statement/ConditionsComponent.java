@@ -44,7 +44,7 @@ public class ConditionsComponent {
      * @param value      Be quoted after stringify. BigDecimal would not be plain string.
      * @since 3.1.8
      */
-    public ConditionsComponent expressionNotEqualsLiteralValue(@Nonnull String expression, @Nonnull Object value) {
+    public ConditionsComponent expressionNotLiteralValue(@Nonnull String expression, @Nonnull Object value) {
         return this.comparison(compareCondition -> compareCondition
                 .compareExpression(expression)
                 .operator(CompareCondition.OP_NEQ)
@@ -70,7 +70,7 @@ public class ConditionsComponent {
      * @param value      Be quoted, numeric. BigDecimal would not be plain string.
      * @since 3.1.8
      */
-    public ConditionsComponent expressionNotEqualsNumericValue(@Nonnull String expression, @Nonnull Number value) {
+    public ConditionsComponent expressionNotNumericValue(@Nonnull String expression, @Nonnull Number value) {
         return this.comparison(compareCondition -> compareCondition
                 .compareExpression(expression)
                 .operator(CompareCondition.OP_NEQ)
@@ -147,7 +147,7 @@ public class ConditionsComponent {
      * @param values     Be quoted each, as number or string.
      * @since 3.1.8
      */
-    public ConditionsComponent expressionNotAmongLiteralValues(@Nonnull String expression, @Nonnull Collection<?> values) {
+    public ConditionsComponent expressionNotInLiteralValues(@Nonnull String expression, @Nonnull Collection<?> values) {
         return this.among(amongstCondition -> amongstCondition
                 .elementAsExpression(expression)
                 .not()
@@ -160,7 +160,7 @@ public class ConditionsComponent {
      * @param values     Be quoted each, as number or string.
      * @since 3.1.8
      */
-    public ConditionsComponent expressionNotAmongNumericValues(@Nonnull String expression, @Nonnull Collection<? extends Number> values) {
+    public ConditionsComponent expressionNotInNumericValues(@Nonnull String expression, @Nonnull Collection<? extends Number> values) {
         return this.among(amongstCondition -> amongstCondition
                 .elementAsExpression(expression)
                 .not()
@@ -204,7 +204,7 @@ public class ConditionsComponent {
      * @return this
      * @since 1.13
      */
-    @Deprecated(since = "3.1.8")
+    @Deprecated(since = "3.1.8", forRemoval = true)
     public ConditionsComponent withCatholicQueryCriteria(@Nonnull CatholicQueryCriteria catholicQueryCriteria) {
         return catholicQueryCriteria.mergeIntoConditionsComponent(this);
     }
@@ -218,7 +218,7 @@ public class ConditionsComponent {
     /**
      * @since 2.0
      */
-    @Deprecated(since = "3.1.0")
+    @Deprecated(since = "3.1.0", forRemoval = true)
     public final ConditionsComponent quickMapping(JsonObject mapping) {
         mapping.forEach(entry -> quickMapping(entry.getKey(), entry.getValue()));
         return this;
@@ -227,7 +227,7 @@ public class ConditionsComponent {
     /**
      * @since 2.0
      */
-    @Deprecated(since = "3.1.0")
+    @Deprecated(since = "3.1.0", forRemoval = true)
     public final ConditionsComponent quickMapping(String key, Object value) {
         if (key != null && !key.isEmpty()) {
             if (value == null) {

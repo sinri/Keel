@@ -141,13 +141,14 @@ public class CompareCondition implements MySQLCondition {
      * @param needQuoting TRUE for value, FALSE for expression
      * @return CompareCondition
      * @since 1.4
+     * @deprecated use againstValue or againstExpression
      */
-    @Deprecated(since = "3.1.8")
+    @Deprecated(since = "3.1.8", forRemoval = true)
     public CompareCondition against(Object rightSide, Boolean needQuoting) {
         if (needQuoting) {
             return againstValue(rightSide);
         } else {
-            return againstExpression(rightSide);
+            return againstExpression(rightSide.toString());
         }
     }
 
@@ -155,18 +156,22 @@ public class CompareCondition implements MySQLCondition {
      * @param rightSide value (would be quoted)
      * @return CompareCondition
      * @since 1.4
+     * @deprecated use againstLiteralValue
      */
-    @Deprecated(since = "3.1.8")
+    @Deprecated(since = "3.1.8", forRemoval = true)
     public CompareCondition against(Object rightSide) {
         return againstValue(rightSide);
     }
 
-    public CompareCondition againstExpression(@Nonnull Object rightSide) {
-        this.rightSide = rightSide.toString();
+    public CompareCondition againstExpression(@Nonnull String rightSide) {
+        this.rightSide = rightSide;
         return this;
     }
 
-    @Deprecated(since = "3.1.8")
+    /**
+     * @deprecated use againstLiteralValue
+     */
+    @Deprecated(since = "3.1.8", forRemoval = true)
     public CompareCondition againstValue(@Nullable Object rightSide) {
         //this.rightSide = String.valueOf(new Quoter(String.valueOf(rightSide)));
         //return this;
@@ -245,6 +250,7 @@ public class CompareCondition implements MySQLCondition {
      * @param value     string or number, would be quoted
      * @return this class instance
      * @since 1.4
+     * @deprecated use expressionEqualsLiteralValue or expressionEqualsNumericValue
      */
     @Deprecated(since = "3.1.8")
     public CompareCondition filedEqualsValue(@Nonnull String fieldName, @Nullable Object value) {
@@ -252,6 +258,29 @@ public class CompareCondition implements MySQLCondition {
             return this.isNull().compareExpression(fieldName);
         }
         return this.operator(OP_EQ).compareExpression(fieldName).againstValue(value);
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition expressionEqualsLiteralValue(@Nonnull String expression, @Nullable Object value) {
+        if (value == null) {
+            return this.compareExpression(expression).isNull();
+        }
+        return this
+                .compareExpression(expression)
+                .beEqual()
+                .againstLiteralValue(value);
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition expressionEqualsNumericValue(@Nonnull String expression, @Nonnull Number value) {
+        return this
+                .compareExpression(expression)
+                .beEqual()
+                .againstNumericValue(value);
     }
 
     /**

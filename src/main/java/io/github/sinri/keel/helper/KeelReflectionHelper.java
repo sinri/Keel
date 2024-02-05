@@ -56,6 +56,15 @@ public class KeelReflectionHelper {
     }
 
     /**
+     * @since 3.1.8
+     * For the repeatable annotations.
+     */
+    @Nonnull
+    public <T extends Annotation> T[] getAnnotationsOfClass(@Nonnull Class<?> anyClass, @Nonnull Class<T> classOfAnnotation) {
+        return anyClass.getAnnotationsByType(classOfAnnotation);
+    }
+
+    /**
      * @param packageName In this package
      * @param baseClass   seek any class implementations of this class
      * @param <R>         the target base class to seek its implementations

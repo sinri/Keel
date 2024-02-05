@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @since 1.13
  */
-@Deprecated(since = "3.1.8")
+@Deprecated(since = "3.1.8", forRemoval = true)
 public class CatholicQueryCriteria {
     protected final Map<String, JsonArray> inclusiveCriteria = new HashMap<>();
     protected final Map<String, JsonArray> exclusiveCriteria = new HashMap<>();

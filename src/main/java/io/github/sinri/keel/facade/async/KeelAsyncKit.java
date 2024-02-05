@@ -213,10 +213,7 @@ public interface KeelAsyncKit {
                 promise.future().onComplete(ar -> this.undeployMe());
             }
         };
-        return verticle.deployMe(new DeploymentOptions()
-                                .setThreadingModel(ThreadingModel.WORKER)
-                        //.setWorker(true)
-                )
+        return verticle.deployMe(new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER))
                 .compose(deploymentId -> promise.future());
     }
 }
