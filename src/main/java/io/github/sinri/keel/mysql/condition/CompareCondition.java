@@ -15,10 +15,7 @@ public class CompareCondition implements MySQLCondition {
     public static final String OP_LT = "<";
     public static final String OP_ELT = "<=";
     public static final String OP_IS = "IS";
-    //    public static final String OP_IS_NOT="IS NOT";
     public static final String OP_LIKE = "LIKE";
-//    public static final String OP_NOT_LIKE="NOT LIKE";
-
     protected String leftSide;
     protected String operator;
     protected String rightSide;
@@ -36,6 +33,62 @@ public class CompareCondition implements MySQLCondition {
         this.operator = operator;
         this.rightSide = null;
         this.inverseOperator = false;
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition beEqual() {
+        this.operator = OP_EQ;
+        return this;
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition beNotEqual() {
+        this.operator = OP_NEQ;
+        return this;
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition beEqualNullSafe() {
+        this.operator = OP_NULL_SAFE_EQ;
+        return this;
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition beGreaterThan() {
+        this.operator = OP_GT;
+        return this;
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition beEqualOrGreaterThan() {
+        this.operator = OP_EGT;
+        return this;
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition beLessThan() {
+        this.operator = OP_LT;
+        return this;
+    }
+
+    /**
+     * @since 3.1.8
+     */
+    public CompareCondition beEqualOrLessThan() {
+        this.operator = OP_ELT;
+        return this;
     }
 
     public CompareCondition not() {
