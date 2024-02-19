@@ -223,7 +223,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
                 tree.addChild(child);
             }
         }
-        options.logger.debug(eventLog -> eventLog.put("TREE", tree.toJsonObject()));
+        options.logger.debug(eventLog -> eventLog.context(c -> c.put("TREE", tree.toJsonObject())));
         return tree;
     }
 
@@ -279,7 +279,8 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
             }
         }
 
-        options.logger.debug(eventLog -> eventLog.put("TREE", tree.toJsonObject()));
+        options.logger.debug(eventLog -> eventLog
+                .context(c -> c.put("TREE", tree.toJsonObject())));
         return tree;
     }
 

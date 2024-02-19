@@ -38,7 +38,9 @@ abstract public class KeelAbstractSocketWrapper {
                 .handler(buffer -> {
                     getLogger().info(eventLog -> eventLog
                             .message("READ BUFFER " + buffer.length() + " BYTES")
+                            .context(c -> c
                             .put("buffer", KeelHelpers.binaryHelper().encodeHexWithUpperDigits(buffer))
+                            )
                     );
 
                     this.funnel.add(() -> {

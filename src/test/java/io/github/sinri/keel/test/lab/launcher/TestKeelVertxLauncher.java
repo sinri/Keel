@@ -20,7 +20,9 @@ public class TestKeelVertxLauncher extends Launcher {
     public void afterConfigParsed(JsonObject config) {
         logger.info(log -> log
                 .message("TestKeelVertxLauncher::afterConfigParsed")
-                .put("config", config)
+                .context(c -> c
+                        .put("config", config)
+                )
         );
     }
 
@@ -28,7 +30,9 @@ public class TestKeelVertxLauncher extends Launcher {
     public void beforeStartingVertx(VertxOptions options) {
         logger.info(log -> log
                 .message("TestKeelVertxLauncher::beforeStartingVertx")
-                .put("VertxOptions", options.toJson())
+                .context(c -> c
+                        .put("VertxOptions", options.toJson())
+                )
         );
     }
 
@@ -37,7 +41,9 @@ public class TestKeelVertxLauncher extends Launcher {
     public void beforeDeployingVerticle(DeploymentOptions deploymentOptions) {
         logger.info(log -> log
                 .message("TestKeelVertxLauncher::beforeDeployingVerticle")
-                .put("VertxOptions", deploymentOptions.toJson())
+                .context(c -> c
+                        .put("VertxOptions", deploymentOptions.toJson())
+                )
         );
     }
 

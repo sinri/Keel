@@ -4,7 +4,7 @@ import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.helper.KeelDateTimeHelper;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonArray;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
@@ -47,10 +47,33 @@ public interface KeelEventLog extends JsonifiableEntity<KeelEventLog> {
         return Future.succeededFuture(sb.toString());
     }
 
-    KeelEventLog put(@Nonnull String key, @Nullable Object value);
+//    @Deprecated(since = "3.1.10", forRemoval = true)
+//    KeelEventLog put(@Nonnull String key, @Nullable Object value);
+//
+//    @Deprecated(since = "3.1.10", forRemoval = true)
+//    @Nullable
+//    Object get(@Nonnull String key);
 
+    /**
+     * @since 3.1.10
+     */
+    default KeelEventLog context(@Nullable Handler<JsonObject> contextHandler) {
+        JsonObject context = new JsonObject();
+        contextHandler.handle(context);
+        this.context(context);
+        return this;
+    }
+
+    /**
+     * @since 3.1.10
+     */
+    KeelEventLog context(@Nullable JsonObject context);
+
+    /**
+     * @since 3.1.10
+     */
     @Nullable
-    Object get(@Nonnull String key);
+    JsonObject context();
 
     KeelEventLog timestamp(long timestamp);
 
@@ -85,23 +108,21 @@ public interface KeelEventLog extends JsonifiableEntity<KeelEventLog> {
      * @since 3.1.7
      * Under one topic, designed a detail-able event classification method, to determine each event stands for.
      */
-    default KeelEventLog classification(@Nonnull List<String> classification) {
-        if (!classification.isEmpty()) {
-            this.put(RESERVED_KEY_CLASSIFICATION, new JsonArray(classification));
-        }
-        return this;
-    }
+    KeelEventLog classification(@Nonnull List<String> classification);
 
     /**
      * @since 3.1.7
      * Under one topic, designed a detail-able event classification method, to determine each event stands for.
      */
-    default KeelEventLog classification(@Nonnull String... classificationItems) {
-        var classification = new JsonArray();
-        for (var c : classificationItems) {
-            classification.add(c);
-        }
-        this.put(RESERVED_KEY_CLASSIFICATION, classification);
-        return this;
-    }
+    KeelEventLog classification(@Nonnull String... classificationItems);
+
+    /**
+     * @since 3.1.10
+     */
+    KeelEventLog exception(Object processedThrowable);
+
+    /**
+     * @since 3.1.10
+     */
+    Object exception();
 }

@@ -31,7 +31,9 @@ public final class KeelLauncher extends Launcher {
     public void afterConfigParsed(JsonObject config) {
         logger().debug(log -> log
                 .message("afterConfigParsed")
-                .put("config", config)
+                .context(c -> c
+                        .put("config", config)
+                )
         );
 
         this.adapter.afterConfigParsed(config);
@@ -41,7 +43,9 @@ public final class KeelLauncher extends Launcher {
     public void beforeStartingVertx(VertxOptions options) {
         logger().debug(log -> log
                 .message("beforeStartingVertx")
-                .put("VertxOptions", options.toJson())
+                .context(c -> c
+                        .put("VertxOptions", options.toJson())
+                )
         );
         this.adapter.beforeStartingVertx(options);
     }
@@ -59,7 +63,9 @@ public final class KeelLauncher extends Launcher {
     public void beforeDeployingVerticle(DeploymentOptions deploymentOptions) {
         logger().debug(log -> log
                 .message("beforeDeployingVerticle")
-                .put("VertxOptions", deploymentOptions.toJson())
+                .context(c -> c
+                        .put("VertxOptions", deploymentOptions.toJson())
+                )
         );
         this.adapter.beforeDeployingVerticle(deploymentOptions);
     }

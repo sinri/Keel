@@ -83,16 +83,20 @@ abstract public class AbstractStatement implements AnyStatement {
                 .compose(resultMatrix -> {
                     getSqlAuditLogger().info(event -> event
                             .message(statement_uuid + " done")
-                            .put("TotalAffectedRows", resultMatrix.getTotalAffectedRows())
-                            .put("TotalFetchedRows", resultMatrix.getTotalFetchedRows())
-                            .put("sql", theSql.get())
+                            .context(c -> c
+                                    .put("TotalAffectedRows", resultMatrix.getTotalAffectedRows())
+                                    .put("TotalFetchedRows", resultMatrix.getTotalFetchedRows())
+                                    .put("sql", theSql.get())
+                            )
                     );
                     return Future.succeededFuture(resultMatrix);
                 }, throwable -> {
                     getSqlAuditLogger().exception(throwable, log -> log
                             .message("keel mysql statement execute failed")
-                            .put("statement_uuid", statement_uuid)
-                            .put("sql", theSql.get())
+                            .context(c -> c
+                                    .put("statement_uuid", statement_uuid)
+                                    .put("sql", theSql.get())
+                            )
                     );
                     return Future.failedFuture(throwable);
                 });

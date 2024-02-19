@@ -28,11 +28,13 @@ public abstract class KeelWebReceptionist {
         Handler<KeelEventLog> previous = this.logger.getPresetEventLogEditor();
         this.logger.setPresetEventLogEditor(eventLog -> {
             eventLog
-                    .put("request", new JsonObject()
-                            .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
-                            .put("method", routingContext.request().method().name())
-                            .put("path", routingContext.request().path())
-                            .put("handler", this.getClass().getName())
+                    .context(c -> c
+                            .put("request", new JsonObject()
+                                    .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
+                                    .put("method", routingContext.request().method().name())
+                                    .put("path", routingContext.request().path())
+                                    .put("handler", this.getClass().getName())
+                            )
                     );
 
             if (previous != null) {
@@ -59,11 +61,13 @@ public abstract class KeelWebReceptionist {
         } catch (Throwable throwable) {
             logger.exception(throwable, event -> event
                     .message("RoutingContext has been dealt by others")
-                    .put("response", new JsonObject()
-                            .put("code", routingContext.response().getStatusCode())
-                            .put("message", routingContext.response().getStatusMessage())
-                            .put("ended", routingContext.response().ended())
-                            .put("closed", routingContext.response().closed())
+                    .context(c -> c
+                            .put("response", new JsonObject()
+                                    .put("code", routingContext.response().getStatusCode())
+                                    .put("message", routingContext.response().getStatusMessage())
+                                    .put("ended", routingContext.response().ended())
+                                    .put("closed", routingContext.response().closed())
+                            )
                     )
             );
         }

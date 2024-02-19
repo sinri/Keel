@@ -56,9 +56,11 @@ public class ReadTemplatedExcelTest extends KeelTest {
 
             keelSheetMatrix.getRowIterator(KeelSheetMatrixRowExt.class).forEachRemaining(r -> {
                 this.logger.info(log -> log.message("record")
+                        .context(c -> c
                         .put("record_id", r.recordId())
                         .put("name", r.name())
                         .put("age", r.age())
+                        )
                 );
             });
         }

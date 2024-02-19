@@ -14,13 +14,15 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
 
     private static void block(Promise<Void> promise) {
         KeelEventLogger loggerInBlockingContext = KeelOutputEventLogCenter.getInstance().createLogger("Sample");
-        loggerInBlockingContext.info(log -> log.message("START").put("thread_id", Thread.currentThread().getId()));
+        loggerInBlockingContext.info(log -> log.message("START")
+                .context(c -> c.put("thread_id", Thread.currentThread().getId())));
         try {
             Thread.sleep(30_000L);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        loggerInBlockingContext.info(log -> log.message("END").put("thread_id", Thread.currentThread().getId()));
+        loggerInBlockingContext.info(log -> log.message("END")
+                .context(c -> c.put("thread_id", Thread.currentThread().getId())));
         promise.complete();
     }
 
@@ -36,7 +38,9 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
                             .compose(deploymentId -> {
                                 loggerInEventLoopContext.info(log -> log
                                         .message("deployed: " + deploymentId)
+                                        .context(c -> c
                                         .put("thread_id", Thread.currentThread().getId())
+                                        )
                                 );
 
 //                                System.out.println("isWorkerContext: " + futureForBlocking.context.isWorkerContext());
@@ -52,7 +56,9 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
                             .compose(blocked -> {
                                 loggerInEventLoopContext.info(log -> log
                                         .message("FIN")
+                                        .context(c -> c
                                         .put("thread_id", Thread.currentThread().getId())
+                                        )
                                 );
                                 return Future.succeededFuture();
                             });
@@ -68,13 +74,17 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
     private static Future<Void> blockPiece(BlockingVerticlePlanA futureForBlocking, KeelEventLogger loggerInEventLoopContext) {
         loggerInEventLoopContext.info(log -> log
                 .message("here before executeBlocking handler")
+                .context(c -> c
                 .put("thread_id", Thread.currentThread().getId())
+                )
         );
         return futureForBlocking.executeBlocking(event -> {
             // 在这个scope里，理论上都是在线程池里run
             loggerInEventLoopContext.info(log -> log
                     .message("here in executeBlocking handler")
+                    .context(c -> c
                     .put("thread_id", Thread.currentThread().getId())
+                    )
             );
             block(event);
         });

@@ -54,6 +54,7 @@ public class MemTest extends KeelTest {
         MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
         MemoryUsage nonHeapMemoryUsage = memoryMXBean.getNonHeapMemoryUsage();
         logger().info(log -> log.message("mem")
+                .context(c -> c
                 .put("heap", new JsonObject()
                         .put("init", heapMemoryUsage.getInit() / (1024 * 2024 * 1.0))
                         .put("used", heapMemoryUsage.getUsed() / (1024 * 2024 * 1.0))
@@ -65,6 +66,7 @@ public class MemTest extends KeelTest {
                         .put("used", nonHeapMemoryUsage.getUsed() / (1024 * 2024 * 1.0))
                         .put("committed", nonHeapMemoryUsage.getCommitted() / (1024 * 2024 * 1.0))
                         .put("max", nonHeapMemoryUsage.getMax() / (1024 * 2024 * 1.0))
+                )
                 )
         );
     }

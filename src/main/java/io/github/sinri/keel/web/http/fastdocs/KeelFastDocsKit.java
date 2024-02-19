@@ -97,10 +97,12 @@ public class KeelFastDocsKit {
                 .put("method", ctx.request().method().name())
                 .put("path", ctx.request().path())
                 .put("stream_id", ctx.request().streamId());
-        logger.debug(event -> event.message("processRouterRequest start").put("request", requestInfo));
+        logger.debug(event -> event.message("processRouterRequest start")
+                .context(c -> c.put("request", requestInfo)));
         if (!Objects.equals(ctx.request().method(), HttpMethod.GET)) {
             ctx.response().setStatusCode(405).end();
-            logger.warning(event -> event.message("processRouterRequest ends with 405").put("request", requestInfo));
+            logger.warning(event -> event.message("processRouterRequest ends with 405")
+                    .context(c -> c.put("request", requestInfo)));
             return;
         }
 
@@ -116,19 +118,24 @@ public class KeelFastDocsKit {
 
         logger.debug("requestPath: " + requestPath);
         if (requestPath.equals(rootURLPath) || requestPath.equals(rootURLPath + "/")) {
-            logger.debug(event -> event.message("processRouterRequest -> 302").put("request", requestInfo));
+            logger.debug(event -> event.message("processRouterRequest -> 302")
+                    .context(c -> c.put("request", requestInfo)));
             ctx.redirect(rootURLPath + (rootURLPath.endsWith("/") ? "" : "/") + "index.md");
         } else if (requestPath.endsWith(".md")) {
-            logger.debug(event -> event.message("processRouterRequest -> processRequestWithMarkdownPath").put("request", requestInfo));
+            logger.debug(event -> event.message("processRouterRequest -> processRequestWithMarkdownPath")
+                    .context(c -> c.put("request", requestInfo)));
             processRequestWithMarkdownPath(options);
         } else if (requestPath.equalsIgnoreCase(this.rootURLPath + "catalogue")) {
-            logger.debug(event -> event.message("processRouterRequest -> processRequestWithCatalogue").put("request", requestInfo));
+            logger.debug(event -> event.message("processRouterRequest -> processRequestWithCatalogue")
+                    .context(c -> c.put("request", requestInfo)));
             processRequestWithCatalogue(options);
         } else if (requestPath.equalsIgnoreCase(this.rootURLPath + "markdown.css")) {
-            logger.debug(event -> event.message("processRouterRequest -> processRequestWithMarkdownCSS").put("request", requestInfo));
+            logger.debug(event -> event.message("processRouterRequest -> processRequestWithMarkdownCSS")
+                    .context(c -> c.put("request", requestInfo)));
             processRequestWithMarkdownCSS(options);
         } else {
-            logger.debug(event -> event.message("processRouterRequest -> processRequestWithStaticPath").put("request", requestInfo));
+            logger.debug(event -> event.message("processRouterRequest -> processRequestWithStaticPath")
+                    .context(c -> c.put("request", requestInfo)));
             processRequestWithStaticPath(options);
         }
     }

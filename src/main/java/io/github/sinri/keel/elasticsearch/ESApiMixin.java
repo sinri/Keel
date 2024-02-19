@@ -48,11 +48,13 @@ public interface ESApiMixin {
         }
 
         Handler<KeelEventLog> logRequestEnricher = log -> log
-                .put("request", new JsonObject()
-                        .put("method", httpMethod.name())
-                        .put("endpoint", endpoint)
-                        .put("queries", queriesForLog)
-                        .put("body", requestBody)
+                .context(c -> c
+                        .put("request", new JsonObject()
+                                .put("method", httpMethod.name())
+                                .put("endpoint", endpoint)
+                                .put("queries", queriesForLog)
+                                .put("body", requestBody)
+                        )
                 );
 
         return Future.succeededFuture()
@@ -71,18 +73,22 @@ public interface ESApiMixin {
                         this.getLogger().error(log -> {
                             logRequestEnricher.handle(log);
                             log.message("ES API Response Error")
-                                    .put("response", new JsonObject()
-                                            .put("status_code", statusCode)
-                                            .put("raw", bufferHttpResponse.bodyAsString()));
+                                    .context(c -> c
+                                            .put("response", new JsonObject()
+                                                    .put("status_code", statusCode)
+                                                    .put("raw", bufferHttpResponse.bodyAsString()))
+                                    );
                         });
                         return Future.failedFuture("ES API: STATUS CODE IS " + statusCode + " | " + bufferHttpResponse.bodyAsString());
                     }
                     this.getLogger().info(log -> {
                         logRequestEnricher.handle(log);
                         log.message("ES API Response Error")
-                                .put("response", new JsonObject()
-                                        .put("status_code", statusCode)
-                                        .put("body", resp));
+                                .context(c -> c
+                                        .put("response", new JsonObject()
+                                                .put("status_code", statusCode)
+                                                .put("body", resp))
+                                );
                     });
                     return Future.succeededFuture(resp);
                 });

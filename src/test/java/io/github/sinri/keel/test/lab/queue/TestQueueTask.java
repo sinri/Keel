@@ -28,8 +28,10 @@ public class TestQueueTask extends KeelQueueTask {
     @Override
     protected KeelEventLogger prepareLogger() {
         return KeelOutputEventLogCenter.getInstance().createLogger("TestQueue", log -> log
+                .context(c -> c
                 .put("id", id)
                 .put("life", life)
+                )
         );
     }
 
@@ -37,7 +39,7 @@ public class TestQueueTask extends KeelQueueTask {
     protected Future<Void> run() {
         getLogger().info("START");
         return KeelAsyncKit.sleep(this.life * 1000L)
-                .eventually(v -> {
+                .eventually(() -> {
                     getLogger().info("END ");
                     return Future.succeededFuture();
                 });

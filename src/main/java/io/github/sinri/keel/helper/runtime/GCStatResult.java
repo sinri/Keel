@@ -158,7 +158,7 @@ public class GCStatResult implements RuntimeStatResult<GCStatResult> {
         } else {
             Keel.getLogger().error(log -> log
                     .message("Found Unknown GarbageCollectorMXBean Name")
-                    .put("detail", new JsonObject()
+                    .context(new JsonObject()
                             .put("class", gc.getClass().getName())
                             .put("name", gc.getName())
                             .put("memoryPoolNames", KeelHelpers.stringHelper().joinStringArray(gc.getMemoryPoolNames(), ","))

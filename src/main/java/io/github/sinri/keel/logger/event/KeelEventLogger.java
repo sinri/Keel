@@ -89,17 +89,11 @@ public interface KeelEventLogger {
     }
 
     default void info(@Nonnull Handler<KeelEventLog> eventLogHandler) {
-        // done debugging
-//        System.out.println("KeelEventLogger::info("+eventLogHandler+") start");
         log(eventLog -> {
-//            System.out.println("KeelEventLogger::info("+eventLogHandler+") inside handler start");
             eventLog.level(KeelLogLevel.INFO);
             eventLog.topic(getPresetTopic());
-//            System.out.println("KeelEventLogger::info("+eventLogHandler+") inside handler go");
             eventLogHandler.handle(eventLog);
-//            System.out.println("KeelEventLogger::info("+eventLogHandler+") inside handler gone");
         });
-//        System.out.println("KeelEventLogger::info("+eventLogHandler+") end");
     }
 
     default void notice(@Nonnull Handler<KeelEventLog> eventLogHandler) {
@@ -181,13 +175,13 @@ public interface KeelEventLogger {
     default void exception(@Nonnull Throwable throwable, @Nonnull String msg, @Nullable JsonObject context) {
         exception(throwable, eventLog -> {
             eventLog.message(msg);
-            if (context != null) eventLog.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
+            if (context != null) eventLog.context(context);
         });
     }
 
     default void exception(@Nonnull Throwable throwable, @Nonnull Handler<KeelEventLog> eventLogHandler) {
         error(eventLog -> {
-            eventLog.put(KeelEventLog.RESERVED_KEY_EVENT_EXCEPTION, this.processThrowable(throwable));
+            eventLog.exception(this.processThrowable(throwable));
             eventLogHandler.handle(eventLog);
         });
     }
@@ -198,7 +192,7 @@ public interface KeelEventLogger {
     default void debug(String msg, JsonObject context) {
         debug(event -> {
             event.message(msg);
-            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
+            event.context(context);
         });
     }
 
@@ -208,7 +202,7 @@ public interface KeelEventLogger {
     default void info(String msg, JsonObject context) {
         info(event -> {
             event.message(msg);
-            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
+            event.context(context);
         });
     }
 
@@ -218,7 +212,7 @@ public interface KeelEventLogger {
     default void notice(String msg, JsonObject context) {
         notice(event -> {
             event.message(msg);
-            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
+            event.context(context);
         });
     }
 
@@ -228,7 +222,7 @@ public interface KeelEventLogger {
     default void warning(String msg, JsonObject context) {
         warning(event -> {
             event.message(msg);
-            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
+            event.context(context);
         });
     }
 
@@ -238,7 +232,7 @@ public interface KeelEventLogger {
     default void error(String msg, JsonObject context) {
         error(event -> {
             event.message(msg);
-            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
+            event.context(context);
         });
     }
 
@@ -248,7 +242,91 @@ public interface KeelEventLogger {
     default void fatal(String msg, JsonObject context) {
         fatal(event -> {
             event.message(msg);
-            if (context != null) event.put(KeelEventLog.RESERVED_KEY_CONTEXT, context);
+            event.context(context);
+        });
+    }
+
+    /**
+     * @since 3.1.10
+     */
+    default void debug(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+        debug(event -> {
+            JsonObject context = new JsonObject();
+            contextHandler.handle(context);
+            event.message(msg);
+            event.context(context);
+        });
+    }
+
+    /**
+     * @since 3.1.10
+     */
+    default void info(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+        info(event -> {
+            JsonObject context = new JsonObject();
+            contextHandler.handle(context);
+            event.message(msg);
+            event.context(context);
+        });
+    }
+
+    /**
+     * @since 3.1.10
+     */
+    default void notice(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+        notice(event -> {
+            JsonObject context = new JsonObject();
+            contextHandler.handle(context);
+            event.message(msg);
+            event.context(context);
+        });
+    }
+
+    /**
+     * @since 3.1.10
+     */
+    default void warning(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+        warning(event -> {
+            JsonObject context = new JsonObject();
+            contextHandler.handle(context);
+            event.message(msg);
+            event.context(context);
+        });
+    }
+
+    /**
+     * @since 3.1.10
+     */
+    default void error(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+        error(event -> {
+            JsonObject context = new JsonObject();
+            contextHandler.handle(context);
+            event.message(msg);
+            event.context(context);
+        });
+    }
+
+    /**
+     * @since 3.1.10
+     */
+    default void fatal(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+        fatal(event -> {
+            JsonObject context = new JsonObject();
+            contextHandler.handle(context);
+            event.message(msg);
+            event.context(context);
+        });
+    }
+
+    /**
+     * @since 3.1.10
+     */
+    default void exception(@Nonnull Throwable throwable, @Nonnull String msg, @Nonnull Handler<JsonObject> contextHandler) {
+        exception(throwable, eventLog -> {
+            JsonObject context = new JsonObject();
+            contextHandler.handle(context);
+            eventLog.message(msg);
+            eventLog.context(context);
         });
     }
 }

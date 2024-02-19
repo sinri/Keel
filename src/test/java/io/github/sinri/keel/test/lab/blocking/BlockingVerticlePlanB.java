@@ -42,7 +42,9 @@ public class BlockingVerticlePlanB {
 
                     loggerInEventLoopContext.info(log -> log
                             .message("init")
-                            .put("thread_id", Thread.currentThread().getId())
+                            .context(c -> c
+                                    .put("thread_id", Thread.currentThread().getId())
+                            )
                     );
 
                     return Future.all(
@@ -69,7 +71,9 @@ public class BlockingVerticlePlanB {
             public void handle(Promise<Void> event) {
                 loggerInEventLoopContext.info(log -> log
                         .message("blockPiece::handle before block")
-                        .put("thread_id", Thread.currentThread().getId())
+                        .context(c -> c
+                                .put("thread_id", Thread.currentThread().getId())
+                        )
                 );
                 block(event);
             }
@@ -78,13 +82,15 @@ public class BlockingVerticlePlanB {
 
     private static void block(Promise<Void> promise) {
         KeelEventLogger loggerInBlockingContext = KeelOutputEventLogCenter.getInstance().createLogger("Sample");
-        loggerInBlockingContext.info(log -> log.message("START").put("thread_id", Thread.currentThread().getId()));
+        loggerInBlockingContext.info(log -> log.message("START")
+                .context(c -> c.put("thread_id", Thread.currentThread().getId())));
         try {
             Thread.sleep(30_000L);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        loggerInBlockingContext.info(log -> log.message("END").put("thread_id", Thread.currentThread().getId()));
+        loggerInBlockingContext.info(log -> log.message("END")
+                .context(c -> c.put("thread_id", Thread.currentThread().getId())));
         promise.complete();
     }
 }

@@ -30,8 +30,10 @@ public class ReadCsvTest extends KeelTest {
                                                     array.add(csvRow.getCell(i).getString());
                                                 }
                                                 logger().info(log -> log.message("ROW")
+                                                        .context(c -> c
                                                         .put("i", indexRef.get())
                                                         .put("cell", array)
+                                                        )
                                                 );
                                                 indexRef.incrementAndGet();
                                             }

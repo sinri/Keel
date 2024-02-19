@@ -57,7 +57,7 @@ public class KeelOutputEventLogCenter extends KeelSyncEventLogCenter {
         return logCenter.createLogger("INSTANT", eventLog -> {
             StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
             if (stackTrace.length <= 5) {
-                eventLog.put("stack", null);
+                eventLog.context(context -> context.put("stack", null));
             } else {
                 JsonArray array = new JsonArray();
 
@@ -69,20 +69,8 @@ public class KeelOutputEventLogCenter extends KeelSyncEventLogCenter {
                         stackTraceElement -> array.add(stackTraceElement.toString())
                 );
 
-                eventLog.put("stack", array);
+                eventLog.context(context -> context.put("stack", array));
             }
         });
     }
-
-//    public static void main(String[] args) {
-//        KeelOutputEventLogCenter.instantLogger().info("main");
-//
-//        new P1().a();
-//    }
-//
-//    private static class P1 {
-//        void a() {
-//            KeelOutputEventLogCenter.instantLogger().info("p1::a");
-//        }
-//    }
 }

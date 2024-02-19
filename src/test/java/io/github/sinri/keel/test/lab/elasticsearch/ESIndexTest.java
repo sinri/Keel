@@ -29,7 +29,8 @@ public class ESIndexTest {
 
         return es.indexGet("kumori-es-test-1", new ESApiMixin.ESApiQueries())
                 .compose(resp -> {
-                    logger.info(log -> log.message("API RESPONSE").put("resp", resp));
+                    logger.info(log -> log.message("API RESPONSE")
+                            .context(c -> c.put("resp", resp)));
                     return Future.succeededFuture();
                 });
     }
