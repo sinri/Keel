@@ -6,18 +6,6 @@ package io.github.sinri.keel.helper.runtime;
 public class MonitorSnapshot {
     private GCStatResult GCStat;
     private CPUTimeResult CPUTime;
-    @Deprecated(since = "3.1.9")
-    private MemoryResult hardwareMemory;
-    /**
-     * @since 3.1.4
-     */
-    @Deprecated(since = "3.1.9")
-    private MemoryResult jvmMemory;
-    /**
-     * @since 3.1.4
-     */
-    @Deprecated(since = "3.1.9")
-    private MemoryResult jvmHeapMemory;
     /**
      * @since 3.1.9
      */
@@ -41,56 +29,6 @@ public class MonitorSnapshot {
         return this;
     }
 
-    /**
-     * @since 3.1.4
-     */
-    @Deprecated(since = "3.1.9")
-    public MemoryResult getHardwareMemory() {
-        return hardwareMemory;
-    }
-
-    /**
-     * @since 3.1.4
-     */
-    @Deprecated(since = "3.1.9")
-    public MonitorSnapshot setHardwareMemory(MemoryResult memory) {
-        this.hardwareMemory = memory;
-        return this;
-    }
-
-    /**
-     * @since 3.1.4
-     */
-    @Deprecated(since = "3.1.9")
-    public MemoryResult getJvmHeapMemory() {
-        return jvmHeapMemory;
-    }
-
-    /**
-     * @since 3.1.4
-     */
-    @Deprecated(since = "3.1.9")
-    public MonitorSnapshot setJvmHeapMemory(MemoryResult jvmHeapMemory) {
-        this.jvmHeapMemory = jvmHeapMemory;
-        return this;
-    }
-
-    /**
-     * @since 3.1.4
-     */
-    @Deprecated(since = "3.1.9")
-    public MemoryResult getJvmMemory() {
-        return jvmMemory;
-    }
-
-    /**
-     * @since 3.1.4
-     */
-    @Deprecated(since = "3.1.9")
-    public MonitorSnapshot setJvmMemory(MemoryResult jvmMemory) {
-        this.jvmMemory = jvmMemory;
-        return this;
-    }
 
     /**
      * @since 3.1.9

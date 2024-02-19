@@ -26,10 +26,6 @@ public class KeelRuntimeMonitor {
             CPUTimeResult cpuTimeSnapshot = KeelHelpers.runtimeHelper().getCPUTimeSnapshot();
 
             JVMMemoryResult jvmMemoryResultSnapshot = KeelHelpers.runtimeHelper().makeJVMMemorySnapshot();
-            // todo remove the deprecated
-            MemoryResult hardwareMemorySnapshot = KeelHelpers.runtimeHelper().getHardwareMemorySnapshot();
-            MemoryResult jvmMemorySnapshot = KeelHelpers.runtimeHelper().getJVMMemorySnapshot();
-            MemoryResult jvmHeapMemorySnapshot = KeelHelpers.runtimeHelper().getJVMHeapMemorySnapshot();
 
             GCStatResult lastGC = _lastGCRef.get();
             if (lastGC != null) {
@@ -50,10 +46,6 @@ public class KeelRuntimeMonitor {
             }
 
             monitorSnapshot.setJvmMemoryResult(jvmMemoryResultSnapshot);
-            // todo remove
-            monitorSnapshot.setHardwareMemory(hardwareMemorySnapshot);
-            monitorSnapshot.setJvmMemory(jvmMemorySnapshot);
-            monitorSnapshot.setJvmHeapMemory(jvmHeapMemorySnapshot);
 
             handler.handle(monitorSnapshot);
         });
