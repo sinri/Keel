@@ -6,15 +6,22 @@ package io.github.sinri.keel.helper.runtime;
 public class MonitorSnapshot {
     private GCStatResult GCStat;
     private CPUTimeResult CPUTime;
+    @Deprecated(since = "3.1.9")
     private MemoryResult hardwareMemory;
     /**
      * @since 3.1.4
      */
+    @Deprecated(since = "3.1.9")
     private MemoryResult jvmMemory;
     /**
      * @since 3.1.4
      */
+    @Deprecated(since = "3.1.9")
     private MemoryResult jvmHeapMemory;
+    /**
+     * @since 3.1.9
+     */
+    private JVMMemoryResult jvmMemoryResult;
 
     public CPUTimeResult getCPUTime() {
         return CPUTime;
@@ -37,6 +44,7 @@ public class MonitorSnapshot {
     /**
      * @since 3.1.4
      */
+    @Deprecated(since = "3.1.9")
     public MemoryResult getHardwareMemory() {
         return hardwareMemory;
     }
@@ -44,6 +52,7 @@ public class MonitorSnapshot {
     /**
      * @since 3.1.4
      */
+    @Deprecated(since = "3.1.9")
     public MonitorSnapshot setHardwareMemory(MemoryResult memory) {
         this.hardwareMemory = memory;
         return this;
@@ -52,6 +61,7 @@ public class MonitorSnapshot {
     /**
      * @since 3.1.4
      */
+    @Deprecated(since = "3.1.9")
     public MemoryResult getJvmHeapMemory() {
         return jvmHeapMemory;
     }
@@ -59,6 +69,7 @@ public class MonitorSnapshot {
     /**
      * @since 3.1.4
      */
+    @Deprecated(since = "3.1.9")
     public MonitorSnapshot setJvmHeapMemory(MemoryResult jvmHeapMemory) {
         this.jvmHeapMemory = jvmHeapMemory;
         return this;
@@ -67,6 +78,7 @@ public class MonitorSnapshot {
     /**
      * @since 3.1.4
      */
+    @Deprecated(since = "3.1.9")
     public MemoryResult getJvmMemory() {
         return jvmMemory;
     }
@@ -74,8 +86,24 @@ public class MonitorSnapshot {
     /**
      * @since 3.1.4
      */
+    @Deprecated(since = "3.1.9")
     public MonitorSnapshot setJvmMemory(MemoryResult jvmMemory) {
         this.jvmMemory = jvmMemory;
+        return this;
+    }
+
+    /**
+     * @since 3.1.9
+     */
+    public JVMMemoryResult getJvmMemoryResult() {
+        return jvmMemoryResult;
+    }
+
+    /**
+     * @since 3.1.9
+     */
+    public MonitorSnapshot setJvmMemoryResult(JVMMemoryResult jvmMemoryResult) {
+        this.jvmMemoryResult = jvmMemoryResult;
         return this;
     }
 }

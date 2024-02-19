@@ -24,26 +24,9 @@ public abstract class KeelIssueLog {
     private final JsonObject attributes = new JsonObject();
     private String topic;
     private KeelLogLevel level;
+    private Throwable throwable;
 
-    protected void setTopic(String topic) {
-        this.topic = topic;
-    }
-
-    protected void setLevel(KeelLogLevel level) {
-        this.level = level;
-    }
-
-    protected void setClassification(@Nonnull List<String> classification) {
-        this.classification.clear();
-        this.classification.addAll(classification);
-    }
-
-    protected void setClassification(@Nonnull String... classification) {
-        this.classification.clear();
-        this.classification.addAll(Arrays.asList(classification));
-    }
-
-    protected void setAttribute(@Nonnull String name, @Nullable Object value) {
+    public void setAttribute(@Nonnull String name, @Nullable Object value) {
         if (value != null) {
             if (value instanceof BigDecimal) {
                 this.attributes.put(name, ((BigDecimal) value).toPlainString());
@@ -57,31 +40,58 @@ public abstract class KeelIssueLog {
         }
     }
 
-
     @Nonnull
-    public final String topic() {
+    public final String getTopic() {
         return this.topic;
     }
 
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
     @Nonnull
-    public final KeelLogLevel level() {
+    public final KeelLogLevel getLevel() {
         return this.level;
     }
 
-    @Nonnull
-    public final List<String> classification() {
-        return classification;
+    public void setLevel(KeelLogLevel level) {
+        this.level = level;
     }
 
     @Nonnull
-    public final JsonObject attributes() {
+    public final List<String> getClassification() {
+        return classification;
+    }
+
+    public void setClassification(@Nonnull List<String> classification) {
+        this.classification.clear();
+        this.classification.addAll(classification);
+    }
+
+    public void setClassification(@Nonnull String... classification) {
+        this.classification.clear();
+        this.classification.addAll(Arrays.asList(classification));
+    }
+
+    @Nonnull
+    public final JsonObject getAttributes() {
         return this.attributes;
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    public KeelIssueLog setThrowable(Throwable throwable) {
+        this.throwable = throwable;
+        return this;
     }
 
     public void toEventLog(@Nonnull KeelEventLog eventLog) {
         eventLog.level(level)
                 .classification(classification)
                 .topic(topic)
-                .put("attributes", attributes);
+                .put("attributes", attributes)
+        ;
     }
 }

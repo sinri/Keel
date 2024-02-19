@@ -1,6 +1,7 @@
 package io.github.sinri.keel.logger.issue;
 
 import io.github.sinri.keel.core.TechnicalPreview;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 
 /**
@@ -15,7 +16,15 @@ public class KeelIssueLogger<T extends KeelIssueLog> {
         this.eventLogger = eventLogger;
     }
 
-    public void issue(T issueLog) {
-        this.eventLogger.log(issueLog::toEventLog);
+    public final void issue(T issueLog) {
+        this.eventLogger.log(eventLog -> {
+            issueLog.toEventLog(eventLog);
+            if (issueLog.getThrowable() != null) {
+                eventLog.put(
+                        KeelEventLog.RESERVED_KEY_EVENT_EXCEPTION,
+                        this.eventLogger.processThrowable(issueLog.getThrowable())
+                );
+            }
+        });
     }
 }

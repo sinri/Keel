@@ -2,6 +2,7 @@ package io.github.sinri.keel.helper;
 
 import io.github.sinri.keel.helper.runtime.CPUTimeResult;
 import io.github.sinri.keel.helper.runtime.GCStatResult;
+import io.github.sinri.keel.helper.runtime.JVMMemoryResult;
 import io.github.sinri.keel.helper.runtime.MemoryResult;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -31,9 +32,10 @@ public class KeelRuntimeHelper {
         );
     }
 
+    private final SystemInfo systemInfo;
 
     private KeelRuntimeHelper() {
-
+        systemInfo = new SystemInfo();
     }
 
     static KeelRuntimeHelper getInstance() {
@@ -70,7 +72,6 @@ public class KeelRuntimeHelper {
      */
     @Nonnull
     public CPUTimeResult getCPUTimeSnapshot() {
-        SystemInfo systemInfo = new SystemInfo();
         CentralProcessor processor = systemInfo.getHardware().getProcessor();
         long[] systemCpuLoadTicks = processor.getSystemCpuLoadTicks();
 
@@ -90,8 +91,8 @@ public class KeelRuntimeHelper {
      * @since 3.1.4 renamed to getHardwareMemorySnapshot
      */
     @Nonnull
+    @Deprecated(since = "3.1.9")
     public MemoryResult getHardwareMemorySnapshot() {
-        SystemInfo systemInfo = new SystemInfo();
         GlobalMemory memory = systemInfo.getHardware().getMemory();
         long totalByte = memory.getTotal();
         long availableByte = memory.getAvailable();
@@ -102,18 +103,24 @@ public class KeelRuntimeHelper {
     }
 
     /**
-     * @since 3.1.4
-     * 这里的口径似乎是JVM内实际申请占用的内存。
+     * @since 3.1.4 这里的口径似乎是JVM内实际申请占用的内存。
+     * @since 3.1.9 让我们换一下口径： Total = Xmx; Available = Free+Max-Total
      */
     @Nonnull
+    @Deprecated(since = "3.1.9")
     public MemoryResult getJVMMemorySnapshot() {
         Runtime runtime = runtime();
-        long totalMemory = runtime.totalMemory(); // JVM总内存量
-        long freeMemory = runtime.freeMemory(); // JVM空闲内存量
-        // long usedMemory = totalMemory - freeMemory; // 使用的内存量
+        long maxMemory = runtime.maxMemory();// JVM 会试图使用的内存总量（如通过Xmx设置或自动设置）
+        long totalMemory = runtime.totalMemory(); // JVM总内存量（当前实际申请下来的）
+        long freeMemory = runtime.freeMemory(); // JVM空闲内存量（当前实际申请下来的内存但没使用或已释放的）
+        // modified since 3.1.9
+//        return new MemoryResult()
+//                .setTotalByte(totalMemory)
+//                .setAvailableByte(freeMemory);
+        // since 3.1.9
         return new MemoryResult()
-                .setTotalByte(totalMemory)
-                .setAvailableByte(freeMemory);
+                .setTotalByte(maxMemory)
+                .setAvailableByte(freeMemory + maxMemory - totalMemory);
     }
 
     /**
@@ -121,6 +128,7 @@ public class KeelRuntimeHelper {
      * 这里的口径似乎是JVM内名义上占用的内存。
      */
     @Nonnull
+    @Deprecated(since = "3.1.9")
     public MemoryResult getJVMHeapMemorySnapshot() {
         MemoryUsage heapMemoryUsage = getHeapMemoryUsage();
         //long initMemory = heapMemoryUsage.getInit();  // 初始的总内存
@@ -131,6 +139,26 @@ public class KeelRuntimeHelper {
         return new MemoryResult()
                 .setTotalByte(maxMemory)
                 .setAvailableByte(maxMemory - usedMemory);
+    }
+
+    public JVMMemoryResult makeJVMMemorySnapshot() {
+        Runtime runtime = runtime();
+        long maxMemory = runtime.maxMemory();// JVM 会试图使用的内存总量（如通过Xmx设置或自动设置）
+        long totalMemory = runtime.totalMemory(); // JVM总内存量（当前实际申请下来的）
+        long freeMemory = runtime.freeMemory(); // JVM空闲内存量（当前实际申请下来的内存但没使用或已释放的）
+
+        GlobalMemory memory = systemInfo.getHardware().getMemory();
+
+        // freeMemory + maxMemory - totalMemory
+        return new JVMMemoryResult()
+                .setPhysicalMaxBytes(memory.getTotal())
+                .setPhysicalUsedBytes(memory.getTotal() - memory.getAvailable())
+                .setRuntimeHeapMaxBytes(maxMemory)
+                .setRuntimeHeapAllocatedBytes(totalMemory)
+                .setRuntimeHeapUsedBytes(totalMemory - freeMemory)
+                .setMxHeapUsedBytes(getHeapMemoryUsage().getUsed())
+                .setMxNonHeapUsedBytes(getNonHeapMemoryUsage().getUsed()) // 独立的
+                ;
     }
 
     /**

@@ -16,7 +16,7 @@ public class MemoryResult implements RuntimeStatResult<MemoryResult> {
         statTime = System.currentTimeMillis();
     }
 
-    private MemoryResult(long statTime) {
+    public MemoryResult(long statTime) {
         this.statTime = statTime;
     }
 
@@ -44,10 +44,12 @@ public class MemoryResult implements RuntimeStatResult<MemoryResult> {
     }
 
     @Override
+    @Deprecated
     public MemoryResult since(MemoryResult start) {
-        return new MemoryResult(getStatTime())
-                .setAvailableByte(getAvailableByte() - start.getAvailableByte())
-                .setTotalByte(getTotalByte());
+        throw new RuntimeException("DO NOT USE THIS");
+//        return new MemoryResult(getStatTime())
+//                .setAvailableByte(getAvailableByte() - start.getAvailableByte())
+//                .setTotalByte(getTotalByte());
     }
 
     public double getMemoryUsage() {
