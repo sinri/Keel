@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 public class KeelWebReceptionistRequestEventLog extends KeelEventLogImpl {
     public KeelWebReceptionistRequestEventLog(@Nonnull String topic, RoutingContext routingContext) {
         super(KeelLogLevel.INFO, topic);
-        this.jsonObject
+        this.toJsonObject()
                 .put("request", new JsonObject()
                         .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                         .put("method", routingContext.request().method().name())

@@ -2,6 +2,7 @@ package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -36,7 +37,7 @@ public interface KeelEventLogCenter {
 
     @Nonnull
     default KeelEventLogger createLogger(@Nonnull String presetTopic) {
-        return createLogger(presetTopic, null);
+        return new KeelEventLoggerImpl(presetTopic, () -> this);
     }
 
     /**
@@ -44,5 +45,22 @@ public interface KeelEventLogCenter {
      */
     default KeelEventLogger createLogger(@Nonnull String presetTopic, @Nullable Supplier<? extends KeelEventLog> baseLogBuilder) {
         return new KeelEventLoggerImpl(presetTopic, () -> this, baseLogBuilder);
+    }
+
+    /**
+     * @since 3.1.10
+     */
+    default KeelEventLogger createLogger(@Nonnull String presetTopic, @Nonnull Handler<KeelEventLogToBeExtended> prepareHandler) {
+        return new KeelEventLoggerImpl(presetTopic, () -> this, new Supplier<>() {
+            @Override
+            public KeelEventLogToBeExtended get() {
+                return new KeelEventLogToBeExtended(KeelLogLevel.INFO, presetTopic) {
+                    @Override
+                    protected void prepare() {
+                        prepareHandler.handle(this);
+                    }
+                };
+            }
+        });
     }
 }

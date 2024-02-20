@@ -80,7 +80,7 @@ public class KeelOutputEventLogCenter extends KeelSyncEventLogCenter {
 
         public InstantLog(@Nonnull String topic, @Nullable JsonArray stack) {
             super(KeelLogLevel.INFO, topic);
-            this.jsonObject.put("stack", stack);
+            this.toJsonObject().put("stack", stack);
         }
     }
 }

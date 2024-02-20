@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class KeelEventLogImpl implements KeelEventLog {
-    protected final @Nonnull JsonObject jsonObject;
+    private final @Nonnull JsonObject jsonObject;
     private long timestamp;
     private @Nonnull String topic;
     private @Nonnull KeelLogLevel level;
