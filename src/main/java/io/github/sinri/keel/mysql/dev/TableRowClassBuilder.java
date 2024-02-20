@@ -103,6 +103,7 @@ class TableRowClassBuilder {
                 .append("\n")
                 .append("import javax.annotation.Nonnull;\n")
                 .append("import javax.annotation.Nullable;\n")
+                .append("import java.util.Objects;\n")
                 .append("\n")
                 .append("/**\n")
                 .append(" * ").append(parsedTableComment()).append("\n")

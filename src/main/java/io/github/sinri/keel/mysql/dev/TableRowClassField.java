@@ -164,7 +164,10 @@ class TableRowClassField {
             code
                     .append("\tpublic ").append(looseEnum.looseEnumName()).append(" ").append(getter).append("() {\n")
                     .append("\t\treturn ").append(looseEnum.looseEnumName()).append(".valueOf(\n")
-                    .append("\t\t\t").append(readMethod).append("(\"").append(field).append("\")\n")
+                    .append("\t\t\t")
+                    .append(nullable ? "" : "Objects.requireNonNull(")
+                    .append(readMethod).append("(\"").append(field).append("\")")
+                    .append(nullable ? "" : ")").append("\n")
                     .append("\t\t);\n")
                     .append("\t}\n");
         } else if (strictEnum != null) {
@@ -183,7 +186,10 @@ class TableRowClassField {
             code
                     .append("\tpublic ").append(strictEnum.fullEnumRef()).append(" ").append(getter).append("() {\n")
                     .append("\t\treturn ").append(strictEnum.fullEnumRef()).append(".valueOf(\n")
-                    .append("\t\t\t").append(readMethod).append("(\"").append(field).append("\")\n")
+                    .append("\t\t\t")
+                    .append(nullable ? "" : "Objects.requireNonNull(")
+                    .append(readMethod).append("(\"").append(field).append("\")")
+                    .append(nullable ? "" : ")").append("\n")
                     .append("\t\t);\n")
                     .append("\t}\n");
         } else {
@@ -202,7 +208,10 @@ class TableRowClassField {
                 code.append("\t@Nonnull\n");
             }
             code.append("\tpublic ").append(returnType).append(" ").append(getter).append("() {\n")
-                    .append("\t\treturn ").append(readMethod).append("(\"").append(field).append("\");\n")
+                    .append("\t\treturn ")
+                    .append(nullable ? "" : "Objects.requireNonNull(")
+                    .append(readMethod).append("(\"").append(field).append("\")")
+                    .append(nullable ? "" : ")").append(";\n")
                     .append("\t}\n");
         }
 
