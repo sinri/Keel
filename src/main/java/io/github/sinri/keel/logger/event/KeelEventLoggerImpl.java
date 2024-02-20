@@ -1,37 +1,36 @@
 package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
-import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class KeelEventLoggerImpl implements KeelEventLogger {
-    private final Supplier<KeelEventLogCenter> eventLogCenterSupplier;
-    private final String presetTopic;
-
-    private @Nullable Handler<KeelEventLog> presetEventLogEditor = null;
-
+    private final @Nonnull Supplier<KeelEventLogCenter> eventLogCenterSupplier;
+    private final @Nonnull String presetTopic;
     private KeelLogLevel visibleLogLevel = KeelLogLevel.INFO;
 
+    private @Nullable Supplier<? extends KeelEventLog> baseLogBuilder;
+
     public KeelEventLoggerImpl(
-            String presetTopic,
-            Supplier<KeelEventLogCenter> eventLogCenterSupplier
+            @Nonnull String presetTopic,
+            @Nonnull Supplier<KeelEventLogCenter> eventLogCenterSupplier
     ) {
         this(presetTopic, eventLogCenterSupplier, null);
     }
 
     public KeelEventLoggerImpl(
-            String presetTopic,
-            Supplier<KeelEventLogCenter> eventLogCenterSupplier,
-            Handler<KeelEventLog> presetEventLogEditor
+            @Nonnull String presetTopic,
+            @Nonnull Supplier<KeelEventLogCenter> eventLogCenterSupplier,
+            @Nullable Supplier<? extends KeelEventLog> baseLogBuilder
     ) {
         this.presetTopic = presetTopic;
         this.eventLogCenterSupplier = eventLogCenterSupplier;
-        this.presetEventLogEditor = presetEventLogEditor;
+        this.baseLogBuilder = baseLogBuilder;
     }
 
     @Nonnull
@@ -45,26 +44,27 @@ public class KeelEventLoggerImpl implements KeelEventLogger {
         this.visibleLogLevel = level;
     }
 
+    @Nonnull
     @Override
     public Supplier<KeelEventLogCenter> getEventLogCenterSupplier() {
         return eventLogCenterSupplier;
     }
 
+    @Nonnull
     @Override
     public String getPresetTopic() {
         return presetTopic;
     }
 
-    @Nullable
+    @Nonnull
     @Override
-    public Handler<KeelEventLog> getPresetEventLogEditor() {
-        return presetEventLogEditor;
+    public Supplier<? extends KeelEventLog> getBaseLogBuilder() {
+        return Objects.requireNonNullElse(baseLogBuilder, (Supplier<KeelEventLogImpl>) () -> new KeelEventLogImpl(KeelLogLevel.INFO, getPresetTopic()));
     }
 
     @Override
-    public KeelEventLogger setPresetEventLogEditor(@Nullable Handler<KeelEventLog> editor) {
-        this.presetEventLogEditor = editor;
-        return this;
+    public void setBaseLogBuilder(@Nullable Supplier<? extends KeelEventLog> baseLogBuilder) {
+        this.baseLogBuilder = baseLogBuilder;
     }
 
     /**

@@ -45,12 +45,13 @@ public interface KeelEventLogger {
         return getEventLogCenterSupplier().get().gracefullyClose();
     }
 
+    @Nonnull
     String getPresetTopic();
 
-    @Nullable
-    Handler<KeelEventLog> getPresetEventLogEditor();
+    @Nonnull
+    Supplier<? extends KeelEventLog> getBaseLogBuilder();
 
-    KeelEventLogger setPresetEventLogEditor(@Nullable Handler<KeelEventLog> editor);
+    void setBaseLogBuilder(@Nullable Supplier<? extends KeelEventLog> baseLogBuilder);
 
     /**
      * @since 3.0.10
@@ -66,11 +67,14 @@ public interface KeelEventLogger {
     List<KeelEventLogger> getBypassLoggers();
 
     default void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
-        KeelEventLog eventLog = KeelEventLog.create(KeelLogLevel.INFO, getPresetTopic());
-        Handler<KeelEventLog> presetEventLogEditor = getPresetEventLogEditor();
-        if (presetEventLogEditor != null) {
-            presetEventLogEditor.handle(eventLog);
-        }
+        KeelEventLog eventLog = getBaseLogBuilder().get();
+
+//        KeelEventLog eventLog = KeelEventLog.create(KeelLogLevel.INFO, getPresetTopic());
+//        Handler<KeelEventLog> presetEventLogEditor = getPresetEventLogEditor();
+//        if (presetEventLogEditor != null) {
+//            presetEventLogEditor.handle(eventLog);
+//        }
+
         eventLogHandler.handle(eventLog);
 
         if (eventLog.level().isEnoughSeriousAs(getVisibleLevel())) {

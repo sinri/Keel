@@ -1,6 +1,8 @@
 package io.github.sinri.keel.logger.event.center;
 
+import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
+import io.github.sinri.keel.logger.event.KeelEventLogImpl;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.adapter.OutputAdapter;
 import io.vertx.core.Future;
@@ -54,12 +56,13 @@ public class KeelOutputEventLogCenter extends KeelSyncEventLogCenter {
     @Nonnull
     public static KeelEventLogger instantLogger() {
         var logCenter = getInstance(KeelEventLog::render);
-        return logCenter.createLogger("INSTANT", eventLog -> {
+        return logCenter.createLogger("INSTANT", () -> {
+            JsonArray array;
             StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
             if (stackTrace.length <= 5) {
-                eventLog.context(context -> context.put("stack", null));
+                array = null;
             } else {
-                JsonArray array = new JsonArray();
+                array = new JsonArray();
 
                 var slice = Arrays.copyOfRange(stackTrace, 5, stackTrace.length);
                 KeelHelpers.jsonHelper().filterStackTrace(
@@ -68,9 +71,16 @@ public class KeelOutputEventLogCenter extends KeelSyncEventLogCenter {
                         (currentPrefix, ps) -> array.add(currentPrefix + " × " + ps),
                         stackTraceElement -> array.add(stackTraceElement.toString())
                 );
-
-                eventLog.context(context -> context.put("stack", array));
             }
+            return new InstantLog("INSTANT", array);
         });
+    }
+
+    private static class InstantLog extends KeelEventLogImpl {
+
+        public InstantLog(@Nonnull String topic, @Nullable JsonArray stack) {
+            super(KeelLogLevel.INFO, topic);
+            this.jsonObject.put("stack", stack);
+        }
     }
 }

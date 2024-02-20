@@ -3,6 +3,7 @@ package io.github.sinri.keel.logger.event.logger;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogCenter;
+import io.github.sinri.keel.logger.event.KeelEventLogImpl;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelSilentEventLogCenter;
 import io.vertx.core.Handler;
@@ -36,19 +37,20 @@ public class KeelSilentEventLogger implements KeelEventLogger {
     }
 
     @Override
+    @Nonnull
     public String getPresetTopic() {
-        return null;
+        return "";
+    }
+
+    @Nonnull
+    @Override
+    public Supplier<? extends KeelEventLog> getBaseLogBuilder() {
+        return (Supplier<KeelEventLog>) () -> new KeelEventLogImpl(KeelLogLevel.SILENT, getPresetTopic());
     }
 
     @Override
-    @Nullable
-    public Handler<KeelEventLog> getPresetEventLogEditor() {
-        return null;
-    }
-
-    @Override
-    public KeelEventLogger setPresetEventLogEditor(@Nullable Handler<KeelEventLog> editor) {
-        return this;
+    public void setBaseLogBuilder(@Nullable Supplier<? extends KeelEventLog> baseLogBuilder) {
+        //
     }
 
     @Override

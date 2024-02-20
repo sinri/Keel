@@ -1,9 +1,7 @@
 package io.github.sinri.keel.web.http.receptionist;
 
-import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
-import io.vertx.core.Handler;
 import io.vertx.core.http.impl.CookieImpl;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
@@ -11,6 +9,7 @@ import io.vertx.ext.web.RoutingContext;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
@@ -25,22 +24,8 @@ public abstract class KeelWebReceptionist {
     public KeelWebReceptionist(RoutingContext routingContext) {
         this.routingContext = routingContext;
         this.logger = createLogger();
-        Handler<KeelEventLog> previous = this.logger.getPresetEventLogEditor();
-        this.logger.setPresetEventLogEditor(eventLog -> {
-            eventLog
-                    .context(c -> c
-                            .put("request", new JsonObject()
-                                    .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
-                                    .put("method", routingContext.request().method().name())
-                                    .put("path", routingContext.request().path())
-                                    .put("handler", this.getClass().getName())
-                            )
-                    );
-
-            if (previous != null) {
-                previous.handle(eventLog);
-            }
-        });
+        // since 3.1.10
+        this.logger.setBaseLogBuilder((Supplier<KeelWebReceptionistRequestEventLog>) () -> new KeelWebReceptionistRequestEventLog(logger.getPresetTopic(), routingContext));
     }
 
     protected RoutingContext getRoutingContext() {
