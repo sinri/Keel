@@ -226,7 +226,11 @@ public class TableRowClassSourceCodeGenerator {
                             comment = null;
                         }
 
-                        fields.add(new TableRowClassField(field, type, comment, strictEnumPackage, envelopePackage));
+                        // since 3.1.10
+                        String nullability = row.getString("Null");
+                        boolean isNullable = "YES".equalsIgnoreCase(nullability);
+
+                        fields.add(new TableRowClassField(field, type, isNullable, comment, strictEnumPackage, envelopePackage));
                     });
                     return Future.succeededFuture(fields);
                 });

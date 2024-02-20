@@ -43,16 +43,22 @@ class TableRowClassField {
      */
     private boolean fieldDeprecated = false;
     private String actualComment;
+    /**
+     * @since 3.1.10
+     */
+    private final boolean nullable;
 
     public TableRowClassField(
             @Nonnull String field,
             @Nonnull String type,
+            boolean nullable,
             @Nullable String comment,
             @Nullable String strictEnumPackage,
             @Nullable String aesEnvelopePackage
     ) {
         this.field = field;
         this.type = type;
+        this.nullable = nullable;
         this.comment = comment;
         this.strictEnumPackage = strictEnumPackage;
         this.aesEnvelopePackage = aesEnvelopePackage;
@@ -150,6 +156,11 @@ class TableRowClassField {
             if (fieldDeprecated) {
                 code.append("\t@Deprecated\n");
             }
+            if (nullable) {
+                code.append("\t@Nullable\n");
+            } else {
+                code.append("\t@Nonnull\n");
+            }
             code
                     .append("\tpublic ").append(looseEnum.looseEnumName()).append(" ").append(getter).append("() {\n")
                     .append("\t\treturn ").append(looseEnum.looseEnumName()).append(".valueOf(\n")
@@ -163,6 +174,11 @@ class TableRowClassField {
                     .append("\t */\n");
             if (fieldDeprecated) {
                 code.append("\t@Deprecated\n");
+            }
+            if (nullable) {
+                code.append("\t@Nullable\n");
+            } else {
+                code.append("\t@Nonnull\n");
             }
             code
                     .append("\tpublic ").append(strictEnum.fullEnumRef()).append(" ").append(getter).append("() {\n")
@@ -179,6 +195,11 @@ class TableRowClassField {
                     .append("\t */\n");
             if (fieldDeprecated) {
                 code.append("\t@Deprecated\n");
+            }
+            if (nullable) {
+                code.append("\t@Nullable\n");
+            } else {
+                code.append("\t@Nonnull\n");
             }
             code.append("\tpublic ").append(returnType).append(" ").append(getter).append("() {\n")
                     .append("\t\treturn ").append(readMethod).append("(\"").append(field).append("\");\n")
