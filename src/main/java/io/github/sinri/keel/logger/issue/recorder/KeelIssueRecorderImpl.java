@@ -1,6 +1,7 @@
 package io.github.sinri.keel.logger.issue.recorder;
 
 import io.github.sinri.keel.core.TechnicalPreview;
+import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 
@@ -15,6 +16,7 @@ public class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>, R> implements K
     protected final @Nonnull Supplier<T> issueRecordBuilder;
     private final @Nonnull KeelIssueRecordCenter<R> issueRecordCenter;
     private final @Nonnull String topic;
+    private KeelLogLevel visibleLevel = KeelLogLevel.INFO;
 
     public KeelIssueRecorderImpl(
             @Nonnull KeelIssueRecordCenter<R> issueRecordCenter,
@@ -24,6 +26,17 @@ public class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>, R> implements K
         this.issueRecordCenter = issueRecordCenter;
         this.issueRecordBuilder = issueRecordBuilder;
         this.topic = topic;
+    }
+
+    @Nonnull
+    @Override
+    public KeelLogLevel getVisibleLevel() {
+        return visibleLevel;
+    }
+
+    @Override
+    public void setVisibleLevel(@Nonnull KeelLogLevel visibleLevel) {
+        this.visibleLevel = visibleLevel;
     }
 
     @Nonnull

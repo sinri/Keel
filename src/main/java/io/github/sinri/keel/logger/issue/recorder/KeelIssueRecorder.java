@@ -17,6 +17,11 @@ import java.util.function.Supplier;
 @TechnicalPreview(since = "3.1.10")
 public interface KeelIssueRecorder<T extends KeelIssueRecord<?>, R> {
     @Nonnull
+    KeelLogLevel getVisibleLevel();
+
+    void setVisibleLevel(@Nonnull KeelLogLevel level);
+
+    @Nonnull
     KeelIssueRecordCenter<R> issueRecordCenter();
 
     /**
@@ -37,7 +42,9 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>, R> {
     default void record(@Nonnull Handler<T> issueHandler) {
         T issue = this.issueRecordBuilder().get();
         issueHandler.handle(issue);
-        this.issueRecordCenter().getAdapter().record(topic(), issue);
+        if (issue.level().isEnoughSeriousAs(getVisibleLevel())) {
+            this.issueRecordCenter().getAdapter().record(topic(), issue);
+        }
     }
 
     default void debug(@Nonnull Handler<T> issueHandler) {
