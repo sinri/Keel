@@ -1,13 +1,17 @@
 package io.github.sinri.keel.logger.issue.recorder;
 
-import io.github.sinri.keel.logger.issue.core.KeelIssueRecord;
-import io.github.sinri.keel.logger.issue.core.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.core.KeelIssueRecorder;
+import io.github.sinri.keel.core.TechnicalPreview;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 
 import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
-public class KeelIssueRecorderImpl<T extends KeelIssueRecord, R> implements KeelIssueRecorder<T, R> {
+/**
+ * @since 3.1.10
+ */
+@TechnicalPreview(since = "3.1.10")
+public class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>, R> implements KeelIssueRecorder<T, R> {
     protected final @Nonnull Supplier<T> issueRecordBuilder;
     private final @Nonnull KeelIssueRecordCenter<R> issueRecordCenter;
     private final @Nonnull String topic;

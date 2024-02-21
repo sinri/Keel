@@ -1,11 +1,15 @@
 package io.github.sinri.keel.logger.issue.center;
 
-import io.github.sinri.keel.logger.issue.core.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.core.KeelIssueRecorderAdapter;
+import io.github.sinri.keel.core.TechnicalPreview;
+import io.github.sinri.keel.logger.issue.recorder.adapter.KeelIssueRecorderAdapter;
 import io.github.sinri.keel.logger.issue.recorder.adapter.SilentAdapter;
 
 import javax.annotation.Nonnull;
 
+/**
+ * @since 3.1.10
+ */
+@TechnicalPreview(since = "3.1.10")
 public class KeelIssueRecordCenterAsSilent implements KeelIssueRecordCenter<String> {
     private static final KeelIssueRecordCenterAsSilent instance = new KeelIssueRecordCenterAsSilent();
 

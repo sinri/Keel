@@ -1,8 +1,8 @@
 package io.github.sinri.keel.logger.issue.recorder.adapter;
 
+import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.logger.issue.core.KeelIssueRecord;
-import io.github.sinri.keel.logger.issue.core.KeelIssueRecorderAdapterAsync;
+import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordJsonObjectRender;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -13,23 +13,27 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * @since 3.1.10
+ */
+@TechnicalPreview(since = "3.1.10")
 abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapterAsync<JsonObject>, KeelIssueRecordJsonObjectRender {
 
-    private final Map<String, Queue<KeelIssueRecord>> issueRecordQueueMap = new HashMap<>();
+    private final Map<String, Queue<KeelIssueRecord<?>>> issueRecordQueueMap = new HashMap<>();
 
     public AliyunSLSIssueAdapter() {
 
     }
 
     @Override
-    public void record(@Nonnull String topic, @Nullable KeelIssueRecord issueRecord) {
+    public void record(@Nonnull String topic, @Nullable KeelIssueRecord<?> issueRecord) {
         if (issueRecord != null) {
             this.fetchQueue(topic).add(issueRecord);
         }
     }
 
     @Nonnull
-    private Queue<KeelIssueRecord> fetchQueue(@Nonnull String topic) {
+    private Queue<KeelIssueRecord<?>> fetchQueue(@Nonnull String topic) {
         return this.issueRecordQueueMap.computeIfAbsent(topic, x -> new ConcurrentLinkedQueue<>());
     }
 
@@ -64,10 +68,10 @@ abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapterA
     }
 
     private Future<Void> handleForTopic(@Nonnull String topic) {
-        Queue<KeelIssueRecord> keelIssueRecords = this.issueRecordQueueMap.get(topic);
-        List<KeelIssueRecord> buffer = new ArrayList<>();
+        Queue<KeelIssueRecord<?>> keelIssueRecords = this.issueRecordQueueMap.get(topic);
+        List<KeelIssueRecord<?>> buffer = new ArrayList<>();
         while (true) {
-            KeelIssueRecord x = keelIssueRecords.poll();
+            KeelIssueRecord<?> x = keelIssueRecords.poll();
             if (x == null) {
                 break;
             }
@@ -80,5 +84,5 @@ abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapterA
         return handleIssueRecordsForTopic(topic, buffer);
     }
 
-    abstract protected Future<Void> handleIssueRecordsForTopic(@Nonnull String topic, @Nonnull List<KeelIssueRecord> buffer);
+    abstract protected Future<Void> handleIssueRecordsForTopic(@Nonnull String topic, @Nonnull List<KeelIssueRecord<?>> buffer);
 }
