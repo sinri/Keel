@@ -25,7 +25,7 @@ public interface ESIndexMixin extends ESApiMixin {
      * @see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.9/indices-create-index.html">Create index API</a>
      */
     default Future<ESIndexCreateResponse> indexCreate(String indexName, ESApiQueries queries, JsonObject requestBody) {
-        return call(HttpMethod.PUT, "/" + indexName, queries, requestBody)
+        return call(HttpMethod.PUT, "/" + indexName, queries, requestBody.toString())
                 .compose(resp -> {
                     return Future.succeededFuture(new ESIndexCreateResponse(resp));
                 });

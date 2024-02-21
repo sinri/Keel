@@ -46,7 +46,7 @@ abstract public class KeelIntravenousBase<T> extends KeelVerticleBase {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         queueAcceptTask = true;
 
         int configuredBatchSize = getBatchSize();
