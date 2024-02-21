@@ -10,8 +10,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
+import java.util.Objects;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
@@ -25,7 +27,13 @@ public interface ESApiMixin {
 
     KeelEventLogger getLogger();
 
-    default Future<JsonObject> call(HttpMethod httpMethod, String endpoint, ESApiQueries queries, @Nullable JsonObject requestBody) {
+    /**
+     * Hot Fix 3.1.9.1
+     *
+     * @since 3.1.10
+     * For Bulk API, of which the body is not a json object.
+     */
+    default Future<JsonObject> call(@Nonnull HttpMethod httpMethod, @Nonnull String endpoint, @Nullable ESApiQueries queries, @Nullable String requestBody) {
         WebClient webClient = WebClient.create(Keel.getVertx());
         String url = this.getEsConfig().clusterApiUrl(endpoint);
         HttpRequest<Buffer> bufferHttpRequest = webClient.requestAbs(httpMethod, url);
@@ -60,7 +68,7 @@ public interface ESApiMixin {
                     if (httpMethod == HttpMethod.GET) {
                         return bufferHttpRequest.send();
                     } else {
-                        return bufferHttpRequest.sendJsonObject(requestBody);
+                        return bufferHttpRequest.sendBuffer(Buffer.buffer(Objects.requireNonNullElse(requestBody, "")));
                     }
                 })
                 .compose(bufferHttpResponse -> {
@@ -73,7 +81,8 @@ public interface ESApiMixin {
                             log.message("ES API Response Error")
                                     .put("response", new JsonObject()
                                             .put("status_code", statusCode)
-                                            .put("raw", bufferHttpResponse.bodyAsString()));
+                                            .put("raw", bufferHttpResponse.bodyAsString())
+                                    );
                         });
                         return Future.failedFuture("ES API: STATUS CODE IS " + statusCode + " | " + bufferHttpResponse.bodyAsString());
                     }
@@ -82,10 +91,20 @@ public interface ESApiMixin {
                         log.message("ES API Response Error")
                                 .put("response", new JsonObject()
                                         .put("status_code", statusCode)
-                                        .put("body", resp));
+                                        .put("body", resp)
+                                );
                     });
                     return Future.succeededFuture(resp);
                 });
+    }
+
+    /**
+     * Hot Fix 3.1.9.1
+     *
+     * @since 3.1.10 based on `io.github.sinri.keel.elasticsearch.ESApiMixin#call(io.vertx.core.http.HttpMethod, java.lang.String, io.github.sinri.keel.elasticsearch.ESApiMixin.ESApiQueries, java.lang.String)`
+     */
+    default Future<JsonObject> callPost(@Nonnull String endpoint, @Nullable ESApiQueries queries, @Nonnull JsonObject requestBody) {
+        return call(HttpMethod.POST, endpoint, queries, requestBody.toString());
     }
 
     class ESApiQueries extends HashMap<String, String> {
