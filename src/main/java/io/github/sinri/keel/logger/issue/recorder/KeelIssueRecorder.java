@@ -16,6 +16,15 @@ import java.util.function.Supplier;
  */
 @TechnicalPreview(since = "3.1.10")
 public interface KeelIssueRecorder<T extends KeelIssueRecord<?>, R> {
+
+    static <T extends KeelIssueRecord<?>, R> KeelIssueRecorder<T, R> build(
+            @Nonnull KeelIssueRecordCenter<R> issueRecordCenter,
+            @Nonnull Supplier<T> issueRecordBuilder,
+            @Nonnull String topic
+    ) {
+        return new KeelIssueRecorderImpl<T, R>(issueRecordCenter, issueRecordBuilder, topic);
+    }
+
     @Nonnull
     KeelLogLevel getVisibleLevel();
 

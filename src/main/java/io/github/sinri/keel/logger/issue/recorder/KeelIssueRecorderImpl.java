@@ -12,7 +12,7 @@ import java.util.function.Supplier;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>, R> implements KeelIssueRecorder<T, R> {
+class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>, R> implements KeelIssueRecorder<T, R> {
     protected final @Nonnull Supplier<T> issueRecordBuilder;
     private final @Nonnull KeelIssueRecordCenter<R> issueRecordCenter;
     private final @Nonnull String topic;
