@@ -17,6 +17,7 @@ import java.util.List;
 @TechnicalPreview(since = "3.1.10")
 public interface KeelIssueRecord<T> extends SelfInterface<T> {
     String AttributeClassification = "classification";
+    String AttributeLevel = "level";
 
     @Nonnull
     String topic();
