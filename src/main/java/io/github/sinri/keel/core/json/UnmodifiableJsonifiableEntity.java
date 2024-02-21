@@ -18,26 +18,19 @@ import java.util.function.Function;
  * @since 3.0.0
  */
 public interface UnmodifiableJsonifiableEntity extends Iterable<Map.Entry<String, Object>>, Shareable {
-    @Nonnull
-    JsonObject toJsonObject();
+    static UnmodifiableJsonifiableEntity wrap(@Nonnull JsonObject jsonObject) {
+        return new UnmodifiableJsonifiableEntityImpl(jsonObject);
+    }
+
+//    @Nonnull
+//    JsonObject toJsonObject();
 
     /**
      * @since 2.7
      * @since 2.8 If java.lang.ClassCastException occurred, return null instead.
+     * @since 3.1.10 make it abstract.
      */
-    default <T> @Nullable T read(Function<JsonPointer, Class<T>> func) {
-        try {
-            JsonPointer jsonPointer = JsonPointer.create();
-            Class<T> tClass = func.apply(jsonPointer);
-            Object o = jsonPointer.queryJson(toJsonObject());
-            if (o == null) {
-                return null;
-            }
-            return tClass.cast(o);
-        } catch (ClassCastException castException) {
-            return null;
-        }
-    }
+    <T> @Nullable T read(@Nonnull Function<JsonPointer, Class<T>> func);
 
     /**
      * @since 2.7
@@ -299,14 +292,20 @@ public interface UnmodifiableJsonifiableEntity extends Iterable<Map.Entry<String
 
     /**
      * @since 2.8
+     * @since 3.1.10 make it abstract.
      */
-    default Buffer toBuffer() {
-        return toJsonObject().toBuffer();
-    }
+    Buffer toBuffer();
 
+    /**
+     * @since 3.0.0
+     * @since 3.1.10 make it abstract.
+     */
     @Override
     @Nonnull
-    default Iterator<Map.Entry<String, Object>> iterator() {
-        return toJsonObject().iterator();
-    }
+    Iterator<Map.Entry<String, Object>> iterator();
+
+    /**
+     * @since 3.1.10
+     */
+    boolean isEmpty();
 }

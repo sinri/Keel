@@ -1,6 +1,7 @@
 package io.github.sinri.keel.logger.issue.record;
 
 import io.github.sinri.keel.core.TechnicalPreview;
+import io.github.sinri.keel.core.json.UnmodifiableJsonifiableEntity;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.json.JsonObject;
 
@@ -71,13 +72,18 @@ public abstract class BaseIssueRecord<T> implements KeelIssueRecord<T>, IssueRec
     }
 
     final protected void attribute(@Nonnull String name, @Nullable Object value) {
+        if (
+                AttributeLevel.equalsIgnoreCase(name)
+                        || AttributeException.equalsIgnoreCase(name)
+                        || AttributeClassification.equalsIgnoreCase(name)
+        ) throw new IllegalArgumentException("Attribute name `" + name + "` reserved");
         attributes.put(name, value);
     }
 
     @Nonnull
     @Override
-    final public JsonObject attributes() {
-        return attributes;
+    final public UnmodifiableJsonifiableEntity attributes() {
+        return UnmodifiableJsonifiableEntity.wrap(attributes);
     }
 
     @Override
@@ -95,7 +101,7 @@ public abstract class BaseIssueRecord<T> implements KeelIssueRecord<T>, IssueRec
     @Nullable
     @Override
     final public String message() {
-        return this.attributes().getString(IssueRecordMessageMixin.AttributeMessage);
+        return this.attributes.getString(IssueRecordMessageMixin.AttributeMessage);
     }
 
     @Override
