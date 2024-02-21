@@ -11,18 +11,17 @@ import java.util.function.Supplier;
 
 /**
  * @param <T> The type of the certain implementation of the issue record used.
- * @param <R> The type that the issue record would be rendered to.
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public interface KeelIssueRecorder<T extends KeelIssueRecord<?>, R> {
+public interface KeelIssueRecorder<T extends KeelIssueRecord<?>> {
 
-    static <T extends KeelIssueRecord<?>, R> KeelIssueRecorder<T, R> build(
-            @Nonnull KeelIssueRecordCenter<R> issueRecordCenter,
+    static <T extends KeelIssueRecord<?>> KeelIssueRecorder<T> build(
+            @Nonnull KeelIssueRecordCenter issueRecordCenter,
             @Nonnull Supplier<T> issueRecordBuilder,
             @Nonnull String topic
     ) {
-        return new KeelIssueRecorderImpl<T, R>(issueRecordCenter, issueRecordBuilder, topic);
+        return new KeelIssueRecorderImpl<T>(issueRecordCenter, issueRecordBuilder, topic);
     }
 
     @Nonnull
@@ -31,7 +30,7 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>, R> {
     void setVisibleLevel(@Nonnull KeelLogLevel level);
 
     @Nonnull
-    KeelIssueRecordCenter<R> issueRecordCenter();
+    KeelIssueRecordCenter issueRecordCenter();
 
     /**
      * @return an instance of issue, to be modified for details.

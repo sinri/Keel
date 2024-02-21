@@ -12,10 +12,20 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public interface KeelIssueRecordStringRender extends KeelIssueRecordRender<String> {
+public class KeelIssueRecordStringRender implements KeelIssueRecordRender<String> {
+    private static final KeelIssueRecordStringRender instance = new KeelIssueRecordStringRender();
+
+    protected KeelIssueRecordStringRender() {
+
+    }
+
+    public static KeelIssueRecordStringRender getInstance() {
+        return instance;
+    }
+
     @Nonnull
     @Override
-    default String renderIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord) {
+    public String renderIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord) {
         StringBuilder s = new StringBuilder("㏒ ");
         s.append(KeelHelpers.datetimeHelper().getDateExpression(issueRecord.timestamp(), KeelDateTimeHelper.MYSQL_DATETIME_MS_PATTERN));
         s.append(" [").append(issueRecord.level().name()).append("]");
@@ -34,7 +44,7 @@ public interface KeelIssueRecordStringRender extends KeelIssueRecordRender<Strin
 
     @Nonnull
     @Override
-    default String renderThrowable(@Nonnull Throwable throwable) {
+    public String renderThrowable(@Nonnull Throwable throwable) {
         return KeelHelpers.stringHelper().renderThrowableChain(throwable, ignorableStackPackageSet());
     }
 }

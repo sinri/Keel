@@ -3,7 +3,7 @@ package io.github.sinri.keel.logger.issue.recorder.adapter;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
-import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordJsonObjectRender;
+import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordRender;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapterAsync<JsonObject>, KeelIssueRecordJsonObjectRender {
+abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapter {
 
     private final Map<String, Queue<KeelIssueRecord<?>>> issueRecordQueueMap = new HashMap<>();
 
@@ -85,4 +85,9 @@ abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapterA
     }
 
     abstract protected Future<Void> handleIssueRecordsForTopic(@Nonnull String topic, @Nonnull List<KeelIssueRecord<?>> buffer);
+
+    @Override
+    public KeelIssueRecordRender<JsonObject> issueRecordRender() {
+        return KeelIssueRecordRender.renderForJsonObject();
+    }
 }

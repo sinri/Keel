@@ -2,7 +2,7 @@ package io.github.sinri.keel.logger.issue.recorder.adapter;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
-import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordStringRender;
+import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordRender;
 import io.vertx.core.Promise;
 
 import javax.annotation.Nonnull;
@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public final class SilentAdapter implements KeelIssueRecorderAdapter<String>, KeelIssueRecordStringRender {
+public final class SilentAdapter implements KeelIssueRecorderAdapter {
     private static final SilentAdapter instance = new SilentAdapter();
 
     private SilentAdapter() {
@@ -20,6 +20,11 @@ public final class SilentAdapter implements KeelIssueRecorderAdapter<String>, Ke
 
     public static SilentAdapter getInstance() {
         return instance;
+    }
+
+    @Override
+    public KeelIssueRecordRender<?> issueRecordRender() {
+        return KeelIssueRecordRender.renderForString();
     }
 
     @Override
@@ -32,9 +37,13 @@ public final class SilentAdapter implements KeelIssueRecorderAdapter<String>, Ke
         promise.complete();
     }
 
-    @Nonnull
     @Override
-    public String renderIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord) {
-        return "";
+    public boolean isStopped() {
+        return false;
+    }
+
+    @Override
+    public boolean isClosed() {
+        return false;
     }
 }

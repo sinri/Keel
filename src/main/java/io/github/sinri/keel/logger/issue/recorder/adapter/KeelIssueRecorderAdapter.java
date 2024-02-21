@@ -13,7 +13,9 @@ import javax.annotation.Nullable;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public interface KeelIssueRecorderAdapter<R> extends KeelIssueRecordRender<R> {
+public interface KeelIssueRecorderAdapter {
+    KeelIssueRecordRender<?> issueRecordRender();
+
     void record(@Nonnull String topic, @Nullable KeelIssueRecord<?> issueRecord);
 
 
@@ -26,4 +28,8 @@ public interface KeelIssueRecorderAdapter<R> extends KeelIssueRecordRender<R> {
         close(voidPromise);
         return voidPromise.future();
     }
+
+    boolean isStopped();
+
+    boolean isClosed();
 }

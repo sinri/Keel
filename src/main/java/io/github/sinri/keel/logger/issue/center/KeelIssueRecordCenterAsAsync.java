@@ -1,7 +1,7 @@
 package io.github.sinri.keel.logger.issue.center;
 
 import io.github.sinri.keel.core.TechnicalPreview;
-import io.github.sinri.keel.logger.issue.recorder.adapter.KeelIssueRecorderAdapterAsync;
+import io.github.sinri.keel.logger.issue.recorder.adapter.KeelIssueRecorderAdapter;
 
 import javax.annotation.Nonnull;
 
@@ -9,16 +9,16 @@ import javax.annotation.Nonnull;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public class KeelIssueRecordCenterAsAsync<R> implements KeelIssueRecordCenter<R> {
-    protected final @Nonnull KeelIssueRecorderAdapterAsync<R> adapter;
+public class KeelIssueRecordCenterAsAsync implements KeelIssueRecordCenter {
+    protected final @Nonnull KeelIssueRecorderAdapter adapter;
 
-    public KeelIssueRecordCenterAsAsync(@Nonnull KeelIssueRecorderAdapterAsync<R> adapter) {
+    public KeelIssueRecordCenterAsAsync(@Nonnull KeelIssueRecorderAdapter adapter) {
         this.adapter = adapter;
     }
 
     @Nonnull
     @Override
-    public KeelIssueRecorderAdapterAsync<R> getAdapter() {
+    public KeelIssueRecorderAdapter getAdapter() {
         return adapter;
     }
 }

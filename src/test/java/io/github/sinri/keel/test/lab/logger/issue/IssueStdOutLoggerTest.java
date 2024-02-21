@@ -11,19 +11,19 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 public class IssueStdOutLoggerTest extends KeelTest {
-    private KeelIssueRecordCenterAsSync<String> center;
+    private KeelIssueRecordCenterAsSync center;
 
     @Nonnull
     @Override
     protected Future<Void> starting() {
-        center = new KeelIssueRecordCenterAsSync<>(SyncStdoutAdapter.getInstance());
+        center = new KeelIssueRecordCenterAsSync(SyncStdoutAdapter.getInstance());
 
         return Future.succeededFuture();
     }
 
     @TestUnit
     public Future<Void> testForStdOutSyncAlef() {
-        KeelIssueRecorder<AlefIssueRecord, String> recorder = center.generateRecorder("StandoutOutputSync", AlefIssueRecord::new);
+        KeelIssueRecorder<AlefIssueRecord> recorder = center.generateRecorder("StandoutOutputSync", AlefIssueRecord::new);
         recorder.record(issue -> {
             issue.classification(List.of("IssueLoggerTest", "testForStdOutSync"));
         });
@@ -32,7 +32,7 @@ public class IssueStdOutLoggerTest extends KeelTest {
 
     @TestUnit
     public Future<Void> testForStdOutSyncBet() {
-        KeelIssueRecorder<BetIssueRecord, String> recorder = center.generateRecorder("StandoutOutputSync", () -> {
+        KeelIssueRecorder<BetIssueRecord> recorder = center.generateRecorder("StandoutOutputSync", () -> {
             return new BetIssueRecord("testForStdOutSyncBet");
         });
         recorder.warning(t -> {

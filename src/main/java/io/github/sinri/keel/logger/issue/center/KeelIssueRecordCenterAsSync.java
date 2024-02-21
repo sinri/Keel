@@ -9,16 +9,16 @@ import javax.annotation.Nonnull;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public class KeelIssueRecordCenterAsSync<R> implements KeelIssueRecordCenter<R> {
-    protected final @Nonnull KeelIssueRecorderAdapter<R> adapter;
+public class KeelIssueRecordCenterAsSync implements KeelIssueRecordCenter {
+    protected final @Nonnull KeelIssueRecorderAdapter adapter;
 
-    public KeelIssueRecordCenterAsSync(@Nonnull KeelIssueRecorderAdapter<R> adapter) {
+    public KeelIssueRecordCenterAsSync(@Nonnull KeelIssueRecorderAdapter adapter) {
         this.adapter = adapter;
     }
 
     @Nonnull
     @Override
-    public KeelIssueRecorderAdapter<R> getAdapter() {
+    public KeelIssueRecorderAdapter getAdapter() {
         return adapter;
     }
 }

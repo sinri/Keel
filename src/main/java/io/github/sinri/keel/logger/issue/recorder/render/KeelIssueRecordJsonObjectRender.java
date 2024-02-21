@@ -14,10 +14,20 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public interface KeelIssueRecordJsonObjectRender extends KeelIssueRecordRender<JsonObject> {
+public class KeelIssueRecordJsonObjectRender implements KeelIssueRecordRender<JsonObject> {
+    private static final KeelIssueRecordJsonObjectRender instance = new KeelIssueRecordJsonObjectRender();
+
+    protected KeelIssueRecordJsonObjectRender() {
+
+    }
+
+    public static KeelIssueRecordJsonObjectRender getInstance() {
+        return instance;
+    }
+
     @Nonnull
     @Override
-    default JsonObject renderIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord) {
+    public JsonObject renderIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord) {
         // by default, the topic is neglected for Aliyun SLS eco
 
         JsonObject x = new JsonObject();
@@ -40,7 +50,7 @@ public interface KeelIssueRecordJsonObjectRender extends KeelIssueRecordRender<J
 
     @Nonnull
     @Override
-    default JsonObject renderThrowable(@Nonnull Throwable throwable) {
+    public JsonObject renderThrowable(@Nonnull Throwable throwable) {
         return Objects.requireNonNull(KeelHelpers.jsonHelper().renderThrowableChain(throwable, ignorableStackPackageSet()));
     }
 }

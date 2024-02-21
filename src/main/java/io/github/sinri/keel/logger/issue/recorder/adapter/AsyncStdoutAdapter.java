@@ -3,7 +3,7 @@ package io.github.sinri.keel.logger.issue.recorder.adapter;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
-import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordStringRender;
+import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordRender;
 import io.github.sinri.keel.servant.intravenous.KeelIntravenous;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public class AsyncStdoutAdapter implements KeelIssueRecorderAdapterAsync<String>, KeelIssueRecordStringRender {
+public class AsyncStdoutAdapter implements KeelIssueRecorderAdapter {
     private static final AsyncStdoutAdapter instance = new AsyncStdoutAdapter();
     private final KeelIntravenous<KeelIssueRecord<?>> intravenous;
     private volatile boolean stopped = false;
@@ -32,9 +32,14 @@ public class AsyncStdoutAdapter implements KeelIssueRecorderAdapterAsync<String>
     }
 
     private Future<Void> writeOneIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord) {
-        String s = this.renderIssueRecord(issueRecord);
+        String s = this.issueRecordRender().renderIssueRecord(issueRecord);
         System.out.println(s);
         return Future.succeededFuture();
+    }
+
+    @Override
+    public KeelIssueRecordRender<String> issueRecordRender() {
+        return KeelIssueRecordRender.renderForString();
     }
 
     @Override

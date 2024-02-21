@@ -12,14 +12,14 @@ import java.util.function.Supplier;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>, R> implements KeelIssueRecorder<T, R> {
+class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>> implements KeelIssueRecorder<T> {
     protected final @Nonnull Supplier<T> issueRecordBuilder;
-    private final @Nonnull KeelIssueRecordCenter<R> issueRecordCenter;
+    private final @Nonnull KeelIssueRecordCenter issueRecordCenter;
     private final @Nonnull String topic;
     private KeelLogLevel visibleLevel = KeelLogLevel.INFO;
 
     public KeelIssueRecorderImpl(
-            @Nonnull KeelIssueRecordCenter<R> issueRecordCenter,
+            @Nonnull KeelIssueRecordCenter issueRecordCenter,
             @Nonnull Supplier<T> issueRecordBuilder,
             @Nonnull String topic
     ) {
@@ -41,7 +41,7 @@ class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>, R> implements KeelIssu
 
     @Nonnull
     @Override
-    public KeelIssueRecordCenter<R> issueRecordCenter() {
+    public KeelIssueRecordCenter issueRecordCenter() {
         return issueRecordCenter;
     }
 

@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public class KeelIssueRecordCenterAsSilent implements KeelIssueRecordCenter<String> {
+public class KeelIssueRecordCenterAsSilent implements KeelIssueRecordCenter {
     private static final KeelIssueRecordCenterAsSilent instance = new KeelIssueRecordCenterAsSilent();
 
     private KeelIssueRecordCenterAsSilent() {
@@ -23,7 +23,7 @@ public class KeelIssueRecordCenterAsSilent implements KeelIssueRecordCenter<Stri
 
     @Nonnull
     @Override
-    public KeelIssueRecorderAdapter<String> getAdapter() {
+    public KeelIssueRecorderAdapter getAdapter() {
         return SilentAdapter.getInstance();
     }
 }
