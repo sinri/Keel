@@ -23,7 +23,7 @@ public abstract class KeelSundial extends KeelVerticleBase<KeelEventLog> {
     @Override
 
     public void start() throws Exception {
-        setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder(getClass().getName()));
+        setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRecorder("Sundial", () -> new KeelEventLog("Sundial")));
         //setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
 
         long delaySeconds = 60 - (System.currentTimeMillis() / 1000) % 60;

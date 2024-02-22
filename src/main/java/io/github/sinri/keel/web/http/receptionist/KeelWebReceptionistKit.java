@@ -60,7 +60,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         try {
             allClasses.forEach(this::loadClass);
         } catch (Exception e) {
-            Keel.getIssueRecorder().exception(e, r -> r.classification(getClass().getName(), "loadPackage"));
+            Keel.getLogger().exception(e, r -> r.classification(getClass().getName(), "loadPackage"));
         }
     }
 
@@ -68,13 +68,13 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         ApiMeta apiMeta = KeelHelpers.reflectionHelper().getAnnotationOfClass(c, ApiMeta.class);
         if (apiMeta == null) return;
 
-        Keel.getIssueRecorder().debug(r -> r.classification(getClass().getName(), "loadClass").message("Loading " + c.getName()));
+        Keel.getLogger().debug(r -> r.classification(getClass().getName(), "loadClass").message("Loading " + c.getName()));
 
         Constructor<? extends R> receptionistConstructor;
         try {
             receptionistConstructor = c.getConstructor(RoutingContext.class);
         } catch (NoSuchMethodException e) {
-            Keel.getIssueRecorder().exception(e, r -> r.classification(getClass().getName(), "loadClass").message("HANDLER REFLECTION EXCEPTION"));
+            Keel.getLogger().exception(e, r -> r.classification(getClass().getName(), "loadClass").message("HANDLER REFLECTION EXCEPTION"));
             return;
         }
 

@@ -1,8 +1,6 @@
 package io.github.sinri.keel.test.lab.excel;
 
-import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.poi.excel.KeelSheet;
 import io.github.sinri.keel.poi.excel.KeelSheets;
 import io.github.sinri.keel.tesuto.KeelTest;
@@ -21,8 +19,8 @@ public class ReadHugeExcelTest extends KeelTest {
     @Nonnull
     @Override
     protected Future<Void> starting() {
-        KeelIssueRecorder<KeelEventLog> issueRecorder = KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder(getClass().getSimpleName());
-        setIssueRecorder(issueRecorder);
+        var issueRecorder = KeelIssueRecordCenter.outputCenter().generateEventLogger(getClass().getSimpleName());
+        setLogger(issueRecorder);
 
 //        try {
 //            this.excelStreamReader = new KeelStreamSheets(file);
@@ -59,7 +57,7 @@ public class ReadHugeExcelTest extends KeelTest {
             x.incrementAndGet();
         });
         excelStreamReader.close();
-        this.getIssueRecorder().info(r -> r.message("FIN 1 " + x.get()));
+        this.getLogger().info(r -> r.message("FIN 1 " + x.get()));
 
         return Future.succeededFuture();
     }
@@ -85,7 +83,7 @@ public class ReadHugeExcelTest extends KeelTest {
                     excelStreamReader.close();
                 })
                 .compose(v -> {
-                    this.getIssueRecorder().info(r -> r.message("FIN 2 " + x.get()));
+                    this.getLogger().info(r -> r.message("FIN 2 " + x.get()));
                     return Future.succeededFuture();
                 });
     }

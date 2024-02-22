@@ -41,11 +41,11 @@ public class ReadTemplatedExcelTest extends KeelTest {
             KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
             KeelSheetMatrix keelSheetMatrix = keelSheet.blockReadAllRowsToMatrix(1, 6, null);
             keelSheetMatrix.getRawRowList().forEach(row -> {
-                this.getIssueRecorder().info(log -> log.message("BLOCK: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
+                this.getLogger().info(log -> log.message("BLOCK: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
             });
 
             keelSheetMatrix.getRowIterator(KeelSheetMatrixRowExt.class).forEachRemaining(r -> {
-                this.getIssueRecorder().info(log -> log.message("record")
+                this.getLogger().info(log -> log.message("record")
                         .context(c -> c
                         .put("record_id", r.recordId())
                         .put("name", r.name())
@@ -64,7 +64,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
         return keelSheet.readAllRowsToMatrix(1, 0, null)
                 .compose(keelSheetMatrix -> {
                     keelSheetMatrix.getRawRowList().forEach(row -> {
-                        this.getIssueRecorder().info(log -> log.message("ASYNC: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
+                        this.getLogger().info(log -> log.message("ASYNC: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
                     });
                     return Future.succeededFuture();
                 })
@@ -82,7 +82,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
             KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
             KeelSheetTemplatedMatrix templatedMatrix = keelSheet.blockReadAllRowsToTemplatedMatrix(0, 6, null);
             templatedMatrix.getRows().forEach(row -> {
-                this.getIssueRecorder().info(log -> log.message("BLOCK TEMPLATED: " + row.toJsonObject()));
+                this.getLogger().info(log -> log.message("BLOCK TEMPLATED: " + row.toJsonObject()));
             });
         }
         return Future.succeededFuture();
@@ -95,7 +95,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
         return keelSheet.readAllRowsToTemplatedMatrix(0, 7, null)
                 .compose(templatedMatrix -> {
                     templatedMatrix.getRows().forEach(row -> {
-                        this.getIssueRecorder().info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));
+                        this.getLogger().info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));
                     });
 
                     return Future.succeededFuture();
@@ -122,7 +122,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
         return keelSheet.readAllRowsToTemplatedMatrix(0, 128, null)
                 .compose(templatedMatrix -> {
                     templatedMatrix.getRows().forEach(row -> {
-                        this.getIssueRecorder().info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));
+                        this.getLogger().info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));
                     });
 
                     return Future.succeededFuture();

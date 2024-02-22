@@ -11,7 +11,7 @@ public class TestMainVerticle extends KeelVerticleBase<KeelEventLog> {
 
     @Override
     public void start() throws Exception {
-        setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder(getClass().getName()));
+        setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRecorder(getClass().getName(), () -> new KeelEventLog(getClass().getName())));
 
         KeelAsyncKit.endless(() -> {
             getRoutineIssueRecorder().info(r -> r.message("X"));

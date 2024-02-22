@@ -16,8 +16,8 @@ public class DSHttpServer extends KeelHttpServer {
                 "web_root/fastdocs/",
                 "Dyson Sphere FastDocs",
                 "Copyright 2022 Sinri Edogawa",
-                KeelIssueRecordCenter.outputCenter()
-                        .generateRoutineIssueRecorder("FastDocs")
+                KeelIssueRecordCenter.outputCenter().generateEventLogger("FastDocs")
+
                 //.generateRecorder("FastDocs",()-> new RoutineIssueRecord("FastDocs"))
                 //KeelOutputEventLogCenter.getInstance().createLogger("FastDocs")
         );

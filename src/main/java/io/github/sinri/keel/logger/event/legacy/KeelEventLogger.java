@@ -15,6 +15,7 @@ import java.util.function.Supplier;
  * @since 2.9.4
  * @since 3.0.10 Add Bypass Loggers Support.
  */
+@Deprecated(since = "3.2.0")
 public interface KeelEventLogger {
     static KeelEventLogger silentLogger() {
         return KeelSilentEventLogger.getInstance();

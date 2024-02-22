@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 /**
  * @since 2.9.4 实验性设计
  */
+@Deprecated(since = "3.2.0")
 public interface KeelEventLogCenter {
 
     /**

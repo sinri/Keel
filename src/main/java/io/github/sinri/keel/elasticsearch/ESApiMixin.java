@@ -1,7 +1,7 @@
 package io.github.sinri.keel.elasticsearch;
 
 import io.github.sinri.keel.logger.event.KeelEventLog;
-import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -28,7 +28,7 @@ public interface ESApiMixin {
     /**
      * @since 3.2.0
      */
-    KeelIssueRecorder<KeelEventLog> getRoutineIssueRecorder();
+    KeelEventLogger getLogger();
 
     /**
      * @since 3.1.10
@@ -79,7 +79,7 @@ public interface ESApiMixin {
                     JsonObject resp = bufferHttpResponse.bodyAsJsonObject();
 
                     if ((statusCode >= 300 || statusCode < 200) || resp == null) {
-                        this.getRoutineIssueRecorder().error(log -> {
+                        this.getLogger().error(log -> {
                             logRequestEnricher.handle(log);
                             log.message("ES API Response Error")
                                     .context(c -> c
@@ -90,7 +90,7 @@ public interface ESApiMixin {
                         });
                         return Future.failedFuture("ES API: STATUS CODE IS " + statusCode + " | " + bufferHttpResponse.bodyAsString());
                     }
-                    this.getRoutineIssueRecorder().info(log -> {
+                    this.getLogger().info(log -> {
                         logRequestEnricher.handle(log);
                         log.message("ES API Response Error")
                                 .context(c -> c

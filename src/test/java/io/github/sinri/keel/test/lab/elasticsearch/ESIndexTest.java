@@ -24,12 +24,12 @@ public class ESIndexTest {
     }
 
     private static Future<Void> test1() {
-        var issueRecorder = KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder("ESIndexTest");
-        ElasticSearchKit es = new ElasticSearchKit("kumori", issueRecorder);
+        var logger = KeelIssueRecordCenter.outputCenter().generateEventLogger("ESIndexTest");
+        ElasticSearchKit es = new ElasticSearchKit("kumori", logger);
 
         return es.indexGet("kumori-es-test-1", new ESApiMixin.ESApiQueries())
                 .compose(resp -> {
-                    issueRecorder.info(log -> log.message("API RESPONSE")
+                    logger.info(log -> log.message("API RESPONSE")
                             .context(c -> c.put("resp", resp)));
                     return Future.succeededFuture();
                 });

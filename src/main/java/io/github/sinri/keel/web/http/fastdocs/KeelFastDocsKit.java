@@ -1,8 +1,7 @@
 package io.github.sinri.keel.web.http.fastdocs;
 
-import io.github.sinri.keel.logger.event.KeelEventLog;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.web.http.fastdocs.page.CataloguePageBuilder;
 import io.github.sinri.keel.web.http.fastdocs.page.MarkdownCssBuilder;
 import io.github.sinri.keel.web.http.fastdocs.page.MarkdownPageBuilder;
@@ -36,7 +35,7 @@ public class KeelFastDocsKit {
     /**
      * @since 3.2.0
      */
-    private KeelIssueRecorder<KeelEventLog> routineIssueRecorder;
+    private KeelEventLogger routineIssueRecorder;
 
     /**
      * @param rootURLPath          such as `/prefix/`
@@ -46,7 +45,7 @@ public class KeelFastDocsKit {
         this.staticHandler = StaticHandler.create();
         this.rootURLPath = rootURLPath;
         this.rootMarkdownFilePath = rootMarkdownFilePath;
-        this.routineIssueRecorder = KeelIssueRecordCenter.createSilentIssueRecorder();
+        this.routineIssueRecorder = KeelEventLogger.from(KeelIssueRecordCenter.createSilentIssueRecorder());
     }
 
     /**
@@ -64,7 +63,7 @@ public class KeelFastDocsKit {
             String docsDirPathBase,
             String subject,
             String footer,
-            KeelIssueRecorder<KeelEventLog> routineIssueRecorder
+            KeelEventLogger routineIssueRecorder
     ) {
         if (!urlPathBase.endsWith("/")) {
             urlPathBase = urlPathBase + "/";
@@ -85,7 +84,7 @@ public class KeelFastDocsKit {
     /**
      * @since 3.2.0
      */
-    public KeelFastDocsKit setRoutineIssueRecorder(KeelIssueRecorder<KeelEventLog> routineIssueRecorder) {
+    public KeelFastDocsKit setRoutineIssueRecorder(KeelEventLogger routineIssueRecorder) {
         this.routineIssueRecorder = routineIssueRecorder;
         return this;
     }
