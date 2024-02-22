@@ -1,6 +1,5 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
@@ -26,11 +25,11 @@ public abstract class KeelQueueTask extends KeelVerticleBase<QueueTaskIssueRecor
     /**
      * @since 3.2.0
      */
-    abstract protected KeelIssueRecorder<RoutineBaseIssueRecord<QueueTaskIssueRecord>> prepareRoutineIssueRecord();
+    abstract protected KeelIssueRecorder<QueueTaskIssueRecord> prepareRoutineIssueRecord();
 
     // as verticle
     public final void start() {
-        KeelIssueRecorder<RoutineBaseIssueRecord<QueueTaskIssueRecord>> issueRecorder = prepareRoutineIssueRecord();
+        KeelIssueRecorder<QueueTaskIssueRecord> issueRecorder = prepareRoutineIssueRecord();
         setRoutineIssueRecorder(issueRecorder);
 
         this.queueWorkerPoolManager.whenOneWorkerStarts();

@@ -1,7 +1,6 @@
 package io.github.sinri.keel.web.http;
 
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
 import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
@@ -80,7 +79,7 @@ abstract public class KeelHttpServer extends KeelVerticleBase<RoutineIssueRecord
     /**
      * @since 3.2.0
      */
-    protected KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> createRoutineIssueRecorder() {
+    protected KeelIssueRecorder<RoutineIssueRecord> createRoutineIssueRecorder() {
         String topic = getClass().getName();
         return KeelIssueRecordCenter.outputCenter().generateRecorder(topic, () -> new RoutineIssueRecord(topic));
     }

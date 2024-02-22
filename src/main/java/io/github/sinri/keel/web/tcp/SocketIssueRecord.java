@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.tcp;
 
-import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.record.BaseIssueRecord;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
@@ -11,12 +11,8 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 /**
  * @since 3.2.0
  */
-public final class SocketIssueRecord extends RoutineBaseIssueRecord<SocketIssueRecord> {
+public final class SocketIssueRecord extends BaseIssueRecord<SocketIssueRecord> {
     public static final String TopicTcpSocket = "TcpSocket";
-
-    public SocketIssueRecord() {
-        super(TopicTcpSocket);
-    }
 
     @Nonnull
     @Override
@@ -30,5 +26,11 @@ public final class SocketIssueRecord extends RoutineBaseIssueRecord<SocketIssueR
                 .put("buffer_size", buffer.length())
         );
         return this;
+    }
+
+    @Nonnull
+    @Override
+    public String topic() {
+        return TopicTcpSocket;
     }
 }

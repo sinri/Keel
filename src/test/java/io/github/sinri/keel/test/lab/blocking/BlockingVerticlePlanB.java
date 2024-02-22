@@ -3,7 +3,6 @@ package io.github.sinri.keel.test.lab.blocking;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
 import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
@@ -16,7 +15,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  */
 public class BlockingVerticlePlanB {
     private static Future<Void> executeBlocking(Handler<Promise<Void>> blockCode) {
-        KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> issueRecorder = KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder("Sample");
+        KeelIssueRecorder<RoutineIssueRecord> issueRecorder = KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder("Sample");
         Promise<Void> promise = Promise.promise();
         KeelVerticleBase<RoutineIssueRecord> verticle = new KeelVerticleBase<>() {
             @Override

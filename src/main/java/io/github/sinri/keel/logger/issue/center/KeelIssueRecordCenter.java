@@ -2,7 +2,6 @@ package io.github.sinri.keel.logger.issue.center;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
-import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
 import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.logger.issue.recorder.adapter.KeelIssueRecorderAdapter;
@@ -39,12 +38,8 @@ public interface KeelIssueRecordCenter {
         return KeelIssueRecorder.build(this, issueRecordBuilder, topic);
     }
 
-//    @Nonnull
-//    default KeelIssueRecorder<RoutineIssueRecord> generateRoutineIssueRecorder(@Nonnull String topic) {
-//        return KeelIssueRecorder.buildForRoutine(this, topic);
-//    }
-
-    default KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> generateRoutineIssueRecorder(@Nonnull String topic) {
+    @Nonnull
+    default KeelIssueRecorder<RoutineIssueRecord> generateRoutineIssueRecorder(@Nonnull String topic) {
         return KeelIssueRecorder.buildForRoutine(this, topic);
     }
 

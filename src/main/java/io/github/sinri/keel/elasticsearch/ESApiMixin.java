@@ -1,6 +1,5 @@
 package io.github.sinri.keel.elasticsearch;
 
-import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
 import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.core.Future;
@@ -29,7 +28,7 @@ public interface ESApiMixin {
     /**
      * @since 3.2.0
      */
-    KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> getRoutineIssueRecorder();
+    KeelIssueRecorder<RoutineIssueRecord> getRoutineIssueRecorder();
 
     /**
      * @since 3.1.10
@@ -57,7 +56,7 @@ public interface ESApiMixin {
             });
         }
 
-        Handler<RoutineBaseIssueRecord<RoutineIssueRecord>> logRequestEnricher = log -> log
+        Handler<RoutineIssueRecord> logRequestEnricher = log -> log
                 .context(c -> c
                         .put("request", new JsonObject()
                                 .put("method", httpMethod.name())

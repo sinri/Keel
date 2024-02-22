@@ -2,7 +2,6 @@ package io.github.sinri.keel.test.lab.queue;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.servant.queue.KeelQueueTask;
 import io.github.sinri.keel.servant.queue.QueueTaskIssueRecord;
@@ -31,8 +30,8 @@ public class TestQueueTask extends KeelQueueTask {
      * @since 3.2.0
      */
     @Override
-    protected KeelIssueRecorder<RoutineBaseIssueRecord<QueueTaskIssueRecord>> prepareRoutineIssueRecord() {
-        KeelIssueRecorder<RoutineBaseIssueRecord<QueueTaskIssueRecord>> x = KeelIssueRecordCenter.outputCenter().generateRecorder("TestQueue", () -> new QueueTaskIssueRecord(getTaskReference(), getTaskCategory()));
+    protected KeelIssueRecorder<QueueTaskIssueRecord> prepareRoutineIssueRecord() {
+        KeelIssueRecorder<QueueTaskIssueRecord> x = KeelIssueRecordCenter.outputCenter().generateRecorder("TestQueue", () -> new QueueTaskIssueRecord(getTaskReference(), getTaskCategory()));
         x.setRecordFormatter(r -> r.context("id", id).context("life", life));
         return x;
     }

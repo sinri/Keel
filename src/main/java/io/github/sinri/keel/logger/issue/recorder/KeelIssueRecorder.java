@@ -4,7 +4,6 @@ import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
-import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
 import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.vertx.core.Handler;
 
@@ -28,8 +27,8 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>> {
         return new KeelIssueRecorderImpl<T>(issueRecordCenter, issueRecordBuilder, topic);
     }
 
-    static KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> buildForRoutine(@Nonnull KeelIssueRecordCenter issueRecordCenter, @Nonnull String topic) {
-        return new KeelRoutineIssueRecorder(issueRecordCenter, topic);
+    static KeelIssueRecorder<RoutineIssueRecord> buildForRoutine(@Nonnull KeelIssueRecordCenter issueRecordCenter, @Nonnull String topic) {
+        return new KeelIssueRecorderImpl<>(issueRecordCenter, () -> new RoutineIssueRecord(topic), topic);
     }
 
     @Nonnull
