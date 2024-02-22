@@ -1,8 +1,8 @@
-package io.github.sinri.keel.logger.event.adapter;
+package io.github.sinri.keel.logger.event.legacy.adapter;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.helper.KeelRuntimeHelper;
-import io.github.sinri.keel.logger.event.KeelEventLog;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 

@@ -1,4 +1,4 @@
-package io.github.sinri.keel.logger.event;
+package io.github.sinri.keel.logger.event.legacy;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.vertx.core.Future;

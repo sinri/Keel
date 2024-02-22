@@ -1,6 +1,6 @@
 package io.github.sinri.keel.facade.launcher;
 
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Launcher;
@@ -27,7 +27,7 @@ public final class KeelLauncher extends Launcher {
     /**
      * @since 3.2.0
      */
-    private KeelIssueRecorder<RoutineIssueRecord> routineIssueRecorder() {
+    private KeelIssueRecorder<KeelEventLog> routineIssueRecorder() {
         return this.adapter.routineIssueRecorder();
     }
 

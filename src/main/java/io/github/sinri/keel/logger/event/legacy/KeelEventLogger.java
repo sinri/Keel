@@ -1,48 +1,87 @@
-package io.github.sinri.keel.logger.event;
+package io.github.sinri.keel.logger.event.legacy;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
-import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
+import io.github.sinri.keel.logger.event.legacy.logger.KeelSilentEventLogger;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.function.Supplier;
 
 /**
- * @since 3.2.0
- * The brand new KeelEventLogger based on KeelIssueRecorder.
+ * @since 2.9.4
+ * @since 3.0.10 Add Bypass Loggers Support.
  */
 public interface KeelEventLogger {
-
-    static KeelEventLogger from(@Nonnull KeelIssueRecorder<KeelEventLog> issueRecorder) {
-        return () -> issueRecorder;
+    static KeelEventLogger silentLogger() {
+        return KeelSilentEventLogger.getInstance();
     }
 
     /**
      * @return Logs of this level or higher are visible.
+     * @since 3.0.11
      */
     @Nonnull
-    default KeelLogLevel getVisibleLevel() {
-        return this.getIssueRecorder().getVisibleLevel();
-    }
+    KeelLogLevel getVisibleLevel();
 
     /**
      * @param level Logs of this level or higher are visible.
+     * @since 3.0.11
      */
-    default void setVisibleLevel(@Nonnull KeelLogLevel level) {
-        this.getIssueRecorder().setVisibleLevel(level);
+    void setVisibleLevel(@Nonnull KeelLogLevel level);
+
+    /**
+     * Note: it is better to keep log center stable.
+     */
+    Supplier<KeelEventLogCenter> getEventLogCenterSupplier();
+
+    /**
+     * Note: if `getEventLogCenterSupplier` generate instances dynamically, the default implement would not affect.
+     */
+    default Future<Void> gracefullyCloseLogCenter() {
+        return getEventLogCenterSupplier().get().gracefullyClose();
     }
 
     @Nonnull
-    KeelIssueRecorder<KeelEventLog> getIssueRecorder();
+    String getPresetTopic();
 
     @Nonnull
-    default String getPresetTopic() {
-        return this.getIssueRecorder().topic();
-    }
+    Supplier<? extends KeelEventLog> getBaseLogBuilder();
+
+    void setBaseLogBuilder(@Nullable Supplier<? extends KeelEventLog> baseLogBuilder);
+
+    /**
+     * @since 3.0.10
+     * Add a bypass logger to this logger.
+     */
+    void addBypassLogger(@Nonnull KeelEventLogger bypassLogger);
+
+    /**
+     * @since 3.0.10
+     * Get the registered bypass loggers, which would be called to handle any logs received by this logger.
+     */
+    @Nonnull
+    List<KeelEventLogger> getBypassLoggers();
 
     default void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
-        this.getIssueRecorder().record(eventLogHandler);
+        KeelEventLog eventLog = getBaseLogBuilder().get();
+
+//        KeelEventLog eventLog = KeelEventLog.create(KeelLogLevel.INFO, getPresetTopic());
+//        Handler<KeelEventLog> presetEventLogEditor = getPresetEventLogEditor();
+//        if (presetEventLogEditor != null) {
+//            presetEventLogEditor.handle(eventLog);
+//        }
+
+        eventLogHandler.handle(eventLog);
+
+        if (eventLog.level().isEnoughSeriousAs(getVisibleLevel())) {
+            getEventLogCenterSupplier().get().log(eventLog);
+            // since 3.0.10, log to registered bypass loggers.
+            getBypassLoggers().forEach(bypassLogger -> bypassLogger.log(eventLogHandler));
+        }
     }
 
     default void debug(@Nonnull Handler<KeelEventLog> eventLogHandler) {
@@ -120,6 +159,10 @@ public interface KeelEventLogger {
         fatal(eventLog -> eventLog.message(msg));
     }
 
+    default Object processThrowable(@Nonnull Throwable throwable) {
+        return getEventLogCenterSupplier().get().processThrowable(throwable);
+    }
+
     default void exception(@Nonnull Throwable throwable) {
         exception(throwable, "Exception Occurred");
     }
@@ -142,7 +185,7 @@ public interface KeelEventLogger {
 
     default void exception(@Nonnull Throwable throwable, @Nonnull Handler<KeelEventLog> eventLogHandler) {
         error(eventLog -> {
-            eventLog.exception(throwable);
+            eventLog.exception(this.processThrowable(throwable));
             eventLogHandler.handle(eventLog);
         });
     }

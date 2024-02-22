@@ -2,8 +2,8 @@ package io.github.sinri.keel.facade;
 
 import io.github.sinri.keel.facade.cluster.KeelClusterKit;
 import io.github.sinri.keel.helper.KeelHelpersInterface;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
@@ -25,11 +25,11 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     /**
      * @since 3.2.0 replace Keel Event Logger.
      */
-    private KeelIssueRecorder<RoutineIssueRecord> issueRecorder;
+    private KeelIssueRecorder<KeelEventLog> issueRecorder;
 
     private KeelInstance() {
         this.configuration = KeelConfiguration.createFromJsonObject(new JsonObject());
-        this.issueRecorder = KeelIssueRecordCenter.outputCenter().generateRecorder("Keel", () -> new RoutineIssueRecord("Keel"));
+        this.issueRecorder = KeelIssueRecordCenter.outputCenter().generateRecorder("Keel", () -> new KeelEventLog("Keel"));
     }
 
     @Nonnull
@@ -105,14 +105,14 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     /**
      * @since 3.2.0
      */
-    public KeelIssueRecorder<RoutineIssueRecord> getIssueRecorder() {
+    public KeelIssueRecorder<KeelEventLog> getIssueRecorder() {
         return issueRecorder;
     }
 
     /**
      * @since 3.2.0
      */
-    public KeelInstance setIssueRecorder(KeelIssueRecorder<RoutineIssueRecord> issueRecorder) {
+    public KeelInstance setIssueRecorder(KeelIssueRecorder<KeelEventLog> issueRecorder) {
         this.issueRecorder = issueRecorder;
         return this;
     }

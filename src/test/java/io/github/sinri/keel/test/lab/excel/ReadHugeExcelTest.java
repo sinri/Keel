@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.lab.excel;
 
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.poi.excel.KeelSheet;
 import io.github.sinri.keel.poi.excel.KeelSheets;
@@ -21,7 +21,7 @@ public class ReadHugeExcelTest extends KeelTest {
     @Nonnull
     @Override
     protected Future<Void> starting() {
-        KeelIssueRecorder<RoutineIssueRecord> issueRecorder = KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder(getClass().getSimpleName());
+        KeelIssueRecorder<KeelEventLog> issueRecorder = KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder(getClass().getSimpleName());
         setIssueRecorder(issueRecorder);
 
 //        try {

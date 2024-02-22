@@ -1,8 +1,8 @@
 package io.github.sinri.keel.tesuto;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.core.Future;
 import io.vertx.core.VertxOptions;
@@ -24,7 +24,7 @@ abstract public class KeelTest {
     /**
      * @since 3.2.0
      */
-    private static KeelIssueRecorder<RoutineIssueRecord> issueRecorder;
+    private static KeelIssueRecorder<KeelEventLog> issueRecorder;
 
     /**
      * It is designed to be called by the subclasses in develop environment (e.g. in IDE).
@@ -122,14 +122,14 @@ abstract public class KeelTest {
     /**
      * @since 3.2.0
      */
-    protected KeelIssueRecorder<RoutineIssueRecord> getIssueRecorder() {
+    protected KeelIssueRecorder<KeelEventLog> getIssueRecorder() {
         return issueRecorder;
     }
 
     /**
      * @since 3.2.0
      */
-    protected void setIssueRecorder(KeelIssueRecorder<RoutineIssueRecord> issueRecorder) {
+    protected void setIssueRecorder(KeelIssueRecorder<KeelEventLog> issueRecorder) {
         KeelTest.issueRecorder = issueRecorder;
     }
 

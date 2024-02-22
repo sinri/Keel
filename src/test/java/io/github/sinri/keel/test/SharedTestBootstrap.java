@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test;
 
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
 import io.vertx.core.Handler;
 import io.vertx.core.VertxOptions;
 

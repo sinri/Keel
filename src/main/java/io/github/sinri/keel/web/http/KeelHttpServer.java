@@ -1,7 +1,7 @@
 package io.github.sinri.keel.web.http;
 
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Handler;
@@ -13,7 +13,7 @@ import io.vertx.ext.web.Router;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-abstract public class KeelHttpServer extends KeelVerticleBase<RoutineIssueRecord> {
+abstract public class KeelHttpServer extends KeelVerticleBase<KeelEventLog> {
     public static final String CONFIG_HTTP_SERVER_PORT = "http_server_port";
     public static final String CONFIG_HTTP_SERVER_OPTIONS = "http_server_options";
     public static final String CONFIG_IS_MAIN_SERVICE = "is_main_service";
@@ -79,9 +79,9 @@ abstract public class KeelHttpServer extends KeelVerticleBase<RoutineIssueRecord
     /**
      * @since 3.2.0
      */
-    protected KeelIssueRecorder<RoutineIssueRecord> createRoutineIssueRecorder() {
+    protected KeelIssueRecorder<KeelEventLog> createRoutineIssueRecorder() {
         String topic = getClass().getName();
-        return KeelIssueRecordCenter.outputCenter().generateRecorder(topic, () -> new RoutineIssueRecord(topic));
+        return KeelIssueRecordCenter.outputCenter().generateRecorder(topic, () -> new KeelEventLog(topic));
     }
 
     public void terminate(Promise<Void> promise) {

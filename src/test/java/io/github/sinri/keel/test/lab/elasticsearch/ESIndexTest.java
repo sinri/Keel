@@ -2,7 +2,7 @@ package io.github.sinri.keel.test.lab.elasticsearch;
 
 import io.github.sinri.keel.elasticsearch.ESApiMixin;
 import io.github.sinri.keel.elasticsearch.ElasticSearchKit;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.Future;
 import io.vertx.core.VertxOptions;

@@ -1,11 +1,11 @@
-package io.github.sinri.keel.logger.event.logger;
+package io.github.sinri.keel.logger.event.legacy.logger;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
-import io.github.sinri.keel.logger.event.KeelEventLog;
-import io.github.sinri.keel.logger.event.KeelEventLogCenter;
-import io.github.sinri.keel.logger.event.KeelEventLogImpl;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelSilentEventLogCenter;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLog;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLogCenter;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLogImpl;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLogger;
+import io.github.sinri.keel.logger.event.legacy.center.KeelSilentEventLogCenter;
 import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;

@@ -1,10 +1,10 @@
-package io.github.sinri.keel.logger.event.center;
+package io.github.sinri.keel.logger.event.legacy.center;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
-import io.github.sinri.keel.logger.event.KeelEventLog;
-import io.github.sinri.keel.logger.event.KeelEventLogImpl;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.adapter.OutputAdapter;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLog;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLogImpl;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLogger;
+import io.github.sinri.keel.logger.event.legacy.adapter.OutputAdapter;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 

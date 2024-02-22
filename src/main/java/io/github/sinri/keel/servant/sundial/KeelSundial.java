@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.sundial;
 
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 
@@ -15,7 +15,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 /**
  * @since 3.0.0
  */
-public abstract class KeelSundial extends KeelVerticleBase<RoutineIssueRecord> {
+public abstract class KeelSundial extends KeelVerticleBase<KeelEventLog> {
     private final Map<String, KeelSundialPlan> planMap = new ConcurrentHashMap<>();
     private Long timerID;
     private final AtomicInteger planFetchingSemaphore = new AtomicInteger(0);

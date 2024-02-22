@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.http.fastdocs.page;
 
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.ext.web.RoutingContext;
 
@@ -20,5 +20,5 @@ public class PageBuilderOptions {
     /**
      * @since 3.2.0
      */
-    public KeelIssueRecorder<RoutineIssueRecord> routineIssueRecorder;
+    public KeelIssueRecorder<KeelEventLog> routineIssueRecorder;
 }

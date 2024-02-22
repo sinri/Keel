@@ -1,7 +1,7 @@
 package io.github.sinri.keel.elasticsearch;
 
 import io.github.sinri.keel.elasticsearch.index.ESIndexMixin;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 
 import javax.annotation.Nonnull;
@@ -16,12 +16,12 @@ public class ElasticSearchKit implements ESApiMixin, ESIndexMixin {
     /**
      * @since 3.2.0
      */
-    private final KeelIssueRecorder<RoutineIssueRecord> routineIssueRecorder;
+    private final KeelIssueRecorder<KeelEventLog> routineIssueRecorder;
 
     /**
      * @since 3.2.0 replace KeelEventLogger with KeelRoutineIssueRecorder.
      */
-    public ElasticSearchKit(@Nonnull String esKey, @Nonnull KeelIssueRecorder<RoutineIssueRecord> routineIssueRecorder) {
+    public ElasticSearchKit(@Nonnull String esKey, @Nonnull KeelIssueRecorder<KeelEventLog> routineIssueRecorder) {
         this.esConfig = new ElasticSearchConfig(esKey);
         this.routineIssueRecorder = routineIssueRecorder;
     }
@@ -34,7 +34,7 @@ public class ElasticSearchKit implements ESApiMixin, ESIndexMixin {
      * @since 3.2.0
      */
     @Override
-    public KeelIssueRecorder<RoutineIssueRecord> getRoutineIssueRecorder() {
+    public KeelIssueRecorder<KeelEventLog> getRoutineIssueRecorder() {
         return routineIssueRecorder;
     }
 }

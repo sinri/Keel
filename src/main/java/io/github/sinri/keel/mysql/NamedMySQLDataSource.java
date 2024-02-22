@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.mysql.exception.KeelMySQLConnectionException;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;

@@ -1,12 +1,12 @@
 package io.github.sinri.keel.test.lab.launcher;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 
-public class TestMainVerticle extends KeelVerticleBase<RoutineIssueRecord> {
+public class TestMainVerticle extends KeelVerticleBase<KeelEventLog> {
 
 
     @Override

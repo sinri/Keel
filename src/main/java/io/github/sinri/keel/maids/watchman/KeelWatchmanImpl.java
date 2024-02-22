@@ -1,6 +1,6 @@
 package io.github.sinri.keel.maids.watchman;
 
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.eventbus.Message;
 import io.vertx.core.eventbus.MessageConsumer;
@@ -11,7 +11,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 /**
  * @since 2.9.3
  */
-abstract class KeelWatchmanImpl extends KeelVerticleBase<RoutineIssueRecord> implements KeelWatchman<RoutineIssueRecord> {
+abstract class KeelWatchmanImpl extends KeelVerticleBase<KeelEventLog> implements KeelWatchman<KeelEventLog> {
     private final String watchmanName;
     private MessageConsumer<Long> consumer;
 

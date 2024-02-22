@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.lab.launcher;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLogger;
+import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Launcher;
 import io.vertx.core.Vertx;

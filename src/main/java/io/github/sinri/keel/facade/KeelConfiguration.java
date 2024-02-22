@@ -1,7 +1,7 @@
 package io.github.sinri.keel.facade;
 
 import io.github.sinri.keel.core.json.JsonifiableEntity;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 

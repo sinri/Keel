@@ -1,9 +1,9 @@
 package io.github.sinri.keel.test.lab.logger;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.adapter.AsyncFilesWriterAdapter;
-import io.github.sinri.keel.logger.event.center.KeelAsyncEventLogCenter;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLogger;
+import io.github.sinri.keel.logger.event.legacy.adapter.AsyncFilesWriterAdapter;
+import io.github.sinri.keel.logger.event.legacy.center.KeelAsyncEventLogCenter;
 import io.vertx.core.Future;
 import io.vertx.core.VertxOptions;
 

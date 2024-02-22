@@ -2,9 +2,9 @@ package io.github.sinri.keel.logger.issue.recorder;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.KeelLogLevel;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
@@ -27,8 +27,8 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>> {
         return new KeelIssueRecorderImpl<T>(issueRecordCenter, issueRecordBuilder, topic);
     }
 
-    static KeelIssueRecorder<RoutineIssueRecord> buildForRoutine(@Nonnull KeelIssueRecordCenter issueRecordCenter, @Nonnull String topic) {
-        return new KeelIssueRecorderImpl<>(issueRecordCenter, () -> new RoutineIssueRecord(topic), topic);
+    static KeelIssueRecorder<KeelEventLog> buildForRoutine(@Nonnull KeelIssueRecordCenter issueRecordCenter, @Nonnull String topic) {
+        return new KeelIssueRecorderImpl<>(issueRecordCenter, () -> new KeelEventLog(topic), topic);
     }
 
     @Nonnull

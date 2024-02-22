@@ -1,9 +1,9 @@
 package io.github.sinri.keel.test.lab.blocking;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.event.KeelEventLog;
+import io.github.sinri.keel.logger.event.legacy.KeelEventLogger;
+import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
 
@@ -12,7 +12,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 /**
  * 这个解决方案的问题是只能有一个Verticle在worker模式跑，如果有多个异步任务，无法以池模式运行，只能排队。
  */
-public class BlockingVerticlePlanA extends KeelVerticleBase<RoutineIssueRecord> {
+public class BlockingVerticlePlanA extends KeelVerticleBase<KeelEventLog> {
 
     private static void block(Promise<Void> promise) {
         KeelEventLogger loggerInBlockingContext = KeelOutputEventLogCenter.getInstance().createLogger("Sample");
@@ -94,7 +94,7 @@ public class BlockingVerticlePlanA extends KeelVerticleBase<RoutineIssueRecord> 
 
     @Override
     public void start() throws Exception {
-        this.setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRecorder(getClass().getName(), () -> new RoutineIssueRecord(getClass().getName())));
+        this.setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRecorder(getClass().getName(), () -> new KeelEventLog(getClass().getName())));
     }
 
     public <T> Future<T> executeBlocking(Handler<Promise<T>> promiseHandler) {

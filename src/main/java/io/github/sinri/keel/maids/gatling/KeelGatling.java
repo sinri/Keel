@@ -1,7 +1,7 @@
 package io.github.sinri.keel.maids.gatling;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
+import io.github.sinri.keel.logger.event.KeelEventLog;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
 import io.vertx.core.shareddata.Counter;
@@ -19,7 +19,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @since 2.9.1
  * @since 2.9.3 change to VERTICLE
  */
-public class KeelGatling extends KeelVerticleBase<RoutineIssueRecord> {
+public class KeelGatling extends KeelVerticleBase<KeelEventLog> {
     private final Options options;
     private final AtomicInteger barrelUsed = new AtomicInteger(0);
 
