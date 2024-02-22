@@ -1,7 +1,8 @@
 package io.github.sinri.keel.elasticsearch;
 
-import io.github.sinri.keel.logger.event.KeelEventLog;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -25,7 +26,10 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 public interface ESApiMixin {
     ElasticSearchConfig getEsConfig();
 
-    KeelEventLogger getLogger();
+    /**
+     * @since 3.2.0
+     */
+    KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> getRoutineIssueRecorder();
 
     /**
      * @since 3.1.10
@@ -53,7 +57,7 @@ public interface ESApiMixin {
             });
         }
 
-        Handler<KeelEventLog> logRequestEnricher = log -> log
+        Handler<RoutineBaseIssueRecord<RoutineIssueRecord>> logRequestEnricher = log -> log
                 .context(c -> c
                         .put("request", new JsonObject()
                                 .put("method", httpMethod.name())
@@ -76,7 +80,7 @@ public interface ESApiMixin {
                     JsonObject resp = bufferHttpResponse.bodyAsJsonObject();
 
                     if ((statusCode >= 300 || statusCode < 200) || resp == null) {
-                        this.getLogger().error(log -> {
+                        this.getRoutineIssueRecorder().error(log -> {
                             logRequestEnricher.handle(log);
                             log.message("ES API Response Error")
                                     .context(c -> c
@@ -87,7 +91,7 @@ public interface ESApiMixin {
                         });
                         return Future.failedFuture("ES API: STATUS CODE IS " + statusCode + " | " + bufferHttpResponse.bodyAsString());
                     }
-                    this.getLogger().info(log -> {
+                    this.getRoutineIssueRecorder().info(log -> {
                         logRequestEnricher.handle(log);
                         log.message("ES API Response Error")
                                 .context(c -> c

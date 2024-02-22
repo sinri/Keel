@@ -2,6 +2,8 @@ package io.github.sinri.keel.logger.issue.center;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.logger.issue.recorder.adapter.KeelIssueRecorderAdapter;
 import io.github.sinri.keel.logger.issue.recorder.adapter.SyncStdoutAdapter;
@@ -14,12 +16,16 @@ import java.util.function.Supplier;
  */
 @TechnicalPreview(since = "3.1.10")
 public interface KeelIssueRecordCenter {
-    static KeelIssueRecordCenter OutputCenter() {
+    static KeelIssueRecordCenter outputCenter() {
         return new KeelIssueRecordCenterAsSync(SyncStdoutAdapter.getInstance());
     }
 
-    static KeelIssueRecordCenter SilentCenter() {
+    static KeelIssueRecordCenter silentCenter() {
         return KeelIssueRecordCenterAsSilent.getInstance();
+    }
+
+    static <X extends KeelIssueRecord<?>> KeelIssueRecorder<X> createSilentIssueRecorder() {
+        return silentCenter().generateRecorder("Silent", () -> null);
     }
 
     @Nonnull
@@ -32,4 +38,14 @@ public interface KeelIssueRecordCenter {
     default <T extends KeelIssueRecord<?>> KeelIssueRecorder<T> generateRecorder(@Nonnull String topic, @Nonnull Supplier<T> issueRecordBuilder) {
         return KeelIssueRecorder.build(this, issueRecordBuilder, topic);
     }
+
+//    @Nonnull
+//    default KeelIssueRecorder<RoutineIssueRecord> generateRoutineIssueRecorder(@Nonnull String topic) {
+//        return KeelIssueRecorder.buildForRoutine(this, topic);
+//    }
+
+    default KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> generateRoutineIssueRecorder(@Nonnull String topic) {
+        return KeelIssueRecorder.buildForRoutine(this, topic);
+    }
+
 }

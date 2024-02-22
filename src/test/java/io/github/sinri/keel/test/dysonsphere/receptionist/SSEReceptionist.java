@@ -1,9 +1,10 @@
 package io.github.sinri.keel.test.dysonsphere.receptionist;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.receptionist.KeelWebReceptionist;
+import io.github.sinri.keel.web.http.receptionist.ReceptionistIssueRecord;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
@@ -34,9 +35,7 @@ public class SSEReceptionist extends KeelWebReceptionist {
     }
 
     @Override
-    protected KeelEventLogger createLogger() {
-        return KeelOutputEventLogCenter.instantLogger();
+    protected KeelIssueRecorder<ReceptionistIssueRecord> createReceptionistIssueRecorder() {
+        return KeelIssueRecordCenter.outputCenter().generateRecorder(ReceptionistIssueRecord.TopicReceptionist, ReceptionistIssueRecord::new);
     }
-
-
 }

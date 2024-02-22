@@ -2,8 +2,8 @@ package io.github.sinri.keel.test.lab.elasticsearch;
 
 import io.github.sinri.keel.elasticsearch.ESApiMixin;
 import io.github.sinri.keel.elasticsearch.ElasticSearchKit;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.Future;
 import io.vertx.core.VertxOptions;
 
@@ -24,12 +24,12 @@ public class ESIndexTest {
     }
 
     private static Future<Void> test1() {
-        KeelEventLogger logger = KeelOutputEventLogCenter.getInstance().createLogger("ESIndexTest");
-        ElasticSearchKit es = new ElasticSearchKit("kumori", logger);
+        var issueRecorder = KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder("ESIndexTest");
+        ElasticSearchKit es = new ElasticSearchKit("kumori", issueRecorder);
 
         return es.indexGet("kumori-es-test-1", new ESApiMixin.ESApiQueries())
                 .compose(resp -> {
-                    logger.info(log -> log.message("API RESPONSE")
+                    issueRecorder.info(log -> log.message("API RESPONSE")
                             .context(c -> c.put("resp", resp)));
                     return Future.succeededFuture();
                 });

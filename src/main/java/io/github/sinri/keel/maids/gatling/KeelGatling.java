@@ -1,6 +1,7 @@
 package io.github.sinri.keel.maids.gatling;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
 import io.vertx.core.shareddata.Counter;
@@ -18,7 +19,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @since 2.9.1
  * @since 2.9.3 change to VERTICLE
  */
-public class KeelGatling extends KeelVerticleBase {
+public class KeelGatling extends KeelVerticleBase<RoutineIssueRecord> {
     private final Options options;
     private final AtomicInteger barrelUsed = new AtomicInteger(0);
 
@@ -30,7 +31,7 @@ public class KeelGatling extends KeelVerticleBase {
         Options options = new Options(gatlingName);
         optionHandler.handle(options);
         KeelGatling keelGatling = new KeelGatling(options);
-        return Keel.getVertx().deployVerticle(keelGatling, new DeploymentOptions().setWorker(true));
+        return Keel.getVertx().deployVerticle(keelGatling, new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER));
     }
 
     protected Future<Void> rest() {
@@ -51,7 +52,7 @@ public class KeelGatling extends KeelVerticleBase {
 
     private Future<Void> fireOnce() {
         if (barrelUsed.get() >= options.getBarrels()) {
-            getLogger().debug("BARREL FULL");
+            getRoutineIssueRecorder().debug(r -> r.message("BARREL FULL"));
             return rest();
         }
         return Future.succeededFuture()
@@ -65,9 +66,9 @@ public class KeelGatling extends KeelVerticleBase {
 
                     fireBullet(bullet, firedAR -> {
                         if (firedAR.failed()) {
-                            getLogger().exception(firedAR.cause(), "BULLET FIRED ERROR");
+                            getRoutineIssueRecorder().exception(firedAR.cause(), r -> r.message("BULLET FIRED ERROR"));
                         } else {
-                            getLogger().info("BULLET FIRED DONE");
+                            getRoutineIssueRecorder().info(r -> r.message("BULLET FIRED DONE"));
                         }
                         barrelUsed.decrementAndGet();
                     });
@@ -75,7 +76,7 @@ public class KeelGatling extends KeelVerticleBase {
                     return KeelAsyncKit.sleep(10L);
                 })
                 .recover(throwable -> {
-                    getLogger().exception(throwable, "FAILED TO LOAD BULLET");
+                    getRoutineIssueRecorder().exception(throwable, r -> r.message("FAILED TO LOAD BULLET"));
                     return rest();
                 });
     }

@@ -4,9 +4,13 @@ import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -24,6 +28,10 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>> {
         return new KeelIssueRecorderImpl<T>(issueRecordCenter, issueRecordBuilder, topic);
     }
 
+    static KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> buildForRoutine(@Nonnull KeelIssueRecordCenter issueRecordCenter, @Nonnull String topic) {
+        return new KeelRoutineIssueRecorder(issueRecordCenter, topic);
+    }
+
     @Nonnull
     KeelLogLevel getVisibleLevel();
 
@@ -38,8 +46,24 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>> {
     @Nonnull
     Supplier<T> issueRecordBuilder();
 
+    /**
+     * @since 3.2.0
+     */
+    void addBypassIssueRecorder(@Nonnull KeelIssueRecorder<T> bypassIssueRecorder);
+
+    /**
+     * @since 3.2.0
+     */
+    @Nonnull
+    List<KeelIssueRecorder<T>> getBypassIssueRecorders();
+
     @Nonnull
     String topic();
+
+    @Nullable
+    Handler<T> getRecordFormatter();
+
+    void setRecordFormatter(@Nullable Handler<T> handler);
 
     /**
      * Record an issue (created with `issueRecordBuilder` and modified with `issueHandler`).
@@ -50,9 +74,21 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>> {
     default void record(@Nonnull Handler<T> issueHandler) {
         T issue = this.issueRecordBuilder().get();
         issueHandler.handle(issue);
+
+        Handler<T> recordFormatter = getRecordFormatter();
+        if (recordFormatter != null) {
+            recordFormatter.handle(issue);
+        }
+
         if (issue.level().isEnoughSeriousAs(getVisibleLevel())) {
             this.issueRecordCenter().getAdapter().record(topic(), issue);
         }
+
+        getBypassIssueRecorders().forEach(keelIssueRecorder -> {
+            if (issue.level().isEnoughSeriousAs(keelIssueRecorder.getVisibleLevel())) {
+                keelIssueRecorder.issueRecordCenter().getAdapter().record(topic(), issue);
+            }
+        });
     }
 
     default void debug(@Nonnull Handler<T> issueHandler) {

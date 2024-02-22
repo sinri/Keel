@@ -1,23 +1,27 @@
 package io.github.sinri.keel.verticles;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.core.AbstractVerticle;
 
 import javax.annotation.Nonnull;
 
-abstract public class KeelVerticleBase extends AbstractVerticle implements KeelVerticle {
-    private KeelEventLogger logger;
+abstract public class KeelVerticleBase<T extends RoutineBaseIssueRecord<?>> extends AbstractVerticle implements KeelVerticle<T> {
+    private @Nonnull KeelIssueRecorder<RoutineBaseIssueRecord<T>> routineIssueRecorder;
 
     public KeelVerticleBase() {
-        this.logger = KeelEventLogger.silentLogger();
+        this.routineIssueRecorder = KeelIssueRecordCenter.createSilentIssueRecorder();
+    }
+
+    @Nonnull
+    @Override
+    public KeelIssueRecorder<RoutineBaseIssueRecord<T>> getRoutineIssueRecorder() {
+        return routineIssueRecorder;
     }
 
     @Override
-    final public @Nonnull KeelEventLogger getLogger() {
-        return logger;
-    }
-
-    final public void setLogger(@Nonnull KeelEventLogger logger) {
-        this.logger = logger;
+    public void setRoutineIssueRecorder(@Nonnull KeelIssueRecorder<RoutineBaseIssueRecord<T>> routineIssueRecorder) {
+        this.routineIssueRecorder = routineIssueRecorder;
     }
 }

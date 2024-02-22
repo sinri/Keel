@@ -2,6 +2,10 @@ package io.github.sinri.keel.test.lab.blocking;
 
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
 
@@ -12,14 +16,14 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  */
 public class BlockingVerticlePlanB {
     private static Future<Void> executeBlocking(Handler<Promise<Void>> blockCode) {
-        KeelEventLogger logger = KeelOutputEventLogCenter.getInstance().createLogger("Sample");
+        KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> issueRecorder = KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder("Sample");
         Promise<Void> promise = Promise.promise();
-        KeelVerticleBase verticle = new KeelVerticleBase() {
+        KeelVerticleBase<RoutineIssueRecord> verticle = new KeelVerticleBase<>() {
             @Override
             public void start() throws Exception {
-                this.setLogger(logger);
+                this.setRoutineIssueRecorder(issueRecorder);
 
-                getLogger().info("in verticle " + deploymentID());
+                getRoutineIssueRecorder().info(r -> r.message("in verticle " + deploymentID()));
                 blockCode.handle(promise);
 
                 promise.future()
@@ -28,9 +32,9 @@ public class BlockingVerticlePlanB {
                         });
             }
         };
-        return verticle.deployMe(new DeploymentOptions().setWorker(true))
+        return verticle.deployMe(new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER))
                 .compose(deploymentId -> {
-                    logger.info("deployed: " + deploymentId);
+                    issueRecorder.info(r -> r.message("deployed: " + deploymentId));
                     return promise.future();
                 });
     }

@@ -1,7 +1,11 @@
 package io.github.sinri.keel.elasticsearch;
 
 import io.github.sinri.keel.elasticsearch.index.ESIndexMixin;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
+
+import javax.annotation.Nonnull;
 
 /**
  * @see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.9/rest-apis.html">ES Restful API 8.9</a>
@@ -10,19 +14,28 @@ import io.github.sinri.keel.logger.event.KeelEventLogger;
  */
 public class ElasticSearchKit implements ESApiMixin, ESIndexMixin {
     private final ElasticSearchConfig esConfig;
-    private final KeelEventLogger logger;
+    /**
+     * @since 3.2.0
+     */
+    private final KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> routineIssueRecorder;
 
-    public ElasticSearchKit(String esKey, KeelEventLogger logger) {
+    /**
+     * @since 3.2.0 replace KeelEventLogger with KeelRoutineIssueRecorder.
+     */
+    public ElasticSearchKit(@Nonnull String esKey, @Nonnull KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> routineIssueRecorder) {
         this.esConfig = new ElasticSearchConfig(esKey);
-        this.logger = logger;
+        this.routineIssueRecorder = routineIssueRecorder;
     }
 
     public ElasticSearchConfig getEsConfig() {
         return esConfig;
     }
 
-    public KeelEventLogger getLogger() {
-        return logger;
+    /**
+     * @since 3.2.0
+     */
+    @Override
+    public KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> getRoutineIssueRecorder() {
+        return routineIssueRecorder;
     }
-
 }

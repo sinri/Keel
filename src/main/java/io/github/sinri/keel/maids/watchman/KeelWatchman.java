@@ -1,5 +1,6 @@
 package io.github.sinri.keel.maids.watchman;
 
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.vertx.core.Handler;
 
@@ -10,7 +11,7 @@ import io.vertx.core.Handler;
  *
  * @since 2.9.3
  */
-public interface KeelWatchman extends KeelVerticle {
+public interface KeelWatchman<T extends RoutineBaseIssueRecord<?>> extends KeelVerticle<T> {
 
     String watchmanName();
 

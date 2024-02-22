@@ -1,6 +1,7 @@
 package io.github.sinri.keel.servant.sundial;
 
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 
@@ -14,7 +15,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 /**
  * @since 3.0.0
  */
-public abstract class KeelSundial extends KeelVerticleBase {
+public abstract class KeelSundial extends KeelVerticleBase<RoutineIssueRecord> {
     private final Map<String, KeelSundialPlan> planMap = new ConcurrentHashMap<>();
     private Long timerID;
     private final AtomicInteger planFetchingSemaphore = new AtomicInteger(0);
@@ -22,7 +23,8 @@ public abstract class KeelSundial extends KeelVerticleBase {
     @Override
 
     public void start() throws Exception {
-        setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
+        setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder(getClass().getName()));
+        //setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
 
         long delaySeconds = 60 - (System.currentTimeMillis() / 1000) % 60;
         this.timerID = Keel.getVertx().setPeriodic(delaySeconds, 60_000L, timerID -> {

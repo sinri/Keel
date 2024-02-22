@@ -1,8 +1,6 @@
 package io.github.sinri.keel.test.lab.excel;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.poi.excel.KeelSheet;
 import io.github.sinri.keel.poi.excel.KeelSheets;
 import io.github.sinri.keel.tesuto.KeelTest;
@@ -16,18 +14,11 @@ import java.util.List;
 
 public class WriteHugeExcelTest extends KeelTest {
     private static final String file = "/Users/leqee/code/Keel/src/test/resources/excel/excel_3.xlsx";
-    private KeelEventLogger logger;
 
-    @Nonnull
-    @Override
-    protected KeelEventLogger logger() {
-        return logger;
-    }
 
     @Nonnull
     @Override
     protected Future<Void> starting() {
-        this.logger = KeelOutputEventLogCenter.getInstance().createLogger(getClass().getSimpleName());
         return Future.succeededFuture();
     }
 

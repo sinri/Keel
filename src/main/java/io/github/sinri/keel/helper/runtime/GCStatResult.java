@@ -156,7 +156,7 @@ public class GCStatResult implements RuntimeStatResult<GCStatResult> {
                 this.addGCTimeAsOld(gc.getCollectionTime());
             }
         } else {
-            Keel.getLogger().error(log -> log
+            Keel.getIssueRecorder().error(log -> log
                     .message("Found Unknown GarbageCollectorMXBean Name")
                     .context(new JsonObject()
                             .put("class", gc.getClass().getName())

@@ -1,41 +1,37 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
+
+import javax.annotation.Nonnull;
 
 /**
  * @since 2.1
  */
-public abstract class KeelQueueTask extends KeelVerticleBase {
+public abstract class KeelQueueTask extends KeelVerticleBase<QueueTaskIssueRecord> {
     QueueWorkerPoolManager queueWorkerPoolManager;
 
     final void setQueueWorkerPoolManager(QueueWorkerPoolManager queueWorkerPoolManager) {
         this.queueWorkerPoolManager = queueWorkerPoolManager;
     }
 
+    @Nonnull
     abstract public String getTaskReference();
 
+    @Nonnull
     abstract public String getTaskCategory();
 
-
-    abstract protected KeelEventLogger prepareLogger();
-
-
     /**
-     * 被设计在 seeker.get 方法中调用。
-     *
-     * @since 3.0.9 实践中，这个设计因为太绕了，没怎么用上，不如灭了。
+     * @since 3.2.0
      */
-    @Deprecated(since = "3.0.9", forRemoval = true)
-    public Future<Void> lockTaskBeforeDeployment() {
-        // 如果需要就重载此方法
-        return Future.succeededFuture();
-    }
+    abstract protected KeelIssueRecorder<RoutineBaseIssueRecord<QueueTaskIssueRecord>> prepareRoutineIssueRecord();
 
     // as verticle
     public final void start() {
-        setLogger(prepareLogger());
+        KeelIssueRecorder<RoutineBaseIssueRecord<QueueTaskIssueRecord>> issueRecorder = prepareRoutineIssueRecord();
+        setRoutineIssueRecorder(issueRecorder);
 
         this.queueWorkerPoolManager.whenOneWorkerStarts();
 
@@ -46,11 +42,11 @@ public abstract class KeelQueueTask extends KeelVerticleBase {
                 })
                 .compose(v -> run())
                 .recover(throwable -> {
-                    getLogger().exception(throwable, "KeelQueueTask Caught throwable from Method run");
+                    getRoutineIssueRecorder().exception(throwable, r -> r.message("KeelQueueTask Caught throwable from Method run"));
                     return Future.succeededFuture();
                 })
                 .eventually(() -> {
-                    getLogger().info("KeelQueueTask to undeploy");
+                    getRoutineIssueRecorder().info(r -> r.message("KeelQueueTask to undeploy"));
                     notifyBeforeUndeploy();
                     return undeployMe().onSuccess(done -> {
                         this.queueWorkerPoolManager.whenOneWorkerEnds();

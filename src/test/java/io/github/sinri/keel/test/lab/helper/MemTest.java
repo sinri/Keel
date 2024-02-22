@@ -39,11 +39,12 @@ public class MemTest extends KeelTest {
         double b = a * 2;
         double c = new Random().nextDouble();
         double x = 1.0 / ((b - a) * c - a * c);
-        logger().info("result", new JsonObject()
-                .put("x", x)
-                .put("isFinite", Double.isFinite(x))
-                .put("isInfinite", Double.isInfinite(x))
-                .put("isNaN", Double.isNaN(x))
+        getIssueRecorder().info(r -> r.context("result", new JsonObject()
+                        .put("x", x)
+                        .put("isFinite", Double.isFinite(x))
+                        .put("isInfinite", Double.isInfinite(x))
+                        .put("isNaN", Double.isNaN(x))
+                )
         );
 
 
@@ -53,20 +54,20 @@ public class MemTest extends KeelTest {
     private void printMemoryUsage() {
         MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
         MemoryUsage nonHeapMemoryUsage = memoryMXBean.getNonHeapMemoryUsage();
-        logger().info(log -> log.message("mem")
+        getIssueRecorder().info(log -> log.message("mem")
                 .context(c -> c
-                .put("heap", new JsonObject()
-                        .put("init", heapMemoryUsage.getInit() / (1024 * 2024 * 1.0))
-                        .put("used", heapMemoryUsage.getUsed() / (1024 * 2024 * 1.0))
-                        .put("committed", heapMemoryUsage.getCommitted() / (1024 * 2024 * 1.0))
-                        .put("max", heapMemoryUsage.getMax() / (1024 * 2024 * 1.0))
-                )
-                .put("non_heap", new JsonObject()
-                        .put("init", nonHeapMemoryUsage.getInit() / (1024 * 2024 * 1.0))
-                        .put("used", nonHeapMemoryUsage.getUsed() / (1024 * 2024 * 1.0))
-                        .put("committed", nonHeapMemoryUsage.getCommitted() / (1024 * 2024 * 1.0))
-                        .put("max", nonHeapMemoryUsage.getMax() / (1024 * 2024 * 1.0))
-                )
+                        .put("heap", new JsonObject()
+                                .put("init", heapMemoryUsage.getInit() / (1024 * 2024 * 1.0))
+                                .put("used", heapMemoryUsage.getUsed() / (1024 * 2024 * 1.0))
+                                .put("committed", heapMemoryUsage.getCommitted() / (1024 * 2024 * 1.0))
+                                .put("max", heapMemoryUsage.getMax() / (1024 * 2024 * 1.0))
+                        )
+                        .put("non_heap", new JsonObject()
+                                .put("init", nonHeapMemoryUsage.getInit() / (1024 * 2024 * 1.0))
+                                .put("used", nonHeapMemoryUsage.getUsed() / (1024 * 2024 * 1.0))
+                                .put("committed", nonHeapMemoryUsage.getCommitted() / (1024 * 2024 * 1.0))
+                                .put("max", nonHeapMemoryUsage.getMax() / (1024 * 2024 * 1.0))
+                        )
                 )
         );
     }
@@ -81,11 +82,11 @@ public class MemTest extends KeelTest {
 
     @TestUnit
     public Future<Void> test3() {
-        logger().info("point 1");
+        getIssueRecorder().info(r -> r.message("point 1"));
         AtomicInteger iRef = new AtomicInteger(2);
         Promise<Void> promise = Promise.promise();
         Keel.getVertx().setPeriodic(3000L, 2000L, timer -> {
-            logger().info("point 2");
+            getIssueRecorder().info(r -> r.message("point 2"));
             if (iRef.decrementAndGet() <= 0) {
                 if (Keel.getVertx().cancelTimer(timer)) {
                     promise.complete();

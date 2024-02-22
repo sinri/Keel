@@ -1,7 +1,5 @@
 package io.github.sinri.keel.web.http.receptionist;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.Handler;
@@ -17,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
@@ -42,7 +41,6 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
      */
     private final List<AuthorizationHandler> authorizationHandlers = new ArrayList<>();
     private final List<Handler<RoutingContext>> userHandlers = new ArrayList<>();
-    private final KeelEventLogger logger;
     private String uploadDirectory = BodyHandler.DEFAULT_UPLOADS_DIRECTORY;
     private String virtualHost = null;
     /**
@@ -53,7 +51,6 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
     public KeelWebReceptionistKit(Class<R> classOfReceptionist, Router router) {
         this.classOfReceptionist = classOfReceptionist;
         this.router = router;
-        this.logger = KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName());
     }
 
     public void loadPackage(String packageName) {
@@ -63,7 +60,7 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         try {
             allClasses.forEach(this::loadClass);
         } catch (Exception e) {
-            logger.exception(e, getClass().getName() + "::loadPackage THROWS");
+            Keel.getIssueRecorder().exception(e, r -> r.classification(getClass().getName(), "loadPackage"));
         }
     }
 
@@ -71,13 +68,13 @@ public class KeelWebReceptionistKit<R extends KeelWebReceptionist> {
         ApiMeta apiMeta = KeelHelpers.reflectionHelper().getAnnotationOfClass(c, ApiMeta.class);
         if (apiMeta == null) return;
 
-        logger.debug(getClass().getName() + " Loading " + c.getName());
+        Keel.getIssueRecorder().debug(r -> r.classification(getClass().getName(), "loadClass").message("Loading " + c.getName()));
 
         Constructor<? extends R> receptionistConstructor;
         try {
             receptionistConstructor = c.getConstructor(RoutingContext.class);
         } catch (NoSuchMethodException e) {
-            logger.exception(e, "HANDLER REFLECTION EXCEPTION");
+            Keel.getIssueRecorder().exception(e, r -> r.classification(getClass().getName(), "loadClass").message("HANDLER REFLECTION EXCEPTION"));
             return;
         }
 

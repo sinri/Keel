@@ -2,6 +2,8 @@ package io.github.sinri.keel.test.lab.blocking;
 
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.*;
 
@@ -10,7 +12,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 /**
  * 这个解决方案的问题是只能有一个Verticle在worker模式跑，如果有多个异步任务，无法以池模式运行，只能排队。
  */
-public class BlockingVerticlePlanA extends KeelVerticleBase {
+public class BlockingVerticlePlanA extends KeelVerticleBase<RoutineIssueRecord> {
 
     private static void block(Promise<Void> promise) {
         KeelEventLogger loggerInBlockingContext = KeelOutputEventLogCenter.getInstance().createLogger("Sample");
@@ -39,7 +41,7 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
                                 loggerInEventLoopContext.info(log -> log
                                         .message("deployed: " + deploymentId)
                                         .context(c -> c
-                                        .put("thread_id", Thread.currentThread().getId())
+                                                .put("thread_id", Thread.currentThread().getId())
                                         )
                                 );
 
@@ -57,7 +59,7 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
                                 loggerInEventLoopContext.info(log -> log
                                         .message("FIN")
                                         .context(c -> c
-                                        .put("thread_id", Thread.currentThread().getId())
+                                                .put("thread_id", Thread.currentThread().getId())
                                         )
                                 );
                                 return Future.succeededFuture();
@@ -75,7 +77,7 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
         loggerInEventLoopContext.info(log -> log
                 .message("here before executeBlocking handler")
                 .context(c -> c
-                .put("thread_id", Thread.currentThread().getId())
+                        .put("thread_id", Thread.currentThread().getId())
                 )
         );
         return futureForBlocking.executeBlocking(event -> {
@@ -83,7 +85,7 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
             loggerInEventLoopContext.info(log -> log
                     .message("here in executeBlocking handler")
                     .context(c -> c
-                    .put("thread_id", Thread.currentThread().getId())
+                            .put("thread_id", Thread.currentThread().getId())
                     )
             );
             block(event);
@@ -92,7 +94,7 @@ public class BlockingVerticlePlanA extends KeelVerticleBase {
 
     @Override
     public void start() throws Exception {
-        this.setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
+        this.setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRecorder(getClass().getName(), () -> new RoutineIssueRecord(getClass().getName())));
     }
 
     public <T> Future<T> executeBlocking(Handler<Promise<T>> promiseHandler) {

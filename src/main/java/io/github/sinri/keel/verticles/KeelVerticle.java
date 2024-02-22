@@ -1,27 +1,32 @@
 package io.github.sinri.keel.verticles;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Verticle;
 import io.vertx.core.json.JsonObject;
 
+import javax.annotation.Nonnull;
+
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 1.14
  */
-public interface KeelVerticle extends Verticle {
-
-    KeelEventLogger getLogger();
+public interface KeelVerticle<T extends RoutineBaseIssueRecord<?>> extends Verticle {
 
     /**
-     * @since 2.4 do not rely on context anymore
-     * @since 2.7 became public
-     * @since 2.9.3 become optional with nothing to do
+     * @since 3.2.0
      */
-    void setLogger(KeelEventLogger logger);
+    @Nonnull
+    KeelIssueRecorder<RoutineBaseIssueRecord<T>> getRoutineIssueRecorder();
+
+    /**
+     * @since 3.2.0
+     */
+    void setRoutineIssueRecorder(@Nonnull KeelIssueRecorder<RoutineBaseIssueRecord<T>> routineIssueRecorder);
 
     /**
      * copied from AbstractVerticle

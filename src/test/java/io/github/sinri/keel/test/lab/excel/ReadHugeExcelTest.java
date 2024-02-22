@@ -1,7 +1,9 @@
 package io.github.sinri.keel.test.lab.excel;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.record.event.RoutineBaseIssueRecord;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.poi.excel.KeelSheet;
 import io.github.sinri.keel.poi.excel.KeelSheets;
 import io.github.sinri.keel.tesuto.KeelTest;
@@ -16,19 +18,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ReadHugeExcelTest extends KeelTest {
     private static final String file = "/Users/leqee/code/Keel/src/test/resources/excel/excel_0.xlsx";
-    private KeelEventLogger logger;
-//    private KeelSheets sheets;
-
-    @Nonnull
-    @Override
-    protected KeelEventLogger logger() {
-        return logger;
-    }
 
     @Nonnull
     @Override
     protected Future<Void> starting() {
-        this.logger = KeelOutputEventLogCenter.getInstance().createLogger(getClass().getSimpleName());
+        KeelIssueRecorder<RoutineBaseIssueRecord<RoutineIssueRecord>> issueRecorder = KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder(getClass().getSimpleName());
+        setIssueRecorder(issueRecorder);
+
 //        try {
 //            this.excelStreamReader = new KeelStreamSheets(file);
 //        } catch (IOException e) {
@@ -64,7 +60,7 @@ public class ReadHugeExcelTest extends KeelTest {
             x.incrementAndGet();
         });
         excelStreamReader.close();
-        this.logger().info("FIN 1 " + x.get());
+        this.getIssueRecorder().info(r -> r.message("FIN 1 " + x.get()));
 
         return Future.succeededFuture();
     }
@@ -90,7 +86,7 @@ public class ReadHugeExcelTest extends KeelTest {
                     excelStreamReader.close();
                 })
                 .compose(v -> {
-                    this.logger().info("FIN 2 " + x.get());
+                    this.getIssueRecorder().info(r -> r.message("FIN 2 " + x.get()));
                     return Future.succeededFuture();
                 });
     }

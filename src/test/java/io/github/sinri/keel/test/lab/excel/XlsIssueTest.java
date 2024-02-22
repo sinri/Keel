@@ -36,7 +36,7 @@ public class XlsIssueTest extends KeelTest {
             return keelSheet.readAllRowsToMatrix()
                     .compose(matrix -> {
                         matrix.getRawRowList().forEach(rawRow -> {
-                            logger().info("row: " + rawRow.toString());
+                            getIssueRecorder().info(r -> r.message("row: " + rawRow.toString()));
                         });
                         return Future.succeededFuture();
                     });

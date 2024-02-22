@@ -1,6 +1,7 @@
 package io.github.sinri.keel.servant.funnel;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
@@ -14,7 +15,7 @@ import java.util.function.Supplier;
 /**
  * @since 3.0.0
  */
-public class KeelFunnel extends KeelVerticleBase {
+public class KeelFunnel extends KeelVerticleBase<RoutineIssueRecord> {
     /**
      * The interrupt, to stop sleeping when idle time ends (a new task comes).
      */
@@ -70,7 +71,7 @@ public class KeelFunnel extends KeelVerticleBase {
                                     //getLogger().debug("funnel done");
                                     return Future.succeededFuture();
                                 }, throwable -> {
-                                    getLogger().exception(throwable, "funnel task error");
+                                    getRoutineIssueRecorder().exception(throwable, r -> r.message("funnel task error"));
                                     return Future.succeededFuture();
                                 });
                     })

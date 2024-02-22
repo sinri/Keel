@@ -1,6 +1,6 @@
 package io.github.sinri.keel.web.http.receptionist;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.http.impl.CookieImpl;
 import io.vertx.core.json.JsonObject;
@@ -9,7 +9,6 @@ import io.vertx.ext.web.RoutingContext;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
@@ -19,23 +18,27 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
  */
 public abstract class KeelWebReceptionist {
     private final RoutingContext routingContext;
-    private final KeelEventLogger logger;
+    private final KeelIssueRecorder<ReceptionistIssueRecord> issueRecorder;
 
     public KeelWebReceptionist(RoutingContext routingContext) {
         this.routingContext = routingContext;
-        this.logger = createLogger();
-        // since 3.1.10
-        this.logger.setBaseLogBuilder((Supplier<KeelWebReceptionistRequestEventLog>) () -> new KeelWebReceptionistRequestEventLog(logger.getPresetTopic(), routingContext));
+        this.issueRecorder = createReceptionistIssueRecorder();
     }
 
     protected RoutingContext getRoutingContext() {
         return routingContext;
     }
 
-    abstract protected KeelEventLogger createLogger();
+    /**
+     * @since 3.2.0
+     */
+    abstract protected KeelIssueRecorder<ReceptionistIssueRecord> createReceptionistIssueRecorder();
 
-    public KeelEventLogger getLogger() {
-        return logger;
+    /**
+     * @since 3.2.0
+     */
+    public KeelIssueRecorder<ReceptionistIssueRecord> getIssueRecorder() {
+        return issueRecorder;
     }
 
     abstract public void handle();
@@ -44,15 +47,13 @@ public abstract class KeelWebReceptionist {
         try {
             routingContext.json(resp);
         } catch (Throwable throwable) {
-            logger.exception(throwable, event -> event
+            getIssueRecorder().exception(throwable, event -> event
                     .message("RoutingContext has been dealt by others")
-                    .context(c -> c
-                            .put("response", new JsonObject()
-                                    .put("code", routingContext.response().getStatusCode())
-                                    .put("message", routingContext.response().getStatusMessage())
-                                    .put("ended", routingContext.response().ended())
-                                    .put("closed", routingContext.response().closed())
-                            )
+                    .setResponse(
+                            routingContext.response().getStatusCode(),
+                            routingContext.response().getStatusMessage(),
+                            routingContext.response().ended(),
+                            routingContext.response().closed()
                     )
             );
         }
@@ -66,7 +67,7 @@ public abstract class KeelWebReceptionist {
                 .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                 .put("code", "OK")
                 .put("data", data);
-        logger.info(event -> event.message("RESPOND SUCCESS"));
+        getIssueRecorder().info(r -> r.message("SUCCESS, TO RESPOND."));
         respondWithJsonObject(resp);
     }
 
@@ -80,7 +81,7 @@ public abstract class KeelWebReceptionist {
                 .put("data", throwable.getMessage());
         String error = KeelHelpers.stringHelper().renderThrowableChain(throwable);
         resp.put("throwable", error);
-        logger.exception(throwable, event -> event.message("RESPOND FAILURE"));
+        getIssueRecorder().exception(throwable, r -> r.message("FAILED, TO RESPOND."));
         respondWithJsonObject(resp);
     }
 
@@ -130,4 +131,5 @@ public abstract class KeelWebReceptionist {
     protected void removeCookie(String name) {
         getRoutingContext().response().removeCookie(name);
     }
+
 }

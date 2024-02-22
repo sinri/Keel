@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.dysonsphere;
 
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.web.http.KeelHttpServer;
 import io.github.sinri.keel.web.http.fastdocs.KeelFastDocsKit;
 import io.github.sinri.keel.web.http.receptionist.KeelWebReceptionist;
@@ -16,7 +16,10 @@ public class DSHttpServer extends KeelHttpServer {
                 "web_root/fastdocs/",
                 "Dyson Sphere FastDocs",
                 "Copyright 2022 Sinri Edogawa",
-                KeelOutputEventLogCenter.getInstance().createLogger("FastDocs")
+                KeelIssueRecordCenter.outputCenter()
+                        .generateRoutineIssueRecorder("FastDocs")
+                //.generateRecorder("FastDocs",()-> new RoutineIssueRecord("FastDocs"))
+                //KeelOutputEventLogCenter.getInstance().createLogger("FastDocs")
         );
 
         new KeelWebReceptionistKit<KeelWebReceptionist>(KeelWebReceptionist.class, router)

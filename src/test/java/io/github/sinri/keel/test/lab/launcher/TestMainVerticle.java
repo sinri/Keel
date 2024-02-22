@@ -1,19 +1,20 @@
 package io.github.sinri.keel.test.lab.launcher;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.record.event.RoutineIssueRecord;
 import io.github.sinri.keel.verticles.KeelVerticleBase;
 import io.vertx.core.Future;
 
-public class TestMainVerticle extends KeelVerticleBase {
+public class TestMainVerticle extends KeelVerticleBase<RoutineIssueRecord> {
 
 
     @Override
     public void start() throws Exception {
-        setLogger(KeelOutputEventLogCenter.instantLogger());
+        setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRoutineIssueRecorder(getClass().getName()));
 
         KeelAsyncKit.endless(() -> {
-            getLogger().info("X");
+            getRoutineIssueRecorder().info(r -> r.message("X"));
             return Future.succeededFuture();
         });
     }
