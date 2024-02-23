@@ -1,7 +1,6 @@
 package io.github.sinri.keel.facade.launcher;
 
-import io.github.sinri.keel.logger.event.KeelEventLog;
-import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.impl.launcher.VertxLifecycleHooks;
@@ -35,7 +34,7 @@ public interface KeelLauncherAdapter extends VertxLifecycleHooks {
     /**
      * @since 3.2.0
      */
-    KeelIssueRecorder<KeelEventLog> routineIssueRecorder();
+    KeelEventLogger eventLogger();
 
 
     void beforeStoppingVertx();

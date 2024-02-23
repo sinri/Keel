@@ -1,7 +1,6 @@
 package io.github.sinri.keel.facade.launcher;
 
-import io.github.sinri.keel.logger.event.KeelEventLog;
-import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Launcher;
 import io.vertx.core.Vertx;
@@ -27,13 +26,13 @@ public final class KeelLauncher extends Launcher {
     /**
      * @since 3.2.0
      */
-    private KeelIssueRecorder<KeelEventLog> routineIssueRecorder() {
-        return this.adapter.routineIssueRecorder();
+    private KeelEventLogger eventLogger() {
+        return this.adapter.eventLogger();
     }
 
     @Override
     public void afterConfigParsed(JsonObject config) {
-        routineIssueRecorder().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("afterConfigParsed")
                 .context(c -> c
                         .put("config", config)
@@ -45,7 +44,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void beforeStartingVertx(VertxOptions options) {
-        routineIssueRecorder().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("beforeStartingVertx")
                 .context(c -> c
                         .put("VertxOptions", options.toJson())
@@ -57,7 +56,7 @@ public final class KeelLauncher extends Launcher {
     @Override
     public void afterStartingVertx(Vertx vertx) {
         Keel.setVertx(vertx);
-        routineIssueRecorder().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("afterStartingVertx")
         );
         this.adapter.afterStartingVertx(vertx);
@@ -65,7 +64,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void beforeDeployingVerticle(DeploymentOptions deploymentOptions) {
-        routineIssueRecorder().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("beforeDeployingVerticle")
                 .context(c -> c
                         .put("VertxOptions", deploymentOptions.toJson())
@@ -81,7 +80,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void beforeStoppingVertx(Vertx vertx) {
-        routineIssueRecorder().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("beforeStoppingVertx")
         );
         this.adapter.beforeStoppingVertx();
@@ -89,7 +88,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void afterStoppingVertx() {
-        routineIssueRecorder().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("afterStoppingVertx")
         );
         this.adapter.afterStoppingVertx();
