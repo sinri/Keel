@@ -7,8 +7,10 @@ import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.logger.issue.recorder.adapter.KeelIssueRecorderAdapter;
 import io.github.sinri.keel.logger.issue.recorder.adapter.SyncStdoutAdapter;
+import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 /**
@@ -39,19 +41,14 @@ public interface KeelIssueRecordCenter {
         return KeelIssueRecorder.build(this, issueRecordBuilder, topic);
     }
 
-    /**
-     * @param issueRecordBuilder Sample for silent: {@code Supplier<T> issueRecordBuilder= () -> null;}
-     * @deprecated use generateIssueRecorder instead
-     */
-    @Nonnull
-    @Deprecated(forRemoval = true)
-    default <T extends KeelIssueRecord<?>> KeelIssueRecorder<T> generateRecorder(@Nonnull String topic, @Nonnull Supplier<T> issueRecordBuilder) {
-        return generateIssueRecorder(topic, issueRecordBuilder);
-    }
-
     @Nonnull
     default KeelEventLogger generateEventLogger(@Nonnull String topic) {
         return KeelEventLogger.from(generateIssueRecorderForEventLogger(topic));
+    }
+
+    @Nonnull
+    default KeelEventLogger generateEventLogger(@Nonnull String topic, @Nullable Handler<KeelEventLog> templateEventLogEditor) {
+        return KeelEventLogger.from(generateIssueRecorderForEventLogger(topic), templateEventLogEditor);
     }
 
     @Nonnull

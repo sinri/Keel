@@ -15,8 +15,27 @@ import javax.annotation.Nullable;
 public interface KeelEventLogger {
 
     static KeelEventLogger from(@Nonnull KeelIssueRecorder<KeelEventLog> issueRecorder) {
-        return () -> issueRecorder;
+        return from(issueRecorder, null);
     }
+
+    static KeelEventLogger from(@Nonnull KeelIssueRecorder<KeelEventLog> issueRecorder, @Nullable Handler<KeelEventLog> templateEventLogEditor) {
+        return new KeelEventLogger() {
+            @Nullable
+            @Override
+            public Handler<KeelEventLog> templateEventLogEditor() {
+                return templateEventLogEditor;
+            }
+
+            @Nonnull
+            @Override
+            public KeelIssueRecorder<KeelEventLog> getIssueRecorder() {
+                return issueRecorder;
+            }
+        };
+    }
+
+    @Nullable
+    Handler<KeelEventLog> templateEventLogEditor();
 
     /**
      * @return Logs of this level or higher are visible.
