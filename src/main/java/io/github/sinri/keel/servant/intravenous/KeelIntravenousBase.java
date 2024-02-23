@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.intravenous;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.verticles.KeelVerticleBase;
+import io.github.sinri.keel.verticles.KeelVerticleImplWithEventLog;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @param <T>
  * @since 3.0.1 redesigned from the original KeelIntravenous
  */
-abstract public class KeelIntravenousBase<T> extends KeelVerticleBase {
+abstract public class KeelIntravenousBase<T> extends KeelVerticleImplWithEventLog {
     private final Queue<T> queue;
     private final AtomicReference<Promise<Void>> interruptRef;
     protected long sleepTime = 1_000L;

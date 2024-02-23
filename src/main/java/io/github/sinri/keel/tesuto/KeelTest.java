@@ -127,8 +127,8 @@ abstract public class KeelTest {
     /**
      * @since 3.2.0
      */
-    protected void setLogger(KeelEventLogger issueRecorder) {
-        KeelTest.eventLogger = issueRecorder;
+    protected void setLogger(KeelEventLogger eventLogger) {
+        KeelTest.eventLogger = eventLogger;
     }
 
     protected @Nonnull Future<Void> starting() {

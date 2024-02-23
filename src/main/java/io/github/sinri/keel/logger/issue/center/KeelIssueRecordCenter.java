@@ -25,7 +25,7 @@ public interface KeelIssueRecordCenter {
     }
 
     static <X extends KeelIssueRecord<?>> KeelIssueRecorder<X> createSilentIssueRecorder() {
-        return silentCenter().generateRecorder("Silent", () -> null);
+        return silentCenter().generateIssueRecorder("Silent", () -> null);
     }
 
     @Nonnull
@@ -35,8 +35,18 @@ public interface KeelIssueRecordCenter {
      * @param issueRecordBuilder Sample for silent: {@code Supplier<T> issueRecordBuilder= () -> null;}
      */
     @Nonnull
-    default <T extends KeelIssueRecord<?>> KeelIssueRecorder<T> generateRecorder(@Nonnull String topic, @Nonnull Supplier<T> issueRecordBuilder) {
+    default <T extends KeelIssueRecord<?>> KeelIssueRecorder<T> generateIssueRecorder(@Nonnull String topic, @Nonnull Supplier<T> issueRecordBuilder) {
         return KeelIssueRecorder.build(this, issueRecordBuilder, topic);
+    }
+
+    /**
+     * @param issueRecordBuilder Sample for silent: {@code Supplier<T> issueRecordBuilder= () -> null;}
+     * @deprecated use generateIssueRecorder instead
+     */
+    @Nonnull
+    @Deprecated(forRemoval = true)
+    default <T extends KeelIssueRecord<?>> KeelIssueRecorder<T> generateRecorder(@Nonnull String topic, @Nonnull Supplier<T> issueRecordBuilder) {
+        return generateIssueRecorder(topic, issueRecordBuilder);
     }
 
     @Nonnull
@@ -46,7 +56,7 @@ public interface KeelIssueRecordCenter {
 
     @Nonnull
     default KeelIssueRecorder<KeelEventLog> generateIssueRecorderForEventLogger(@Nonnull String topic) {
-        return generateRecorder(topic, () -> new KeelEventLog(topic));
+        return generateIssueRecorder(topic, () -> new KeelEventLog(topic));
     }
 
 }

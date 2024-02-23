@@ -20,7 +20,7 @@ abstract public class AbstractStatement implements AnyStatement {
      * @since 3.2.0 replace original SQL Audit Logger
      */
     protected static @Nonnull KeelIssueRecorder<MySQLAuditIssueRecord> sqlAuditIssueRecorder = KeelIssueRecordCenterAsSilent.getInstance()
-            .generateRecorder(MySQLAuditIssueRecord.AttributeMysqlAudit, MySQLAuditIssueRecord::new);
+            .generateIssueRecorder(MySQLAuditIssueRecord.AttributeMysqlAudit, MySQLAuditIssueRecord::new);
     protected static @Nonnull String SQL_COMPONENT_SEPARATOR = " ";//"\n";
     protected final @Nonnull String statement_uuid;
     private @Nonnull String remarkAsComment = "";

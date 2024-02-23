@@ -32,7 +32,7 @@ abstract class KeelWatchmanImpl extends KeelVerticleBase<KeelEventLog> implement
     public void start() {
         this.consumer = Keel.getVertx().eventBus().consumer(eventBusAddress());
         this.consumer.handler(this::consumeHandleMassage);
-        this.consumer.exceptionHandler(throwable -> getRoutineIssueRecorder()
+        this.consumer.exceptionHandler(throwable -> getIssueRecorder()
                 .exception(throwable, r -> r.message(watchmanName() + " ERROR")));
 
         try {
@@ -52,19 +52,19 @@ abstract class KeelWatchmanImpl extends KeelVerticleBase<KeelEventLog> implement
 
     protected void consumeHandleMassage(Message<Long> message) {
         Long timestamp = message.body();
-        getRoutineIssueRecorder().debug(r -> r.message(watchmanName() + " TRIGGERED FOR " + timestamp));
+        getIssueRecorder().debug(r -> r.message(watchmanName() + " TRIGGERED FOR " + timestamp));
 
         long x = timestamp / interval();
         Keel.getVertx().sharedData().getLockWithTimeout(eventBusAddress() + "@" + x, Math.min(3_000L, interval() - 1), lockAR -> {
             if (lockAR.failed()) {
-                getRoutineIssueRecorder().warning(r -> r.message("LOCK ACQUIRE FAILED FOR " + timestamp + " i.e. " + x));
+                getIssueRecorder().warning(r -> r.message("LOCK ACQUIRE FAILED FOR " + timestamp + " i.e. " + x));
             } else {
                 Lock lock = lockAR.result();
-                getRoutineIssueRecorder().info(r -> r.message("LOCK ACQUIRED FOR " + timestamp + " i.e. " + x));
+                getIssueRecorder().info(r -> r.message("LOCK ACQUIRED FOR " + timestamp + " i.e. " + x));
                 regularHandler().handle(timestamp);
                 Keel.getVertx().setTimer(interval(), timerID -> {
                     lock.release();
-                    getRoutineIssueRecorder().info(r -> r.message("LOCK RELEASED FOR " + timestamp + " i.e. " + x));
+                    getIssueRecorder().info(r -> r.message("LOCK RELEASED FOR " + timestamp + " i.e. " + x));
                 });
             }
         });

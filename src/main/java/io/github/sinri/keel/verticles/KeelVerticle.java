@@ -21,12 +21,12 @@ public interface KeelVerticle<T extends KeelIssueRecord<T>> extends Verticle {
      * @since 3.2.0
      */
     @Nonnull
-    KeelIssueRecorder<T> getRoutineIssueRecorder();
+    KeelIssueRecorder<T> getIssueRecorder();
 
     /**
      * @since 3.2.0
      */
-    void setRoutineIssueRecorder(@Nonnull KeelIssueRecorder<T> routineIssueRecorder);
+    void setIssueRecorder(@Nonnull KeelIssueRecorder<T> issueRecorder);
 
     /**
      * copied from AbstractVerticle

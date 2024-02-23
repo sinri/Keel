@@ -94,7 +94,7 @@ public class BlockingVerticlePlanA extends KeelVerticleBase<KeelEventLog> {
 
     @Override
     public void start() throws Exception {
-        this.setRoutineIssueRecorder(KeelIssueRecordCenter.outputCenter().generateRecorder(getClass().getName(), () -> new KeelEventLog(getClass().getName())));
+        this.setIssueRecorder(KeelIssueRecordCenter.outputCenter().generateIssueRecorder(getClass().getName(), () -> new KeelEventLog(getClass().getName())));
     }
 
     public <T> Future<T> executeBlocking(Handler<Promise<T>> promiseHandler) {

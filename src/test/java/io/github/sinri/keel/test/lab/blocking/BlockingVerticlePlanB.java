@@ -14,14 +14,14 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  */
 public class BlockingVerticlePlanB {
     private static Future<Void> executeBlocking(Handler<Promise<Void>> blockCode) {
-        var issueRecorder = KeelIssueRecordCenter.outputCenter().generateRecorder("Sample", () -> new KeelEventLog("Sample"));
+        var issueRecorder = KeelIssueRecordCenter.outputCenter().generateIssueRecorder("Sample", () -> new KeelEventLog("Sample"));
         Promise<Void> promise = Promise.promise();
         KeelVerticleBase<KeelEventLog> verticle = new KeelVerticleBase<>() {
             @Override
             public void start() throws Exception {
-                this.setRoutineIssueRecorder(issueRecorder);
+                this.setIssueRecorder(issueRecorder);
 
-                getRoutineIssueRecorder().info(r -> r.message("in verticle " + deploymentID()));
+                getIssueRecorder().info(r -> r.message("in verticle " + deploymentID()));
                 blockCode.handle(promise);
 
                 promise.future()

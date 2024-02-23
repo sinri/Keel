@@ -30,7 +30,7 @@ public abstract class KeelQueueTask extends KeelVerticleBase<QueueTaskIssueRecor
     // as verticle
     public final void start() {
         KeelIssueRecorder<QueueTaskIssueRecord> issueRecorder = prepareRoutineIssueRecord();
-        setRoutineIssueRecorder(issueRecorder);
+        setIssueRecorder(issueRecorder);
 
         this.queueWorkerPoolManager.whenOneWorkerStarts();
 
@@ -41,11 +41,11 @@ public abstract class KeelQueueTask extends KeelVerticleBase<QueueTaskIssueRecor
                 })
                 .compose(v -> run())
                 .recover(throwable -> {
-                    getRoutineIssueRecorder().exception(throwable, r -> r.message("KeelQueueTask Caught throwable from Method run"));
+                    getIssueRecorder().exception(throwable, r -> r.message("KeelQueueTask Caught throwable from Method run"));
                     return Future.succeededFuture();
                 })
                 .eventually(() -> {
-                    getRoutineIssueRecorder().info(r -> r.message("KeelQueueTask to undeploy"));
+                    getIssueRecorder().info(r -> r.message("KeelQueueTask to undeploy"));
                     notifyBeforeUndeploy();
                     return undeployMe().onSuccess(done -> {
                         this.queueWorkerPoolManager.whenOneWorkerEnds();

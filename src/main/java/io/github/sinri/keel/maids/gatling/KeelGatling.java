@@ -52,7 +52,7 @@ public class KeelGatling extends KeelVerticleBase<KeelEventLog> {
 
     private Future<Void> fireOnce() {
         if (barrelUsed.get() >= options.getBarrels()) {
-            getRoutineIssueRecorder().debug(r -> r.message("BARREL FULL"));
+            getIssueRecorder().debug(r -> r.message("BARREL FULL"));
             return rest();
         }
         return Future.succeededFuture()
@@ -66,9 +66,9 @@ public class KeelGatling extends KeelVerticleBase<KeelEventLog> {
 
                     fireBullet(bullet, firedAR -> {
                         if (firedAR.failed()) {
-                            getRoutineIssueRecorder().exception(firedAR.cause(), r -> r.message("BULLET FIRED ERROR"));
+                            getIssueRecorder().exception(firedAR.cause(), r -> r.message("BULLET FIRED ERROR"));
                         } else {
-                            getRoutineIssueRecorder().info(r -> r.message("BULLET FIRED DONE"));
+                            getIssueRecorder().info(r -> r.message("BULLET FIRED DONE"));
                         }
                         barrelUsed.decrementAndGet();
                     });
@@ -76,7 +76,7 @@ public class KeelGatling extends KeelVerticleBase<KeelEventLog> {
                     return KeelAsyncKit.sleep(10L);
                 })
                 .recover(throwable -> {
-                    getRoutineIssueRecorder().exception(throwable, r -> r.message("FAILED TO LOAD BULLET"));
+                    getIssueRecorder().exception(throwable, r -> r.message("FAILED TO LOAD BULLET"));
                     return rest();
                 });
     }

@@ -23,7 +23,7 @@ public class IssueStdOutLoggerTest extends KeelTest {
 
     @TestUnit
     public Future<Void> testForStdOutSyncAlef() {
-        KeelIssueRecorder<AlefIssueRecord> recorder = center.generateRecorder("StandoutOutputSync", AlefIssueRecord::new);
+        KeelIssueRecorder<AlefIssueRecord> recorder = center.generateIssueRecorder("StandoutOutputSync", AlefIssueRecord::new);
         recorder.record(issue -> {
             issue.classification(List.of("IssueLoggerTest", "testForStdOutSync"));
         });
@@ -32,7 +32,7 @@ public class IssueStdOutLoggerTest extends KeelTest {
 
     @TestUnit
     public Future<Void> testForStdOutSyncBet() {
-        KeelIssueRecorder<BetIssueRecord> recorder = center.generateRecorder("StandoutOutputSync", () -> {
+        KeelIssueRecorder<BetIssueRecord> recorder = center.generateIssueRecorder("StandoutOutputSync", () -> {
             return new BetIssueRecord("testForStdOutSyncBet");
         });
         recorder.warning(t -> {

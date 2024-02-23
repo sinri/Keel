@@ -7,6 +7,8 @@ import io.github.sinri.keel.servant.queue.KeelQueueTask;
 import io.github.sinri.keel.servant.queue.QueueTaskIssueRecord;
 import io.vertx.core.Future;
 
+import javax.annotation.Nonnull;
+
 public class TestQueueTask extends KeelQueueTask {
     String id;
     int life;
@@ -16,6 +18,7 @@ public class TestQueueTask extends KeelQueueTask {
         this.life = life;
     }
 
+    @Nonnull
     @Override
     public String getTaskReference() {
         return id;
@@ -31,17 +34,17 @@ public class TestQueueTask extends KeelQueueTask {
      */
     @Override
     protected KeelIssueRecorder<QueueTaskIssueRecord> prepareRoutineIssueRecord() {
-        KeelIssueRecorder<QueueTaskIssueRecord> x = KeelIssueRecordCenter.outputCenter().generateRecorder("TestQueue", () -> new QueueTaskIssueRecord(getTaskReference(), getTaskCategory()));
+        KeelIssueRecorder<QueueTaskIssueRecord> x = KeelIssueRecordCenter.outputCenter().generateIssueRecorder("TestQueue", () -> new QueueTaskIssueRecord(getTaskReference(), getTaskCategory()));
         x.setRecordFormatter(r -> r.context("id", id).context("life", life));
         return x;
     }
 
     @Override
     protected Future<Void> run() {
-        getRoutineIssueRecorder().info(r -> r.message("START"));
+        getIssueRecorder().info(r -> r.message("START"));
         return KeelAsyncKit.sleep(this.life * 1000L)
                 .eventually(() -> {
-                    getRoutineIssueRecorder().info(r -> r.message("END"));
+                    getIssueRecorder().info(r -> r.message("END"));
                     return Future.succeededFuture();
                 });
     }

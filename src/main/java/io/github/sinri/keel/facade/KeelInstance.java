@@ -29,7 +29,7 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
 
     private KeelInstance() {
         this.configuration = KeelConfiguration.createFromJsonObject(new JsonObject());
-        this.issueRecorder = KeelEventLogger.from(KeelIssueRecordCenter.outputCenter().generateRecorder("Keel", () -> new KeelEventLog("Keel")));
+        this.issueRecorder = KeelEventLogger.from(KeelIssueRecordCenter.outputCenter().generateIssueRecorder("Keel", () -> new KeelEventLog("Keel")));
     }
 
     @Nonnull

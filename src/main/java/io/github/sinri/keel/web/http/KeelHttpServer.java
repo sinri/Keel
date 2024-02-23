@@ -47,7 +47,7 @@ abstract public class KeelHttpServer extends KeelVerticleBase<KeelEventLog> {
 
     @Override
     public void start() throws Exception {
-        setRoutineIssueRecorder(createRoutineIssueRecorder());
+        setIssueRecorder(createRoutineIssueRecorder());
 
         this.server = Keel.getVertx().createHttpServer(getHttpServerOptions());
 
@@ -56,17 +56,17 @@ abstract public class KeelHttpServer extends KeelVerticleBase<KeelEventLog> {
 
         server.requestHandler(router)
                 .exceptionHandler(throwable -> {
-                    getRoutineIssueRecorder().exception(throwable, r -> r.message("KeelHttpServer Exception"));
+                    getIssueRecorder().exception(throwable, r -> r.message("KeelHttpServer Exception"));
                 })
                 .listen(httpServerAsyncResult -> {
                     if (httpServerAsyncResult.succeeded()) {
                         HttpServer httpServer = httpServerAsyncResult.result();
-                        getRoutineIssueRecorder().info(r -> r.message("HTTP Server Established, Actual Port: " + httpServer.actualPort()));
+                        getIssueRecorder().info(r -> r.message("HTTP Server Established, Actual Port: " + httpServer.actualPort()));
 
 //                        this.getKeel().addClosePrepareHandler(this::terminate);
                     } else {
                         Throwable throwable = httpServerAsyncResult.cause();
-                        getRoutineIssueRecorder().exception(throwable, r -> r.message("Listen failed"));
+                        getIssueRecorder().exception(throwable, r -> r.message("Listen failed"));
 
                         if (this.isMainService()) {
                             Keel.gracefullyClose(Promise::complete);
@@ -81,16 +81,16 @@ abstract public class KeelHttpServer extends KeelVerticleBase<KeelEventLog> {
      */
     protected KeelIssueRecorder<KeelEventLog> createRoutineIssueRecorder() {
         String topic = getClass().getName();
-        return KeelIssueRecordCenter.outputCenter().generateRecorder(topic, () -> new KeelEventLog(topic));
+        return KeelIssueRecordCenter.outputCenter().generateIssueRecorder(topic, () -> new KeelEventLog(topic));
     }
 
     public void terminate(Promise<Void> promise) {
         server.close().andThen(ar -> {
                     if (ar.succeeded()) {
-                        getRoutineIssueRecorder().info(r -> r.message("HTTP Server Closed"));
+                        getIssueRecorder().info(r -> r.message("HTTP Server Closed"));
                         promise.complete();
                     } else {
-                        getRoutineIssueRecorder().exception(ar.cause(), r -> r.message("HTTP Server Closing Failure: " + ar.cause().getMessage()));
+                        getIssueRecorder().exception(ar.cause(), r -> r.message("HTTP Server Closing Failure: " + ar.cause().getMessage()));
                         promise.fail(ar.cause());
                     }
                 })

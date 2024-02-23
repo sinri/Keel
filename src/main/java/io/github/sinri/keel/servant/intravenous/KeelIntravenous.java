@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * @param <T>
+ * @param <T> The type of drop
  * @since 3.0.1 became a sugar
  */
 public class KeelIntravenous<T> extends KeelIntravenousBase<T> {

@@ -25,6 +25,6 @@ public class TestReceptionist extends KeelWebFutureReceptionist {
 
     @Override
     protected KeelIssueRecorder<ReceptionistIssueRecord> createReceptionistIssueRecorder() {
-        return KeelIssueRecordCenter.outputCenter().generateRecorder(ReceptionistIssueRecord.TopicReceptionist, ReceptionistIssueRecord::new);
+        return KeelIssueRecordCenter.outputCenter().generateIssueRecorder(ReceptionistIssueRecord.TopicReceptionist, ReceptionistIssueRecord::new);
     }
 }

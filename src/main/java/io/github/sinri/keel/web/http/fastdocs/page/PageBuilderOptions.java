@@ -19,5 +19,5 @@ public class PageBuilderOptions {
     /**
      * @since 3.2.0
      */
-    public KeelEventLogger routineIssueRecorder;
+    public KeelEventLogger eventLogger;
 }

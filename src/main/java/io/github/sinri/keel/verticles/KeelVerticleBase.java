@@ -8,20 +8,20 @@ import io.vertx.core.AbstractVerticle;
 import javax.annotation.Nonnull;
 
 abstract public class KeelVerticleBase<T extends KeelIssueRecord<T>> extends AbstractVerticle implements KeelVerticle<T> {
-    private @Nonnull KeelIssueRecorder<T> routineIssueRecorder;
+    private @Nonnull KeelIssueRecorder<T> issueRecorder;
 
     public KeelVerticleBase() {
-        this.routineIssueRecorder = KeelIssueRecordCenter.createSilentIssueRecorder();
+        this.issueRecorder = KeelIssueRecordCenter.createSilentIssueRecorder();
     }
 
     @Nonnull
     @Override
-    public KeelIssueRecorder<T> getRoutineIssueRecorder() {
-        return routineIssueRecorder;
+    public KeelIssueRecorder<T> getIssueRecorder() {
+        return issueRecorder;
     }
 
     @Override
-    public void setRoutineIssueRecorder(@Nonnull KeelIssueRecorder<T> routineIssueRecorder) {
-        this.routineIssueRecorder = routineIssueRecorder;
+    public void setIssueRecorder(@Nonnull KeelIssueRecorder<T> issueRecorder) {
+        this.issueRecorder = issueRecorder;
     }
 }

@@ -32,7 +32,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         }
         this.embedded = x.toString().contains("!/");
         this.actualFileRootOutsideJAR = x.getPath();
-        options.routineIssueRecorder.debug(r -> r.message("EMBEDDED: " + embedded + " url: " + x + " actualFileRootOutsideJAR: " + actualFileRootOutsideJAR));
+        options.eventLogger.debug(r -> r.message("EMBEDDED: " + embedded + " url: " + x + " actualFileRootOutsideJAR: " + actualFileRootOutsideJAR));
     }
 
     @Override
@@ -223,12 +223,12 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
                 tree.addChild(child);
             }
         }
-        options.routineIssueRecorder.debug(eventLog -> eventLog.context(c -> c.put("TREE", tree.toJsonObject())));
+        options.eventLogger.debug(eventLog -> eventLog.context(c -> c.put("TREE", tree.toJsonObject())));
         return tree;
     }
 
     private TreeNode buildTreeNodeInJar(JarEntry jarEntry) {
-        options.routineIssueRecorder.debug(r -> r.message("buildTreeNodeInJar: " + jarEntry.getName() + " isDir: " + jarEntry.isDirectory()));
+        options.eventLogger.debug(r -> r.message("buildTreeNodeInJar: " + jarEntry.getName() + " isDir: " + jarEntry.isDirectory()));
         TreeNode treeNode = new TreeNode();
         treeNode.name = String.valueOf(Path.of(jarEntry.getName()).getFileName());
         if (jarEntry.isDirectory()) {
@@ -258,7 +258,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
 
     protected TreeNode buildTreeOutsideJAR() {
         File root = new File(actualFileRootOutsideJAR);
-        options.routineIssueRecorder.debug(r -> r.message("buildTreeOutsideJAR " + root.getAbsolutePath()));
+        options.eventLogger.debug(r -> r.message("buildTreeOutsideJAR " + root.getAbsolutePath()));
 
         TreeNode tree = new TreeNode();
         tree.href = options.rootURLPath + "index.md";
@@ -266,10 +266,10 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         tree.level = 0;
 
         if (root.isDirectory()) {
-            options.routineIssueRecorder.debug(r -> r.message("IS DIR? " + root.isDirectory()));
+            options.eventLogger.debug(r -> r.message("IS DIR? " + root.isDirectory()));
             File[] files = root.listFiles();
             if (files != null) {
-                options.routineIssueRecorder.debug(r -> r.message("files total " + files.length));
+                options.eventLogger.debug(r -> r.message("files total " + files.length));
                 for (var file : files) {
                     var x = buildTreeNodeOutsideJar(file);
                     if (x != null) {
@@ -279,13 +279,13 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
             }
         }
 
-        options.routineIssueRecorder.debug(eventLog -> eventLog
+        options.eventLogger.debug(eventLog -> eventLog
                 .context(c -> c.put("TREE", tree.toJsonObject())));
         return tree;
     }
 
     private TreeNode buildTreeNodeOutsideJar(File item) {
-        options.routineIssueRecorder.debug(r -> r.message("buildTreeNodeOutsideJar " + item.getAbsolutePath()));
+        options.eventLogger.debug(r -> r.message("buildTreeNodeOutsideJar " + item.getAbsolutePath()));
         String base = new File(actualFileRootOutsideJAR).getAbsolutePath();
         TreeNode treeNode = new TreeNode();
         if (item.isDirectory()) {

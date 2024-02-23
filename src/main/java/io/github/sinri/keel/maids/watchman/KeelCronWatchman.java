@@ -34,7 +34,7 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
 
             readAsyncMapForEventHandlers(calendar)
                     .onSuccess(list -> list.forEach(x -> x.handle(now)))
-                    .onFailure(throwable -> getRoutineIssueRecorder().exception(throwable, r -> {
+                    .onFailure(throwable -> getIssueRecorder().exception(throwable, r -> {
                     }));
         };
         this.cronTabUpdateStartup = cronTabUpdateStartup;
@@ -211,7 +211,7 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
                 .compose(v -> cronTabUpdateStartup.apply(eventBusAddress()))
                 .onSuccess(v -> super.start())
                 .onFailure(throwable -> {
-                    getRoutineIssueRecorder().exception(throwable, r -> {
+                    getIssueRecorder().exception(throwable, r -> {
                     });
                     undeployMe();
                 });

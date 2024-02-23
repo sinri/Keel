@@ -1,16 +1,18 @@
 package io.github.sinri.keel.tesuto;
 
+import javax.annotation.Nonnull;
+
 /**
  * @since 3.0.14 add skip.
  */
 public class TestUnitResult {
-    private final String testName;
+    private final @Nonnull String testName;
     private Long spentTime;
     private Boolean done;
     private Throwable cause;
     private Boolean skipped;
 
-    public TestUnitResult(String name) {
+    public TestUnitResult(@Nonnull String name) {
         this.testName = name;
     }
 
@@ -28,6 +30,7 @@ public class TestUnitResult {
         this.skipped = true;
     }
 
+    @Nonnull
     public String getTestName() {
         return testName;
     }
