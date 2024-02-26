@@ -7,6 +7,7 @@ import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
 
 /**
  * @since 3.2.0
@@ -19,19 +20,7 @@ public interface KeelEventLogger {
     }
 
     static KeelEventLogger from(@Nonnull KeelIssueRecorder<KeelEventLog> issueRecorder, @Nullable Handler<KeelEventLog> templateEventLogEditor) {
-        return new KeelEventLogger() {
-            @Nullable
-            @Override
-            public Handler<KeelEventLog> templateEventLogEditor() {
-                return templateEventLogEditor;
-            }
-
-            @Nonnull
-            @Override
-            public KeelIssueRecorder<KeelEventLog> getIssueRecorder() {
-                return issueRecorder;
-            }
-        };
+        return new KeelEventLoggerImpl(issueRecorder, templateEventLogEditor);
     }
 
     @Nullable
@@ -41,34 +30,22 @@ public interface KeelEventLogger {
      * @return Logs of this level or higher are visible.
      */
     @Nonnull
-    default KeelLogLevel getVisibleLevel() {
-        return this.getIssueRecorder().getVisibleLevel();
-    }
+    KeelLogLevel getVisibleLevel();
 
     /**
      * @param level Logs of this level or higher are visible.
      */
-    default void setVisibleLevel(@Nonnull KeelLogLevel level) {
-        this.getIssueRecorder().setVisibleLevel(level);
-    }
+    void setVisibleLevel(@Nonnull KeelLogLevel level);
+
+    void addBypassLogger(@Nonnull KeelEventLogger bypassLogger);
 
     @Nonnull
-    KeelIssueRecorder<KeelEventLog> getIssueRecorder();
+    List<KeelEventLogger> getBypassLoggers();
 
     @Nonnull
-    default String getPresetTopic() {
-        return this.getIssueRecorder().topic();
-    }
+    String getPresetTopic();
 
-    default void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
-        this.getIssueRecorder().record(r -> {
-            var x = templateEventLogEditor();
-            if (x != null) {
-                x.handle(r);
-            }
-            eventLogHandler.handle(r);
-        });
-    }
+    void log(@Nonnull Handler<KeelEventLog> eventLogHandler);
 
     default void debug(@Nonnull Handler<KeelEventLog> eventLogHandler) {
         log(eventLog -> {
