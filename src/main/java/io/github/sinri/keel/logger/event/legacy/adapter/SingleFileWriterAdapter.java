@@ -12,6 +12,7 @@ import java.util.List;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class SingleFileWriterAdapter implements KeelEventLoggerAdapter {
     private FileWriter fileWriter;
 

@@ -12,6 +12,7 @@ import java.util.List;
  * 本类无需Keel实例。
  * 单例模式。
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public final class SilentAdapter implements KeelEventLoggerAdapter {
     private static final SilentAdapter instance = new SilentAdapter();
 

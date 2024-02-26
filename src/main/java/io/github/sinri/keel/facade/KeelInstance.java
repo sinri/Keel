@@ -2,7 +2,7 @@ package io.github.sinri.keel.facade;
 
 import io.github.sinri.keel.facade.cluster.KeelClusterKit;
 import io.github.sinri.keel.helper.KeelHelpersInterface;
-import io.github.sinri.keel.logger.event.KeelEventLog;
+import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.*;
@@ -25,11 +25,13 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     /**
      * @since 3.2.0 replace Keel Event Logger.
      */
-    private KeelEventLogger issueRecorder;
+    @Nonnull
+    private KeelEventLogger eventLogger;
 
     private KeelInstance() {
         this.configuration = KeelConfiguration.createFromJsonObject(new JsonObject());
-        this.issueRecorder = KeelEventLogger.from(KeelIssueRecordCenter.outputCenter().generateIssueRecorder("Keel", () -> new KeelEventLog("Keel")));
+        this.eventLogger = KeelIssueRecordCenter.outputCenter().generateEventLogger("Keel");
+        this.eventLogger.setVisibleLevel(KeelLogLevel.WARNING);
     }
 
     @Nonnull
@@ -48,7 +50,7 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     }
 
     public void setVertx(@Nonnull Vertx outsideVertx) {
-        issueRecorder.debug(r -> r.message("KeelInstance::setVertx is called with outsideVertx " + outsideVertx + " while currently vertx is " + vertx));
+        eventLogger.debug(r -> r.message("KeelInstance::setVertx is called with outsideVertx " + outsideVertx + " while currently vertx is " + vertx));
         if (vertx == null) {
             vertx = outsideVertx;
         } else {
@@ -104,16 +106,20 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
 
     /**
      * @since 3.2.0
+     * To acquire an instant logger for those logs without designed topic.
+     * By default, it is print to stdout and only WARNING and above may be recorded.
+     * If you want to debug locally, just get it and reset its visible level.
      */
+    @Nonnull
     public KeelEventLogger getLogger() {
-        return issueRecorder;
+        return eventLogger;
     }
 
     /**
      * @since 3.2.0
      */
-    public KeelInstance setLogger(KeelEventLogger issueRecorder) {
-        this.issueRecorder = issueRecorder;
+    public KeelInstance setLogger(@Nonnull KeelEventLogger eventLogger) {
+        this.eventLogger = eventLogger;
         return this;
     }
 

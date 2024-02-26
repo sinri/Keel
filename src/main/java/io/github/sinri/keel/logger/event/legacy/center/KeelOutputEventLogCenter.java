@@ -19,6 +19,7 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 /**
  * @since 3.0.0
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class KeelOutputEventLogCenter extends KeelSyncEventLogCenter {
     /**
      * @since 3.0.10 Change to use KeelEventLog::render

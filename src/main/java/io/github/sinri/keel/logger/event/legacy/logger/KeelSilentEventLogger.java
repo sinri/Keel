@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Supplier;
 
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class KeelSilentEventLogger implements KeelEventLogger {
     private final static KeelSilentEventLogger instance = new KeelSilentEventLogger();
 

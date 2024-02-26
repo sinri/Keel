@@ -1,7 +1,5 @@
 package io.github.sinri.keel.web.http.fastdocs;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.web.http.fastdocs.page.CataloguePageBuilder;
 import io.github.sinri.keel.web.http.fastdocs.page.MarkdownCssBuilder;
 import io.github.sinri.keel.web.http.fastdocs.page.MarkdownPageBuilder;
@@ -32,10 +30,7 @@ public class KeelFastDocsKit {
     private String documentSubject = "FastDocs";
     private String footerText = "Public Domain";
 
-    /**
-     * @since 3.2.0
-     */
-    private KeelEventLogger eventLogger;
+//    private KeelEventLogger eventLogger = KeelEventLogger.from(KeelIssueRecordCenter.createSilentIssueRecorder());
 
     /**
      * @param rootURLPath          such as `/prefix/`
@@ -45,7 +40,6 @@ public class KeelFastDocsKit {
         this.staticHandler = StaticHandler.create();
         this.rootURLPath = rootURLPath;
         this.rootMarkdownFilePath = rootMarkdownFilePath;
-        this.eventLogger = KeelEventLogger.from(KeelIssueRecordCenter.createSilentIssueRecorder());
     }
 
     /**
@@ -62,8 +56,7 @@ public class KeelFastDocsKit {
             String urlPathBase,
             String docsDirPathBase,
             String subject,
-            String footer,
-            KeelEventLogger eventLogger
+            String footer
     ) {
         if (!urlPathBase.endsWith("/")) {
             urlPathBase = urlPathBase + "/";
@@ -74,19 +67,10 @@ public class KeelFastDocsKit {
 
         KeelFastDocsKit keelFastDocsKit = new KeelFastDocsKit(urlPathBase, docsDirPathBase)
                 .setDocumentSubject(subject)
-                .setFooterText(footer)
-                .setEventLogger(eventLogger);
+                .setFooterText(footer);
 
         router.route(urlPathBase + "*")
                 .handler(keelFastDocsKit::processRouterRequest);
-    }
-
-    /**
-     * @since 3.2.0
-     */
-    public KeelFastDocsKit setEventLogger(KeelEventLogger eventLogger1) {
-        this.eventLogger = eventLogger1;
-        return this;
     }
 
     public KeelFastDocsKit setDocumentSubject(String documentSubject) {
@@ -104,45 +88,37 @@ public class KeelFastDocsKit {
                 .put("method", ctx.request().method().name())
                 .put("path", ctx.request().path())
                 .put("stream_id", ctx.request().streamId());
-        eventLogger.debug(event -> event.message("processRouterRequest start")
-                .context(c -> c.put("request", requestInfo)));
+        // eventLogger.debug(event -> event.message("processRouterRequest start").context(c -> c.put("request", requestInfo)));
         if (!Objects.equals(ctx.request().method(), HttpMethod.GET)) {
             ctx.response().setStatusCode(405).end();
-            eventLogger.warning(event -> event.message("processRouterRequest ends with 405")
-                    .context(c -> c.put("request", requestInfo)));
+            // eventLogger.warning(event -> event.message("processRouterRequest ends with 405").context(c -> c.put("request", requestInfo)));
             return;
         }
 
         String requestPath = ctx.request().path();
 
         PageBuilderOptions options = new PageBuilderOptions();
-        options.eventLogger = eventLogger;
         options.ctx = ctx;
         options.subjectOfDocuments = this.documentSubject;
         options.footerText = this.footerText;
         options.rootURLPath = this.rootURLPath;
         options.rootMarkdownFilePath = this.rootMarkdownFilePath;
 
-        eventLogger.debug(r -> r.message("requestPath: " + requestPath));
+//        eventLogger.debug(r -> r.message("requestPath: " + requestPath));
         if (requestPath.equals(rootURLPath) || requestPath.equals(rootURLPath + "/")) {
-            eventLogger.debug(event -> event.message("processRouterRequest -> 302")
-                    .context(c -> c.put("request", requestInfo)));
+            // eventLogger.debug(event -> event.message("processRouterRequest -> 302").context(c -> c.put("request", requestInfo)));
             ctx.redirect(rootURLPath + (rootURLPath.endsWith("/") ? "" : "/") + "index.md");
         } else if (requestPath.endsWith(".md")) {
-            eventLogger.debug(event -> event.message("processRouterRequest -> processRequestWithMarkdownPath")
-                    .context(c -> c.put("request", requestInfo)));
+            // eventLogger.debug(event -> event.message("processRouterRequest -> processRequestWithMarkdownPath").context(c -> c.put("request", requestInfo)));
             processRequestWithMarkdownPath(options);
         } else if (requestPath.equalsIgnoreCase(this.rootURLPath + "catalogue")) {
-            eventLogger.debug(event -> event.message("processRouterRequest -> processRequestWithCatalogue")
-                    .context(c -> c.put("request", requestInfo)));
+            // eventLogger.debug(event -> event.message("processRouterRequest -> processRequestWithCatalogue").context(c -> c.put("request", requestInfo)));
             processRequestWithCatalogue(options);
         } else if (requestPath.equalsIgnoreCase(this.rootURLPath + "markdown.css")) {
-            eventLogger.debug(event -> event.message("processRouterRequest -> processRequestWithMarkdownCSS")
-                    .context(c -> c.put("request", requestInfo)));
+            // eventLogger.debug(event -> event.message("processRouterRequest -> processRequestWithMarkdownCSS").context(c -> c.put("request", requestInfo)));
             processRequestWithMarkdownCSS(options);
         } else {
-            eventLogger.debug(event -> event.message("processRouterRequest -> processRequestWithStaticPath")
-                    .context(c -> c.put("request", requestInfo)));
+            // eventLogger.debug(event -> event.message("processRouterRequest -> processRequestWithStaticPath").context(c -> c.put("request", requestInfo)));
             processRequestWithStaticPath(options);
         }
     }
@@ -160,11 +136,11 @@ public class KeelFastDocsKit {
     protected void processRequestWithMarkdownPath(PageBuilderOptions options) {
         getRelativePathOfRequest(options.ctx)
                 .compose(relativePathOfMarkdownFile -> {
-                    eventLogger.debug(r -> r.message("processRequestWithMarkdownPath relativePathOfMarkdownFile: " + relativePathOfMarkdownFile));
+                    // eventLogger.debug(r -> r.message("processRequestWithMarkdownPath relativePathOfMarkdownFile: " + relativePathOfMarkdownFile));
                     String markdownFilePath = this.rootMarkdownFilePath + relativePathOfMarkdownFile;
-                    eventLogger.debug(r -> r.message("processRequestWithMarkdownPath file: " + markdownFilePath));
+                    // eventLogger.debug(r -> r.message("processRequestWithMarkdownPath file: " + markdownFilePath));
                     File x = new File(markdownFilePath);
-                    eventLogger.debug(r -> r.message("abs: " + x.getAbsolutePath()));
+                    // eventLogger.debug(r -> r.message("abs: " + x.getAbsolutePath()));
                     String markdownContent;
                     try {
                         InputStream resourceAsStream = getClass().getClassLoader()
@@ -175,7 +151,7 @@ public class KeelFastDocsKit {
                         byte[] bytes = resourceAsStream.readAllBytes();
                         markdownContent = new String(bytes);
                     } catch (IOException e) {
-                        eventLogger.exception(e, r -> r.message("Cannot read target file " + markdownFilePath));
+                        // eventLogger.exception(e, r -> r.message("Cannot read target file " + markdownFilePath));
                         return Future.failedFuture("Cannot read target file: " + e.getMessage());
                     }
 
@@ -184,12 +160,12 @@ public class KeelFastDocsKit {
                     return Future.succeededFuture(new MarkdownPageBuilder(options));
                 })
                 .onFailure(throwable -> {
-                    eventLogger.exception(throwable, r -> r.message("processRequestWithMarkdownPath 404"));
+                    //eventLogger.exception(throwable, r -> r.message("processRequestWithMarkdownPath 404"));
                     options.ctx.response().setStatusCode(404).end();
                 })
                 .compose(MarkdownPageBuilder::respond)
                 .compose(v -> {
-                    eventLogger.debug(r -> r.message("processRequestWithMarkdownPath ends"));
+                    // eventLogger.debug(r -> r.message("processRequestWithMarkdownPath ends"));
                     return Future.succeededFuture();
                 });
 
@@ -199,7 +175,7 @@ public class KeelFastDocsKit {
         options.fromDoc = options.ctx.request().getParam("from_doc");
         new CataloguePageBuilder(options).respond()
                 .compose(v -> {
-                    eventLogger.debug(r -> r.message("processRequestWithCatalogue ends"));
+                    //eventLogger.debug(r -> r.message("processRequestWithCatalogue ends"));
                     return Future.succeededFuture();
                 });
     }
@@ -207,7 +183,7 @@ public class KeelFastDocsKit {
     protected void processRequestWithMarkdownCSS(PageBuilderOptions options) {
         new MarkdownCssBuilder(options).respond()
                 .compose(v -> {
-                    eventLogger.debug(r -> r.message("processRequestWithMarkdownCSS ends"));
+                    // eventLogger.debug(r -> r.message("processRequestWithMarkdownCSS ends"));
                     return Future.succeededFuture();
                 });
     }

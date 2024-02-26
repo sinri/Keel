@@ -1,9 +1,6 @@
 package io.github.sinri.keel.elasticsearch;
 
-import io.github.sinri.keel.logger.event.KeelEventLog;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
@@ -26,11 +23,6 @@ public interface ESApiMixin {
     ElasticSearchConfig getEsConfig();
 
     /**
-     * @since 3.2.0
-     */
-    KeelEventLogger getLogger();
-
-    /**
      * @since 3.1.10
      * For Bulk API, of which the body is not a json object.
      */
@@ -48,23 +40,19 @@ public interface ESApiMixin {
             bufferHttpRequest.putHeader("X-Opaque-Id", opaqueId);
         }
 
-        JsonObject queriesForLog = new JsonObject();
         if (queries != null) {
-            queries.forEach((k, v) -> {
-                bufferHttpRequest.addQueryParam(k, v);
-                queriesForLog.put(k, v);
-            });
+            queries.forEach(bufferHttpRequest::addQueryParam);
         }
 
-        Handler<KeelEventLog> logRequestEnricher = log -> log
-                .context(c -> c
-                        .put("request", new JsonObject()
-                                .put("method", httpMethod.name())
-                                .put("endpoint", endpoint)
-                                .put("queries", queriesForLog)
-                                .put("body", requestBody)
-                        )
-                );
+//        Handler<KeelEventLog> logRequestEnricher = log -> log
+//                .context(c -> c
+//                        .put("request", new JsonObject()
+//                                .put("method", httpMethod.name())
+//                                .put("endpoint", endpoint)
+//                                .put("queries", queriesForLog)
+//                                .put("body", requestBody)
+//                        )
+//                );
 
         return Future.succeededFuture()
                 .compose(v -> {
@@ -79,26 +67,34 @@ public interface ESApiMixin {
                     JsonObject resp = bufferHttpResponse.bodyAsJsonObject();
 
                     if ((statusCode >= 300 || statusCode < 200) || resp == null) {
-                        this.getLogger().error(log -> {
-                            logRequestEnricher.handle(log);
-                            log.message("ES API Response Error")
-                                    .context(c -> c
-                                            .put("response", new JsonObject()
-                                                    .put("status_code", statusCode)
-                                                    .put("raw", bufferHttpResponse.bodyAsString()))
-                                    );
-                        });
-                        return Future.failedFuture("ES API: STATUS CODE IS " + statusCode + " | " + bufferHttpResponse.bodyAsString());
+//                        this.getLogger().error(log -> {
+//                            logRequestEnricher.handle(log);
+//                            log.message("ES API Response Error")
+//                                    .context(c -> c
+//                                            .put("response", new JsonObject()
+//                                                    .put("status_code", statusCode)
+//                                                    .put("raw", bufferHttpResponse.bodyAsString()))
+//                                    );
+//                        });
+//                        return Future.failedFuture("ES API: STATUS CODE IS " + statusCode + " | " + bufferHttpResponse.bodyAsString());
+
+                        return Future.failedFuture(new ESApiException(
+                                statusCode, bufferHttpResponse.bodyAsString(),
+                                httpMethod,
+                                endpoint,
+                                queries,
+                                requestBody
+                        ));
                     }
-                    this.getLogger().info(log -> {
-                        logRequestEnricher.handle(log);
-                        log.message("ES API Response Error")
-                                .context(c -> c
-                                        .put("response", new JsonObject()
-                                                .put("status_code", statusCode)
-                                                .put("body", resp))
-                                );
-                    });
+//                    this.getLogger().info(log -> {
+//                        logRequestEnricher.handle(log);
+//                        log.message("ES API Response Error")
+//                                .context(c -> c
+//                                        .put("response", new JsonObject()
+//                                                .put("status_code", statusCode)
+//                                                .put("body", resp))
+//                                );
+//                    });
                     return Future.succeededFuture(resp);
                 });
     }
@@ -184,6 +180,61 @@ public interface ESApiMixin {
             JsonObject jsonObject = new JsonObject();
             this.forEach(jsonObject::put);
             return jsonObject;
+        }
+    }
+
+    class ESApiException extends Exception {
+        private final int statusCode;
+        private final @Nullable String response;
+
+        private final @Nonnull HttpMethod httpMethod;
+        private final @Nonnull String endpoint;
+        private final @Nullable ESApiQueries queries;
+        private final @Nullable String requestBody;
+
+        public ESApiException(
+                int statusCode, @Nullable String response,
+                @Nonnull HttpMethod httpMethod,
+                @Nonnull String endpoint,
+                @Nullable ESApiQueries queries,
+                @Nullable String requestBody
+        ) {
+            this.statusCode = statusCode;
+            this.response = response;
+
+            this.httpMethod = httpMethod;
+            this.endpoint = endpoint;
+            this.queries = queries;
+            this.requestBody = requestBody;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+
+        @Nullable
+        public String getResponse() {
+            return response;
+        }
+
+        @Nonnull
+        public String getEndpoint() {
+            return endpoint;
+        }
+
+        @Nullable
+        public ESApiQueries getQueries() {
+            return queries;
+        }
+
+        @Nonnull
+        public HttpMethod getHttpMethod() {
+            return httpMethod;
+        }
+
+        @Nullable
+        public String getRequestBody() {
+            return requestBody;
         }
     }
 }

@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class KeelSyncEventLogCenter implements KeelEventLogCenter {
     private final KeelEventLoggerAdapter adapter;
     private KeelLogLevel visibleLogLevel = KeelLogLevel.INFO;

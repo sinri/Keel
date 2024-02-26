@@ -15,7 +15,7 @@ import java.util.Objects;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
-@Deprecated(since = "3.2.0")
+@Deprecated(since = "3.2.0", forRemoval = true)
 public interface KeelEventLog extends JsonifiableEntity<KeelEventLog> {
     String RESERVED_KEY_EVENT_MSG = "msg";
     String RESERVED_KEY_EVENT_EXCEPTION = "exception";

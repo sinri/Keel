@@ -120,20 +120,22 @@ abstract public class KeelTest {
     /**
      * @since 3.2.0
      */
+    @Nonnull
     protected KeelEventLogger getLogger() {
-        return eventLogger;
-    }
-
-    @Deprecated(since = "3.2.0")
-    protected KeelEventLogger logger() {
         return eventLogger;
     }
 
     /**
      * @since 3.2.0
      */
-    protected void setLogger(KeelEventLogger eventLogger) {
+    protected void setLogger(@Nonnull KeelEventLogger eventLogger) {
         KeelTest.eventLogger = eventLogger;
+    }
+
+    @Deprecated(since = "3.2.0")
+    @Nonnull
+    protected KeelEventLogger logger() {
+        return eventLogger;
     }
 
     protected @Nonnull Future<Void> starting() {

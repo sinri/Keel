@@ -18,6 +18,7 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 /**
  * @since 3.0.0
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class AsyncFilesWriterAdapter implements KeelEventLoggerAdapter {
     private final String logDir;
     private final String dateFormat;

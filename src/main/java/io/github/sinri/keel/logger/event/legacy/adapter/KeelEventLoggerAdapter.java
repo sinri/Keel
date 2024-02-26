@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
+@Deprecated(since = "3.2.0", forRemoval = true)
 public interface KeelEventLoggerAdapter {
 
     /**

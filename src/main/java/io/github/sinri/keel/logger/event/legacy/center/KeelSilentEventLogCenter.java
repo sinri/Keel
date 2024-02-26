@@ -7,6 +7,7 @@ import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
 
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class KeelSilentEventLogCenter implements KeelEventLogCenter {
     private final static KeelSilentEventLogCenter instance = new KeelSilentEventLogCenter();
 

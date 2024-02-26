@@ -18,16 +18,19 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 public final class KeelLauncher extends Launcher {
 
     private final KeelLauncherAdapter adapter;
+    private final KeelEventLogger logger;
 
     public KeelLauncher(@Nonnull KeelLauncherAdapter adapter) {
         this.adapter = adapter;
+        this.logger = adapter.buildEventLoggerForLauncher();
     }
 
     /**
      * @since 3.2.0
      */
+    @Nonnull
     private KeelEventLogger eventLogger() {
-        return this.adapter.eventLogger();
+        return this.logger;
     }
 
     @Override

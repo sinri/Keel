@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * @since 2.9.4 实验性设计
  */
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class KeelAsyncEventLogCenter implements KeelEventLogCenter {
     private final @Nonnull KeelEventLoggerAdapter adapter;
     private final @Nonnull Queue<KeelEventLog> queue;

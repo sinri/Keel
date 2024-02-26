@@ -25,7 +25,7 @@ public class ESIndexTest {
 
     private static Future<Void> test1() {
         var logger = KeelIssueRecordCenter.outputCenter().generateEventLogger("ESIndexTest");
-        ElasticSearchKit es = new ElasticSearchKit("kumori", logger);
+        ElasticSearchKit es = new ElasticSearchKit("kumori");
 
         return es.indexGet("kumori-es-test-1", new ESApiMixin.ESApiQueries())
                 .compose(resp -> {

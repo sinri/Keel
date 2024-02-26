@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+@Deprecated(since = "3.2.0", forRemoval = true)
 public class KeelEventLoggerImpl implements KeelEventLogger {
     private final @Nonnull Supplier<KeelEventLogCenter> eventLogCenterSupplier;
     private final @Nonnull String presetTopic;
