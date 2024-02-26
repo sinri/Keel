@@ -61,7 +61,13 @@ public interface KeelEventLogger {
     }
 
     default void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
-        this.getIssueRecorder().record(eventLogHandler);
+        this.getIssueRecorder().record(r -> {
+            var x = templateEventLogEditor();
+            if (x != null) {
+                x.handle(r);
+            }
+            eventLogHandler.handle(r);
+        });
     }
 
     default void debug(@Nonnull Handler<KeelEventLog> eventLogHandler) {

@@ -124,6 +124,11 @@ abstract public class KeelTest {
         return eventLogger;
     }
 
+    @Deprecated(since = "3.2.0")
+    protected KeelEventLogger logger() {
+        return eventLogger;
+    }
+
     /**
      * @since 3.2.0
      */

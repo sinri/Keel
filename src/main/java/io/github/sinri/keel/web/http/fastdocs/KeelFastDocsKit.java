@@ -63,7 +63,7 @@ public class KeelFastDocsKit {
             String docsDirPathBase,
             String subject,
             String footer,
-            KeelEventLogger routineIssueRecorder
+            KeelEventLogger eventLogger
     ) {
         if (!urlPathBase.endsWith("/")) {
             urlPathBase = urlPathBase + "/";
@@ -75,7 +75,7 @@ public class KeelFastDocsKit {
         KeelFastDocsKit keelFastDocsKit = new KeelFastDocsKit(urlPathBase, docsDirPathBase)
                 .setDocumentSubject(subject)
                 .setFooterText(footer)
-                .setEventLogger(routineIssueRecorder);
+                .setEventLogger(eventLogger);
 
         router.route(urlPathBase + "*")
                 .handler(keelFastDocsKit::processRouterRequest);
@@ -84,8 +84,8 @@ public class KeelFastDocsKit {
     /**
      * @since 3.2.0
      */
-    public KeelFastDocsKit setEventLogger(KeelEventLogger eventLogger) {
-        this.eventLogger = eventLogger;
+    public KeelFastDocsKit setEventLogger(KeelEventLogger eventLogger1) {
+        this.eventLogger = eventLogger1;
         return this;
     }
 
