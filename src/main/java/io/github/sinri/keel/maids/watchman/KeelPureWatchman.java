@@ -1,5 +1,7 @@
 package io.github.sinri.keel.maids.watchman;
 
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -37,6 +39,14 @@ public class KeelPureWatchman extends KeelWatchmanImpl {
     @Override
     public long interval() {
         return options.getInterval();
+    }
+
+    /**
+     * @since 3.2.0
+     */
+    @Override
+    protected KeelEventLogger buildEventLogger() {
+        return KeelIssueRecordCenter.silentCenter().generateEventLogger(getClass().getName());
     }
 
     public static class Options {

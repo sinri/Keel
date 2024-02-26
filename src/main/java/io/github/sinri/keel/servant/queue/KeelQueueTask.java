@@ -1,7 +1,6 @@
 package io.github.sinri.keel.servant.queue;
 
-import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
-import io.github.sinri.keel.verticles.KeelVerticleBase;
+import io.github.sinri.keel.verticles.KeelVerticleImplWithIssueRecorder;
 import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
@@ -9,7 +8,7 @@ import javax.annotation.Nonnull;
 /**
  * @since 2.1
  */
-public abstract class KeelQueueTask extends KeelVerticleBase<QueueTaskIssueRecord> {
+public abstract class KeelQueueTask extends KeelVerticleImplWithIssueRecorder<QueueTaskIssueRecord> {
     QueueWorkerPoolManager queueWorkerPoolManager;
 
     final void setQueueWorkerPoolManager(QueueWorkerPoolManager queueWorkerPoolManager) {
@@ -22,16 +21,8 @@ public abstract class KeelQueueTask extends KeelVerticleBase<QueueTaskIssueRecor
     @Nonnull
     abstract public String getTaskCategory();
 
-    /**
-     * @since 3.2.0
-     */
-    abstract protected KeelIssueRecorder<QueueTaskIssueRecord> prepareRoutineIssueRecord();
-
     // as verticle
     public final void start() {
-        KeelIssueRecorder<QueueTaskIssueRecord> issueRecorder = prepareRoutineIssueRecord();
-        setIssueRecorder(issueRecorder);
-
         this.queueWorkerPoolManager.whenOneWorkerStarts();
 
         Future.succeededFuture()

@@ -1,7 +1,9 @@
 package io.github.sinri.keel.servant.intravenous;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.verticles.KeelVerticleImplWithEventLog;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.verticles.KeelVerticleImplWithEventLogger;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 
@@ -15,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @param <T>
  * @since 3.0.1 redesigned from the original KeelIntravenous
  */
-abstract public class KeelIntravenousBase<T> extends KeelVerticleImplWithEventLog {
+abstract public class KeelIntravenousBase<T> extends KeelVerticleImplWithEventLogger {
     private final Queue<T> queue;
     private final AtomicReference<Promise<Void>> interruptRef;
     protected long sleepTime = 1_000L;
@@ -128,4 +130,13 @@ abstract public class KeelIntravenousBase<T> extends KeelVerticleImplWithEventLo
                     return this.undeployMe();
                 });
     }
+
+    /**
+     * @since 3.2.0
+     */
+    @Override
+    protected KeelEventLogger buildEventLogger() {
+        return KeelIssueRecordCenter.silentCenter().generateEventLogger(getClass().getName());
+    }
+
 }

@@ -24,19 +24,10 @@ public class TestQueueTask extends KeelQueueTask {
         return id;
     }
 
+    @Nonnull
     @Override
     public String getTaskCategory() {
         return "TEST";
-    }
-
-    /**
-     * @since 3.2.0
-     */
-    @Override
-    protected KeelIssueRecorder<QueueTaskIssueRecord> prepareRoutineIssueRecord() {
-        KeelIssueRecorder<QueueTaskIssueRecord> x = KeelIssueRecordCenter.outputCenter().generateIssueRecorder("TestQueue", () -> new QueueTaskIssueRecord(getTaskReference(), getTaskCategory()));
-        x.setRecordFormatter(r -> r.context("id", id).context("life", life));
-        return x;
     }
 
     @Override
@@ -47,5 +38,13 @@ public class TestQueueTask extends KeelQueueTask {
                     getIssueRecorder().info(r -> r.message("END"));
                     return Future.succeededFuture();
                 });
+    }
+
+    @Nonnull
+    @Override
+    protected KeelIssueRecorder<QueueTaskIssueRecord> buildIssueRecorder() {
+        var x = KeelIssueRecordCenter.outputCenter().generateIssueRecorder(QueueTaskIssueRecord.TopicQueue, () -> new QueueTaskIssueRecord(getTaskReference(), getTaskCategory()));
+        x.setRecordFormatter(r -> r.context("id", id).context("life", life));
+        return x;
     }
 }

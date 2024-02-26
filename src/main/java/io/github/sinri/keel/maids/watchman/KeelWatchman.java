@@ -11,7 +11,7 @@ import io.vertx.core.Handler;
  *
  * @since 2.9.3
  */
-public interface KeelWatchman<T extends KeelIssueRecord<T>> extends KeelVerticle<T> {
+public interface KeelWatchman<T extends KeelIssueRecord<T>> extends KeelVerticle {
 
     String watchmanName();
 

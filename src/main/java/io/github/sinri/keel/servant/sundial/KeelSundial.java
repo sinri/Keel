@@ -1,8 +1,8 @@
 package io.github.sinri.keel.servant.sundial;
 
-import io.github.sinri.keel.logger.event.KeelEventLog;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.verticles.KeelVerticleImplWithEventLog;
+import io.github.sinri.keel.verticles.KeelVerticleImplWithEventLogger;
 import io.vertx.core.Future;
 
 import java.util.*;
@@ -15,17 +15,20 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 /**
  * @since 3.0.0
  */
-public abstract class KeelSundial extends KeelVerticleImplWithEventLog {
+public abstract class KeelSundial extends KeelVerticleImplWithEventLogger {
     private final Map<String, KeelSundialPlan> planMap = new ConcurrentHashMap<>();
     private Long timerID;
     private final AtomicInteger planFetchingSemaphore = new AtomicInteger(0);
 
+
+    @Override
+    protected KeelEventLogger buildEventLogger() {
+        return KeelIssueRecordCenter.outputCenter().generateEventLogger("Sundial");
+    }
+
     @Override
 
     public void start() throws Exception {
-        setIssueRecorder(KeelIssueRecordCenter.outputCenter().generateIssueRecorder("Sundial", () -> new KeelEventLog("Sundial")));
-        //setLogger(KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName()));
-
         long delaySeconds = 60 - (System.currentTimeMillis() / 1000) % 60;
         this.timerID = Keel.getVertx().setPeriodic(delaySeconds, 60_000L, timerID -> {
             Calendar calendar = Calendar.getInstance();

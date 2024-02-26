@@ -34,4 +34,5 @@ public class KeelIntravenous<T> extends KeelIntravenousBase<T> {
     protected Future<Void> process(List<T> list) {
         return processor.apply(list);
     }
+
 }

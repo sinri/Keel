@@ -1,32 +1,18 @@
 package io.github.sinri.keel.verticles;
 
-import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
-import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Verticle;
 import io.vertx.core.json.JsonObject;
 
-import javax.annotation.Nonnull;
-
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 1.14
+ * @since 3.2.0 remove logger
  */
-public interface KeelVerticle<T extends KeelIssueRecord<T>> extends Verticle {
-
-    /**
-     * @since 3.2.0
-     */
-    @Nonnull
-    KeelIssueRecorder<T> getIssueRecorder();
-
-    /**
-     * @since 3.2.0
-     */
-    void setIssueRecorder(@Nonnull KeelIssueRecorder<T> issueRecorder);
+public interface KeelVerticle extends Verticle {
 
     /**
      * copied from AbstractVerticle

@@ -1,7 +1,7 @@
 package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.verticles.KeelVerticleBase;
+import io.github.sinri.keel.verticles.KeelVerticleImplWithIssueRecorder;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.ThreadingModel;
@@ -17,7 +17,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  *
  * @since 2.1
  */
-public abstract class KeelQueue extends KeelVerticleBase<QueueManageIssueRecord> {
+public abstract class KeelQueue extends KeelVerticleImplWithIssueRecorder<QueueManageIssueRecord> {
     private KeelQueueNextTaskSeeker nextTaskSeeker;
     private QueueWorkerPoolManager queueWorkerPoolManager;
     private SignalReader signalReader;

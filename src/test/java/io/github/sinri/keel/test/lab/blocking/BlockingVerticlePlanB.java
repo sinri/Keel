@@ -1,11 +1,13 @@
 package io.github.sinri.keel.test.lab.blocking;
 
 import io.github.sinri.keel.logger.event.KeelEventLog;
-import io.github.sinri.keel.logger.event.legacy.KeelEventLogger;
-import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.verticles.KeelVerticleBase;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
+import io.github.sinri.keel.verticles.KeelVerticleImplWithIssueRecorder;
 import io.vertx.core.*;
+
+import javax.annotation.Nonnull;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
@@ -16,10 +18,15 @@ public class BlockingVerticlePlanB {
     private static Future<Void> executeBlocking(Handler<Promise<Void>> blockCode) {
         var issueRecorder = KeelIssueRecordCenter.outputCenter().generateIssueRecorder("Sample", () -> new KeelEventLog("Sample"));
         Promise<Void> promise = Promise.promise();
-        KeelVerticleBase<KeelEventLog> verticle = new KeelVerticleBase<>() {
+        KeelVerticleImplWithIssueRecorder<KeelEventLog> verticle = new KeelVerticleImplWithIssueRecorder<>() {
+            @Nonnull
+            @Override
+            public KeelIssueRecorder<KeelEventLog> buildIssueRecorder() {
+                return issueRecorder;
+            }
+
             @Override
             public void start() throws Exception {
-                this.setIssueRecorder(issueRecorder);
 
                 getIssueRecorder().info(r -> r.message("in verticle " + deploymentID()));
                 blockCode.handle(promise);
@@ -40,7 +47,7 @@ public class BlockingVerticlePlanB {
     public static void main(String[] args) {
         Keel.initializeVertx(new VertxOptions())
                 .compose(done -> {
-                    KeelEventLogger loggerInEventLoopContext = KeelOutputEventLogCenter.getInstance().createLogger("Sample");
+                    KeelEventLogger loggerInEventLoopContext = KeelIssueRecordCenter.outputCenter().generateEventLogger("Sample");
 
                     loggerInEventLoopContext.info(log -> log
                             .message("init")
@@ -83,7 +90,8 @@ public class BlockingVerticlePlanB {
     }
 
     private static void block(Promise<Void> promise) {
-        KeelEventLogger loggerInBlockingContext = KeelOutputEventLogCenter.getInstance().createLogger("Sample");
+        KeelEventLogger loggerInBlockingContext = KeelIssueRecordCenter.outputCenter().generateEventLogger("Sample");
+
         loggerInBlockingContext.info(log -> log.message("START")
                 .context(c -> c.put("thread_id", Thread.currentThread().getId())));
         try {
