@@ -1,10 +1,8 @@
 package io.github.sinri.keel.test.dysonsphere.receptionist;
 
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
-import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.receptionist.KeelWebFutureReceptionist;
-import io.github.sinri.keel.web.http.receptionist.ReceptionistIssueRecord;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -24,7 +22,8 @@ public class TestReceptionist extends KeelWebFutureReceptionist {
     }
 
     @Override
-    protected KeelIssueRecorder<ReceptionistIssueRecord> createReceptionistIssueRecorder() {
-        return KeelIssueRecordCenter.outputCenter().generateIssueRecorder(ReceptionistIssueRecord.TopicReceptionist, ReceptionistIssueRecord::new);
+    protected KeelIssueRecordCenter issueRecordCenter() {
+        return KeelIssueRecordCenter.outputCenter();
     }
+
 }

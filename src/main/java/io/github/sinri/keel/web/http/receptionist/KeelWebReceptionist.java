@@ -1,5 +1,6 @@
 package io.github.sinri.keel.web.http.receptionist;
 
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.http.impl.CookieImpl;
@@ -7,8 +8,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Objects;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
@@ -22,7 +24,12 @@ public abstract class KeelWebReceptionist {
 
     public KeelWebReceptionist(RoutingContext routingContext) {
         this.routingContext = routingContext;
-        this.issueRecorder = createReceptionistIssueRecorder();
+        this.issueRecorder = issueRecordCenter().generateIssueRecorder(ReceptionistIssueRecord.TopicReceptionist, () -> new ReceptionistIssueRecord(readRequestID()));
+        this.issueRecorder.info(r -> r.setRequest(
+                routingContext.request().method(),
+                routingContext.request().path(),
+                this.getClass()
+        ));
     }
 
     protected RoutingContext getRoutingContext() {
@@ -32,7 +39,7 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.2.0
      */
-    abstract protected KeelIssueRecorder<ReceptionistIssueRecord> createReceptionistIssueRecorder();
+    abstract protected KeelIssueRecordCenter issueRecordCenter();
 
     /**
      * @since 3.2.0
@@ -88,15 +95,15 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.0.8 mark it nullable as it might be null.
      */
-    public @Nullable String readRequestID() {
-        return routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID);
+    public @Nonnull String readRequestID() {
+        return Objects.requireNonNull(routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID));
     }
 
     /**
      * @since 3.0.8 mark it nullable as it might be null.
      */
-    public @Nullable Long readRequestStartTime() {
-        return routingContext.get(KeelPlatformHandler.KEEL_REQUEST_START_TIME);
+    public @Nonnull Long readRequestStartTime() {
+        return Objects.requireNonNull(routingContext.get(KeelPlatformHandler.KEEL_REQUEST_START_TIME));
     }
 
     public List<String> readRequestIPChain() {

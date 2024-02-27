@@ -1,6 +1,7 @@
 package io.github.sinri.keel.web.http.receptionist;
 
 import io.github.sinri.keel.logger.issue.record.BaseIssueRecord;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 
 import javax.annotation.Nonnull;
@@ -13,6 +14,10 @@ public final class ReceptionistIssueRecord extends BaseIssueRecord<ReceptionistI
     public static final String TopicReceptionist = "Receptionist";
     public static final String AttributeRequest = "request";
     public static final String AttributeResponse = "response";
+
+    public ReceptionistIssueRecord(@Nonnull String requestId) {
+        this.attribute("request_id", requestId);
+    }
 
     @Nonnull
     @Override
@@ -27,14 +32,12 @@ public final class ReceptionistIssueRecord extends BaseIssueRecord<ReceptionistI
     }
 
     public ReceptionistIssueRecord setRequest(
-            @Nonnull String requestId,
-            @Nonnull String method,
+            @Nonnull HttpMethod method,
             @Nonnull String path,
             @Nonnull Class<?> receptionistClass
     ) {
         this.attribute(AttributeRequest, new JsonObject()
-                .put("request_id", requestId)
-                .put("method", method)
+                .put("method", method.name())
                 .put("path", path)
                 .put("handler", receptionistClass.getName())
         );
