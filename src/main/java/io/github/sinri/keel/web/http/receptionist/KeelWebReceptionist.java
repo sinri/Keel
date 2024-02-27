@@ -9,6 +9,7 @@ import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
@@ -19,10 +20,10 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
  * @since 3.0.0 TEST PASSED
  */
 public abstract class KeelWebReceptionist {
-    private final RoutingContext routingContext;
-    private final KeelIssueRecorder<ReceptionistIssueRecord> issueRecorder;
+    private final @Nonnull RoutingContext routingContext;
+    private final @Nonnull KeelIssueRecorder<ReceptionistIssueRecord> issueRecorder;
 
-    public KeelWebReceptionist(RoutingContext routingContext) {
+    public KeelWebReceptionist(@Nonnull RoutingContext routingContext) {
         this.routingContext = routingContext;
         this.issueRecorder = issueRecordCenter().generateIssueRecorder(ReceptionistIssueRecord.TopicReceptionist, () -> new ReceptionistIssueRecord(readRequestID()));
         this.issueRecorder.info(r -> r.setRequest(
@@ -32,25 +33,28 @@ public abstract class KeelWebReceptionist {
         ));
     }
 
-    protected RoutingContext getRoutingContext() {
+    @Nonnull
+    protected final RoutingContext getRoutingContext() {
         return routingContext;
     }
 
     /**
      * @since 3.2.0
      */
+    @Nonnull
     abstract protected KeelIssueRecordCenter issueRecordCenter();
 
     /**
      * @since 3.2.0
      */
-    public KeelIssueRecorder<ReceptionistIssueRecord> getIssueRecorder() {
+    @Nonnull
+    public final KeelIssueRecorder<ReceptionistIssueRecord> getIssueRecorder() {
         return issueRecorder;
     }
 
     abstract public void handle();
 
-    private void respondWithJsonObject(JsonObject resp) {
+    private void respondWithJsonObject(@Nonnull JsonObject resp) {
         try {
             routingContext.json(resp);
         } catch (Throwable throwable) {
@@ -69,7 +73,7 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.0.12 add request_id to output json object
      */
-    protected void respondOnSuccess(Object data) {
+    protected void respondOnSuccess(@Nullable Object data) {
         JsonObject resp = new JsonObject()
                 .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                 .put("code", "OK")
@@ -81,7 +85,7 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.0.12 add request_id to output json object
      */
-    protected void respondOnFailure(Throwable throwable) {
+    protected void respondOnFailure(@Nonnull Throwable throwable) {
         var resp = new JsonObject()
                 .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                 .put("code", "FAILED")
@@ -106,7 +110,7 @@ public abstract class KeelWebReceptionist {
         return Objects.requireNonNull(routingContext.get(KeelPlatformHandler.KEEL_REQUEST_START_TIME));
     }
 
-    public List<String> readRequestIPChain() {
+    public @Nonnull List<String> readRequestIPChain() {
         return KeelHelpers.netHelper().parseWebClientIPChain(routingContext);
     }
 
@@ -128,14 +132,14 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.0.1
      */
-    protected void addCookie(String name, String value, Long maxAge) {
+    protected void addCookie(@Nonnull String name, @Nonnull String value, Long maxAge) {
         addCookie(name, value, maxAge, false);
     }
 
     /**
      * @since 3.0.1
      */
-    protected void removeCookie(String name) {
+    protected void removeCookie(@Nonnull String name) {
         getRoutingContext().response().removeCookie(name);
     }
 
