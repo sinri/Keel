@@ -29,13 +29,19 @@ public abstract class KeelWebReceptionist {
         this.issueRecorder.info(r -> r.setRequest(
                 routingContext.request().method(),
                 routingContext.request().path(),
-                this.getClass()
+                this.getClass(),
+                (isVerboseLogging() ? routingContext.request().query() : null),
+                (isVerboseLogging() ? routingContext.body().asString() : null)
         ));
     }
 
     @Nonnull
     protected final RoutingContext getRoutingContext() {
         return routingContext;
+    }
+
+    protected boolean isVerboseLogging() {
+        return false;
     }
 
     /**
@@ -60,7 +66,7 @@ public abstract class KeelWebReceptionist {
         } catch (Throwable throwable) {
             getIssueRecorder().exception(throwable, event -> event
                     .message("RoutingContext has been dealt by others")
-                    .setResponse(
+                    .setRespondInfo(
                             routingContext.response().getStatusCode(),
                             routingContext.response().getStatusMessage(),
                             routingContext.response().ended(),
@@ -78,7 +84,12 @@ public abstract class KeelWebReceptionist {
                 .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                 .put("code", "OK")
                 .put("data", data);
-        getIssueRecorder().info(r -> r.message("SUCCESS, TO RESPOND."));
+        getIssueRecorder().info(r -> {
+            r.message("SUCCESS, TO RESPOND.");
+            if (isVerboseLogging()) {
+                r.setResponse(resp);
+            }
+        });
         respondWithJsonObject(resp);
     }
 
@@ -92,7 +103,12 @@ public abstract class KeelWebReceptionist {
                 .put("data", throwable.getMessage());
         String error = KeelHelpers.stringHelper().renderThrowableChain(throwable);
         resp.put("throwable", error);
-        getIssueRecorder().exception(throwable, r -> r.message("FAILED, TO RESPOND."));
+        getIssueRecorder().exception(throwable, r -> {
+            r.message("FAILED, TO RESPOND.");
+            if (isVerboseLogging()) {
+                r.setResponse(resp);
+            }
+        });
         respondWithJsonObject(resp);
     }
 

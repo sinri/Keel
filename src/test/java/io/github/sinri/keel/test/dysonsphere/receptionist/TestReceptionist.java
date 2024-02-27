@@ -7,6 +7,8 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
+import javax.annotation.Nonnull;
+
 @ApiMeta(routePath = "/receptionist/test", allowMethods = {"GET", "POST"})
 public class TestReceptionist extends KeelWebFutureReceptionist {
     public TestReceptionist(RoutingContext routingContext) {
@@ -21,6 +23,7 @@ public class TestReceptionist extends KeelWebFutureReceptionist {
         return Future.succeededFuture(jsonObject);
     }
 
+    @Nonnull
     @Override
     protected KeelIssueRecordCenter issueRecordCenter() {
         return KeelIssueRecordCenter.outputCenter();

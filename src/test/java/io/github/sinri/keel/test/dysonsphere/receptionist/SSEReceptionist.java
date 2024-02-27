@@ -6,6 +6,8 @@ import io.github.sinri.keel.web.http.receptionist.KeelWebReceptionist;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
+import javax.annotation.Nonnull;
+
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 @ApiMeta(routePath = "/receptionist/sse", allowMethods = {"GET", "POST"}, timeout = 0)
@@ -32,6 +34,7 @@ public class SSEReceptionist extends KeelWebReceptionist {
         });
     }
 
+    @Nonnull
     @Override
     protected KeelIssueRecordCenter issueRecordCenter() {
         return KeelIssueRecordCenter.outputCenter();
