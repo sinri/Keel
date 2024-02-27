@@ -22,10 +22,22 @@ abstract public class KeelWebFutureReceptionist extends KeelWebReceptionist {
         Future.succeededFuture()
                 .compose(v -> handleForFuture())
                 .andThen(ar -> {
-                    if (ar.failed()) {
-                        this.respondOnFailure(ar.cause());
-                    } else {
-                        this.respondOnSuccess(ar.result());
+                    try {
+                        if (ar.failed()) {
+                            this.respondOnFailure(ar.cause());
+                        } else {
+                            this.respondOnSuccess(ar.result());
+                        }
+                    } catch (Throwable throwable) {
+                        getIssueRecorder().exception(throwable, event -> event
+                                .message("RoutingContext has been dealt by others")
+                                .setRespondInfo(
+                                        getRoutingContext().response().getStatusCode(),
+                                        getRoutingContext().response().getStatusMessage(),
+                                        getRoutingContext().response().ended(),
+                                        getRoutingContext().response().closed()
+                                )
+                        );
                     }
                 });
     }

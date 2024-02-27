@@ -18,6 +18,7 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 /**
  * @since 2.9.2
  * @since 3.0.0 TEST PASSED
+ * @since 3.2.0 Moved the responding error for `dealt` logging logic out of the `respondOn*` methods.
  */
 public abstract class KeelWebReceptionist {
     private final @Nonnull RoutingContext routingContext;
@@ -61,19 +62,7 @@ public abstract class KeelWebReceptionist {
     abstract public void handle();
 
     private void respondWithJsonObject(@Nonnull JsonObject resp) {
-        try {
-            routingContext.json(resp);
-        } catch (Throwable throwable) {
-            getIssueRecorder().exception(throwable, event -> event
-                    .message("RoutingContext has been dealt by others")
-                    .setRespondInfo(
-                            routingContext.response().getStatusCode(),
-                            routingContext.response().getStatusMessage(),
-                            routingContext.response().ended(),
-                            routingContext.response().closed()
-                    )
-            );
-        }
+        routingContext.json(resp);
     }
 
     /**
