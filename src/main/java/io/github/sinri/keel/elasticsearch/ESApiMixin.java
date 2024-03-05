@@ -56,7 +56,7 @@ public interface ESApiMixin {
 
         return Future.succeededFuture()
                 .compose(v -> {
-                    if (httpMethod == HttpMethod.GET) {
+                    if (httpMethod == HttpMethod.GET || httpMethod == HttpMethod.DELETE) {
                         return bufferHttpRequest.send();
                     } else {
                         return bufferHttpRequest.sendBuffer(Buffer.buffer(Objects.requireNonNullElse(requestBody, "")));
