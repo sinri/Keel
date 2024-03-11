@@ -1,6 +1,7 @@
 package io.github.sinri.keel.mysql.matrix;
 
 
+import io.github.sinri.keel.helper.KeelHelpersInterface;
 import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -10,10 +11,7 @@ import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.data.Numeric;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -184,5 +182,56 @@ public interface ResultMatrix {
             rowToMapHandler.accept(map, item);
         });
         return Future.succeededFuture(map);
+    }
+
+    /**
+     * Shrink a result matrix of rows by a set of rows.
+     * Yang Rui needs it.
+     *
+     * @param shrinkByKeys      The keys of fields that would not be shrunk.
+     * @param shrinkBodyListKey The key of the shrunk body in result.
+     * @since 3.2.2
+     */
+    default List<JsonObject> buildShrinkList(
+            Collection<String> shrinkByKeys,
+            String shrinkBodyListKey
+    ) {
+        Map<String, JsonObject> keyMap = new HashMap<>();
+        Map<String, List<JsonObject>> bodyMap = new HashMap<>();
+        List<JsonObject> rowList = getRowList();
+        rowList.forEach(item -> {
+            JsonObject keyEntity = new JsonObject();
+            JsonObject bodyEntity = new JsonObject();
+
+            item.forEach(entry -> {
+                if (shrinkByKeys.contains(entry.getKey())) {
+                    keyEntity.put(entry.getKey(), entry.getValue());
+                } else {
+                    bodyEntity.put(entry.getKey(), entry.getValue());
+                }
+            });
+
+            shrinkByKeys.forEach(sk -> {
+                if (!keyEntity.containsKey(sk)) {
+                    keyEntity.putNull(sk);
+                }
+            });
+            String skEntityHash = KeelHelpersInterface.KeelHelpers.jsonHelper().getJsonForObjectWhoseItemKeysSorted(keyEntity);
+
+            keyMap.put(skEntityHash, keyEntity);
+            bodyMap.computeIfAbsent(skEntityHash, s -> new ArrayList<>())
+                    .add(bodyEntity);
+        });
+        List<JsonObject> resultList = new ArrayList<>();
+        new TreeMap<>(bodyMap).forEach((k, v) -> {
+            JsonObject x = new JsonObject();
+            JsonObject keyEntity = keyMap.get(k);
+            keyEntity.forEach(e -> {
+                x.put(e.getKey(), e.getValue());
+            });
+            List<JsonObject> jsonObjects = bodyMap.get(k);
+            x.put(shrinkBodyListKey, jsonObjects);
+        });
+        return resultList;
     }
 }

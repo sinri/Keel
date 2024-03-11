@@ -38,7 +38,6 @@ public interface KeelIssueRecordCenter {
      */
     @Nonnull
     default <T extends KeelIssueRecord<?>> KeelIssueRecorder<T> generateIssueRecorder(@Nonnull String topic, @Nonnull Supplier<T> issueRecordBuilder) {
-        // ok
         return KeelIssueRecorder.build(this, issueRecordBuilder, topic);
     }
 
@@ -54,7 +53,6 @@ public interface KeelIssueRecordCenter {
 
     @Nonnull
     default KeelIssueRecorder<KeelEventLog> generateIssueRecorderForEventLogger(@Nonnull String topic) {
-        // dame
         return generateIssueRecorder(topic, () -> new KeelEventLog(topic));
     }
 
