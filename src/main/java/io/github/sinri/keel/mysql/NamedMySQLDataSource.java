@@ -1,6 +1,5 @@
 package io.github.sinri.keel.mysql;
 
-import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.mysql.exception.KeelMySQLConnectionException;
 import io.github.sinri.keel.mysql.exception.KeelMySQLException;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
@@ -119,7 +118,7 @@ public class NamedMySQLDataSource<C extends NamedMySQLConnection> {
                         String versionExp = firstRow.getString("v");
                         return Future.succeededFuture(versionExp);
                     } catch (Throwable e) {
-                        KeelOutputEventLogCenter.instantLogger().exception(e);
+                        Keel.getLogger().exception(e);
                         return Future.succeededFuture(null);
                     }
                 });

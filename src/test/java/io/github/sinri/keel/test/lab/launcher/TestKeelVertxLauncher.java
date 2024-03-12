@@ -1,7 +1,7 @@
 package io.github.sinri.keel.test.lab.launcher;
 
-import io.github.sinri.keel.logger.event.legacy.KeelEventLogger;
-import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Launcher;
 import io.vertx.core.Vertx;
@@ -13,7 +13,7 @@ public class TestKeelVertxLauncher extends Launcher {
     private final KeelEventLogger logger;
 
     public TestKeelVertxLauncher() {
-        this.logger = KeelOutputEventLogCenter.getInstance().createLogger("launcher");
+        this.logger = KeelIssueRecordCenter.outputCenter().generateEventLogger("launcher");
     }
 
     @Override

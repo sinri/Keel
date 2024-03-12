@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test;
 
-import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.Handler;
 import io.vertx.core.VertxOptions;
 
@@ -24,7 +24,7 @@ public class SharedTestBootstrap {
                 )
                 .onSuccess(handler)
                 .onFailure(throwable -> {
-                    KeelOutputEventLogCenter.getInstance().createLogger("SharedTestBootstrap")
+                    KeelIssueRecordCenter.outputCenter().generateEventLogger("SharedTestBootstrap")
                             .exception(throwable, "Keel Initialize Failure");
                 });
     }

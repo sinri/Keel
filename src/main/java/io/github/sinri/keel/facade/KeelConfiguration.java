@@ -1,7 +1,6 @@
 package io.github.sinri.keel.facade;
 
 import io.github.sinri.keel.core.json.JsonifiableEntity;
-import io.github.sinri.keel.logger.event.legacy.center.KeelOutputEventLogCenter;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
@@ -14,6 +13,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
@@ -54,8 +54,7 @@ public class KeelConfiguration implements JsonifiableEntity<KeelConfiguration> {
             try {
                 KeelHelpers.jsonHelper().writeIntoJsonObject(jsonObject, keychain, properties.getProperty(plainKey));
             } catch (Throwable throwable) {
-                KeelOutputEventLogCenter.instantLogger().exception(throwable, "io.github.sinri.keel.facade.KeelConfiguration.transformPropertiesToJsonObject Format Failed" + properties);
-
+                Keel.getLogger().exception(throwable, "io.github.sinri.keel.facade.KeelConfiguration.transformPropertiesToJsonObject Format Failed" + properties);
             }
         }
         return jsonObject;
