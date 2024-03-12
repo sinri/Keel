@@ -8,9 +8,11 @@ import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowSet;
 import io.vertx.sqlclient.data.Numeric;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
@@ -23,7 +25,8 @@ class ResultMatrixImpl implements ResultMatrix {
     private final List<Row> rowList = new ArrayList<>();
     private final int totalFetchedRows;
     private final int totalAffectedRows;
-    private final long lastInsertedID;
+    private final @Nullable Long lastInsertedID;
+
     public ResultMatrixImpl(RowSet<Row> rowSet) {
         //this.rowSet = rowSet;
         for (var row : rowSet) {
@@ -50,7 +53,7 @@ class ResultMatrixImpl implements ResultMatrix {
 
     @Override
     public long getLastInsertedID() {
-        return lastInsertedID;
+        return Objects.requireNonNull(lastInsertedID);
     }
 
     @Override
