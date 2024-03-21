@@ -7,6 +7,11 @@ import javax.annotation.Nonnull;
 public final class QueueManageIssueRecord extends BaseIssueRecord<QueueManageIssueRecord> {
     public static final String TopicQueue = "Queue";
 
+    public QueueManageIssueRecord() {
+        super();
+        this.classification("manage");
+    }
+
 
     @Nonnull
     @Override

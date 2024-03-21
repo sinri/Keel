@@ -38,6 +38,14 @@ Consider to use [Dry Dock of Keel](https://github.com/sinri/DryDockOfKeel) to bu
 
 ## Migration
 
+### From 3.1.x to 3.2.x
+
+* Rebuilt logging implementation.
+  * The `KeelIssueRecord*` becomes the base realization.
+  * The `KeelEventLog*` are kept but reimplemented above `KeelIssueRecord*`.
+  * Refined the classed that use logging.
+* Provided `KeelMetrixRecord*` functions.
+
 ### From 3.0.x to 3.1.x
 
 * The `KeelHelpers` becomes a static member of class `KeelHelpersInterface`.

@@ -11,7 +11,7 @@ public final class QueueTaskIssueRecord extends BaseIssueRecord<QueueTaskIssueRe
     public static final String TopicQueue = "Queue";
 
     public QueueTaskIssueRecord(@Nonnull String taskReference, @Nonnull String taskCategory) {
-        this.classification("reference:" + taskReference, "category:" + taskCategory);
+        this.classification("task", "reference:" + taskReference, "category:" + taskCategory);
     }
 
     @Nonnull
