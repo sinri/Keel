@@ -1,6 +1,7 @@
 package io.github.sinri.keel.facade.async;
 
-import io.github.sinri.keel.verticles.KeelVerticleBase;
+import io.github.sinri.keel.verticles.KeelVerticle;
+import io.github.sinri.keel.verticles.KeelVerticleImplPure;
 import io.vertx.core.*;
 
 import javax.annotation.Nonnull;
@@ -206,9 +207,9 @@ public interface KeelAsyncKit {
     @Nonnull
     static <T> Future<T> executeBlocking(@Nonnull Handler<Promise<T>> blockingCodeHandler) {
         Promise<T> promise = Promise.promise();
-        KeelVerticleBase verticle = new KeelVerticleBase() {
+        KeelVerticle verticle = new KeelVerticleImplPure() {
             @Override
-            public void start() throws Exception {
+            public void start() {
                 blockingCodeHandler.handle(promise);
                 promise.future().onComplete(ar -> this.undeployMe());
             }

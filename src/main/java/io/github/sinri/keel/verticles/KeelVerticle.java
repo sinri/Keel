@@ -1,6 +1,5 @@
 package io.github.sinri.keel.verticles;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
@@ -11,17 +10,9 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 1.14
+ * @since 3.2.0 remove logger
  */
 public interface KeelVerticle extends Verticle {
-
-    KeelEventLogger getLogger();
-
-    /**
-     * @since 2.4 do not rely on context anymore
-     * @since 2.7 became public
-     * @since 2.9.3 become optional with nothing to do
-     */
-    void setLogger(KeelEventLogger logger);
 
     /**
      * copied from AbstractVerticle

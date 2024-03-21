@@ -1,6 +1,5 @@
 package io.github.sinri.keel.web.http.fastdocs.page;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -15,6 +14,4 @@ public class PageBuilderOptions {
 
     public String subjectOfDocuments = "FastDocs";
     public String footerText = "Without Copyright";
-
-    public KeelEventLogger logger;
 }

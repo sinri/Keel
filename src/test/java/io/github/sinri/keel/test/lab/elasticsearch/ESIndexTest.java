@@ -2,8 +2,7 @@ package io.github.sinri.keel.test.lab.elasticsearch;
 
 import io.github.sinri.keel.elasticsearch.ESApiMixin;
 import io.github.sinri.keel.elasticsearch.ElasticSearchKit;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.Future;
 import io.vertx.core.VertxOptions;
 
@@ -16,7 +15,7 @@ public class ESIndexTest {
 
         test1()
                 .onFailure(throwable -> {
-                    KeelOutputEventLogCenter.instantLogger().exception(throwable);
+                    Keel.getLogger().exception(throwable);
                 })
                 .eventually(() -> {
                     return Keel.getVertx().close();
@@ -24,8 +23,8 @@ public class ESIndexTest {
     }
 
     private static Future<Void> test1() {
-        KeelEventLogger logger = KeelOutputEventLogCenter.getInstance().createLogger("ESIndexTest");
-        ElasticSearchKit es = new ElasticSearchKit("kumori", logger);
+        var logger = KeelIssueRecordCenter.outputCenter().generateEventLogger("ESIndexTest");
+        ElasticSearchKit es = new ElasticSearchKit("kumori");
 
         return es.indexGet("kumori-es-test-1", new ESApiMixin.ESApiQueries())
                 .compose(resp -> {

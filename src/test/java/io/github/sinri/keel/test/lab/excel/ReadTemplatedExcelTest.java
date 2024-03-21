@@ -1,7 +1,5 @@
 package io.github.sinri.keel.test.lab.excel;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.github.sinri.keel.poi.excel.KeelSheet;
 import io.github.sinri.keel.poi.excel.KeelSheets;
 import io.github.sinri.keel.poi.excel.entity.KeelSheetMatrix;
@@ -23,19 +21,11 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 public class ReadTemplatedExcelTest extends KeelTest {
     private static final String file = "/Users/leqee/code/Keel/src/test/resources/excel/excel_1.xlsx";
     private static final String fileXls = "/Users/leqee/code/Keel/src/test/resources/excel/excel_4.xls";
-    private KeelEventLogger logger;
-
-    @Nonnull
-    @Override
-    protected KeelEventLogger logger() {
-        return logger;
-    }
 
 
     @Nonnull
     @Override
     protected Future<Void> starting() {
-        this.logger = KeelOutputEventLogCenter.getInstance().createLogger(getClass().getSimpleName());
         return Future.succeededFuture();
     }
 
@@ -51,11 +41,11 @@ public class ReadTemplatedExcelTest extends KeelTest {
             KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
             KeelSheetMatrix keelSheetMatrix = keelSheet.blockReadAllRowsToMatrix(1, 6, null);
             keelSheetMatrix.getRawRowList().forEach(row -> {
-                this.logger.info(log -> log.message("BLOCK: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
+                this.getLogger().info(log -> log.message("BLOCK: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
             });
 
             keelSheetMatrix.getRowIterator(KeelSheetMatrixRowExt.class).forEachRemaining(r -> {
-                this.logger.info(log -> log.message("record")
+                this.getLogger().info(log -> log.message("record")
                         .context(c -> c
                         .put("record_id", r.recordId())
                         .put("name", r.name())
@@ -74,7 +64,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
         return keelSheet.readAllRowsToMatrix(1, 0, null)
                 .compose(keelSheetMatrix -> {
                     keelSheetMatrix.getRawRowList().forEach(row -> {
-                        this.logger.info(log -> log.message("ASYNC: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
+                        this.getLogger().info(log -> log.message("ASYNC: " + KeelHelpers.stringHelper().joinStringArray(row, ", ")));
                     });
                     return Future.succeededFuture();
                 })
@@ -92,7 +82,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
             KeelSheet keelSheet = keelSheets.generateReaderForSheet(0);
             KeelSheetTemplatedMatrix templatedMatrix = keelSheet.blockReadAllRowsToTemplatedMatrix(0, 6, null);
             templatedMatrix.getRows().forEach(row -> {
-                this.logger.info(log -> log.message("BLOCK TEMPLATED: " + row.toJsonObject()));
+                this.getLogger().info(log -> log.message("BLOCK TEMPLATED: " + row.toJsonObject()));
             });
         }
         return Future.succeededFuture();
@@ -105,7 +95,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
         return keelSheet.readAllRowsToTemplatedMatrix(0, 7, null)
                 .compose(templatedMatrix -> {
                     templatedMatrix.getRows().forEach(row -> {
-                        this.logger.info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));
+                        this.getLogger().info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));
                     });
 
                     return Future.succeededFuture();
@@ -132,7 +122,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
         return keelSheet.readAllRowsToTemplatedMatrix(0, 128, null)
                 .compose(templatedMatrix -> {
                     templatedMatrix.getRows().forEach(row -> {
-                        this.logger.info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));
+                        this.getLogger().info(log -> log.message("ASYNC TEMPLATED: " + row.toJsonObject()));
                     });
 
                     return Future.succeededFuture();

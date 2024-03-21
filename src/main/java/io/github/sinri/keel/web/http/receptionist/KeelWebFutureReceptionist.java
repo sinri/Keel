@@ -17,15 +17,27 @@ abstract public class KeelWebFutureReceptionist extends KeelWebReceptionist {
     @Override
     public void handle() {
         // since 3.1.5 add a starting log
-        getLogger().info(log -> log.message("TO HANDLE REQUEST"));
+        getIssueRecorder().info(log -> log.message("TO HANDLE REQUEST"));
 
         Future.succeededFuture()
                 .compose(v -> handleForFuture())
                 .andThen(ar -> {
-                    if (ar.failed()) {
-                        this.respondOnFailure(ar.cause());
-                    } else {
-                        this.respondOnSuccess(ar.result());
+                    try {
+                        if (ar.failed()) {
+                            this.respondOnFailure(ar.cause());
+                        } else {
+                            this.respondOnSuccess(ar.result());
+                        }
+                    } catch (Throwable throwable) {
+                        getIssueRecorder().exception(throwable, event -> event
+                                .message("RoutingContext has been dealt by others")
+                                .setRespondInfo(
+                                        getRoutingContext().response().getStatusCode(),
+                                        getRoutingContext().response().getStatusMessage(),
+                                        getRoutingContext().response().ended(),
+                                        getRoutingContext().response().closed()
+                                )
+                        );
                     }
                 });
     }

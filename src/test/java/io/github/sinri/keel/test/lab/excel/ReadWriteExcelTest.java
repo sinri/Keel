@@ -60,10 +60,10 @@ public class ReadWriteExcelTest extends KeelTest {
 
                         BigDecimal f = rowModel.readValueToBigDecimalStrippedTrailingZeros(2);
 
-                        logger().info(log -> log.message("Row [" + name + "]=" + raw)
+                        getLogger().info(log -> log.message("Row [" + name + "]=" + raw)
                                 .context(c -> c
-                                .put("number", "d=" + d + " i=" + i + " l=" + l + " b=" + b.toPlainString() + " s=" + s.toPlainString())
-                                .put("formula", f.toPlainString())
+                                        .put("number", "d=" + d + " i=" + i + " l=" + l + " b=" + b.toPlainString() + " s=" + s.toPlainString())
+                                        .put("formula", f.toPlainString())
                                 )
                         );
                     }

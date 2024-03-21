@@ -1,91 +1,85 @@
 package io.github.sinri.keel.logger.event;
 
 import io.github.sinri.keel.logger.KeelLogLevel;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
+import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Supplier;
 
-public class KeelEventLoggerImpl implements KeelEventLogger {
-    private final @Nonnull Supplier<KeelEventLogCenter> eventLogCenterSupplier;
-    private final @Nonnull String presetTopic;
-    private KeelLogLevel visibleLogLevel = KeelLogLevel.INFO;
+/**
+ * @since 3.2.0
+ */
+class KeelEventLoggerImpl implements KeelEventLogger {
+    private final @Nonnull KeelIssueRecorder<KeelEventLog> issueRecorder;
+    private final @Nullable Handler<KeelEventLog> templateEventLogEditor;
+    private final @Nonnull List<KeelEventLogger> bypassLoggers;
 
-    private @Nullable Supplier<? extends KeelEventLog> baseLogBuilder;
-
-    public KeelEventLoggerImpl(
-            @Nonnull String presetTopic,
-            @Nonnull Supplier<KeelEventLogCenter> eventLogCenterSupplier
-    ) {
-        this(presetTopic, eventLogCenterSupplier, null);
+    KeelEventLoggerImpl(@Nonnull KeelIssueRecorder<KeelEventLog> issueRecorder, @Nullable Handler<KeelEventLog> templateEventLogEditor) {
+        this.issueRecorder = issueRecorder;
+        this.templateEventLogEditor = templateEventLogEditor;
+        this.bypassLoggers = new ArrayList<>();
     }
 
-    public KeelEventLoggerImpl(
-            @Nonnull String presetTopic,
-            @Nonnull Supplier<KeelEventLogCenter> eventLogCenterSupplier,
-            @Nullable Supplier<? extends KeelEventLog> baseLogBuilder
-    ) {
-        this.presetTopic = presetTopic;
-        this.eventLogCenterSupplier = eventLogCenterSupplier;
-        this.baseLogBuilder = baseLogBuilder;
+    @Nullable
+    @Override
+    public Handler<KeelEventLog> templateEventLogEditor() {
+        return templateEventLogEditor;
+    }
+
+    @Nonnull
+    private KeelIssueRecorder<KeelEventLog> getIssueRecorder() {
+        return issueRecorder;
+    }
+
+    @Override
+    public void addBypassLogger(@Nonnull KeelEventLogger bypassLogger) {
+        this.bypassLoggers.add(bypassLogger);
+    }
+
+    @Nonnull
+    @Override
+    public List<KeelEventLogger> getBypassLoggers() {
+        return bypassLoggers;
     }
 
     @Nonnull
     @Override
     public KeelLogLevel getVisibleLevel() {
-        return visibleLogLevel;
+        return this.getIssueRecorder().getVisibleLevel();
     }
 
     @Override
     public void setVisibleLevel(@Nonnull KeelLogLevel level) {
-        this.visibleLogLevel = level;
-    }
-
-    @Nonnull
-    @Override
-    public Supplier<KeelEventLogCenter> getEventLogCenterSupplier() {
-        return eventLogCenterSupplier;
+        this.getIssueRecorder().setVisibleLevel(level);
     }
 
     @Nonnull
     @Override
     public String getPresetTopic() {
-        return presetTopic;
-    }
-
-    @Nonnull
-    @Override
-    public Supplier<? extends KeelEventLog> getBaseLogBuilder() {
-        return Objects.requireNonNullElse(baseLogBuilder, (Supplier<KeelEventLogImpl>) () -> new KeelEventLogImpl(KeelLogLevel.INFO, getPresetTopic()));
+        return this.getIssueRecorder().topic();
     }
 
     @Override
-    public void setBaseLogBuilder(@Nullable Supplier<? extends KeelEventLog> baseLogBuilder) {
-        this.baseLogBuilder = baseLogBuilder;
-    }
+    public void log(@Nonnull Handler<KeelEventLog> eventLogHandler) {
+        this.getIssueRecorder().record(r -> {
+            var x = templateEventLogEditor();
+            if (x != null) {
+                x.handle(r);
+            }
+            eventLogHandler.handle(r);
+        });
 
-    /**
-     * @since 3.0.10
-     */
-    private final List<KeelEventLogger> bypassLoggerList = new ArrayList<>();
-
-    /**
-     * @since 3.0.10
-     */
-    @Override
-    public void addBypassLogger(@Nonnull KeelEventLogger bypassLogger) {
-        this.bypassLoggerList.add(bypassLogger);
-    }
-
-    /**
-     * @since 3.0.10
-     */
-    @Nonnull
-    @Override
-    public List<KeelEventLogger> getBypassLoggers() {
-        return this.bypassLoggerList;
+        getBypassLoggers().forEach(bypassLogger -> {
+            bypassLogger.log(r -> {
+                var x = templateEventLogEditor();
+                if (x != null) {
+                    x.handle(r);
+                }
+                eventLogHandler.handle(r);
+            });
+        });
     }
 }

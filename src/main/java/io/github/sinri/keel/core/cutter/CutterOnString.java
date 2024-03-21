@@ -2,7 +2,6 @@ package io.github.sinri.keel.core.cutter;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -11,6 +10,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
+
+import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 /**
  * @since 3.0.19
@@ -60,7 +61,7 @@ public class CutterOnString implements Cutter<String> {
                     cut();
                 })
                 .onFailure(throwable -> {
-                    KeelOutputEventLogCenter.instantLogger().exception(throwable, "Cutter::handle ERROR");
+                    Keel.getLogger().exception(throwable, "Cutter::handle ERROR");
                 });
     }
 
@@ -90,7 +91,7 @@ public class CutterOnString implements Cutter<String> {
                     return Future.succeededFuture();
                 })
                 .onFailure(throwable -> {
-                    KeelOutputEventLogCenter.instantLogger().exception(throwable, "Cutter::cut ERROR");
+                    Keel.getLogger().exception(throwable, "Cutter::cut ERROR");
                 })
                 .compose(v -> {
                     return Future.succeededFuture();

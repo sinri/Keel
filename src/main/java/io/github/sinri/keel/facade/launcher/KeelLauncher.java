@@ -18,18 +18,24 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 public final class KeelLauncher extends Launcher {
 
     private final KeelLauncherAdapter adapter;
+    private final KeelEventLogger logger;
 
     public KeelLauncher(@Nonnull KeelLauncherAdapter adapter) {
         this.adapter = adapter;
+        this.logger = adapter.buildEventLoggerForLauncher();
     }
 
-    private KeelEventLogger logger() {
-        return this.adapter.logger();
+    /**
+     * @since 3.2.0
+     */
+    @Nonnull
+    private KeelEventLogger eventLogger() {
+        return this.logger;
     }
 
     @Override
     public void afterConfigParsed(JsonObject config) {
-        logger().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("afterConfigParsed")
                 .context(c -> c
                         .put("config", config)
@@ -41,7 +47,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void beforeStartingVertx(VertxOptions options) {
-        logger().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("beforeStartingVertx")
                 .context(c -> c
                         .put("VertxOptions", options.toJson())
@@ -53,7 +59,7 @@ public final class KeelLauncher extends Launcher {
     @Override
     public void afterStartingVertx(Vertx vertx) {
         Keel.setVertx(vertx);
-        logger().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("afterStartingVertx")
         );
         this.adapter.afterStartingVertx(vertx);
@@ -61,7 +67,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void beforeDeployingVerticle(DeploymentOptions deploymentOptions) {
-        logger().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("beforeDeployingVerticle")
                 .context(c -> c
                         .put("VertxOptions", deploymentOptions.toJson())
@@ -77,7 +83,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void beforeStoppingVertx(Vertx vertx) {
-        logger().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("beforeStoppingVertx")
         );
         this.adapter.beforeStoppingVertx();
@@ -85,7 +91,7 @@ public final class KeelLauncher extends Launcher {
 
     @Override
     public void afterStoppingVertx() {
-        logger().debug(log -> log
+        eventLogger().debug(log -> log
                 .message("afterStoppingVertx")
         );
         this.adapter.afterStoppingVertx();

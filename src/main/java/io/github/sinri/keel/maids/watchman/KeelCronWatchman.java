@@ -2,6 +2,7 @@ package io.github.sinri.keel.maids.watchman;
 
 import io.github.sinri.keel.core.KeelCronExpression;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -34,7 +35,8 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
 
             readAsyncMapForEventHandlers(calendar)
                     .onSuccess(list -> list.forEach(x -> x.handle(now)))
-                    .onFailure(throwable -> getLogger().exception(throwable));
+                    .onFailure(throwable -> getLogger().exception(throwable, r -> {
+                    }));
         };
         this.cronTabUpdateStartup = cronTabUpdateStartup;
     }
@@ -210,9 +212,17 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
                 .compose(v -> cronTabUpdateStartup.apply(eventBusAddress()))
                 .onSuccess(v -> super.start())
                 .onFailure(throwable -> {
-                    getLogger().exception(throwable);
+                    getLogger().exception(throwable, r -> {
+                    });
                     undeployMe();
                 });
     }
 
+    /**
+     * @since 3.2.0
+     */
+    @Override
+    protected KeelEventLogger buildEventLogger() {
+        return null;
+    }
 }

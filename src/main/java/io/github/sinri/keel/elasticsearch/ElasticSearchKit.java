@@ -1,7 +1,8 @@
 package io.github.sinri.keel.elasticsearch;
 
 import io.github.sinri.keel.elasticsearch.index.ESIndexMixin;
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+
+import javax.annotation.Nonnull;
 
 /**
  * @see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/8.9/rest-apis.html">ES Restful API 8.9</a>
@@ -10,19 +11,15 @@ import io.github.sinri.keel.logger.event.KeelEventLogger;
  */
 public class ElasticSearchKit implements ESApiMixin, ESIndexMixin {
     private final ElasticSearchConfig esConfig;
-    private final KeelEventLogger logger;
 
-    public ElasticSearchKit(String esKey, KeelEventLogger logger) {
+    /**
+     * @since 3.2.0 replace KeelEventLogger with KeelRoutineIssueRecorder.
+     */
+    public ElasticSearchKit(@Nonnull String esKey) {
         this.esConfig = new ElasticSearchConfig(esKey);
-        this.logger = logger;
     }
 
     public ElasticSearchConfig getEsConfig() {
         return esConfig;
     }
-
-    public KeelEventLogger getLogger() {
-        return logger;
-    }
-
 }

@@ -16,7 +16,7 @@ A Java framework with VERT.X eco, for projects for web, job and more.
 
 ## Third Party Integration
 
-* [Vert.x](https://vertx.io) 4.5.1
+* [Vert.x](https://vertx.io) 4.5.4
 * [org.commonmark:commonmark](https://github.com/commonmark/commonmark-java) ![GitHub](https://img.shields.io/github/license/commonmark/commonmark-java)
   0.21.0
 * [org.reflections:reflections](https://github.com/ronmamo/reflections) ![GitHub](https://img.shields.io/github/license/ronmamo/reflections)
@@ -31,12 +31,23 @@ A Java framework with VERT.X eco, for projects for web, job and more.
 
 Consider to use [Dry Dock of Keel](https://github.com/sinri/DryDockOfKeel) to build an application quickly!
 
+I started a project to provide lession around how to startup with DryDock, including
+Keel: https://github.com/sinri/DryDockLession :)
+
 ## Branches
 
 * latest: the latest pushed version of Keel, may not be released yet.
 * p3: the latest released version of Keel 3.x.
 
 ## Migration
+
+### From 3.1.x to 3.2.x
+
+* Rebuilt logging implementation.
+  * The `KeelIssueRecord*` becomes the base realization.
+  * The `KeelEventLog*` are kept but reimplemented above `KeelIssueRecord*`.
+  * Refined the classed that use logging.
+* Provided `KeelMetrixRecord*` functions.
 
 ### From 3.0.x to 3.1.x
 

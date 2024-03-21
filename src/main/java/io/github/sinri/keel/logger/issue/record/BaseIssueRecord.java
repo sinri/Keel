@@ -14,7 +14,7 @@ import java.util.List;
  * @since 3.1.10
  */
 @TechnicalPreview(since = "3.1.10")
-public abstract class BaseIssueRecord<T> implements KeelIssueRecord<T>, IssueRecordMessageMixin<T> {
+public abstract class BaseIssueRecord<T> implements KeelIssueRecord<T> {
     private final @Nonnull JsonObject attributes;
     private final @Nonnull List<String> classification;
     private long timestamp;
@@ -108,5 +108,11 @@ public abstract class BaseIssueRecord<T> implements KeelIssueRecord<T>, IssueRec
     final public T message(@Nonnull String message) {
         this.attribute(IssueRecordMessageMixin.AttributeMessage, message);
         return getImplementation();
+    }
+
+    @Override
+    public T context(@Nonnull JsonObject context) {
+        this.attribute(AttributeContext, context);
+        return this.getImplementation();
     }
 }

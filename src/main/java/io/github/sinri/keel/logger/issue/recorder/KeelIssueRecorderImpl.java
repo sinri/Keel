@@ -4,8 +4,12 @@ import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
+import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -54,9 +58,41 @@ class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>> implements KeelIssueRe
         return issueRecordBuilder;
     }
 
+    private final List<KeelIssueRecorder<T>> bypassIssueRecorders = new ArrayList<>();
+    @Nullable
+    Handler<T> recordFormatter = null;
+
+    /**
+     * @since 3.2.0
+     */
+    @Override
+    public void addBypassIssueRecorder(@Nonnull KeelIssueRecorder<T> bypassIssueRecorder) {
+        bypassIssueRecorders.add(bypassIssueRecorder);
+    }
+
     @Nonnull
     @Override
     public String topic() {
         return topic;
+    }
+
+    /**
+     * @since 3.2.0
+     */
+    @Nonnull
+    @Override
+    public List<KeelIssueRecorder<T>> getBypassIssueRecorders() {
+        return bypassIssueRecorders;
+    }
+
+    @Nullable
+    @Override
+    public Handler<T> getRecordFormatter() {
+        return recordFormatter;
+    }
+
+    @Override
+    public void setRecordFormatter(@Nullable Handler<T> handler) {
+        this.recordFormatter = handler;
     }
 }

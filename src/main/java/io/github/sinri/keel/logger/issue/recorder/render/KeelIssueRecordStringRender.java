@@ -29,7 +29,7 @@ public class KeelIssueRecordStringRender implements KeelIssueRecordRender<String
         StringBuilder s = new StringBuilder("㏒ ");
         s.append(KeelHelpers.datetimeHelper().getDateExpression(issueRecord.timestamp(), KeelDateTimeHelper.MYSQL_DATETIME_MS_PATTERN));
         s.append(" [").append(issueRecord.level().name()).append("]");
-        s.append(" ").append(issueRecord.topic()).append("(").append(KeelHelpers.stringHelper().joinStringArray(issueRecord.classification(), ",")).append(")");
+        s.append(" ").append(issueRecord.topic()).append(" (").append(KeelHelpers.stringHelper().joinStringArray(issueRecord.classification(), ",")).append(")");
         if (!issueRecord.attributes().isEmpty()) {
             issueRecord.attributes().forEach(attribute -> {
                 s.append("\n ▪ ").append(attribute.getKey()).append(": ").append(attribute.getValue());

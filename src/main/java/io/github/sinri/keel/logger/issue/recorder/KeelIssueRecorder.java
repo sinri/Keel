@@ -7,6 +7,8 @@ import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -38,8 +40,24 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>> {
     @Nonnull
     Supplier<T> issueRecordBuilder();
 
+    /**
+     * @since 3.2.0
+     */
+    void addBypassIssueRecorder(@Nonnull KeelIssueRecorder<T> bypassIssueRecorder);
+
+    /**
+     * @since 3.2.0
+     */
+    @Nonnull
+    List<KeelIssueRecorder<T>> getBypassIssueRecorders();
+
     @Nonnull
     String topic();
+
+    @Nullable
+    Handler<T> getRecordFormatter();
+
+    void setRecordFormatter(@Nullable Handler<T> handler);
 
     /**
      * Record an issue (created with `issueRecordBuilder` and modified with `issueHandler`).
@@ -50,9 +68,21 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>> {
     default void record(@Nonnull Handler<T> issueHandler) {
         T issue = this.issueRecordBuilder().get();
         issueHandler.handle(issue);
+
+        Handler<T> recordFormatter = getRecordFormatter();
+        if (recordFormatter != null) {
+            recordFormatter.handle(issue);
+        }
+
         if (issue.level().isEnoughSeriousAs(getVisibleLevel())) {
             this.issueRecordCenter().getAdapter().record(topic(), issue);
         }
+
+        getBypassIssueRecorders().forEach(keelIssueRecorder -> {
+            if (issue.level().isEnoughSeriousAs(keelIssueRecorder.getVisibleLevel())) {
+                keelIssueRecorder.issueRecordCenter().getAdapter().record(topic(), issue);
+            }
+        });
     }
 
     default void debug(@Nonnull Handler<T> issueHandler) {
@@ -103,4 +133,38 @@ public interface KeelIssueRecorder<T extends KeelIssueRecord<?>> {
             issueHandler.handle(t);
         });
     }
+
+    default void exception(@Nonnull Throwable throwable, @Nonnull String message) {
+        exception(throwable, t -> t.message(message));
+    }
+
+    default void exception(@Nonnull Throwable throwable) {
+        exception(throwable, t -> {
+        });
+    }
+
+    default void debug(@Nonnull String message) {
+        debug(t -> t.message(message));
+    }
+
+    default void info(@Nonnull String message) {
+        info(t -> t.message(message));
+    }
+
+    default void notice(@Nonnull String message) {
+        notice(t -> t.message(message));
+    }
+
+    default void warning(@Nonnull String message) {
+        warning(t -> t.message(message));
+    }
+
+    default void error(@Nonnull String message) {
+        error(t -> t.message(message));
+    }
+
+    default void fatal(@Nonnull String message) {
+        fatal(t -> t.message(message));
+    }
+
 }

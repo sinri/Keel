@@ -1,104 +1,121 @@
 package io.github.sinri.keel.web.http.receptionist;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.web.http.prehandler.KeelPlatformHandler;
 import io.vertx.core.http.impl.CookieImpl;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Objects;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 2.9.2
  * @since 3.0.0 TEST PASSED
+ * @since 3.2.0 Moved the responding error for `dealt` logging logic out of the `respondOn*` methods.
  */
 public abstract class KeelWebReceptionist {
-    private final RoutingContext routingContext;
-    private final KeelEventLogger logger;
+    private final @Nonnull RoutingContext routingContext;
+    private final @Nonnull KeelIssueRecorder<ReceptionistIssueRecord> issueRecorder;
 
-    public KeelWebReceptionist(RoutingContext routingContext) {
+    public KeelWebReceptionist(@Nonnull RoutingContext routingContext) {
         this.routingContext = routingContext;
-        this.logger = createLogger();
-        // since 3.1.10
-        this.logger.setBaseLogBuilder((Supplier<KeelWebReceptionistRequestEventLog>) () -> new KeelWebReceptionistRequestEventLog(logger.getPresetTopic(), routingContext));
+        this.issueRecorder = issueRecordCenter().generateIssueRecorder(ReceptionistIssueRecord.TopicReceptionist, () -> new ReceptionistIssueRecord(readRequestID()));
+        this.issueRecorder.info(r -> r.setRequest(
+                routingContext.request().method(),
+                routingContext.request().path(),
+                this.getClass(),
+                (isVerboseLogging() ? routingContext.request().query() : null),
+                (isVerboseLogging() ? routingContext.body().asString() : null)
+        ));
     }
 
-    protected RoutingContext getRoutingContext() {
+    @Nonnull
+    protected final RoutingContext getRoutingContext() {
         return routingContext;
     }
 
-    abstract protected KeelEventLogger createLogger();
+    protected boolean isVerboseLogging() {
+        return false;
+    }
 
-    public KeelEventLogger getLogger() {
-        return logger;
+    /**
+     * @since 3.2.0
+     */
+    @Nonnull
+    abstract protected KeelIssueRecordCenter issueRecordCenter();
+
+    /**
+     * @since 3.2.0
+     */
+    @Nonnull
+    public final KeelIssueRecorder<ReceptionistIssueRecord> getIssueRecorder() {
+        return issueRecorder;
     }
 
     abstract public void handle();
 
-    private void respondWithJsonObject(JsonObject resp) {
-        try {
-            routingContext.json(resp);
-        } catch (Throwable throwable) {
-            logger.exception(throwable, event -> event
-                    .message("RoutingContext has been dealt by others")
-                    .context(c -> c
-                            .put("response", new JsonObject()
-                                    .put("code", routingContext.response().getStatusCode())
-                                    .put("message", routingContext.response().getStatusMessage())
-                                    .put("ended", routingContext.response().ended())
-                                    .put("closed", routingContext.response().closed())
-                            )
-                    )
-            );
-        }
+    private void respondWithJsonObject(@Nonnull JsonObject resp) {
+        routingContext.json(resp);
     }
 
     /**
      * @since 3.0.12 add request_id to output json object
      */
-    protected void respondOnSuccess(Object data) {
+    protected void respondOnSuccess(@Nullable Object data) {
         JsonObject resp = new JsonObject()
                 .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                 .put("code", "OK")
                 .put("data", data);
-        logger.info(event -> event.message("RESPOND SUCCESS"));
+        getIssueRecorder().info(r -> {
+            r.message("SUCCESS, TO RESPOND.");
+            if (isVerboseLogging()) {
+                r.setResponse(resp);
+            }
+        });
         respondWithJsonObject(resp);
     }
 
     /**
      * @since 3.0.12 add request_id to output json object
      */
-    protected void respondOnFailure(Throwable throwable) {
+    protected void respondOnFailure(@Nonnull Throwable throwable) {
         var resp = new JsonObject()
                 .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                 .put("code", "FAILED")
                 .put("data", throwable.getMessage());
         String error = KeelHelpers.stringHelper().renderThrowableChain(throwable);
         resp.put("throwable", error);
-        logger.exception(throwable, event -> event.message("RESPOND FAILURE"));
+        getIssueRecorder().exception(throwable, r -> {
+            r.message("FAILED, TO RESPOND.");
+            if (isVerboseLogging()) {
+                r.setResponse(resp);
+            }
+        });
         respondWithJsonObject(resp);
     }
 
     /**
      * @since 3.0.8 mark it nullable as it might be null.
      */
-    public @Nullable String readRequestID() {
-        return routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID);
+    public @Nonnull String readRequestID() {
+        return Objects.requireNonNull(routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID));
     }
 
     /**
      * @since 3.0.8 mark it nullable as it might be null.
      */
-    public @Nullable Long readRequestStartTime() {
-        return routingContext.get(KeelPlatformHandler.KEEL_REQUEST_START_TIME);
+    public @Nonnull Long readRequestStartTime() {
+        return Objects.requireNonNull(routingContext.get(KeelPlatformHandler.KEEL_REQUEST_START_TIME));
     }
 
-    public List<String> readRequestIPChain() {
+    public @Nonnull List<String> readRequestIPChain() {
         return KeelHelpers.netHelper().parseWebClientIPChain(routingContext);
     }
 
@@ -120,14 +137,15 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.0.1
      */
-    protected void addCookie(String name, String value, Long maxAge) {
+    protected void addCookie(@Nonnull String name, @Nonnull String value, Long maxAge) {
         addCookie(name, value, maxAge, false);
     }
 
     /**
      * @since 3.0.1
      */
-    protected void removeCookie(String name) {
+    protected void removeCookie(@Nonnull String name) {
         getRoutingContext().response().removeCookie(name);
     }
+
 }

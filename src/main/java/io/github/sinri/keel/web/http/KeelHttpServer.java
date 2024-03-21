@@ -1,9 +1,8 @@
 package io.github.sinri.keel.web.http;
 
 import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
-import io.github.sinri.keel.verticles.KeelVerticleBase;
-import io.vertx.core.Handler;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.verticles.KeelVerticleImplWithEventLogger;
 import io.vertx.core.Promise;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
@@ -12,11 +11,10 @@ import io.vertx.ext.web.Router;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
-abstract public class KeelHttpServer extends KeelVerticleBase {
+abstract public class KeelHttpServer extends KeelVerticleImplWithEventLogger {
     public static final String CONFIG_HTTP_SERVER_PORT = "http_server_port";
     public static final String CONFIG_HTTP_SERVER_OPTIONS = "http_server_options";
     public static final String CONFIG_IS_MAIN_SERVICE = "is_main_service";
-    protected Handler<Promise<Object>> gracefulCloseHandler;
     protected HttpServer server;
 
     protected int getHttpServerPort() {
@@ -39,19 +37,8 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
 
     protected abstract void configureRoutes(Router router);
 
-    public KeelHttpServer setGracefulCloseHandler(Handler<Promise<Object>> gracefulCloseHandler) {
-        this.gracefulCloseHandler = gracefulCloseHandler;
-        return this;
-    }
-
-    protected KeelEventLogger createLogger() {
-        return KeelOutputEventLogCenter.getInstance().createLogger(getClass().getName());
-    }
-
     @Override
     public void start() throws Exception {
-        setLogger(createLogger());
-
         this.server = Keel.getVertx().createHttpServer(getHttpServerOptions());
 
         Router router = Router.router(Keel.getVertx());
@@ -59,37 +46,46 @@ abstract public class KeelHttpServer extends KeelVerticleBase {
 
         server.requestHandler(router)
                 .exceptionHandler(throwable -> {
-                    getLogger().exception(throwable, "KeelHttpServer Exception");
+                    getLogger().exception(throwable, r -> r.message("KeelHttpServer Exception"));
                 })
                 .listen(httpServerAsyncResult -> {
                     if (httpServerAsyncResult.succeeded()) {
                         HttpServer httpServer = httpServerAsyncResult.result();
-                        getLogger().info("HTTP Server Established, Actual Port: " + httpServer.actualPort());
-
-//                        this.getKeel().addClosePrepareHandler(this::terminate);
+                        getLogger().info(r -> r.message("HTTP Server Established, Actual Port: " + httpServer.actualPort()));
                     } else {
                         Throwable throwable = httpServerAsyncResult.cause();
-                        getLogger().exception(throwable, "Listen failed");
+                        getLogger().exception(throwable, r -> r.message("Listen failed"));
 
                         if (this.isMainService()) {
                             Keel.gracefullyClose(Promise::complete);
                         }
                     }
-                })
-        ;
+                });
+    }
+
+
+    /**
+     * @since 3.2.0
+     */
+    @Override
+    protected KeelEventLogger buildEventLogger() {
+        return KeelIssueRecordCenter.outputCenter().generateEventLogger("KeelHttpServer");
     }
 
     public void terminate(Promise<Void> promise) {
-        server.close(ar -> {
-            if (ar.succeeded()) {
-                getLogger().info("HTTP Server Closed");
-            } else {
-                getLogger().error("HTTP Server Closing Failure: " + ar.cause().getMessage());
-            }
-
-            if (this.isMainService()) {
-                Keel.gracefullyClose(Promise::complete);
-            }
-        });
+        server.close().andThen(ar -> {
+                    if (ar.succeeded()) {
+                        getLogger().info(r -> r.message("HTTP Server Closed"));
+                        promise.complete();
+                    } else {
+                        getLogger().exception(ar.cause(), r -> r.message("HTTP Server Closing Failure: " + ar.cause().getMessage()));
+                        promise.fail(ar.cause());
+                    }
+                })
+                .andThen(ar -> {
+                    if (this.isMainService()) {
+                        Keel.gracefullyClose(Promise::complete);
+                    }
+                });
     }
 }

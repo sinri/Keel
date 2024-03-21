@@ -1,10 +1,10 @@
 package io.github.sinri.keel.facade;
 
-import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.facade.cluster.KeelClusterKit;
 import io.github.sinri.keel.helper.KeelHelpersInterface;
+import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
-import io.github.sinri.keel.logger.event.center.KeelOutputEventLogCenter;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -16,19 +16,22 @@ import java.util.Objects;
 /**
  * @since 3.1.0
  */
-@TechnicalPreview(since = "3.1.0")
 public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     public static KeelInstance Keel = new KeelInstance();
 
     private final @Nonnull KeelConfiguration configuration;
     private @Nullable Vertx vertx;
     private @Nullable ClusterManager clusterManager;
-
-    private KeelEventLogger logger;
+    /**
+     * @since 3.2.0 replace Keel Event Logger.
+     */
+    @Nonnull
+    private KeelEventLogger eventLogger;
 
     private KeelInstance() {
         this.configuration = KeelConfiguration.createFromJsonObject(new JsonObject());
-        this.logger = KeelOutputEventLogCenter.getInstance().createLogger("Keel");
+        this.eventLogger = KeelIssueRecordCenter.outputCenter().generateEventLogger("Keel");
+        this.eventLogger.setVisibleLevel(KeelLogLevel.WARNING);
     }
 
     @Nonnull
@@ -47,7 +50,7 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     }
 
     public void setVertx(@Nonnull Vertx outsideVertx) {
-        logger.debug("KeelInstance::setVertx is called with outsideVertx " + outsideVertx + " while currently vertx is " + vertx);
+        eventLogger.debug(r -> r.message("KeelInstance::setVertx is called with outsideVertx " + outsideVertx + " while currently vertx is " + vertx));
         if (vertx == null) {
             vertx = outsideVertx;
         } else {
@@ -101,21 +104,29 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
         return isVertxInitialized() && getVertx().isClustered();
     }
 
+    /**
+     * @since 3.2.0
+     * To acquire an instant logger for those logs without designed topic.
+     * By default, it is print to stdout and only WARNING and above may be recorded.
+     * If you want to debug locally, just get it and reset its visible level.
+     */
+    @Nonnull
     public KeelEventLogger getLogger() {
-        return logger;
+        return eventLogger;
     }
 
-    public KeelInstance setLogger(KeelEventLogger logger) {
-        this.logger = logger;
+    /**
+     * @since 3.2.0
+     */
+    public KeelInstance setLogger(@Nonnull KeelEventLogger eventLogger) {
+        this.eventLogger = eventLogger;
         return this;
     }
 
     public Future<Void> gracefullyClose(@Nonnull Handler<Promise<Void>> promiseHandler) {
         Promise<Void> promise = Promise.promise();
         promiseHandler.handle(promise);
-        return promise.future().compose(v -> {
-            return getVertx().close();
-        });
+        return promise.future().compose(v -> getVertx().close());
     }
 
     public Future<Void> close() {

@@ -1,16 +1,16 @@
 package io.github.sinri.keel.web.tcp;
 
-import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
+import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.servant.funnel.KeelFunnel;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import io.vertx.core.ThreadingModel;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.SocketAddress;
 
 import java.util.UUID;
-
-import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 /**
  * @since 2.8
@@ -19,7 +19,10 @@ abstract public class KeelAbstractSocketWrapper {
     private final String socketID;
     private final NetSocket socket;
     private final KeelFunnel funnel;
-    private KeelEventLogger logger;
+    /**
+     * @since 3.2.0
+     */
+    private KeelIssueRecorder<SocketIssueRecord> issueRecorder;
 
     public KeelAbstractSocketWrapper(NetSocket socket) {
         this(socket, UUID.randomUUID().toString());
@@ -28,19 +31,17 @@ abstract public class KeelAbstractSocketWrapper {
     public KeelAbstractSocketWrapper(NetSocket socket, String socketID) {
         this.socketID = socketID;
         this.socket = socket;
-        this.logger = KeelEventLogger.silentLogger();
-//        this.logger.setCategoryPrefix(socketID);
+
+        this.setIssueRecorder(KeelIssueRecordCenter.createSilentIssueRecorder());
 
         this.funnel = new KeelFunnel();
-        this.funnel.deployMe(new DeploymentOptions().setWorker(true));
+        this.funnel.deployMe(new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER));
 
         this.socket
                 .handler(buffer -> {
-                    getLogger().info(eventLog -> eventLog
+                    getIssueRecorder().info(eventLog -> eventLog
                             .message("READ BUFFER " + buffer.length() + " BYTES")
-                            .context(c -> c
-                            .put("buffer", KeelHelpers.binaryHelper().encodeHexWithUpperDigits(buffer))
-                            )
+                            .buffer(buffer)
                     );
 
                     this.funnel.add(() -> {
@@ -55,7 +56,7 @@ abstract public class KeelAbstractSocketWrapper {
                      This handler might be called after the close handler
                      when the socket is paused and there are still buffers to deliver.
                      */
-                    getLogger().info("READ TO END");
+                    getIssueRecorder().info(r -> r.message("READ TO END"));
                     whenReadToEnd();
                 })
                 .drainHandler(drain -> {
@@ -67,29 +68,34 @@ abstract public class KeelAbstractSocketWrapper {
                     The stream implementation defines when the drain handler,
                     for example it could be when the queue size has been reduced to maxSize / 2.
                      */
-                    getLogger().info("BE WRITABLE AGAIN, RESUME");
+                    getIssueRecorder().info(r -> r.message("BE WRITABLE AGAIN, RESUME"));
                     socket.resume();
                     whenDrain();
                 })
                 .closeHandler(close -> {
-                    getLogger().info("SOCKET CLOSE");
+                    getIssueRecorder().info(r -> r.message("SOCKET CLOSE"));
                     this.funnel.undeployMe();
                     whenClose();
                 })
                 .exceptionHandler(throwable -> {
-                    getLogger().exception(throwable, "socket exception");
+                    getIssueRecorder().exception(throwable, r -> r.message("socket exception"));
                     whenExceptionOccurred(throwable);
                 });
     }
 
-
-    public KeelEventLogger getLogger() {
-        return logger;
+    /**
+     * @since 3.2.0
+     */
+    public KeelIssueRecorder<SocketIssueRecord> getIssueRecorder() {
+        return issueRecorder;
     }
 
-    public KeelAbstractSocketWrapper setLogger(KeelEventLogger logger) {
-        this.logger = logger;
-//        this.logger.setCategoryPrefix(socketID);
+    /**
+     * @since 3.2.0
+     */
+    public KeelAbstractSocketWrapper setIssueRecorder(KeelIssueRecorder<SocketIssueRecord> issueRecorder) {
+        this.issueRecorder = issueRecorder;
+        this.issueRecorder.setRecordFormatter(r -> r.classification("socket_id:" + socketID));
         return this;
     }
 
@@ -130,7 +136,7 @@ abstract public class KeelAbstractSocketWrapper {
         Future<Void> future = this.socket.write(s);
         if (this.socket.writeQueueFull()) {
             this.socket.pause();
-            getLogger().info("Write Queue Full, PAUSE");
+            getIssueRecorder().info(r -> r.message("Write Queue Full, PAUSE"));
         }
         return future;
     }
@@ -139,7 +145,7 @@ abstract public class KeelAbstractSocketWrapper {
         Future<Void> future = this.socket.write(s, enc);
         if (this.socket.writeQueueFull()) {
             this.socket.pause();
-            getLogger().info("Write Queue Full, PAUSE");
+            getIssueRecorder().info(r -> r.message("Write Queue Full, PAUSE"));
         }
         return future;
     }
@@ -148,7 +154,7 @@ abstract public class KeelAbstractSocketWrapper {
         Future<Void> future = this.socket.write(buffer);
         if (this.socket.writeQueueFull()) {
             this.socket.pause();
-            getLogger().info("Write Queue Full, PAUSE");
+            getIssueRecorder().info(r -> r.message("Write Queue Full, PAUSE"));
         }
         return future;
     }

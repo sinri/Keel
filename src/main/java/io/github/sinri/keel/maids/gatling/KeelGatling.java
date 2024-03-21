@@ -1,7 +1,8 @@
 package io.github.sinri.keel.maids.gatling;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
-import io.github.sinri.keel.verticles.KeelVerticleBase;
+import io.github.sinri.keel.logger.event.KeelEventLogger;
+import io.github.sinri.keel.verticles.KeelVerticleImplWithEventLogger;
 import io.vertx.core.*;
 import io.vertx.core.shareddata.Counter;
 
@@ -18,7 +19,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * @since 2.9.1
  * @since 2.9.3 change to VERTICLE
  */
-public class KeelGatling extends KeelVerticleBase {
+public class KeelGatling extends KeelVerticleImplWithEventLogger {
     private final Options options;
     private final AtomicInteger barrelUsed = new AtomicInteger(0);
 
@@ -30,7 +31,7 @@ public class KeelGatling extends KeelVerticleBase {
         Options options = new Options(gatlingName);
         optionHandler.handle(options);
         KeelGatling keelGatling = new KeelGatling(options);
-        return Keel.getVertx().deployVerticle(keelGatling, new DeploymentOptions().setWorker(true));
+        return Keel.getVertx().deployVerticle(keelGatling, new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER));
     }
 
     protected Future<Void> rest() {
@@ -51,7 +52,7 @@ public class KeelGatling extends KeelVerticleBase {
 
     private Future<Void> fireOnce() {
         if (barrelUsed.get() >= options.getBarrels()) {
-            getLogger().debug("BARREL FULL");
+            getLogger().debug(r -> r.message("BARREL FULL"));
             return rest();
         }
         return Future.succeededFuture()
@@ -65,9 +66,9 @@ public class KeelGatling extends KeelVerticleBase {
 
                     fireBullet(bullet, firedAR -> {
                         if (firedAR.failed()) {
-                            getLogger().exception(firedAR.cause(), "BULLET FIRED ERROR");
+                            getLogger().exception(firedAR.cause(), r -> r.message("BULLET FIRED ERROR"));
                         } else {
-                            getLogger().info("BULLET FIRED DONE");
+                            getLogger().info(r -> r.message("BULLET FIRED DONE"));
                         }
                         barrelUsed.decrementAndGet();
                     });
@@ -75,7 +76,7 @@ public class KeelGatling extends KeelVerticleBase {
                     return KeelAsyncKit.sleep(10L);
                 })
                 .recover(throwable -> {
-                    getLogger().exception(throwable, "FAILED TO LOAD BULLET");
+                    getLogger().exception(throwable, r -> r.message("FAILED TO LOAD BULLET"));
                     return rest();
                 });
     }
@@ -111,7 +112,7 @@ public class KeelGatling extends KeelVerticleBase {
                     .compose(v -> {
                         if (blocked.get()) {
                             return releaseExclusiveLocksOfBullet(bullet)
-                                    .eventually(released -> Future.failedFuture(new Exception("This bullet met Exclusive Lock Block.")));
+                                    .eventually(() -> Future.failedFuture(new Exception("This bullet met Exclusive Lock Block.")));
                         }
                         return Future.succeededFuture();
                     });
@@ -151,6 +152,11 @@ public class KeelGatling extends KeelVerticleBase {
                 );
 
         promise.future().andThen(handler);
+    }
+
+    @Override
+    protected KeelEventLogger buildEventLogger() {
+        return null;
     }
 
     public static class Options {
