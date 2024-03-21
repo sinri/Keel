@@ -31,6 +31,9 @@ A Java framework with VERT.X eco, for projects for web, job and more.
 
 Consider to use [Dry Dock of Keel](https://github.com/sinri/DryDockOfKeel) to build an application quickly!
 
+I started a project to provide lession around how to startup with DryDock, including
+Keel: https://github.com/sinri/DryDockLession :)
+
 ## Branches
 
 * latest: the latest pushed version of Keel, may not be released yet.
