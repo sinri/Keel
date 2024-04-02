@@ -6,6 +6,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.DecodeException;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
@@ -73,9 +75,7 @@ public interface ESApiMixin {
                 })
                 .compose(bufferHttpResponse -> {
                     int statusCode = bufferHttpResponse.statusCode();
-                    JsonObject resp = bufferHttpResponse.bodyAsJsonObject();
-
-                    if ((statusCode >= 300 || statusCode < 200) || resp == null) {
+                    if ((statusCode >= 300 || statusCode < 200)) {
                         this.getLogger().error(log -> {
                             logRequestEnricher.handle(log);
                             log.message("ES API Response Error")
@@ -86,12 +86,21 @@ public interface ESApiMixin {
                         });
                         return Future.failedFuture("ES API: STATUS CODE IS " + statusCode + " | " + bufferHttpResponse.bodyAsString());
                     }
+
+                    JsonObject resp;
+                    try {
+                        resp = bufferHttpResponse.bodyAsJsonObject();
+                    } catch (DecodeException decodeException) {
+                        resp = new JsonObject()
+                                .put("array", new JsonArray(bufferHttpResponse.bodyAsString()));
+                    }
+                    JsonObject finalResp = resp;
                     this.getLogger().info(log -> {
                         logRequestEnricher.handle(log);
                         log.message("ES API Response Error")
                                 .put("response", new JsonObject()
                                         .put("status_code", statusCode)
-                                        .put("body", resp)
+                                        .put("body", finalResp)
                                 );
                     });
                     return Future.succeededFuture(resp);

@@ -42,10 +42,10 @@ public class SelectStatement extends AbstractReadStatement {
     public SelectStatement(@Nonnull SelectStatement another) {
         this.whereConditionsComponent = new ConditionsComponent(another.whereConditionsComponent);
         this.havingConditionsComponent = new ConditionsComponent(another.havingConditionsComponent);
-        this.tables = new ArrayList(another.tables);
-        this.columns = new ArrayList(another.columns);
-        this.categories = new ArrayList(another.categories);
-        this.sortRules = new ArrayList(another.sortRules);
+        this.tables = new ArrayList<>(another.tables);
+        this.columns = new ArrayList<>(another.columns);
+        this.categories = new ArrayList<>(another.categories);
+        this.sortRules = new ArrayList<>(another.sortRules);
         this.offset = another.offset;
         this.limit = another.limit;
         this.lockMode = another.lockMode;
@@ -55,10 +55,10 @@ public class SelectStatement extends AbstractReadStatement {
     public SelectStatement() {
         this.whereConditionsComponent = new ConditionsComponent();
         this.havingConditionsComponent = new ConditionsComponent();
-        this.tables = new ArrayList();
-        this.columns = new ArrayList();
-        this.categories = new ArrayList();
-        this.sortRules = new ArrayList();
+        this.tables = new ArrayList<>();
+        this.columns = new ArrayList<>();
+        this.categories = new ArrayList<>();
+        this.sortRules = new ArrayList<>();
         this.offset = 0L;
         this.limit = 0L;
         this.lockMode = "";
@@ -92,7 +92,7 @@ public class SelectStatement extends AbstractReadStatement {
         if (alias.isBlank()) {
             throw new KeelSQLGenerateError("Sub Query without alias");
         }
-        return this.from("(" + subQuery.toString() + ")", alias);
+        return this.from("(" + subQuery + ")", alias);
     }
 
     public SelectStatement leftJoin(@Nonnull Function<JoinComponent, JoinComponent> joinFunction) {
@@ -225,8 +225,8 @@ public class SelectStatement extends AbstractReadStatement {
                     throw new RuntimeException(var3);
                 }
             }), this.execute(sqlConnection)).compose((compositeFuture) -> {
-                Long total = (Long)compositeFuture.resultAt(0);
-                ResultMatrix resultMatrix = (ResultMatrix)compositeFuture.resultAt(1);
+                Long total = compositeFuture.resultAt(0);
+                ResultMatrix resultMatrix = compositeFuture.resultAt(1);
                 return Future.succeededFuture(new PaginationResult(total, resultMatrix));
             });
         }
