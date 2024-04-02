@@ -22,6 +22,11 @@ public class ConditionsComponent {
         conditions = new ArrayList<>();
     }
 
+    public ConditionsComponent(@Nonnull ConditionsComponent another) {
+        this.conditions = another.conditions;
+    }
+
+
     public boolean isEmpty() {
         return this.conditions.isEmpty();
     }

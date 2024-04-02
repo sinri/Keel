@@ -1,10 +1,15 @@
 package io.github.sinri.keel.mysql.statement;
 
+import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.github.sinri.keel.mysql.condition.CompareCondition;
 import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.MySQLCondition;
 import io.github.sinri.keel.mysql.condition.RawCondition;
 import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
+import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
+import io.github.sinri.keel.mysql.matrix.ResultMatrix;
+import io.vertx.core.Future;
+import io.vertx.sqlclient.SqlConnection;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -17,13 +22,13 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
 public class SelectStatement extends AbstractReadStatement {
     //    private final List<KeelMySQLCondition> whereConditions = new ArrayList<>();
-    final ConditionsComponent whereConditionsComponent = new ConditionsComponent();
+    final ConditionsComponent whereConditionsComponent;
     //    private final List<KeelMySQLCondition> havingConditions = new ArrayList<>();
-    final ConditionsComponent havingConditionsComponent = new ConditionsComponent();
-    private final List<String> tables = new ArrayList<>();
-    private final List<String> columns = new ArrayList<>();
-    private final List<String> categories = new ArrayList<>();
-    private final List<String> sortRules = new ArrayList<>();
+    final ConditionsComponent havingConditionsComponent;
+    private final List<String> tables;
+    private final List<String> columns;
+    private final List<String> categories;
+    private final List<String> sortRules;
     private long offset = 0;
     private long limit = 0;
     private @Nonnull String lockMode = "";
@@ -33,6 +38,32 @@ public class SelectStatement extends AbstractReadStatement {
      * @since 3.1.0
      */
     private @Nullable Long maxExecutionTime = null;
+
+    public SelectStatement(@Nonnull SelectStatement another) {
+        this.whereConditionsComponent = new ConditionsComponent(another.whereConditionsComponent);
+        this.havingConditionsComponent = new ConditionsComponent(another.havingConditionsComponent);
+        this.tables = new ArrayList(another.tables);
+        this.columns = new ArrayList(another.columns);
+        this.categories = new ArrayList(another.categories);
+        this.sortRules = new ArrayList(another.sortRules);
+        this.offset = another.offset;
+        this.limit = another.limit;
+        this.lockMode = another.lockMode;
+        this.maxExecutionTime = another.maxExecutionTime;
+    }
+
+    public SelectStatement() {
+        this.whereConditionsComponent = new ConditionsComponent();
+        this.havingConditionsComponent = new ConditionsComponent();
+        this.tables = new ArrayList();
+        this.columns = new ArrayList();
+        this.categories = new ArrayList();
+        this.sortRules = new ArrayList();
+        this.offset = 0L;
+        this.limit = 0L;
+        this.lockMode = "";
+        this.maxExecutionTime = null;
+    }
 
     public SelectStatement from(@Nonnull String tableExpression) {
         return from(tableExpression, null);
@@ -85,6 +116,11 @@ public class SelectStatement extends AbstractReadStatement {
     public SelectStatement straightJoin(@Nonnull Function<JoinComponent, JoinComponent> joinFunction) {
         JoinComponent join = new JoinComponent("STRAIGHT_JOIN");
         tables.add(joinFunction.apply(join).toString());
+        return this;
+    }
+
+    public SelectStatement resetColumns() {
+        this.columns.clear();
         return this;
     }
 
@@ -167,6 +203,33 @@ public class SelectStatement extends AbstractReadStatement {
     public SelectStatement setMaxExecutionTime(long maxExecutionTime) {
         this.maxExecutionTime = maxExecutionTime;
         return this;
+    }
+
+    public Future<PaginationResult> queryForPagination(NamedMySQLConnection sqlConnection, long pageNo, long pageSize) {
+        return this.queryForPagination(sqlConnection.getSqlConnection(), pageNo, pageSize);
+    }
+
+    public Future<PaginationResult> queryForPagination(SqlConnection sqlConnection, long pageNo, long pageSize) {
+        if (pageSize <= 0L) {
+            throw new IllegalArgumentException("page size <= 0");
+        } else if (pageNo < 1L) {
+            throw new IllegalArgumentException("page no < 1");
+        } else {
+            SelectStatement countStatement = (new SelectStatement(this)).resetColumns().columnWithAlias("count(*)", "total").limit(0L, 0L);
+            this.limit(pageSize, (pageNo - 1L) * pageSize);
+            return Future.all(countStatement.execute(sqlConnection).compose((resultMatrix) -> {
+                try {
+                    long total = resultMatrix.getOneColumnOfFirstRowAsLong("total");
+                    return Future.succeededFuture(total);
+                } catch (KeelSQLResultRowIndexError var3) {
+                    throw new RuntimeException(var3);
+                }
+            }), this.execute(sqlConnection)).compose((compositeFuture) -> {
+                Long total = (Long)compositeFuture.resultAt(0);
+                ResultMatrix resultMatrix = (ResultMatrix)compositeFuture.resultAt(1);
+                return Future.succeededFuture(new PaginationResult(total, resultMatrix));
+            });
+        }
     }
 
     public String toString() {
@@ -263,6 +326,24 @@ public class SelectStatement extends AbstractReadStatement {
                 s += KeelHelpers.stringHelper().joinStringArray(onConditions, " AND ");
             }
             return s;
+        }
+    }
+
+    public static class PaginationResult {
+        private final long total;
+        private final ResultMatrix resultMatrix;
+
+        public PaginationResult(long total, ResultMatrix resultMatrix) {
+            this.total = total;
+            this.resultMatrix = resultMatrix;
+        }
+
+        public long getTotal() {
+            return this.total;
+        }
+
+        public ResultMatrix getResultMatrix() {
+            return this.resultMatrix;
         }
     }
 
