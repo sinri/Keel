@@ -2,7 +2,7 @@ package io.github.sinri.keel.mysql.matrix;
 
 import io.github.sinri.keel.core.json.JsonifiableEntity;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
-import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
+import io.github.sinri.keel.mysql.exception.KeelMySQLResultRowIndexError;
 import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
@@ -144,7 +144,7 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
                     try {
                         T t = resultMatrix.buildTableRowByIndex(0, classOfTableRow);
                         return Future.succeededFuture(t);
-                    } catch (KeelSQLResultRowIndexError e) {
+                    } catch (KeelMySQLResultRowIndexError e) {
                         return Future.succeededFuture(null);
                     }
                 });

@@ -37,7 +37,7 @@ public class KeelSheetMatrixTemplatedRowImpl implements KeelSheetMatrixTemplated
 
     @Override
     public List<String> getRawRow() {
-        return getRawRow();
+        return rawRow;
     }
 
     @Override

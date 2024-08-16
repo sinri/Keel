@@ -32,6 +32,7 @@ package io.github.sinri.keel.helper.authenticator.googleauth;
 
 //import org.apache.http.client.utils.URIBuilder;
 
+import javax.annotation.Nonnull;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -79,7 +80,7 @@ public final class GoogleAuthenticatorQRGenerator {
      * @see <a href="https://code.google.com/p/google-authenticator/wiki/KeyUriFormat">Google Authenticator - KeyUriFormat</a>
      */
     private static String formatLabel(String issuer, String accountName) {
-        if (accountName == null || accountName.trim().length() == 0) {
+        if (accountName == null || accountName.trim().isEmpty()) {
             throw new IllegalArgumentException("Account name must not be empty.");
         }
 
@@ -193,19 +194,12 @@ public final class GoogleAuthenticatorQRGenerator {
 //        return uri.toString();
     }
 
-    private static String getAlgorithmName(HmacHashFunction hashFunction) {
-        switch (hashFunction) {
-            case HmacSHA1:
-                return "SHA1";
-
-            case HmacSHA256:
-                return "SHA256";
-
-            case HmacSHA512:
-                return "SHA512";
-
-            default:
-                throw new IllegalArgumentException(String.format("Unknown algorithm %s", hashFunction));
-        }
+    private static String getAlgorithmName(@Nonnull HmacHashFunction hashFunction) {
+        return switch (hashFunction) {
+            case HmacSHA1 -> "SHA1";
+            case HmacSHA256 -> "SHA256";
+            case HmacSHA512 -> "SHA512";
+            //default -> throw new IllegalArgumentException(String.format("Unknown algorithm %s", hashFunction));
+        };
     }
 }

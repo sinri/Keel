@@ -5,8 +5,8 @@ import io.github.sinri.keel.mysql.condition.CompareCondition;
 import io.github.sinri.keel.mysql.condition.GroupCondition;
 import io.github.sinri.keel.mysql.condition.MySQLCondition;
 import io.github.sinri.keel.mysql.condition.RawCondition;
-import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
-import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
+import io.github.sinri.keel.mysql.exception.KeelMySQLGenerateError;
+import io.github.sinri.keel.mysql.exception.KeelMySQLResultRowIndexError;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
@@ -73,7 +73,7 @@ public class SelectStatement extends AbstractReadStatement {
 
     public SelectStatement from(@Nonnull String tableExpression, @Nullable String alias) {
         if (tableExpression.isBlank()) {
-            throw new KeelSQLGenerateError("Select from blank");
+            throw new KeelMySQLGenerateError("Select from blank");
         }
         String x = tableExpression;
         if (alias != null) {
@@ -92,7 +92,7 @@ public class SelectStatement extends AbstractReadStatement {
      */
     public SelectStatement from(@Nonnull AbstractReadStatement subQuery, @Nonnull String alias) {
         if (alias.isBlank()) {
-            throw new KeelSQLGenerateError("Sub Query without alias");
+            throw new KeelMySQLGenerateError("Sub Query without alias");
         }
         return this.from("(" + subQuery + ")", alias);
     }
@@ -288,7 +288,7 @@ public class SelectStatement extends AbstractReadStatement {
                                     try {
                                         long total = resultMatrix.getOneColumnOfFirstRowAsLong("total");
                                         return Future.succeededFuture(total);
-                                    } catch (KeelSQLResultRowIndexError e) {
+                                    } catch (KeelMySQLResultRowIndexError e) {
                                         throw new RuntimeException(e);
                                     }
                                 }),

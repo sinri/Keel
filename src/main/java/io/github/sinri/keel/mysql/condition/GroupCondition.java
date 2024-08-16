@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.condition;
 
-import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
+import io.github.sinri.keel.mysql.exception.KeelMySQLGenerateError;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class GroupCondition implements MySQLCondition {
     /**
      * 生成SQL的组合逻辑条件表达式文本。如果出错，则抛出 KeelSQLGenerateError 异常。
      *
-     * @throws KeelSQLGenerateError sql generate error
+     * @throws KeelMySQLGenerateError sql generate error
      */
     @Override
     public String toString() {
@@ -44,7 +44,7 @@ public class GroupCondition implements MySQLCondition {
         }
         StringBuilder x = new StringBuilder();
         for (MySQLCondition condition : conditions) {
-            if (x.length() > 0) {
+            if (!x.isEmpty()) {
                 x.append(" ").append(junction).append(" ");
             }
             x.append(condition);

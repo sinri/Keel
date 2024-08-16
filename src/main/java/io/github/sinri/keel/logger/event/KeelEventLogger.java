@@ -100,7 +100,7 @@ public interface KeelEventLogger {
         });
     }
 
-    default void debug(@Nullable String msg) {
+    default void debug(String msg) {
         debug(eventLog -> eventLog.message(msg));
     }
 

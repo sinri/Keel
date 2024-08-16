@@ -6,7 +6,7 @@ import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -100,7 +100,7 @@ public interface KeelCacheInterface<K, V> {
      * @since 1.14
      */
     @Nonnull
-    ConcurrentMap<K, V> getSnapshotMap();
+    Map<K, V> getSnapshotMap();
 
     /**
      * @since 2.8

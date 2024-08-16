@@ -1,9 +1,11 @@
 package io.github.sinri.keel.cache.impl;
 
 import io.github.sinri.keel.cache.KeelCacheInterface;
-import io.github.sinri.keel.cache.ValueWrapper;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -73,8 +75,8 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
 
     @Override
     @Nonnull
-    public ConcurrentMap<K, V> getSnapshotMap() {
-        ConcurrentMap<K, V> snapshot = new ConcurrentHashMap<>();
+    public synchronized Map<K, V> getSnapshotMap() {
+        Map<K, V> snapshot = new HashMap<>();
         this.map.keySet().forEach(key -> {
             ValueWrapper<V> vw = this.map.get(key);
             if (vw != null) {
@@ -83,6 +85,6 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
                 }
             }
         });
-        return snapshot;
+        return Collections.unmodifiableMap(snapshot);
     }
 }

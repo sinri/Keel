@@ -21,7 +21,7 @@ public class ColumnedTest extends KeelTest {
 
     @TestUnit
     public Future<Void> test1() {
-        KeelSheets keelSheets = KeelSheets.openFile(new FileAccessOptions()
+        KeelSheets keelSheets = KeelSheets.loadToRead(new FileAccessOptions()
                 .setFile(fileName)
                 .setWithFormulaEvaluator(true)
         );

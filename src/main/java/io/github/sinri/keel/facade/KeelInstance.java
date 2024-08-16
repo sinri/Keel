@@ -20,7 +20,7 @@ import java.util.Objects;
  * @since 3.1.0
  */
 public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
-    public static KeelInstance Keel = new KeelInstance();
+    public final static KeelInstance Keel = new KeelInstance();
 
     /**
      * @since 3.2.3

@@ -5,6 +5,7 @@ import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
+import io.vertx.core.ThreadingModel;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.shareddata.AsyncMap;
@@ -43,7 +44,9 @@ public class KeelCronWatchman extends KeelWatchmanImpl {
 
     public static Future<String> deploy(String watchmanName, Function<String, Future<Void>> cronTabUpdateStartup) {
         KeelCronWatchman keelCronWatchman = new KeelCronWatchman(watchmanName, cronTabUpdateStartup);
-        return Keel.getVertx().deployVerticle(keelCronWatchman, new DeploymentOptions().setWorker(true));
+        return Keel.getVertx().deployVerticle(keelCronWatchman, new DeploymentOptions()
+                .setThreadingModel(ThreadingModel.WORKER)
+        );
     }
 
     private static Future<Void> operateCronTab(String asyncMapName, Supplier<Future<Void>> supplier) {

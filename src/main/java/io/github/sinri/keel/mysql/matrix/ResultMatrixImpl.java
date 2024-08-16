@@ -1,6 +1,6 @@
 package io.github.sinri.keel.mysql.matrix;
 
-import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
+import io.github.sinri.keel.mysql.exception.KeelMySQLResultRowIndexError;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.mysqlclient.MySQLClient;
@@ -75,28 +75,28 @@ class ResultMatrixImpl implements ResultMatrix {
     }
 
     @Override
-    public JsonObject getFirstRow() throws KeelSQLResultRowIndexError {
+    public JsonObject getFirstRow() throws KeelMySQLResultRowIndexError {
         return getRowByIndex(0);
     }
 
     /**
-     * @throws KeelSQLResultRowIndexError 行号不正确时抛出异常
+     * @throws KeelMySQLResultRowIndexError 行号不正确时抛出异常
      */
     @Override
-    public JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError {
+    public JsonObject getRowByIndex(int index) throws KeelMySQLResultRowIndexError {
         try {
             return rowList.get(index).toJson();
         } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
-            throw new KeelSQLResultRowIndexError(indexOutOfBoundsException);
+            throw new KeelMySQLResultRowIndexError(indexOutOfBoundsException);
         }
     }
 
     /**
-     * @throws KeelSQLResultRowIndexError 行号不正确时抛出异常
+     * @throws KeelMySQLResultRowIndexError 行号不正确时抛出异常
      * @throws RuntimeException           封装类的时候可能会抛出异常
      */
     @Override
-    public <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError {
+    public <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelMySQLResultRowIndexError {
         try {
             return ResultMatrix.buildTableRow(getRowByIndex(index), classOfTableRow);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
@@ -122,27 +122,27 @@ class ResultMatrixImpl implements ResultMatrix {
      * @since 2.7
      */
     @Override
-    public String getOneColumnOfFirstRowAsDateTime(String columnName) throws KeelSQLResultRowIndexError {
+    public String getOneColumnOfFirstRowAsDateTime(String columnName) throws KeelMySQLResultRowIndexError {
         return KeelHelpers.datetimeHelper().getMySQLFormatLocalDateTimeExpression(getFirstRow().getString(columnName));
     }
 
     @Override
-    public String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError {
+    public String getOneColumnOfFirstRowAsString(String columnName) throws KeelMySQLResultRowIndexError {
         return getFirstRow().getString(columnName);
     }
 
     @Override
-    public Numeric getOneColumnOfFirstRowAsNumeric(String columnName) throws KeelSQLResultRowIndexError {
+    public Numeric getOneColumnOfFirstRowAsNumeric(String columnName) throws KeelMySQLResultRowIndexError {
         return Numeric.create(getFirstRow().getNumber(columnName));
     }
 
     @Override
-    public Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelSQLResultRowIndexError {
+    public Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelMySQLResultRowIndexError {
         return getFirstRow().getInteger(columnName);
     }
 
     @Override
-    public Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelSQLResultRowIndexError {
+    public Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelMySQLResultRowIndexError {
         return getFirstRow().getLong(columnName);
     }
 

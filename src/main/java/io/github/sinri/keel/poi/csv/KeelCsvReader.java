@@ -64,7 +64,7 @@ public class KeelCsvReader {
          * < 0111211122
          */
         int quoterFlag = 0;
-        String buffer = null;
+        StringBuilder buffer = null;
 
         String line;
         while (true) {
@@ -75,16 +75,16 @@ public class KeelCsvReader {
                 if (row == null) return null;
                 else {
                     if (buffer != null) {
-                        row.addCell(new CsvCell(buffer));
+                        row.addCell(new CsvCell(buffer.toString()));
                     }
                     break;
                 }
             }
 
             if (row == null) row = new CsvRow();
-            if (buffer == null) buffer = "";
+            if (buffer == null) buffer = new StringBuilder();
             else {
-                buffer += "\n";
+                buffer.append("\n");
             }
 
             for (int i = 0; i < line.length(); i++) {
@@ -95,27 +95,27 @@ public class KeelCsvReader {
                     } else if (quoterFlag == 1) {
                         quoterFlag = 2;
                     } else {
-                        buffer += singleString;
+                        buffer.append(singleString);
                         quoterFlag = 1;
                     }
                 } else if (singleString.equals(separator)) {
                     if (quoterFlag == 0 || quoterFlag == 2) {
                         // buffer to cell
-                        row.addCell(new CsvCell(buffer));
+                        row.addCell(new CsvCell(buffer.toString()));
                         quoterFlag = 0;
-                        buffer = "";
+                        buffer = new StringBuilder();
                     } else {
-                        buffer += singleString;
+                        buffer.append(singleString);
                     }
                 } else {
-                    buffer += singleString;
+                    buffer.append(singleString);
                 }
             }
 
             // now this line ends
             if (quoterFlag == 0 || quoterFlag == 2) {
                 // the row ends within this line
-                row.addCell(new CsvCell(buffer));
+                row.addCell(new CsvCell(buffer.toString()));
                 break;
             } else {
                 // the row expends to the next line

@@ -47,7 +47,7 @@ public class StaxTest extends KeelTest {
 
     @TestUnit
     public Future<Void> test2() {
-        KeelSheets keelSheets = KeelSheets.openFile(new FileAccessOptions()
+        KeelSheets keelSheets = KeelSheets.loadToRead(new FileAccessOptions()
                         .setStreamingReaderBuilder(builder -> {
 //                    builder
 //                            .rowCacheSize(100)//缓存到内存中的行数，默认是10

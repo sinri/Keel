@@ -68,10 +68,6 @@ public class KeelDigestHelper {
     }
 
     /**
-     * @param algorithm
-     * @param raw
-     * @return
-     * @throws NoSuchAlgorithmException
      * @since 3.0.11
      */
     public String digestToLower(@Nonnull String algorithm, @Nonnull String raw) throws NoSuchAlgorithmException {
@@ -81,10 +77,6 @@ public class KeelDigestHelper {
     }
 
     /**
-     * @param algorithm
-     * @param raw
-     * @return
-     * @throws NoSuchAlgorithmException
      * @since 3.0.11
      */
     public String digestToUpper(@Nonnull String algorithm, @Nonnull String raw) throws NoSuchAlgorithmException {

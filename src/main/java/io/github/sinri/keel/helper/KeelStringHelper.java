@@ -160,7 +160,7 @@ public class KeelStringHelper {
         for (int i = 0; i < camelCase.length(); i++) {
             String current = camelCase.substring(i, i + 1);
             if (current.matches("[\\s_]")) continue;
-            if (part.length() == 0) {
+            if (part.isEmpty()) {
                 part.append(current.toLowerCase());
             } else {
                 if (current.matches("[A-Z]")) {
@@ -170,7 +170,7 @@ public class KeelStringHelper {
                 part.append(current.toLowerCase());
             }
         }
-        if (part.length() > 0) {
+        if (!part.isEmpty()) {
             parts.add(part.toString());
         }
         return KeelHelpers.stringHelper().joinStringArray(parts, "_");

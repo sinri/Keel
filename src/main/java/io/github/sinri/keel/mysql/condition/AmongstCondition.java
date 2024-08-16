@@ -1,7 +1,7 @@
 package io.github.sinri.keel.mysql.condition;
 
 import io.github.sinri.keel.mysql.Quoter;
-import io.github.sinri.keel.mysql.exception.KeelSQLGenerateError;
+import io.github.sinri.keel.mysql.exception.KeelMySQLGenerateError;
 import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
 
 import javax.annotation.Nonnull;
@@ -219,12 +219,12 @@ public class AmongstCondition implements MySQLCondition {
     /**
      * 生成SQL的比较条件表达式文本。如果出错，则抛出 KeelSQLGenerateError 异常。
      *
-     * @throws KeelSQLGenerateError sql generate error
+     * @throws KeelMySQLGenerateError sql generate error
      */
     @Override
     public String toString() {
         if (targetSet.isEmpty()) {
-            throw new KeelSQLGenerateError("AmongstCondition Target Set Empty");
+            throw new KeelMySQLGenerateError("AmongstCondition Target Set Empty");
         }
 
         String s = element;

@@ -2,7 +2,7 @@ package io.github.sinri.keel.mysql.matrix;
 
 
 import io.github.sinri.keel.helper.KeelHelpersInterface;
-import io.github.sinri.keel.mysql.exception.KeelSQLResultRowIndexError;
+import io.github.sinri.keel.mysql.exception.KeelMySQLResultRowIndexError;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -57,24 +57,24 @@ public interface ResultMatrix {
 
     JsonArray toJsonArray();
 
-    JsonObject getFirstRow() throws KeelSQLResultRowIndexError;
+    JsonObject getFirstRow() throws KeelMySQLResultRowIndexError;
 
-    JsonObject getRowByIndex(int index) throws KeelSQLResultRowIndexError;
+    JsonObject getRowByIndex(int index) throws KeelMySQLResultRowIndexError;
 
     /**
      * @since 1.10
      */
-    <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelSQLResultRowIndexError;
+    <T extends ResultRow> T buildTableRowByIndex(int index, Class<T> classOfTableRow) throws KeelMySQLResultRowIndexError;
 
-    String getOneColumnOfFirstRowAsDateTime(String columnName) throws KeelSQLResultRowIndexError;
+    String getOneColumnOfFirstRowAsDateTime(String columnName) throws KeelMySQLResultRowIndexError;
 
-    String getOneColumnOfFirstRowAsString(String columnName) throws KeelSQLResultRowIndexError;
+    String getOneColumnOfFirstRowAsString(String columnName) throws KeelMySQLResultRowIndexError;
 
-    Numeric getOneColumnOfFirstRowAsNumeric(String columnName) throws KeelSQLResultRowIndexError;
+    Numeric getOneColumnOfFirstRowAsNumeric(String columnName) throws KeelMySQLResultRowIndexError;
 
-    Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelSQLResultRowIndexError;
+    Integer getOneColumnOfFirstRowAsInteger(String columnName) throws KeelMySQLResultRowIndexError;
 
-    Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelSQLResultRowIndexError;
+    Long getOneColumnOfFirstRowAsLong(String columnName) throws KeelMySQLResultRowIndexError;
 
     List<String> getOneColumnAsDateTime(String columnName);
 

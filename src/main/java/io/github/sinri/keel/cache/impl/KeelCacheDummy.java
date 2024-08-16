@@ -3,8 +3,8 @@ package io.github.sinri.keel.cache.impl;
 import io.github.sinri.keel.cache.KeelCacheInterface;
 
 import javax.annotation.Nonnull;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Collections;
+import java.util.Map;
 
 public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
 
@@ -24,7 +24,7 @@ public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public V read(K key) {
+    public V read(@Nonnull K key) {
         return null;
     }
 
@@ -48,8 +48,9 @@ public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
 
     }
 
+    @Nonnull
     @Override
-    public ConcurrentMap<K, V> getSnapshotMap() {
-        return new ConcurrentHashMap<>();
+    public Map<K, V> getSnapshotMap() {
+        return Collections.emptyMap();
     }
 }

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.cache.temporaryvalue;
 
-import io.github.sinri.keel.cache.ValueWrapper;
+import io.github.sinri.keel.cache.impl.ValueWrapper;
 import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 /**
  * @since 3.0.1
  */
+@Deprecated(since = "4.0.0")
 public class KeelAsyncTemporaryValue<P> {
     private final AtomicReference<ValueWrapper<P>> valueWrapperAtomicReference;
     private long defaultLifetimeInSeconds = 10L;
@@ -70,7 +71,7 @@ public class KeelAsyncTemporaryValue<P> {
                     return loader.get()
                             .compose(p -> {
                                 if (p == null) {
-                                    this.set(p);
+                                    this.set(null);
                                 }
                                 return Future.succeededFuture(p);
                             });

@@ -1,10 +1,11 @@
 package io.github.sinri.keel.cache.impl;
 
 import io.github.sinri.keel.cache.KeelAsyncCacheInterface;
-import io.github.sinri.keel.cache.ValueWrapper;
 import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -89,16 +90,18 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
     }
 
     @Override
-    public Future<ConcurrentMap<K, V>> getSnapshotMap() {
+    public Future<Map<K, V>> getSnapshotMap() {
         ConcurrentMap<K, V> snapshot = new ConcurrentHashMap<>();
-        this.map.keySet().forEach(key -> {
-            ValueWrapper<V> vw = this.map.get(key);
-            if (vw != null) {
-                if (vw.isAliveNow()) {
-                    snapshot.put(key, vw.getValue());
+        synchronized (this.map) {
+            this.map.keySet().forEach(key -> {
+                ValueWrapper<V> vw = this.map.get(key);
+                if (vw != null) {
+                    if (vw.isAliveNow()) {
+                        snapshot.put(key, vw.getValue());
+                    }
                 }
-            }
-        });
-        return Future.succeededFuture(snapshot);
+            });
+        }
+        return Future.succeededFuture(Collections.unmodifiableMap(snapshot));
     }
 }

@@ -104,7 +104,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
     @Override
     public Future<Void> remove(@Nonnull Collection<K> keys) {
         return actionInLock(() -> {
-            keys.forEach(key -> map.remove(key));
+            keys.forEach(map::remove);
             return true;
         });
     }

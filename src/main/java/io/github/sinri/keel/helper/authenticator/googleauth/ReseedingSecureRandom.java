@@ -79,12 +79,14 @@ public class ReseedingSecureRandom {
 
     private void buildSecureRandom() {
         try {
-            if (this.algorithm == null && this.provider == null) {
-                this.secureRandom = new SecureRandom();
-            } else if (this.provider == null) {
-                this.secureRandom = SecureRandom.getInstance(this.algorithm);
+            if (this.provider == null) {
+                if (this.algorithm == null) {
+                    this.secureRandom = new SecureRandom();
+                } else {
+                    this.secureRandom = SecureRandom.getInstance(this.algorithm);
+                }
             } else {
-                this.secureRandom = SecureRandom.getInstance(this.algorithm, this.provider);
+                this.secureRandom = SecureRandom.getInstance(this.provider, this.algorithm);
             }
         } catch (NoSuchAlgorithmException e) {
             throw new GoogleAuthenticatorException(

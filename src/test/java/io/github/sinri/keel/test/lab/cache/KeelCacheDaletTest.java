@@ -1,6 +1,6 @@
 package io.github.sinri.keel.test.lab.cache;
 
-import io.github.sinri.keel.cache.impl.KeelCacheDalet;
+import io.github.sinri.keel.cache.KeelEverlastingCacheVerticle;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.tesuto.KeelTest;
@@ -58,7 +58,7 @@ public class KeelCacheDaletTest extends KeelTest {
                 });
     }
 
-    private static class Dalet extends KeelCacheDalet {
+    private static class Dalet extends KeelEverlastingCacheVerticle {
 
         @Override
         public Future<Void> fullyUpdate() {

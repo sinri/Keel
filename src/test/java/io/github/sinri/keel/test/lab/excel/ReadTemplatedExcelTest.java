@@ -38,7 +38,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
 
     @TestUnit(skip = true)
     public Future<Void> test1() {
-        try (KeelSheets keelSheets = KeelSheets.openFile(new FileAccessOptions().setFile(file))) {
+        try (KeelSheets keelSheets = KeelSheets.loadToRead(new FileAccessOptions().setFile(file))) {
             KeelSheetReader keelSheet = keelSheets.generateReaderForSheet(0, x -> {
             });
             KeelSheetMatrix keelSheetMatrix = keelSheet.blockReadAllRowsToMatrix(1, 6, null);
@@ -61,7 +61,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
 
     @TestUnit(skip = false)
     public Future<Void> test2() {
-        KeelSheets keelSheets = KeelSheets.openFile(new FileAccessOptions().setFile(file));
+        KeelSheets keelSheets = KeelSheets.loadToRead(new FileAccessOptions().setFile(file));
         KeelSheetReader keelSheet = keelSheets.generateReaderForSheet(0, x -> {
         });
         return keelSheet.readAllRowsToMatrix(1, 0, null)
@@ -81,7 +81,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
 
     @TestUnit(skip = true)
     public Future<Void> test3() {
-        try (KeelSheets keelSheets = KeelSheets.openFile(new FileAccessOptions().setFile(file))) {
+        try (KeelSheets keelSheets = KeelSheets.loadToRead(new FileAccessOptions().setFile(file))) {
             KeelSheetReader keelSheet = keelSheets.generateReaderForSheet(0, x -> {
             });
             KeelSheetTemplatedMatrix templatedMatrix = keelSheet.blockReadAllRowsToTemplatedMatrix(0, 6, null);
@@ -94,7 +94,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
 
     @TestUnit(skip = true)
     public Future<Void> test4() {
-        KeelSheets keelSheets = KeelSheets.openFile(new FileAccessOptions().setFile(file));
+        KeelSheets keelSheets = KeelSheets.loadToRead(new FileAccessOptions().setFile(file));
         KeelSheetReader keelSheet = keelSheets.generateReaderForSheet(0, s -> {
         });
         return keelSheet.readAllRowsToTemplatedMatrix(0, 7, null)
@@ -122,7 +122,7 @@ public class ReadTemplatedExcelTest extends KeelTest {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        KeelSheets keelSheets = KeelSheets.openFile(new FileAccessOptions().setInputStream(fileInputStream));
+        KeelSheets keelSheets = KeelSheets.loadToRead(new FileAccessOptions().setInputStream(fileInputStream));
         KeelSheetReader keelSheet = keelSheets.generateReaderForSheet(0, x -> {
         });
         return keelSheet.readAllRowsToTemplatedMatrix(0, 128, null)

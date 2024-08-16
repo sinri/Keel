@@ -73,6 +73,11 @@ abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapter 
                 });
     }
 
+    /**
+     * Override this method to limit the log batch size in bytes.
+     *
+     * @return the size of log buffer to be executed in a batch.
+     */
     protected int bufferSize() {
         return 1000;
     }

@@ -1,4 +1,4 @@
-package io.github.sinri.keel.cache;
+package io.github.sinri.keel.cache.impl;
 
 import javax.annotation.Nullable;
 import java.lang.ref.SoftReference;

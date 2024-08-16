@@ -28,6 +28,7 @@ public class KeelUDPTransceiver {
     public KeelUDPTransceiver(DatagramSocket udpServer, int port, @Nonnull KeelIssueRecorder<DatagramIssueRecord> issueRecorder) {
         this.port = port;
         this.udpServer = udpServer;
+        this.issueRecorder = issueRecorder;
         this.setIssueRecorder(issueRecorder);
     }
 
@@ -65,9 +66,6 @@ public class KeelUDPTransceiver {
                                         .bufferReceived(data, sender.hostAddress(), sender.port())
                                 );
                                 this.datagramSocketConsumer.accept(sender, data);
-                            })
-                            .endHandler(end -> {
-                                getIssueRecorder().info(r -> r.message("read end"));
                             })
                             .exceptionHandler(throwable -> {
                                 getIssueRecorder().exception(throwable, r -> r.message("read error"));

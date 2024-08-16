@@ -144,11 +144,11 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         return catalogueDivContentCache;
     }
 
-    protected String getFooterDivContent() {
+    private String getFooterDivContent() {
         return options.footerText + " | Powered by FastDocs";
     }
 
-    public StringBuilder createHTMLCodeForDir(TreeNode tree) {
+    private StringBuilder createHTMLCodeForDir(TreeNode tree) {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<div class='dir_box'>");

@@ -6,7 +6,6 @@ import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.logger.issue.recorder.adapter.KeelIssueRecorderAdapter;
-import io.github.sinri.keel.logger.issue.recorder.adapter.SyncStdoutAdapter;
 import io.vertx.core.Handler;
 
 import javax.annotation.Nonnull;

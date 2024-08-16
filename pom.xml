@@ -6,7 +6,7 @@
 
     <groupId>io.github.sinri</groupId>
     <artifactId>Keel</artifactId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
     <!--    <version>3.2.15</version>-->
 
     <name>Keel</name>
@@ -38,7 +38,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <vertxVersion>4.5.8</vertxVersion>
+        <vertxVersion>4.5.9</vertxVersion>
         <commonmarkVersion>0.21.0</commonmarkVersion>
         <jacksonVersion>2.16.1</jacksonVersion>
         <poiVersion>5.2.5</poiVersion>
@@ -180,8 +180,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>11</source>
-                    <target>11</target>
+                    <source>17</source>
+                    <target>17</target>
                 </configuration>
                 <version>3.8.1</version>
             </plugin>

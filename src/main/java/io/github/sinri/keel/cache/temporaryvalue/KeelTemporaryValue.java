@@ -1,6 +1,6 @@
 package io.github.sinri.keel.cache.temporaryvalue;
 
-import io.github.sinri.keel.cache.ValueWrapper;
+import io.github.sinri.keel.cache.impl.ValueWrapper;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicReference;
@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 /**
  * @since 3.0.1
  */
+@Deprecated(since = "4.0.0")
 public class KeelTemporaryValue<P> {
     private final AtomicReference<ValueWrapper<P>> valueWrapperAtomicReference;
     private long defaultLifetimeInSeconds = 10L;

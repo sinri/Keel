@@ -67,9 +67,7 @@ public class KeelAesEcbNoPadding extends KeelAesBase {
 //            System.out.println("encrypted bytes: " + KeelHelpers.binaryHelper().encodeHexWithUpperDigits(encryptedBytes));
             var decryptedBytes = cipher.doFinal(encryptedBytes);
 //            System.out.println("decrypted bytes: " + KeelHelpers.binaryHelper().encodeHexWithUpperDigits(decryptedBytes));
-            var s = new String(decryptedBytes, ENCODING);
-//            System.out.println("decrypted text: " + s);
-            return s;
+            return new String(decryptedBytes, ENCODING);
         } catch (NoSuchPaddingException | IllegalBlockSizeException | NoSuchAlgorithmException | BadPaddingException |
                  InvalidKeyException e) {
             throw new RuntimeException(e);

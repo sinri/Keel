@@ -1,6 +1,7 @@
 package io.github.sinri.keel.test.lab.excel;
 
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
+import io.github.sinri.keel.poi.excel.FileWriteStyle;
 import io.github.sinri.keel.poi.excel.KeelSheets;
 import io.github.sinri.keel.poi.excel.writer.KeelSheetWriter;
 import io.github.sinri.keel.tesuto.KeelTest;
@@ -30,7 +31,7 @@ public class WriteHugeExcelTest extends KeelTest {
 
     //@TestUnit
     public Future<Void> test1() {
-        KeelSheets sheets = new KeelSheets();
+        KeelSheets sheets = KeelSheets.createToWrite(FileWriteStyle.Xlsx);
         KeelSheetWriter sheet = sheets.generateWriterForSheet("Needs");
         sheet.blockWriteAllRows(List.of(
                 List.of("Name", "Need", "Note"),
@@ -45,7 +46,7 @@ public class WriteHugeExcelTest extends KeelTest {
 
     @TestUnit(skip = true)
     public Future<Void> testWriteNotStream() {
-        KeelSheets sheets = new KeelSheets();
+        KeelSheets sheets = KeelSheets.createToWrite(FileWriteStyle.Xlsx);
         KeelSheetWriter sheet = sheets.generateWriterForSheet("Huge");
 
         return write20wRows(sheet)
@@ -58,8 +59,7 @@ public class WriteHugeExcelTest extends KeelTest {
 
     @TestUnit
     public Future<Void> testWriteStream() {
-        KeelSheets sheets = new KeelSheets();
-        sheets.useStreamWrite();
+        KeelSheets sheets = KeelSheets.createToWrite(FileWriteStyle.StreamingXlsx);
         KeelSheetWriter sheet = sheets.generateWriterForSheet("Huge");
 
         return write20wRows(sheet)

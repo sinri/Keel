@@ -30,6 +30,7 @@
 
 package io.github.sinri.keel.helper.authenticator.googleauth;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 
 public class GoogleAuthenticatorConfig {
@@ -40,7 +41,7 @@ public class GoogleAuthenticatorConfig {
     private int keyModulus = (int) Math.pow(10, codeDigits);
     private int secretBits = 160;
     private KeyRepresentation keyRepresentation = KeyRepresentation.BASE32;
-    private HmacHashFunction hmacHashFunction = HmacHashFunction.HmacSHA1;
+    private @Nonnull HmacHashFunction hmacHashFunction = HmacHashFunction.HmacSHA1;
 
     /**
      * Returns the key module.
@@ -126,6 +127,7 @@ public class GoogleAuthenticatorConfig {
      *
      * @return the HMAC hash function.
      */
+    @Nonnull
     public HmacHashFunction getHmacHashFunction() {
         return hmacHashFunction;
     }

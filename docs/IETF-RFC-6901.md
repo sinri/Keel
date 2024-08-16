@@ -206,7 +206,7 @@ The following JSON strings evaluate to the accompanying values:
     "/m~0n"      8
 ```
 
-6. URI Fragment Identifier Representation
+### 6. URI Fragment Identifier Representation
 
 A JSON Pointer can be represented in a URI fragment identifier by encoding it into octets using
 UTF-8 [RFC3629](https://datatracker.ietf.org/doc/html/rfc3629), while percent-encoding those characters not allowed by

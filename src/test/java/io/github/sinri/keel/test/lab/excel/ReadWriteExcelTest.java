@@ -1,6 +1,7 @@
 package io.github.sinri.keel.test.lab.excel;
 
 import io.github.sinri.keel.poi.excel.FileAccessOptions;
+import io.github.sinri.keel.poi.excel.FileWriteStyle;
 import io.github.sinri.keel.poi.excel.KeelSheets;
 import io.github.sinri.keel.poi.excel.reader.KeelSheetReader;
 import io.github.sinri.keel.poi.excel.reader.entity.KeelSheetMatrixRow;
@@ -19,7 +20,7 @@ public class ReadWriteExcelTest extends KeelTest {
 
     @TestUnit(skip = true)
     public Future<Void> write() {
-        KeelSheets keelSheets = KeelSheets.autoGenerateXLSX();
+        KeelSheets keelSheets = KeelSheets.createToWrite(FileWriteStyle.Xlsx);
         KeelSheetWriter keelSheet = keelSheets.generateWriterForSheet("First Sheet");
         keelSheet.blockWriteAllRows(List.of(
                 List.of("name", "value"),
@@ -40,7 +41,7 @@ public class ReadWriteExcelTest extends KeelTest {
 
     @TestUnit(skip = false)
     public Future<Void> read() {
-        KeelSheets keelSheets = KeelSheets.openFile(new FileAccessOptions().setFile(file));
+        KeelSheets keelSheets = KeelSheets.loadToRead(new FileAccessOptions().setFile(file));
         KeelSheetReader keelSheet = keelSheets.generateReaderForSheet(0, s -> {
         });
         return keelSheet.readAllRowsToMatrix(1, 3, null)

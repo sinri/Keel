@@ -1,6 +1,5 @@
-package io.github.sinri.keel.cache.impl;
+package io.github.sinri.keel.cache;
 
-import io.github.sinri.keel.cache.KeelEverlastingCacheInterface;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.verticles.KeelVerticleImplPure;
 import io.vertx.core.Future;
@@ -19,9 +18,10 @@ import java.util.concurrent.ConcurrentMap;
  * 2. everlasting cache till modified;
  * 3. regular updating.
  *
- * @since 3.2.11
+ * @since 3.2.11 Named KeelCacheDalet
+ * @since 4.0.0 Named KeelEverlastingCacheVerticle
  */
-abstract public class KeelCacheDalet extends KeelVerticleImplPure implements KeelEverlastingCacheInterface<String, String> {
+abstract public class KeelEverlastingCacheVerticle extends KeelVerticleImplPure implements KeelEverlastingCacheInterface<String, String> {
     private final ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
 
 

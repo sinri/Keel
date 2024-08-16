@@ -2,6 +2,7 @@ package io.github.sinri.keel.mysql.statement.component;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.Quoter;
+import io.github.sinri.keel.mysql.exception.KeelMySQLGenerateError;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -12,7 +13,7 @@ import javax.annotation.Nullable;
 @TechnicalPreview(since = "3.0.19")
 public class UpdateSetAssignmentComponent {
     private final @Nonnull String fieldName;
-    private @Nonnull String expression;
+    private String expression;
 
     public UpdateSetAssignmentComponent(@Nonnull String fieldName) {
         this.fieldName = fieldName;
@@ -24,11 +25,11 @@ public class UpdateSetAssignmentComponent {
     }
 
     public UpdateSetAssignmentComponent assignmentToValue(@Nullable Object expression) {
-        if(expression==null){
+        if (expression == null) {
             this.expression = "NULL";
-        }else if (expression instanceof Number){
+        } else if (expression instanceof Number) {
             this.expression = expression.toString();
-        }else{
+        } else {
             this.expression = new Quoter(expression.toString()).toString();
         }
         return this;
@@ -46,6 +47,9 @@ public class UpdateSetAssignmentComponent {
 
     @Override
     public String toString() {
+        if (expression == null) {
+            throw new KeelMySQLGenerateError("The expression in UPDATE SET STATEMENT is not set.");
+        }
         return fieldName + "=" + expression;
     }
 

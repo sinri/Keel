@@ -5,7 +5,7 @@ import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 
 import javax.annotation.Nonnull;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -83,7 +83,7 @@ public interface KeelAsyncCacheInterface<K, V> {
      * @return ConcurrentMap K → V alive value only
      * @since 1.14
      */
-    Future<ConcurrentMap<K, V>> getSnapshotMap();
+    Future<Map<K, V>> getSnapshotMap();
 
     class NotCached extends Exception {
         public NotCached(String key) {

@@ -45,8 +45,8 @@ public class StatementTest extends KeelTest {
                 ))
                 .table("table")
                 .where(conditionsComponent -> conditionsComponent
-                        .comparison(compareCondition -> compareCondition
-                                .filedEqualsValue("aaa", "333")))
+                        .expressionEqualsLiteralValue("aaa", "333")
+                )
                 .toString();
         System.out.println(sql);
         return Future.succeededFuture();

@@ -22,7 +22,7 @@ import java.util.Objects;
  * @since 1.12
  * @since 3.0.0 TEST PASSED
  */
-public class KeelFastDocsKit {
+public final class KeelFastDocsKit {
     private final StaticHandler staticHandler;
     private final String rootURLPath;
     private final String rootMarkdownFilePath;
@@ -133,7 +133,7 @@ public class KeelFastDocsKit {
         return Future.succeededFuture(URLDecoder.decode(raw, StandardCharsets.UTF_8));
     }
 
-    protected void processRequestWithMarkdownPath(PageBuilderOptions options) {
+    private void processRequestWithMarkdownPath(PageBuilderOptions options) {
         getRelativePathOfRequest(options.ctx)
                 .compose(relativePathOfMarkdownFile -> {
                     // eventLogger.debug(r -> r.message("processRequestWithMarkdownPath relativePathOfMarkdownFile: " + relativePathOfMarkdownFile));
@@ -142,9 +142,8 @@ public class KeelFastDocsKit {
                     File x = new File(markdownFilePath);
                     // eventLogger.debug(r -> r.message("abs: " + x.getAbsolutePath()));
                     String markdownContent;
-                    try {
-                        InputStream resourceAsStream = getClass().getClassLoader()
-                                .getResourceAsStream(markdownFilePath);
+                    try (InputStream resourceAsStream = getClass().getClassLoader()
+                            .getResourceAsStream(markdownFilePath)) {
                         if (resourceAsStream == null) {
                             throw new IOException("resourceAsStream is null");
                         }
@@ -171,7 +170,7 @@ public class KeelFastDocsKit {
 
     }
 
-    protected void processRequestWithCatalogue(PageBuilderOptions options) {
+    private void processRequestWithCatalogue(PageBuilderOptions options) {
         options.fromDoc = options.ctx.request().getParam("from_doc");
         new CataloguePageBuilder(options).respond()
                 .compose(v -> {
@@ -180,7 +179,7 @@ public class KeelFastDocsKit {
                 });
     }
 
-    protected void processRequestWithMarkdownCSS(PageBuilderOptions options) {
+    private void processRequestWithMarkdownCSS(PageBuilderOptions options) {
         new MarkdownCssBuilder(options).respond()
                 .compose(v -> {
                     // eventLogger.debug(r -> r.message("processRequestWithMarkdownCSS ends"));
@@ -188,7 +187,7 @@ public class KeelFastDocsKit {
                 });
     }
 
-    protected void processRequestWithStaticPath(PageBuilderOptions options) {
+    private void processRequestWithStaticPath(PageBuilderOptions options) {
         this.staticHandler.handle(options.ctx);
     }
 }

@@ -24,12 +24,12 @@ public class KeelNetHelper {
         return instance;
     }
 
-    public static void main(String[] args) {
-        Long x = KeelNetHelper.getInstance().convertIPv4ToNumber("255.255.255.255");
-        System.out.println("x=" + x);
-        String s = KeelNetHelper.getInstance().convertNumberToIPv4(x);
-        System.out.println("s=" + s);
-    }
+//    public static void main(String[] args) {
+//        Long x = KeelNetHelper.getInstance().convertIPv4ToNumber("255.255.255.255");
+//        System.out.println("x=" + x);
+//        String s = KeelNetHelper.getInstance().convertNumberToIPv4(x);
+//        System.out.println("s=" + s);
+//    }
 
     @Nullable
     public Long convertIPv4ToNumber(@Nullable String ipv4) {
