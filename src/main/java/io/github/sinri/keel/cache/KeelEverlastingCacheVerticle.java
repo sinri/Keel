@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentMap;
  * @since 3.2.11 Named KeelCacheDalet
  * @since 4.0.0 Named KeelEverlastingCacheVerticle
  */
-abstract public class KeelEverlastingCacheVerticle extends KeelVerticleImplPure implements KeelEverlastingCacheInterface<String, String> {
+abstract public class KeelEverlastingCacheVerticle extends KeelVerticleImplPure implements KeelEverlastingCache<String, String> {
     private final ConcurrentMap<String, String> map = new ConcurrentHashMap<>();
 
 

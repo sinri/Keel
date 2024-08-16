@@ -1,6 +1,6 @@
 package io.github.sinri.keel.cache;
 
-import io.github.sinri.keel.cache.impl.KeelCacheBet;
+import io.github.sinri.keel.cache.impl.KeelAsyncCacheImpl;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
@@ -13,12 +13,12 @@ import java.util.function.Function;
  * @param <V>
  * @since 1.14
  */
-public interface KeelAsyncCacheInterface<K, V> {
+public interface KeelAsyncCache<K, V> {
     /**
      * @since 2.5
      */
-    static <K, V> KeelAsyncCacheInterface<K, V> createDefaultInstance() {
-        return new KeelCacheBet<>();
+    static <K, V> KeelAsyncCache<K, V> create() {
+        return new KeelAsyncCacheImpl<>();
     }
 
     /**

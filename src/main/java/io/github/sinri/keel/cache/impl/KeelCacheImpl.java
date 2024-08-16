@@ -1,6 +1,6 @@
 package io.github.sinri.keel.cache.impl;
 
-import io.github.sinri.keel.cache.KeelCacheInterface;
+import io.github.sinri.keel.cache.KeelCache;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -14,11 +14,11 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @since 2.5
  */
-public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
+public class KeelCacheImpl<K, V> implements KeelCache<K, V> {
     private final ConcurrentMap<K, ValueWrapper<V>> map;
     private long defaultLifeInSeconds = 1000L;
 
-    public KeelCacheAlef() {
+    public KeelCacheImpl() {
         this.map = new ConcurrentHashMap<>();
     }
 
@@ -28,7 +28,7 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public KeelCacheInterface<K, V> setDefaultLifeInSeconds(long lifeInSeconds) {
+    public KeelCache<K, V> setDefaultLifeInSeconds(long lifeInSeconds) {
         defaultLifeInSeconds = lifeInSeconds;
         return this;
     }

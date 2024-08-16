@@ -1,6 +1,6 @@
 package io.github.sinri.keel.redis;
 
-import io.github.sinri.keel.cache.KeelAsyncCacheInterface;
+import io.github.sinri.keel.cache.KeelAsyncCache;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +11,7 @@ import java.util.function.Function;
 /**
  * @since 3.0.5
  */
-public class KeelAsyncCacheWithRedis implements KeelAsyncCacheInterface<String, String> {
+public class KeelAsyncCacheWithRedis implements KeelAsyncCache<String, String> {
     private final RedisKit redisKit;
 
     public KeelAsyncCacheWithRedis(String redisInstanceKey) {

@@ -1,6 +1,6 @@
 package io.github.sinri.keel.cache.impl;
 
-import io.github.sinri.keel.cache.KeelAsyncEverlastingCacheInterface;
+import io.github.sinri.keel.cache.KeelAsyncEverlastingCache;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,12 +16,12 @@ import java.util.function.BooleanSupplier;
  * @param <V>
  * @since 2.9
  */
-public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<K, V> {
+public class KeelAsyncEverlastingCacheImpl<K, V> implements KeelAsyncEverlastingCache<K, V> {
     private final Lock lock;
     private final Map<K, V> map;
     private long lockWaitMs = 100;
 
-    public KeelCacheGimel() {
+    public KeelAsyncEverlastingCacheImpl() {
         lock = new ReentrantLock();
         map = new HashMap<>();
     }
@@ -30,7 +30,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
         return lockWaitMs;
     }
 
-    public KeelCacheGimel<K, V> setLockWaitMs(long lockWaitMs) {
+    public KeelAsyncEverlastingCacheImpl<K, V> setLockWaitMs(long lockWaitMs) {
         this.lockWaitMs = lockWaitMs;
         return this;
     }

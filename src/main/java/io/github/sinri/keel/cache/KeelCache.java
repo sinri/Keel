@@ -1,7 +1,7 @@
 package io.github.sinri.keel.cache;
 
-import io.github.sinri.keel.cache.impl.KeelCacheAlef;
 import io.github.sinri.keel.cache.impl.KeelCacheDummy;
+import io.github.sinri.keel.cache.impl.KeelCacheImpl;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ import java.util.function.Function;
  * @param <V> class for key
  * @since 1.9
  */
-public interface KeelCacheInterface<K, V> {
+public interface KeelCache<K, V> {
     /**
      * @param <K> class for key
      * @param <V> class for value
@@ -22,14 +22,14 @@ public interface KeelCacheInterface<K, V> {
      * @since 1.9 Use CaffeineCacheKit as implementation by default.
      * @since 2.5 changed to use KeelCacheAlef
      */
-    static <K, V> KeelCacheInterface<K, V> createDefaultInstance() {
-        return new KeelCacheAlef<>();
+    static <K, V> KeelCache<K, V> create() {
+        return new KeelCacheImpl<>();
     }
 
     /**
      * @since 2.6
      */
-    static <K, V> KeelCacheInterface<K, V> getDummyInstance() {
+    static <K, V> KeelCache<K, V> createDummy() {
         return new KeelCacheDummy<>();
     }
 
@@ -41,7 +41,7 @@ public interface KeelCacheInterface<K, V> {
     /**
      * @since 2.8
      */
-    KeelCacheInterface<K, V> setDefaultLifeInSeconds(long lifeInSeconds);
+    KeelCache<K, V> setDefaultLifeInSeconds(long lifeInSeconds);
 
     /**
      * Save an item (as key and value pair) into cache, keep it available for a certain time.

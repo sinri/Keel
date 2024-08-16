@@ -1,6 +1,6 @@
 package io.github.sinri.keel.cache.impl;
 
-import io.github.sinri.keel.cache.KeelAsyncCacheInterface;
+import io.github.sinri.keel.cache.KeelAsyncCache;
 import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,10 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
+public class KeelAsyncCacheImpl<K, V> implements KeelAsyncCache<K, V> {
     private final ConcurrentMap<K, ValueWrapper<V>> map;
 
-    public KeelCacheBet() {
+    public KeelAsyncCacheImpl() {
         this.map = new ConcurrentHashMap<>();
     }
 

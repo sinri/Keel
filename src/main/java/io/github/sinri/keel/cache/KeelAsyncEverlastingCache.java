@@ -1,6 +1,7 @@
 package io.github.sinri.keel.cache;
 
-import io.github.sinri.keel.cache.impl.KeelCacheVet;
+import io.github.sinri.keel.cache.impl.KeelAsyncEverlastingCacheImpl;
+import io.vertx.core.Future;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -11,22 +12,27 @@ import java.util.Map;
  * @param <V>
  * @since 2.9
  */
-public interface KeelEverlastingCacheInterface<K, V> {
-    static <K, V> KeelEverlastingCacheInterface<K, V> createDefaultInstance() {
-        return new KeelCacheVet<>();
+public interface KeelAsyncEverlastingCache<K, V> {
+    static <K, V> KeelAsyncEverlastingCache<K, V> create() {
+        return new KeelAsyncEverlastingCacheImpl<>();
+    }
+
+    default long getLockWaitMs() {
+        return 100;
     }
 
     /**
      * Save the item to cache.
      */
-    void save(@NotNull K k, V v);
+    Future<Void> save(@NotNull K k, V v);
 
-    void save(@NotNull Map<K, V> appendEntries);
+    Future<Void> save(@NotNull Map<K, V> appendEntries);
 
     /**
      * @return cache value or null when not-existed
+     * @since 2.9.4 return Future
      */
-    default V read(@NotNull K k) {
+    default Future<V> read(@NotNull K k) {
         return read(k, null);
     }
 
@@ -34,29 +40,30 @@ public interface KeelEverlastingCacheInterface<K, V> {
      * @param k key
      * @param v default value for the situation that key not existed
      * @return @return cache value or default when not-existed
+     * @since 2.9.4 return Future
      */
-    V read(@NotNull K k, V v);
+    Future<V> read(@NotNull K k, V v);
 
     /**
      * Remove the cached item with key.
      *
      * @param key key
      */
-    void remove(@NotNull K key);
+    Future<Void> remove(@NotNull K key);
 
-    void remove(@NotNull Collection<K> keys);
+    Future<Void> remove(@NotNull Collection<K> keys);
 
     /**
      * Remove all the cached items.
      */
-    void removeAll();
+    Future<Void> removeAll();
 
     /**
      * Replace all entries in cache map with new entries.
      *
      * @param newEntries new map of entries
      */
-    void replaceAll(@NotNull Map<K, V> newEntries);
+    Future<Void> replaceAll(@NotNull Map<K, V> newEntries);
 
     /**
      * @return ConcurrentMap K → V alive value only
@@ -64,16 +71,4 @@ public interface KeelEverlastingCacheInterface<K, V> {
      */
     @NotNull
     Map<K, V> getSnapshotMap();
-
-//    class LockedException extends Exception{
-//        public LockedException(){
-//            super("KeelEverlastingCacheInterface Locked");
-//        }
-//        public LockedException(String msg){
-//            super(msg);
-//        }
-//        public LockedException(Throwable throwable){
-//            super(throwable);
-//        }
-//    }
 }

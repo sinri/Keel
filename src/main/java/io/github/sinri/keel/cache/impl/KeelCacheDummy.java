@@ -1,12 +1,12 @@
 package io.github.sinri.keel.cache.impl;
 
-import io.github.sinri.keel.cache.KeelCacheInterface;
+import io.github.sinri.keel.cache.KeelCache;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.Map;
 
-public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
+public class KeelCacheDummy<K, V> implements KeelCache<K, V> {
 
     @Override
     public long getDefaultLifeInSeconds() {
@@ -14,7 +14,7 @@ public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public KeelCacheInterface<K, V> setDefaultLifeInSeconds(long lifeInSeconds) {
+    public KeelCache<K, V> setDefaultLifeInSeconds(long lifeInSeconds) {
         return this;
     }
 
