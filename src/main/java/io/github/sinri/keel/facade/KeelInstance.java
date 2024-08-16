@@ -11,9 +11,9 @@ import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.spi.cluster.ClusterManager;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -25,13 +25,13 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     /**
      * @since 3.2.3
      */
-    private final @Nonnull KeelConfigElement configuration;
+    private final @NotNull KeelConfigElement configuration;
     private @Nullable Vertx vertx;
     private @Nullable ClusterManager clusterManager;
     /**
      * @since 3.2.0 replace Keel Event Logger.
      */
-    @Nonnull
+    @NotNull
     private KeelEventLogger eventLogger;
 
     private KeelInstance() {
@@ -40,12 +40,12 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
         this.eventLogger.setVisibleLevel(KeelLogLevel.WARNING);
     }
 
-    @Nonnull
+    @NotNull
     public KeelConfigElement getConfiguration() {
         return configuration;
     }
 
-    public @Nullable String config(@Nonnull String dotJoinedKeyChain) {
+    public @Nullable String config(@NotNull String dotJoinedKeyChain) {
         String[] split = dotJoinedKeyChain.split("\\.");
         KeelConfigElement keelConfigElement = this.configuration.extract(split);
         if (keelConfigElement == null) {
@@ -54,12 +54,12 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
         return keelConfigElement.getValueAsString();
     }
 
-    public @Nonnull Vertx getVertx() {
+    public @NotNull Vertx getVertx() {
         Objects.requireNonNull(vertx);
         return vertx;
     }
 
-    public void setVertx(@Nonnull Vertx outsideVertx) {
+    public void setVertx(@NotNull Vertx outsideVertx) {
         eventLogger.debug(r -> r.message("KeelInstance::setVertx is called with outsideVertx " + outsideVertx + " while currently vertx is " + vertx));
         if (vertx == null) {
             vertx = outsideVertx;
@@ -73,12 +73,12 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
         return clusterManager;
     }
 
-    public Future<Void> initializeVertx(@Nonnull VertxOptions vertxOptions) {
+    public Future<Void> initializeVertx(@NotNull VertxOptions vertxOptions) {
         return initializeVertx(vertxOptions, null);
     }
 
     public Future<Void> initializeVertx(
-            @Nonnull VertxOptions vertxOptions,
+            @NotNull VertxOptions vertxOptions,
             @Nullable ClusterManager clusterManager
     ) {
         this.clusterManager = clusterManager;
@@ -97,7 +97,7 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
         }
     }
 
-    public void initializeVertxStandalone(@Nonnull VertxOptions vertxOptions) {
+    public void initializeVertxStandalone(@NotNull VertxOptions vertxOptions) {
         // todo: remove legacy code, follow vertx
         if (vertxOptions.getClusterManager() != null) {
             vertxOptions.setClusterManager(null);
@@ -120,7 +120,7 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
      * By default, it is print to stdout and only WARNING and above may be recorded.
      * If you want to debug locally, just get it and reset its visible level.
      */
-    @Nonnull
+    @NotNull
     public KeelEventLogger getLogger() {
         return eventLogger;
     }
@@ -128,12 +128,12 @@ public class KeelInstance implements KeelHelpersInterface, KeelClusterKit {
     /**
      * @since 3.2.0
      */
-    public KeelInstance setLogger(@Nonnull KeelEventLogger eventLogger) {
+    public KeelInstance setLogger(@NotNull KeelEventLogger eventLogger) {
         this.eventLogger = eventLogger;
         return this;
     }
 
-    public Future<Void> gracefullyClose(@Nonnull io.vertx.core.Handler<Promise<Void>> promiseHandler) {
+    public Future<Void> gracefullyClose(@NotNull io.vertx.core.Handler<Promise<Void>> promiseHandler) {
         Promise<Void> promise = Promise.promise();
         promiseHandler.handle(promise);
         return promise.future().compose(v -> getVertx().close());

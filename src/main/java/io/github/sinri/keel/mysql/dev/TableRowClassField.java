@@ -1,7 +1,9 @@
 package io.github.sinri.keel.mysql.dev;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -49,8 +51,8 @@ class TableRowClassField {
     private final boolean nullable;
 
     public TableRowClassField(
-            @Nonnull String field,
-            @Nonnull String type,
+            @NotNull String field,
+            @NotNull String type,
             boolean nullable,
             @Nullable String comment,
             @Nullable String strictEnumPackage,

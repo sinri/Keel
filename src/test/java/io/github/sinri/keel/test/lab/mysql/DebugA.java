@@ -4,14 +4,13 @@ import io.github.sinri.keel.mysql.KeelMySQLConfiguration;
 import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class DebugA extends KeelTest {
 
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> starting() {
         Keel.getConfiguration().loadPropertiesFile("config.properties");

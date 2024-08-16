@@ -1,6 +1,7 @@
 package io.github.sinri.keel.poi.excel.reader.entity;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class KeelSheetTemplatedMatrixImpl implements KeelSheetTemplatedMatrix {
     private final KeelSheetMatrixRowTemplate template;
     private final List<List<String>> rawRows;
 
-    KeelSheetTemplatedMatrixImpl(@Nonnull KeelSheetMatrixRowTemplate template) {
+    KeelSheetTemplatedMatrixImpl(@NotNull KeelSheetMatrixRowTemplate template) {
         this.template = template;
         this.rawRows = new ArrayList<>();
     }
@@ -43,7 +44,7 @@ public class KeelSheetTemplatedMatrixImpl implements KeelSheetTemplatedMatrix {
     }
 
     @Override
-    public KeelSheetTemplatedMatrix addRawRow(@Nonnull List<String> rawRow) {
+    public KeelSheetTemplatedMatrix addRawRow(@NotNull List<String> rawRow) {
         this.rawRows.add(rawRow);
         return this;
     }

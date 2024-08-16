@@ -1,9 +1,9 @@
 package io.github.sinri.keel.logger.issue.record;
 
 import io.github.sinri.keel.core.TechnicalPreview;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since 3.1.10
@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 public interface IssueRecordMessageMixin<T> extends KeelIssueRecordCore<T> {
     String AttributeMessage = "message";
 
-    T message(@Nonnull String message);
+    T message(@NotNull String message);
 
     @Nullable
     String message();

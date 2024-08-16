@@ -6,9 +6,9 @@ import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.core.spi.cluster.NodeInfo;
 import io.vertx.spi.cluster.hazelcast.ConfigUtil;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -21,22 +21,9 @@ public interface KeelClusterKit {
     @Nullable
     ClusterManager getClusterManager();
 
-    @TechnicalPreview(since = "3.1.0")
-    default @Nonnull String getVertxNodeNetAddress() {
-        if (getClusterManager() == null) return "";
-        NodeInfo nodeInfo = getClusterManager().getNodeInfo();
-        return nodeInfo.host() + ":" + nodeInfo.port();
-    }
-
-    @TechnicalPreview(since = "3.1.0")
-    default @Nonnull String getVertxNodeID() {
-        if (getClusterManager() == null) return "";
-        return getClusterManager().getNodeId();
-    }
-
     static ClusterManager createClusterManagerForSAE(
-            @Nonnull String clusterName,
-            @Nonnull List<String> members,
+            @NotNull String clusterName,
+            @NotNull List<String> members,
             int port, int portCount
     ) {
         TcpIpConfig tcpIpConfig = new TcpIpConfig()
@@ -60,5 +47,18 @@ public interface KeelClusterKit {
                 .setNetworkConfig(networkConfig);
 
         return new HazelcastClusterManager(hazelcastConfig);
+    }
+
+    @TechnicalPreview(since = "3.1.0")
+    default @NotNull String getVertxNodeNetAddress() {
+        if (getClusterManager() == null) return "";
+        NodeInfo nodeInfo = getClusterManager().getNodeInfo();
+        return nodeInfo.host() + ":" + nodeInfo.port();
+    }
+
+    @TechnicalPreview(since = "3.1.0")
+    default @NotNull String getVertxNodeID() {
+        if (getClusterManager() == null) return "";
+        return getClusterManager().getNodeId();
     }
 }

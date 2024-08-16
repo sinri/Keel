@@ -1,23 +1,22 @@
 package io.github.sinri.keel.test.lab.logger.issue;
 
 import io.github.sinri.keel.logger.issue.record.BaseIssueRecord;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 public final class BetIssueRecord extends BaseIssueRecord<BetIssueRecord> {
-    public BetIssueRecord(@Nonnull String caller) {
+    public BetIssueRecord(@NotNull String caller) {
         this.classification("Bet", caller);
     }
 
-    @Nonnull
     @Override
-    public BetIssueRecord getImplementation() {
+    public @NotNull BetIssueRecord getImplementation() {
         return this;
     }
 
-    @Nonnull
+
     @Override
-    public String topic() {
+    public @NotNull String topic() {
         return "Bet";
     }
 

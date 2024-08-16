@@ -2,9 +2,9 @@ package io.github.sinri.keel.mysql;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.vertx.sqlclient.SqlConnection;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since 3.0.11 Technical Preview. To avoid mix in multi-data-sources.
@@ -24,7 +24,7 @@ abstract public class NamedMySQLConnection {
     /**
      * @return The data source which provided the sql connection.
      */
-    @Nonnull
+    @NotNull
     abstract public String getDataSourceName();
 
     private @Nullable String mysqlVersion;

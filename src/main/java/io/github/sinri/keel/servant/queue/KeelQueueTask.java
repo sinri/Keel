@@ -2,8 +2,8 @@ package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.verticles.KeelVerticleImplWithIssueRecorder;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 /**
  * @since 2.1
@@ -15,10 +15,10 @@ public abstract class KeelQueueTask extends KeelVerticleImplWithIssueRecorder<Qu
         this.queueWorkerPoolManager = queueWorkerPoolManager;
     }
 
-    @Nonnull
+    @NotNull
     abstract public String getTaskReference();
 
-    @Nonnull
+    @NotNull
     abstract public String getTaskCategory();
 
     @Override

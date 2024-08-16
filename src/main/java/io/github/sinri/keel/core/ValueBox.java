@@ -1,6 +1,7 @@
 package io.github.sinri.keel.core;
 
-import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Store a value or not, and provide the ability to determine if the value is set, even if the value is null.

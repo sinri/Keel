@@ -5,8 +5,8 @@ import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.Future;
 import io.vertx.core.VertxOptions;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -122,14 +122,14 @@ abstract public class KeelTest {
                 });
     }
 
-    protected @Nonnull VertxOptions buildVertxOptions() {
+    protected @NotNull VertxOptions buildVertxOptions() {
         return new VertxOptions();
     }
 
     /**
      * @since 3.2.0
      */
-    @Nonnull
+    @NotNull
     protected KeelEventLogger getLogger() {
         return eventLogger;
     }
@@ -137,21 +137,21 @@ abstract public class KeelTest {
     /**
      * @since 3.2.0
      */
-    protected void setLogger(@Nonnull KeelEventLogger eventLogger) {
+    protected void setLogger(@NotNull KeelEventLogger eventLogger) {
         KeelTest.eventLogger = eventLogger;
     }
 
     @Deprecated(since = "3.2.0")
-    @Nonnull
+    @NotNull
     protected KeelEventLogger logger() {
         return eventLogger;
     }
 
-    protected @Nonnull Future<Void> starting() {
+    protected @NotNull Future<Void> starting() {
         return Future.succeededFuture();
     }
 
-    protected @Nonnull Future<Void> ending(List<TestUnitResult> testUnitResults) {
+    protected @NotNull Future<Void> ending(List<TestUnitResult> testUnitResults) {
         return Future.succeededFuture();
     }
 

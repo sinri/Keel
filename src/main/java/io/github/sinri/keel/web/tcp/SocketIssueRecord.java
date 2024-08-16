@@ -3,8 +3,7 @@ package io.github.sinri.keel.web.tcp;
 import io.github.sinri.keel.logger.issue.record.BaseIssueRecord;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
@@ -14,13 +13,12 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 public final class SocketIssueRecord extends BaseIssueRecord<SocketIssueRecord> {
     public static final String TopicTcpSocket = "TcpSocket";
 
-    @Nonnull
     @Override
-    public SocketIssueRecord getImplementation() {
+    public @NotNull SocketIssueRecord getImplementation() {
         return this;
     }
 
-    public SocketIssueRecord buffer(@Nonnull Buffer buffer) {
+    public SocketIssueRecord buffer(@NotNull Buffer buffer) {
         this.context("buffer", new JsonObject()
                 .put("buffer_content", KeelHelpers.binaryHelper().encodeHexWithUpperDigits(buffer))
                 .put("buffer_size", buffer.length())
@@ -28,9 +26,8 @@ public final class SocketIssueRecord extends BaseIssueRecord<SocketIssueRecord> 
         return this;
     }
 
-    @Nonnull
     @Override
-    public String topic() {
+    public @NotNull String topic() {
         return TopicTcpSocket;
     }
 }

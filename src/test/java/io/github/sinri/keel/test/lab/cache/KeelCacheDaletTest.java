@@ -8,15 +8,15 @@ import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.ThreadingModel;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Date;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class KeelCacheDaletTest extends KeelTest {
 
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> starting() {
         Keel.getLogger().setVisibleLevel(KeelLogLevel.DEBUG);

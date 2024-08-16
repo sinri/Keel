@@ -1,8 +1,8 @@
 package io.github.sinri.keel.facade.async;
 
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.function.Function;
 
@@ -15,15 +15,15 @@ import java.util.function.Function;
 public class FutureForEach<T> {
     private final Function<T, Future<Void>> asyncItemProcessFunction;
 
-    private FutureForEach(@Nonnull Function<T, Future<Void>> itemProcessor) {
+    private FutureForEach(@NotNull Function<T, Future<Void>> itemProcessor) {
         this.asyncItemProcessFunction = itemProcessor;
     }
 
-    static <T> Future<Void> call(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    static <T> Future<Void> call(@NotNull Iterable<T> collection, @NotNull Function<T, Future<Void>> itemProcessor) {
         return new FutureForEach<>(itemProcessor).process(collection);
     }
 
-    private Future<Void> process(@Nonnull Iterable<T> collection) {
+    private Future<Void> process(@NotNull Iterable<T> collection) {
         Iterator<T> iterator = collection.iterator();
         return KeelAsyncKit.repeatedlyCall(routineResult -> {
             if (iterator.hasNext()) {

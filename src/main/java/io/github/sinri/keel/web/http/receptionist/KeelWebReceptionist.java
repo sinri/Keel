@@ -7,9 +7,9 @@ import io.vertx.core.http.impl.CookieImpl;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
@@ -21,10 +21,10 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
  * @since 3.2.0 Moved the responding error for `dealt` logging logic out of the `respondOn*` methods.
  */
 public abstract class KeelWebReceptionist {
-    private final @Nonnull RoutingContext routingContext;
-    private final @Nonnull KeelIssueRecorder<ReceptionistIssueRecord> issueRecorder;
+    private final @NotNull RoutingContext routingContext;
+    private final @NotNull KeelIssueRecorder<ReceptionistIssueRecord> issueRecorder;
 
-    public KeelWebReceptionist(@Nonnull RoutingContext routingContext) {
+    public KeelWebReceptionist(@NotNull RoutingContext routingContext) {
         this.routingContext = routingContext;
         this.issueRecorder = issueRecordCenter().generateIssueRecorder(ReceptionistIssueRecord.TopicReceptionist, () -> new ReceptionistIssueRecord(readRequestID()));
         this.issueRecorder.info(r -> r.setRequest(
@@ -36,7 +36,7 @@ public abstract class KeelWebReceptionist {
         ));
     }
 
-    @Nonnull
+    @NotNull
     protected final RoutingContext getRoutingContext() {
         return routingContext;
     }
@@ -48,20 +48,20 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.2.0
      */
-    @Nonnull
+    @NotNull
     abstract protected KeelIssueRecordCenter issueRecordCenter();
 
     /**
      * @since 3.2.0
      */
-    @Nonnull
+    @NotNull
     public final KeelIssueRecorder<ReceptionistIssueRecord> getIssueRecorder() {
         return issueRecorder;
     }
 
     abstract public void handle();
 
-    private void respondWithJsonObject(@Nonnull JsonObject resp) {
+    private void respondWithJsonObject(@NotNull JsonObject resp) {
         routingContext.json(resp);
     }
 
@@ -85,7 +85,7 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.0.12 add request_id to output json object
      */
-    protected void respondOnFailure(@Nonnull Throwable throwable) {
+    protected void respondOnFailure(@NotNull Throwable throwable) {
         var resp = new JsonObject()
                 .put("request_id", routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID))
                 .put("code", "FAILED")
@@ -104,18 +104,18 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.0.8 mark it nullable as it might be null.
      */
-    public @Nonnull String readRequestID() {
+    public @NotNull String readRequestID() {
         return Objects.requireNonNull(routingContext.get(KeelPlatformHandler.KEEL_REQUEST_ID));
     }
 
     /**
      * @since 3.0.8 mark it nullable as it might be null.
      */
-    public @Nonnull Long readRequestStartTime() {
+    public @NotNull Long readRequestStartTime() {
         return Objects.requireNonNull(routingContext.get(KeelPlatformHandler.KEEL_REQUEST_START_TIME));
     }
 
-    public @Nonnull List<String> readRequestIPChain() {
+    public @NotNull List<String> readRequestIPChain() {
         return KeelHelpers.netHelper().parseWebClientIPChain(routingContext);
     }
 
@@ -137,14 +137,14 @@ public abstract class KeelWebReceptionist {
     /**
      * @since 3.0.1
      */
-    protected void addCookie(@Nonnull String name, @Nonnull String value, Long maxAge) {
+    protected void addCookie(@NotNull String name, @NotNull String value, Long maxAge) {
         addCookie(name, value, maxAge, false);
     }
 
     /**
      * @since 3.0.1
      */
-    protected void removeCookie(@Nonnull String name) {
+    protected void removeCookie(@NotNull String name) {
         getRoutingContext().response().removeCookie(name);
     }
 

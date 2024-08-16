@@ -2,9 +2,9 @@ package io.github.sinri.keel.helper;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -47,12 +47,12 @@ public class KeelJsonHelper {
         System.out.println(x1);
     }
 
-    public JsonObject writeIntoJsonObject(@Nonnull JsonObject jsonObject, @Nonnull String key, @Nullable Object value) {
+    public JsonObject writeIntoJsonObject(@NotNull JsonObject jsonObject, @NotNull String key, @Nullable Object value) {
         jsonObject.put(key, value);
         return jsonObject;
     }
 
-    public JsonArray writeIntoJsonArray(@Nonnull JsonArray jsonArray, int index, @Nullable Object value) {
+    public JsonArray writeIntoJsonArray(@NotNull JsonArray jsonArray, int index, @Nullable Object value) {
         if (index >= 0) {
             if (index >= jsonArray.size()) {
                 for (var i = jsonArray.size(); i <= index; i++) {
@@ -69,8 +69,8 @@ public class KeelJsonHelper {
     /**
      * @throws RuntimeException if not writable
      */
-    @Nonnull
-    public JsonObject writeIntoJsonObject(@Nonnull JsonObject jsonObject, @Nonnull List<Object> keychain, @Nullable Object value) {
+    @NotNull
+    public JsonObject writeIntoJsonObject(@NotNull JsonObject jsonObject, @NotNull List<Object> keychain, @Nullable Object value) {
         Objects.requireNonNull(jsonObject);
         if (keychain.isEmpty()) {
             throw new RuntimeException();
@@ -108,8 +108,8 @@ public class KeelJsonHelper {
         return jsonObject;
     }
 
-    @Nonnull
-    public JsonArray writeIntoJsonArray(@Nonnull JsonArray jsonArray, @Nonnull List<Object> keychain, @Nullable Object value) {
+    @NotNull
+    public JsonArray writeIntoJsonArray(@NotNull JsonArray jsonArray, @NotNull List<Object> keychain, @Nullable Object value) {
         Objects.requireNonNull(keychain);
         if (keychain.isEmpty()) {
             throw new RuntimeException();
@@ -161,17 +161,17 @@ public class KeelJsonHelper {
     }
 
     @Nullable
-    public Object readFromJsonObject(@Nonnull JsonObject jsonObject, @Nonnull String key) {
+    public Object readFromJsonObject(@NotNull JsonObject jsonObject, @NotNull String key) {
         return jsonObject.getValue(key);
     }
 
     @Nullable
-    public Object readFromJsonArray(@Nonnull JsonArray jsonArray, int index) {
+    public Object readFromJsonArray(@NotNull JsonArray jsonArray, int index) {
         return jsonArray.getValue(index);
     }
 
     @Nullable
-    public Object readFromJsonObject(@Nonnull JsonObject jsonObject, @Nonnull List<Object> keychain) {
+    public Object readFromJsonObject(@NotNull JsonObject jsonObject, @NotNull List<Object> keychain) {
         Objects.requireNonNull(keychain);
         if (keychain.isEmpty()) {
             throw new RuntimeException();
@@ -191,7 +191,7 @@ public class KeelJsonHelper {
     }
 
     @Nullable
-    public Object readFromJsonArray(@Nonnull JsonArray jsonArray, @Nonnull List<Object> keychain) {
+    public Object readFromJsonArray(@NotNull JsonArray jsonArray, @NotNull List<Object> keychain) {
         Objects.requireNonNull(keychain);
         if (keychain.isEmpty()) {
             throw new RuntimeException();
@@ -216,8 +216,8 @@ public class KeelJsonHelper {
     /**
      * @since 2.4
      */
-    @Nonnull
-    private JsonArray getSortedJsonArray(@Nonnull JsonArray array) {
+    @NotNull
+    private JsonArray getSortedJsonArray(@NotNull JsonArray array) {
         List<Object> list = new ArrayList<>();
         array.forEach(list::add);
         list.sort(Comparator.comparing(Object::toString));
@@ -227,16 +227,16 @@ public class KeelJsonHelper {
     /**
      * @since 2.4
      */
-    @Nonnull
-    public String getJsonForArrayWhoseItemsSorted(@Nonnull JsonArray array) {
+    @NotNull
+    public String getJsonForArrayWhoseItemsSorted(@NotNull JsonArray array) {
         return getSortedJsonArray(array).toString();
     }
 
     /**
      * @since 2.4
      */
-    @Nonnull
-    private JsonObject getSortedJsonObject(@Nonnull JsonObject object) {
+    @NotNull
+    private JsonObject getSortedJsonObject(@NotNull JsonObject object) {
         JsonObject result = new JsonObject();
         List<String> keyList = new ArrayList<>(object.getMap().keySet());
         keyList.sort(Comparator.naturalOrder());
@@ -256,8 +256,8 @@ public class KeelJsonHelper {
     /**
      * @since 2.4
      */
-    @Nonnull
-    public String getJsonForObjectWhoseItemKeysSorted(@Nonnull JsonObject object) {
+    @NotNull
+    public String getJsonForObjectWhoseItemKeysSorted(@NotNull JsonObject object) {
         return getSortedJsonObject(object).toString();
     }
 
@@ -273,7 +273,7 @@ public class KeelJsonHelper {
      * @since 2.9
      */
     @Nullable
-    public JsonObject renderThrowableChain(@Nullable Throwable throwable, @Nonnull Set<String> ignorableStackPackageSet) {
+    public JsonObject renderThrowableChain(@Nullable Throwable throwable, @NotNull Set<String> ignorableStackPackageSet) {
         if (throwable == null) return null;
 
         Throwable cause = throwable.getCause();
@@ -300,14 +300,15 @@ public class KeelJsonHelper {
 
     public void filterStackTrace(
             @Nullable StackTraceElement[] stackTrace,
-            @Nonnull Set<String> ignorableStackPackageSet,
-            @Nonnull BiConsumer<String, Integer> ignoredStackTraceItemsConsumer,
-            @Nonnull Consumer<StackTraceElement> stackTraceItemConsumer
+            @NotNull Set<String> ignorableStackPackageSet,
+            @NotNull BiConsumer<String, Integer> ignoredStackTraceItemsConsumer,
+            @NotNull Consumer<StackTraceElement> stackTraceItemConsumer
     ) {
         if (stackTrace != null) {
             String ignoringClassPackage = null;
             int ignoringCount = 0;
             for (StackTraceElement stackTranceItem : stackTrace) {
+                if (stackTranceItem == null) continue;
                 String className = stackTranceItem.getClassName();
                 String matchedClassPackage = null;
                 for (var cp : ignorableStackPackageSet) {
@@ -349,8 +350,8 @@ public class KeelJsonHelper {
      * @since 2.9 original name: buildStackChainText
      * @since 3.0.0 become private and renamed to filterStackTraceToJsonArray
      */
-    @Nonnull
-    private JsonArray filterStackTraceToJsonArray(@Nullable StackTraceElement[] stackTrace, @Nonnull Set<String> ignorableStackPackageSet) {
+    @NotNull
+    private JsonArray filterStackTraceToJsonArray(@Nullable StackTraceElement[] stackTrace, @NotNull Set<String> ignorableStackPackageSet) {
         JsonArray array = new JsonArray();
 
         filterStackTrace(
@@ -376,7 +377,7 @@ public class KeelJsonHelper {
     /**
      * @since 3.0.0
      */
-    @Nonnull
+    @NotNull
     public String renderJsonToStringBlock(@Nullable String name, @Nullable Object object) {
         if (object == null) {
             return "null";
@@ -389,7 +390,7 @@ public class KeelJsonHelper {
      * @param object Value of entry amongst the entries, or the item amongst the array.
      * @return rendered string block ended with NEW_LINE.
      */
-    @Nonnull
+    @NotNull
     private String renderJsonItem(@Nullable String key, @Nullable Object object, int indentation, @Nullable String typeMark) {
         StringBuilder subBlock = new StringBuilder();
         if (indentation > 1) {

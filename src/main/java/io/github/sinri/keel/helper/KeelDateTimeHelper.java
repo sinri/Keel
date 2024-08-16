@@ -1,7 +1,8 @@
 package io.github.sinri.keel.helper;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -155,7 +156,7 @@ public class KeelDateTimeHelper {
      * @return Date instance.
      * @since 3.0.11
      */
-    public @Nullable Date parseExpressionToDateInstance(@Nonnull String dateStr, @Nonnull String formatStr) {
+    public @Nullable Date parseExpressionToDateInstance(@NotNull String dateStr, @NotNull String formatStr) {
         try {
             SimpleDateFormat format = new SimpleDateFormat(formatStr);
             return format.parse(dateStr);

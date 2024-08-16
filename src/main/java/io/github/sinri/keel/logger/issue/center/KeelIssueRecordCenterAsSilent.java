@@ -3,8 +3,8 @@ package io.github.sinri.keel.logger.issue.center;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.issue.recorder.adapter.KeelIssueRecorderAdapter;
 import io.github.sinri.keel.logger.issue.recorder.adapter.SilentAdapter;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 /**
  * @since 3.1.10
@@ -21,7 +21,7 @@ public class KeelIssueRecordCenterAsSilent implements KeelIssueRecordCenter {
         return instance;
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public KeelIssueRecorderAdapter getAdapter() {
         return SilentAdapter.getInstance();

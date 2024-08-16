@@ -3,8 +3,7 @@ package io.github.sinri.keel.web.udp;
 import io.github.sinri.keel.logger.issue.record.BaseIssueRecord;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
@@ -14,19 +13,18 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 public final class DatagramIssueRecord extends BaseIssueRecord<DatagramIssueRecord> {
     public static final String TopicUdpDatagram = "UdpDatagram";
 
-    @Nonnull
+
     @Override
-    public String topic() {
+    public @NotNull String topic() {
         return TopicUdpDatagram;
     }
 
-    @Nonnull
     @Override
-    public DatagramIssueRecord getImplementation() {
+    public @NotNull DatagramIssueRecord getImplementation() {
         return this;
     }
 
-    private DatagramIssueRecord buffer(@Nonnull Buffer buffer, @Nonnull String address, int port, @Nonnull String action) {
+    private DatagramIssueRecord buffer(@NotNull Buffer buffer, @NotNull String address, int port, @NotNull String action) {
         this.context(action, new JsonObject()
                         .put("address", action)
                         .put("port", port)
@@ -38,11 +36,11 @@ public final class DatagramIssueRecord extends BaseIssueRecord<DatagramIssueReco
         return this;
     }
 
-    public DatagramIssueRecord bufferSent(@Nonnull Buffer buffer, @Nonnull String address, int port) {
+    public DatagramIssueRecord bufferSent(@NotNull Buffer buffer, @NotNull String address, int port) {
         return this.buffer(buffer, address, port, "sent_to");
     }
 
-    public DatagramIssueRecord bufferReceived(@Nonnull Buffer buffer, @Nonnull String address, int port) {
+    public DatagramIssueRecord bufferReceived(@NotNull Buffer buffer, @NotNull String address, int port) {
         return this.buffer(buffer, address, port, "received_from");
     }
 }

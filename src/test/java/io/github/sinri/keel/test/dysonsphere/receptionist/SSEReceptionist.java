@@ -5,8 +5,7 @@ import io.github.sinri.keel.web.http.ApiMeta;
 import io.github.sinri.keel.web.http.receptionist.KeelWebReceptionist;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
@@ -34,7 +33,7 @@ public class SSEReceptionist extends KeelWebReceptionist {
         });
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected KeelIssueRecordCenter issueRecordCenter() {
         return KeelIssueRecordCenter.outputCenter();

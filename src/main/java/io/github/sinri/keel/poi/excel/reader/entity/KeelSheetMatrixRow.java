@@ -2,9 +2,9 @@ package io.github.sinri.keel.poi.excel.reader.entity;
 
 import io.github.sinri.keel.poi.excel.reader.options.ColumnReadOptions;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class KeelSheetMatrixRow {
         this.rawRow = rawRow;
     }
 
-    @Nonnull
+    @NotNull
     public String readValue(int i) {
         return rawRow.get(i);
     }
@@ -68,7 +68,7 @@ public class KeelSheetMatrixRow {
      * @return a json object with each column in defined type
      * @since 3.2.16
      */
-    public JsonObject toJsonObject(@Nonnull List<ColumnReadOptions> columns) {
+    public JsonObject toJsonObject(@NotNull List<ColumnReadOptions> columns) {
         JsonObject jsonObject = new JsonObject();
         for (int i = 0; i < columns.size(); i++) {
             ColumnReadOptions column = columns.get(i);
@@ -101,7 +101,7 @@ public class KeelSheetMatrixRow {
      * Use Jackson to map Json Object to a java class.
      * @see <a href="https://github.com/FasterXML/jackson-databind">Jackson Databind</a>
      */
-    public <T> T toBoundDataEntity(@Nonnull List<ColumnReadOptions> columns, Class<T> tClass) {
+    public <T> T toBoundDataEntity(@NotNull List<ColumnReadOptions> columns, Class<T> tClass) {
         return toJsonObject(columns).mapTo(tClass);
     }
 }

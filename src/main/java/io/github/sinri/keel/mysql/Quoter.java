@@ -1,11 +1,12 @@
 package io.github.sinri.keel.mysql;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public class Quoter {
-    private final @Nonnull String quoted;
+    private final @NotNull String quoted;
 
     public Quoter(@Nullable String x, boolean withWildcards) {
         if (x == null) {
@@ -43,7 +44,7 @@ public class Quoter {
         }
     }
 
-    public Quoter(@Nonnull List<?> list) {
+    public Quoter(@NotNull List<?> list) {
         StringBuilder q = new StringBuilder();
         for (Object y : list) {
             if (!q.isEmpty()) {
@@ -58,7 +59,7 @@ public class Quoter {
         quoted = "(" + q + ")";
     }
 
-    public static @Nonnull String escapeString(@Nonnull String s) {
+    public static @NotNull String escapeString(@NotNull String s) {
         return s.replace("\\", "\\\\")
                 .replace("\b", "\\b")
                 .replace("\n", "\\n")
@@ -70,13 +71,13 @@ public class Quoter {
                 .replace("\"", "\\\"");
     }
 
-    public static @Nonnull String escapeStringWithWildcards(@Nonnull String s) {
+    public static @NotNull String escapeStringWithWildcards(@NotNull String s) {
         return escapeString(s)
                 .replace("%", "\\%")
                 .replace("_", "\\_");
     }
 
-    public static @Nonnull String quoteEscapedString(@Nonnull String s) {
+    public static @NotNull String quoteEscapedString(@NotNull String s) {
         return "'" + s + "'";
     }
 

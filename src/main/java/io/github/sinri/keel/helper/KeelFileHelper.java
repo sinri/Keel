@@ -1,9 +1,9 @@
 package io.github.sinri.keel.helper;
 
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +31,7 @@ public class KeelFileHelper {
         return instance;
     }
 
-    public @Nonnull byte[] readFileAsByteArray(@Nonnull String filePath, boolean seekInsideJarWhenNotFound) throws IOException {
+    public byte[] readFileAsByteArray(@NotNull String filePath, boolean seekInsideJarWhenNotFound) throws IOException {
         try {
             return Files.readAllBytes(Path.of(filePath));
         } catch (IOException e) {
@@ -54,34 +54,11 @@ public class KeelFileHelper {
     /**
      * @param filePath path string of the target file, or directory
      * @return the URL of target file; if not there, null return.
-     * @deprecated USAGE CLEANED
-     */
-    @Nullable
-    @Deprecated(forRemoval = true, since = "3.2.12.1")
-    public URL getUrlOfFileInJar(@Nonnull String filePath) {
-        return getUrlOfFileInRunningJar(filePath);
-    }
-
-    /**
-     * @param filePath path string of the target file, or directory
-     * @return the URL of target file; if not there, null return.
      * @since 3.2.12.1 original name is `getUrlOfFileInJar`.
      */
     @Nullable
-    public URL getUrlOfFileInRunningJar(@Nonnull String filePath) {
+    public URL getUrlOfFileInRunningJar(@NotNull String filePath) {
         return KeelFileHelper.class.getClassLoader().getResource(filePath);
-    }
-
-    /**
-     * Seek in JAR, under the root (exclusive)
-     * @param root ends with '/'
-     * @return list of JarEntry
-     * @deprecated USAGE CLEANED
-     */
-    @Deprecated(forRemoval = true, since = "3.2.12.1")
-    @Nonnull
-    public List<JarEntry> traversalInJar(@Nonnull String root) {
-        return traversalInRunningJar(root);
     }
 
     /**
@@ -91,8 +68,8 @@ public class KeelFileHelper {
      * @return list of JarEntry
      * @since 3.2.12.1 original name is `traversalInJar`.
      */
-    @Nonnull
-    public List<JarEntry> traversalInRunningJar(@Nonnull String root) {
+    @NotNull
+    public List<JarEntry> traversalInRunningJar(@NotNull String root) {
         List<JarEntry> jarEntryList = new ArrayList<>();
         try {
             // should root ends with '/'?
@@ -164,20 +141,9 @@ public class KeelFileHelper {
     /**
      * The in-class classes, i.e. subclasses, would be neglected.
      *
-     * @since 3.2.11
-     * @deprecated USAGE CLEANED
-     */
-    @Deprecated(since = "3.2.12.1", forRemoval = true)
-    public Set<String> seekPackageClassFilesInJar(@Nonnull String packageName) {
-        return seekPackageClassFilesInRunningJar(packageName);
-    }
-
-    /**
-     * The in-class classes, i.e. subclasses, would be neglected.
-     *
      * @since 3.2.12.1 original name is `seekPackageClassFilesInJar`.
      */
-    public Set<String> seekPackageClassFilesInRunningJar(@Nonnull String packageName) {
+    public Set<String> seekPackageClassFilesInRunningJar(@NotNull String packageName) {
         Set<String> classes = new HashSet<>();
         // Get the current class's class loader
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();

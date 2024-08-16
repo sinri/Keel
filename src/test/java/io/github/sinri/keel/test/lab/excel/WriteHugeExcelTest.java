@@ -8,8 +8,8 @@ import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.github.sinri.keel.tesuto.TestUnitResult;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +17,13 @@ public class WriteHugeExcelTest extends KeelTest {
     private static final String file = "/Users/sinri/code/keel/src/test/resources/runtime/huge.xlsx";
 
 
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> starting() {
         return Future.succeededFuture();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> ending(List<TestUnitResult> testUnitResults) {
         return Future.succeededFuture();

@@ -2,9 +2,9 @@ package io.github.sinri.keel.helper;
 
 import io.github.sinri.keel.helper.encryption.base32.Base32;
 import io.vertx.core.buffer.Buffer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -40,8 +40,8 @@ public class KeelStringHelper {
      * @since 1.11
      * @since 3.0.8 toString → String.valueOf
      */
-    @Nonnull
-    public <T> String joinStringArray(@Nullable T[] x, @Nonnull String separator) {
+    @NotNull
+    public <T> String joinStringArray(@Nullable T[] x, @NotNull String separator) {
         if (x == null) return "";
 
         StringBuilder result = new StringBuilder();
@@ -62,8 +62,8 @@ public class KeelStringHelper {
      * @since 3.0.7 Collection → Iterable
      * @since 3.0.8 toString → String.valueOf
      */
-    @Nonnull
-    public String joinStringArray(@Nullable Iterable<?> x, @Nonnull String separator) {
+    @NotNull
+    public String joinStringArray(@Nullable Iterable<?> x, @NotNull String separator) {
         if (x == null) return "";
 
         StringBuilder result = new StringBuilder();
@@ -87,8 +87,8 @@ public class KeelStringHelper {
      * @return the matrix of hex as string
      * @since 1.11
      */
-    @Nonnull
-    public String bufferToHexMatrix(@Nonnull Buffer buffer, int rowSize) {
+    @NotNull
+    public String bufferToHexMatrix(@NotNull Buffer buffer, int rowSize) {
         StringBuilder matrix = new StringBuilder();
         String s = KeelHelpers.binaryHelper().encodeHexWithUpperDigits(buffer);
         for (int i = 0; i < s.length(); i += 2) {
@@ -179,13 +179,14 @@ public class KeelStringHelper {
     /**
      * @since 2.9
      */
-    @Nonnull
-    public String buildStackChainText(@Nullable StackTraceElement[] stackTrace, @Nonnull Set<String> ignorableStackPackageSet) {
+    @NotNull
+    public String buildStackChainText(@Nullable StackTraceElement[] stackTrace, @NotNull Set<String> ignorableStackPackageSet) {
         StringBuilder sb = new StringBuilder();
         if (stackTrace != null) {
             String ignoringClassPackage = null;
             int ignoringCount = 0;
             for (StackTraceElement stackTranceItem : stackTrace) {
+                if (stackTranceItem == null) continue;
                 String className = stackTranceItem.getClassName();
                 String matchedClassPackage = null;
                 for (var cp : ignorableStackPackageSet) {
@@ -247,7 +248,7 @@ public class KeelStringHelper {
     /**
      * @since 2.9
      */
-    @Nonnull
+    @NotNull
     public String buildStackChainText(@Nullable StackTraceElement[] stackTrace) {
         return buildStackChainText(stackTrace, Set.of());
     }
@@ -256,8 +257,8 @@ public class KeelStringHelper {
     /**
      * @since 2.9
      */
-    @Nonnull
-    public String renderThrowableChain(@Nullable Throwable throwable, @Nonnull Set<String> ignorableStackPackageSet) {
+    @NotNull
+    public String renderThrowableChain(@Nullable Throwable throwable, @NotNull Set<String> ignorableStackPackageSet) {
         if (throwable == null) return "";
         Throwable cause = throwable.getCause();
         StringBuilder sb = new StringBuilder();
@@ -288,7 +289,7 @@ public class KeelStringHelper {
     /**
      * @since 2.9
      */
-    @Nonnull
+    @NotNull
     public String renderThrowableChain(@Nullable Throwable throwable) {
         return renderThrowableChain(throwable, KeelRuntimeHelper.ignorableCallStackPackage);
     }
@@ -296,48 +297,45 @@ public class KeelStringHelper {
     /**
      * @since 2.9.4
      */
-    @Nonnull
-    public byte[] encodeWithBase64ToBytes(@Nonnull String s) {
+    public byte[] encodeWithBase64ToBytes(@NotNull String s) {
         return KeelHelpers.binaryHelper().encodeWithBase64(s.getBytes());
     }
 
     /**
      * @since 2.9.4
      */
-    @Nonnull
-    public String encodeWithBase64(@Nonnull String s) {
+    @NotNull
+    public String encodeWithBase64(@NotNull String s) {
         return new String(encodeWithBase64ToBytes(s));
     }
 
     /**
      * @since 2.9.4
      */
-    @Nonnull
-    public byte[] decodeWithBase64ToBytes(@Nonnull String s) {
+    public byte[] decodeWithBase64ToBytes(@NotNull String s) {
         return Base64.getDecoder().decode(s);
     }
 
     /**
      * @since 2.9.4
      */
-    @Nonnull
-    public String encodeWithBase32(@Nonnull String s) {
+    @NotNull
+    public String encodeWithBase32(@NotNull String s) {
         return Base32.encode(s.getBytes());
     }
 
     /**
      * @since 2.9.4
      */
-    @Nonnull
-    public byte[] decodeWithBase32ToBytes(@Nonnull String s) {
+    public byte[] decodeWithBase32ToBytes(@NotNull String s) {
         return Base32.decode(s);
     }
 
     /**
      * @since 2.9.4
      */
-    @Nonnull
-    public String decodeWithBase32(@Nonnull String s) {
+    @NotNull
+    public String decodeWithBase32(@NotNull String s) {
         return new String(decodeWithBase32ToBytes(s));
     }
 
@@ -346,8 +344,8 @@ public class KeelStringHelper {
      * @param group such as 0 for the entire, n for the Nth component.
      * @since 3.0.8
      */
-    @Nonnull
-    public List<String> regexFindAll(@Nonnull String regex, int flags, @Nonnull String text, int group) {
+    @NotNull
+    public List<String> regexFindAll(@NotNull String regex, int flags, @NotNull String text, int group) {
         List<String> blankParamGroups = new ArrayList<>();
         Pattern patternForSpacedArgument = Pattern.compile(regex, flags);
         Matcher patternForSpacedArgumentMatcher = patternForSpacedArgument.matcher(text);
@@ -395,7 +393,7 @@ public class KeelStringHelper {
      * @since 3.2.14
      * @since 3.2.15 PR from yhzdys
      */
-    public String encodeToNyaCode(@Nonnull String raw) {
+    public String encodeToNyaCode(@NotNull String raw) {
         String encoded = URLEncoder.encode(raw, StandardCharsets.UTF_8);
         int i = 0;
         char[] chars = encoded.toCharArray(), buffer = new char[chars.length << 1];
@@ -410,7 +408,7 @@ public class KeelStringHelper {
      * @since 3.2.14
      * @since 3.2.15 PR from yhzdys
      */
-    public String decodeFromNyaCode(@Nonnull String code) {
+    public String decodeFromNyaCode(@NotNull String code) {
         int idx = 0;
         char[] chars = code.toCharArray(), buffer = new char[chars.length >> 1];
         for (int i = 0; i < chars.length; ) {

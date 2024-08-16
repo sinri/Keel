@@ -5,8 +5,8 @@ import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
 import io.vertx.core.net.SocketAddress;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
@@ -20,12 +20,12 @@ public class KeelUDPTransceiver {
     /**
      * @since 3.2.0
      */
-    private @Nonnull KeelIssueRecorder<DatagramIssueRecord> issueRecorder;
+    private @NotNull KeelIssueRecorder<DatagramIssueRecord> issueRecorder;
     private BiConsumer<SocketAddress, Buffer> datagramSocketConsumer = (sender, buffer) -> {
         // do nothing
     };
 
-    public KeelUDPTransceiver(DatagramSocket udpServer, int port, @Nonnull KeelIssueRecorder<DatagramIssueRecord> issueRecorder) {
+    public KeelUDPTransceiver(DatagramSocket udpServer, int port, @NotNull KeelIssueRecorder<DatagramIssueRecord> issueRecorder) {
         this.port = port;
         this.udpServer = udpServer;
         this.issueRecorder = issueRecorder;
@@ -35,7 +35,7 @@ public class KeelUDPTransceiver {
     /**
      * @since 3.2.0
      */
-    public @Nonnull KeelIssueRecorder<DatagramIssueRecord> getIssueRecorder() {
+    public @NotNull KeelIssueRecorder<DatagramIssueRecord> getIssueRecorder() {
         return issueRecorder;
     }
 

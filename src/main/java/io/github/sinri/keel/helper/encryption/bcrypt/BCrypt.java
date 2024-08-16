@@ -14,7 +14,9 @@ package io.github.sinri.keel.helper.encryption.bcrypt;
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-import javax.annotation.Nonnull;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
@@ -386,7 +388,7 @@ public class BCrypt {
      * @return base64-encoded string
      * @throws IllegalArgumentException if the length is invalid
      */
-    private static @Nonnull String encode_base64(@Nonnull byte[] d, int len)
+    private static @NotNull String encode_base64(byte[] d, int len)
             throws IllegalArgumentException {
         int off = 0;
         StringBuilder rs = new StringBuilder();
@@ -442,7 +444,7 @@ public class BCrypt {
      * @return an array containing the decoded bytes
      * @throws IllegalArgumentException if maxolen is invalid
      */
-    private static @Nonnull byte[] decode_base64(@Nonnull String stringToDecode, int maxLengthToDecode)
+    private static @NotNull byte[] decode_base64(@NotNull String stringToDecode, int maxLengthToDecode)
             throws IllegalArgumentException {
         StringBuilder rs = new StringBuilder();
         int off = 0, slen = stringToDecode.length(), olen = 0;
@@ -491,7 +493,7 @@ public class BCrypt {
      *             current offset into data
      * @return the next word of material from data
      */
-    private static int streamtoword(@Nonnull byte[] data, @Nonnull int[] offp) {
+    private static int streamtoword(@NotNull byte[] data, @NotNull int[] offp) {
         int i;
         int word = 0;
         int off = offp[0];
@@ -511,7 +513,7 @@ public class BCrypt {
      * @param password the password to hash
      * @return the hashed password
      */
-    public static @Nonnull String hashpw(@Nonnull String password) {
+    public static @NotNull String hashpw(@NotNull String password) {
         return hashpw(password, BCrypt.gensalt());
     }
 
@@ -523,7 +525,7 @@ public class BCrypt {
      *                 using BCrypt.gensalt)
      * @return the hashed password
      */
-    public static @Nonnull String hashpw(@Nonnull String password, @Nonnull String salt) {
+    public static @NotNull String hashpw(@NotNull String password, @NotNull String salt) {
         BCrypt B;
         String real_salt;
         byte[] passwordb, saltb, hashed;
@@ -633,7 +635,7 @@ public class BCrypt {
      * @param hashed    the previously-hashed password
      * @return true if the passwords match, false otherwise
      */
-    public static boolean checkpw(@Nonnull String plaintext, @Nonnull String hashed) {
+    public static boolean checkpw(@NotNull String plaintext, @NotNull String hashed) {
         byte[] hashed_bytes;
         byte[] try_bytes;
         String try_pw = hashpw(plaintext, hashed);

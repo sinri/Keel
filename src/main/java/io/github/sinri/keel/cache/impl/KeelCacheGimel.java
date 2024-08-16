@@ -2,8 +2,8 @@ package io.github.sinri.keel.cache.impl;
 
 import io.github.sinri.keel.cache.KeelAsyncEverlastingCacheInterface;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -63,7 +63,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
     }
 
     @Override
-    public Future<Void> save(@Nonnull K k, V v) {
+    public Future<Void> save(@NotNull K k, V v) {
         return actionInLock(() -> {
             map.put(k, v);
             return true;
@@ -71,7 +71,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
     }
 
     @Override
-    public Future<Void> save(@Nonnull Map<K, V> appendEntries) {
+    public Future<Void> save(@NotNull Map<K, V> appendEntries) {
         return actionInLock(() -> {
             map.putAll(appendEntries);
             return true;
@@ -79,7 +79,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
     }
 
     @Override
-    public Future<V> read(@Nonnull K k, V v) {
+    public Future<V> read(@NotNull K k, V v) {
         AtomicReference<V> vRef = new AtomicReference<>();
         return actionInLock(() -> {
             var x = map.get(k);
@@ -94,7 +94,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
     }
 
     @Override
-    public Future<Void> remove(@Nonnull K key) {
+    public Future<Void> remove(@NotNull K key) {
         return actionInLock(() -> {
             map.remove(key);
             return true;
@@ -102,7 +102,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
     }
 
     @Override
-    public Future<Void> remove(@Nonnull Collection<K> keys) {
+    public Future<Void> remove(@NotNull Collection<K> keys) {
         return actionInLock(() -> {
             keys.forEach(map::remove);
             return true;
@@ -122,7 +122,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
      * @since 2.9.4 no longer implemented by replace map
      */
     @Override
-    public Future<Void> replaceAll(@Nonnull Map<K, V> newEntries) {
+    public Future<Void> replaceAll(@NotNull Map<K, V> newEntries) {
         return actionInLock(() -> {
             Set<K> ks = newEntries.keySet();
             map.putAll(newEntries);
@@ -136,7 +136,7 @@ public class KeelCacheGimel<K, V> implements KeelAsyncEverlastingCacheInterface<
     }
 
     @Override
-    @Nonnull
+    @NotNull
     public Map<K, V> getSnapshotMap() {
         return Collections.unmodifiableMap(map);
     }

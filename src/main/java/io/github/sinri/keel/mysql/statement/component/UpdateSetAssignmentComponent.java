@@ -3,23 +3,23 @@ package io.github.sinri.keel.mysql.statement.component;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.Quoter;
 import io.github.sinri.keel.mysql.exception.KeelMySQLGenerateError;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since 3.0.19
  */
 @TechnicalPreview(since = "3.0.19")
 public class UpdateSetAssignmentComponent {
-    private final @Nonnull String fieldName;
+    private final @NotNull String fieldName;
     private String expression;
 
-    public UpdateSetAssignmentComponent(@Nonnull String fieldName) {
+    public UpdateSetAssignmentComponent(@NotNull String fieldName) {
         this.fieldName = fieldName;
     }
 
-    public UpdateSetAssignmentComponent assignmentToExpression(@Nonnull String expression) {
+    public UpdateSetAssignmentComponent assignmentToExpression(@NotNull String expression) {
         this.expression = expression;
         return this;
     }
@@ -40,7 +40,7 @@ public class UpdateSetAssignmentComponent {
         return this;
     }
 
-    public UpdateSetAssignmentComponent assignmentToCaseOperator(@Nonnull CaseOperator caseOperator) {
+    public UpdateSetAssignmentComponent assignmentToCaseOperator(@NotNull CaseOperator caseOperator) {
         this.expression = caseOperator.toString();
         return this;
     }

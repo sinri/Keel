@@ -3,9 +3,9 @@ package io.github.sinri.keel.web.http.receptionist;
 import io.github.sinri.keel.logger.issue.record.BaseIssueRecord;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since 3.2.0
@@ -16,26 +16,26 @@ public final class ReceptionistIssueRecord extends BaseIssueRecord<ReceptionistI
     public static final String AttributeResponse = "response";
     public static final String AttributeRespondInfo = "RespondInfo";
 
-    public ReceptionistIssueRecord(@Nonnull String requestId) {
+    public ReceptionistIssueRecord(@NotNull String requestId) {
         this.attribute("request_id", requestId);
     }
 
-    @Nonnull
+
     @Override
-    public ReceptionistIssueRecord getImplementation() {
+    public @NotNull ReceptionistIssueRecord getImplementation() {
         return this;
     }
 
-    @Nonnull
+
     @Override
-    public String topic() {
+    public @NotNull String topic() {
         return TopicReceptionist;
     }
 
     public ReceptionistIssueRecord setRequest(
-            @Nonnull HttpMethod method,
-            @Nonnull String path,
-            @Nonnull Class<?> receptionistClass,
+            @NotNull HttpMethod method,
+            @NotNull String path,
+            @NotNull Class<?> receptionistClass,
             @Nullable String query,
             @Nullable String body
     ) {

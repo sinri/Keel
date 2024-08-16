@@ -1,6 +1,7 @@
 package io.github.sinri.keel.core;
 
-import javax.annotation.Nonnull;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * For the "return self" trick, let the interface could define a self return method to make chain call available.
@@ -9,6 +10,6 @@ import javax.annotation.Nonnull;
  * @since 3.1.10
  */
 public interface SelfInterface<T> {
-    @Nonnull
+    @NotNull
     T getImplementation();
 }

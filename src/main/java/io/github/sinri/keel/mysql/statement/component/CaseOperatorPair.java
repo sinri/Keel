@@ -2,9 +2,9 @@ package io.github.sinri.keel.mysql.statement.component;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.Quoter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since 3.0.19
@@ -18,7 +18,7 @@ public class CaseOperatorPair {
 
     }
 
-    public CaseOperatorPair setThenAsNumber(@Nonnull Number thenAsNumber) {
+    public CaseOperatorPair setThenAsNumber(@NotNull Number thenAsNumber) {
         this.thenExpression = String.valueOf(thenAsNumber);
         return this;
     }
@@ -28,7 +28,7 @@ public class CaseOperatorPair {
         return this;
     }
 
-    public CaseOperatorPair setWhenAsNumber(@Nonnull Number whenAsNumber) {
+    public CaseOperatorPair setWhenAsNumber(@NotNull Number whenAsNumber) {
         this.whenExpression = String.valueOf(whenAsNumber);
         return this;
     }
@@ -38,22 +38,22 @@ public class CaseOperatorPair {
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public String getWhenExpression() {
         return whenExpression;
     }
 
-    public CaseOperatorPair setWhenExpression(@Nonnull String whenExpression) {
+    public CaseOperatorPair setWhenExpression(@NotNull String whenExpression) {
         this.whenExpression = whenExpression;
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public String getThenExpression() {
         return thenExpression;
     }
 
-    public CaseOperatorPair setThenExpression(@Nonnull String thenExpression) {
+    public CaseOperatorPair setThenExpression(@NotNull String thenExpression) {
         this.thenExpression = thenExpression;
         return this;
     }

@@ -5,9 +5,9 @@ import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.impl.launcher.VertxLifecycleHooks;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since 3.0.10 Technical Preview
@@ -29,14 +29,14 @@ public interface KeelLauncherAdapter extends VertxLifecycleHooks {
      * Create a launcher.
      * Do not override this.
      */
-    default @Nonnull KeelLauncher launcher() {
+    default @NotNull KeelLauncher launcher() {
         return new KeelLauncher(this);
     }
 
     /**
      * @since 3.2.0
      */
-    default @Nonnull KeelEventLogger buildEventLoggerForLauncher() {
+    default @NotNull KeelEventLogger buildEventLoggerForLauncher() {
         return KeelIssueRecordCenter.outputCenter().generateEventLogger(getClass().getName());
     }
 

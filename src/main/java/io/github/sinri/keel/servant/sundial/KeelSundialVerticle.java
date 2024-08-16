@@ -2,8 +2,8 @@ package io.github.sinri.keel.servant.sundial;
 
 import io.github.sinri.keel.verticles.KeelVerticleImplPure;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Calendar;
 
 /**
@@ -14,7 +14,7 @@ public class KeelSundialVerticle extends KeelVerticleImplPure {
     private final KeelSundialPlan sundialPlan;
     private final Calendar now;
 
-    public KeelSundialVerticle(@Nonnull KeelSundialPlan sundialPlan, Calendar now) {
+    public KeelSundialVerticle(@NotNull KeelSundialPlan sundialPlan, Calendar now) {
         this.sundialPlan = sundialPlan;
         this.now = now;
     }

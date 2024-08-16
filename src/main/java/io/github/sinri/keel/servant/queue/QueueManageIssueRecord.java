@@ -1,8 +1,9 @@
 package io.github.sinri.keel.servant.queue;
 
 import io.github.sinri.keel.logger.issue.record.BaseIssueRecord;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+
 
 public final class QueueManageIssueRecord extends BaseIssueRecord<QueueManageIssueRecord> {
     public static final String TopicQueue = "Queue";
@@ -13,15 +14,13 @@ public final class QueueManageIssueRecord extends BaseIssueRecord<QueueManageIss
     }
 
 
-    @Nonnull
     @Override
-    public QueueManageIssueRecord getImplementation() {
+    public @NotNull QueueManageIssueRecord getImplementation() {
         return this;
     }
 
-    @Nonnull
     @Override
-    public String topic() {
+    public @NotNull String topic() {
         return TopicQueue;
     }
 }

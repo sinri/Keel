@@ -1,8 +1,8 @@
 package io.github.sinri.keel.cache.impl;
 
 import io.github.sinri.keel.cache.KeelCacheInterface;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +34,12 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public void save(@Nonnull K key, V value, long lifeInSeconds) {
+    public void save(@NotNull K key, V value, long lifeInSeconds) {
         this.map.put(key, new ValueWrapper<>(value, lifeInSeconds));
     }
 
     @Override
-    public V read(@Nonnull K key, V fallbackValue) {
+    public V read(@NotNull K key, V fallbackValue) {
         ValueWrapper<V> vw = this.map.get(key);
         if (vw == null) {
             return fallbackValue;
@@ -52,7 +52,7 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public void remove(@Nonnull K key) {
+    public void remove(@NotNull K key) {
         this.map.remove(key);
     }
 
@@ -74,8 +74,7 @@ public class KeelCacheAlef<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    @Nonnull
-    public synchronized Map<K, V> getSnapshotMap() {
+    public synchronized @NotNull Map<K, V> getSnapshotMap() {
         Map<K, V> snapshot = new HashMap<>();
         this.map.keySet().forEach(key -> {
             ValueWrapper<V> vw = this.map.get(key);

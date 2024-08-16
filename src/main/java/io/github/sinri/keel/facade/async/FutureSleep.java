@@ -2,8 +2,7 @@ package io.github.sinri.keel.facade.async;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 

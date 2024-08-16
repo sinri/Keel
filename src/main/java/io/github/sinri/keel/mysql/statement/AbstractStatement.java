@@ -7,8 +7,8 @@ import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -19,35 +19,35 @@ abstract public class AbstractStatement implements AnyStatement {
     /**
      * @since 3.2.0 replace original SQL Audit Logger
      */
-    protected static @Nonnull KeelIssueRecorder<MySQLAuditIssueRecord> sqlAuditIssueRecorder = KeelIssueRecordCenterAsSilent.getInstance()
+    protected static @NotNull KeelIssueRecorder<MySQLAuditIssueRecord> sqlAuditIssueRecorder = KeelIssueRecordCenterAsSilent.getInstance()
             .generateIssueRecorder(MySQLAuditIssueRecord.AttributeMysqlAudit, MySQLAuditIssueRecord::new);
-    protected static @Nonnull String SQL_COMPONENT_SEPARATOR = " ";//"\n";
-    protected final @Nonnull String statement_uuid;
-    private @Nonnull String remarkAsComment = "";
+    protected static @NotNull String SQL_COMPONENT_SEPARATOR = " ";//"\n";
+    protected final @NotNull String statement_uuid;
+    private @NotNull String remarkAsComment = "";
 
     public AbstractStatement() {
         this.statement_uuid = UUID.randomUUID().toString();
     }
 
-    @Nonnull
+    @NotNull
     public static KeelIssueRecorder<MySQLAuditIssueRecord> getSqlAuditIssueRecorder() {
         return sqlAuditIssueRecorder;
     }
 
-    public static void setSqlAuditIssueRecorder(@Nonnull KeelIssueRecorder<MySQLAuditIssueRecord> sqlAuditIssueRecorder) {
+    public static void setSqlAuditIssueRecorder(@NotNull KeelIssueRecorder<MySQLAuditIssueRecord> sqlAuditIssueRecorder) {
         AbstractStatement.sqlAuditIssueRecorder = sqlAuditIssueRecorder;
     }
 
-    public static void setSqlComponentSeparator(@Nonnull String sqlComponentSeparator) {
+    public static void setSqlComponentSeparator(@NotNull String sqlComponentSeparator) {
         SQL_COMPONENT_SEPARATOR = sqlComponentSeparator;
     }
 
-    @Nonnull
+    @NotNull
     protected String getRemarkAsComment() {
         return remarkAsComment;
     }
 
-    public AbstractStatement setRemarkAsComment(@Nonnull String remarkAsComment) {
+    public AbstractStatement setRemarkAsComment(@NotNull String remarkAsComment) {
         remarkAsComment = remarkAsComment.replaceAll("[\\r\\n]+", "¦");
         this.remarkAsComment = remarkAsComment;
         return this;
@@ -72,7 +72,7 @@ abstract public class AbstractStatement implements AnyStatement {
      * @since 3.0.0 removed try-catch
      */
     @Override
-    public final Future<ResultMatrix> execute(@Nonnull SqlConnection sqlConnection) {
+    public final Future<ResultMatrix> execute(@NotNull SqlConnection sqlConnection) {
         AtomicReference<String> theSql = new AtomicReference<>();
         return Future.succeededFuture(this.toString())
                 .compose(sql -> {
@@ -101,19 +101,19 @@ abstract public class AbstractStatement implements AnyStatement {
         public static final String KeyTotalAffectedRows = "TotalAffectedRows";
         public static final String KeyTotalFetchedRows = "TotalFetchedRows";
 
-        @Nonnull
+
         @Override
-        public MySQLAuditIssueRecord getImplementation() {
+        public @NotNull MySQLAuditIssueRecord getImplementation() {
             return this;
         }
 
-        @Nonnull
+
         @Override
-        public String topic() {
+        public @NotNull String topic() {
             return TopicMysqlAudit;
         }
 
-        public MySQLAuditIssueRecord setPreparation(@Nonnull String statement_uuid, @Nonnull String sql) {
+        public MySQLAuditIssueRecord setPreparation(@NotNull String statement_uuid, @NotNull String sql) {
             this.message("MySQL query prepared.")
                     .attribute(AttributeMysqlAudit, new JsonObject()
                             .put(KeyStatementUuid, statement_uuid)
@@ -123,8 +123,8 @@ abstract public class AbstractStatement implements AnyStatement {
         }
 
         public MySQLAuditIssueRecord setForDone(
-                @Nonnull String statement_uuid,
-                @Nonnull String sql,
+                @NotNull String statement_uuid,
+                @NotNull String sql,
                 int totalAffectedRows,
                 int totalFetchedRows
         ) {
@@ -138,7 +138,7 @@ abstract public class AbstractStatement implements AnyStatement {
             return this;
         }
 
-        public MySQLAuditIssueRecord setForFailed(@Nonnull String statement_uuid, @Nonnull String sql) {
+        public MySQLAuditIssueRecord setForFailed(@NotNull String statement_uuid, @NotNull String sql) {
             this.message("MySQL query failed.")
                     .attribute(AttributeMysqlAudit, new JsonObject()
                             .put(KeyStatementUuid, statement_uuid)

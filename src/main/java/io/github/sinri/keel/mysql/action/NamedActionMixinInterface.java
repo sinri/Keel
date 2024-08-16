@@ -2,8 +2,8 @@ package io.github.sinri.keel.mysql.action;
 
 import io.github.sinri.keel.core.SelfInterface;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 /**
  * @param <C>
@@ -12,6 +12,6 @@ import javax.annotation.Nonnull;
  */
 public interface NamedActionMixinInterface<C extends NamedMySQLConnection, W>
         extends SelfInterface<W> {
-    @Nonnull
+    @NotNull
     C getNamedSqlConnection();
 }

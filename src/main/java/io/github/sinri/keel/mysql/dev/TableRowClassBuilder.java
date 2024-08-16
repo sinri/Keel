@@ -1,7 +1,9 @@
 package io.github.sinri.keel.mysql.dev;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,9 +16,9 @@ import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
  * @since 3.1.7 Add deprecated table annotation.
  */
 class TableRowClassBuilder {
-    private final @Nonnull String packageName;
+    private final @NotNull String packageName;
     private final @Nullable String schema;
-    private final @Nonnull String table;
+    private final @NotNull String table;
 
     private boolean provideConstSchema = true;
     private boolean provideConstTable = true;
@@ -25,13 +27,13 @@ class TableRowClassBuilder {
     private @Nullable String tableComment;
     private @Nullable String ddl;
 
-    private final @Nonnull List<TableRowClassField> fields = new ArrayList<>();
+    private final @NotNull List<TableRowClassField> fields = new ArrayList<>();
     /**
      * @since 3.1.7
      */
     private boolean tableDeprecated = false;
 
-    public TableRowClassBuilder(@Nonnull String table, @Nullable String schema, @Nonnull String packageName) {
+    public TableRowClassBuilder(@NotNull String table, @Nullable String schema, @NotNull String packageName) {
         this.table = table;
         this.schema = schema;
         this.packageName = packageName;
@@ -67,7 +69,7 @@ class TableRowClassBuilder {
         return this;
     }
 
-    public TableRowClassBuilder addFields(@Nonnull List<TableRowClassField> fields) {
+    public TableRowClassBuilder addFields(@NotNull List<TableRowClassField> fields) {
         this.fields.addAll(fields);
         return this;
     }

@@ -6,8 +6,8 @@ import io.github.sinri.keel.web.http.receptionist.KeelWebFutureReceptionist;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 @ApiMeta(routePath = "/receptionist/test-for-get", allowMethods = {"GET"})
 @ApiMeta(routePath = "/receptionist/test-for-post", allowMethods = {"POST"})
@@ -24,7 +24,7 @@ public class TestReceptionist extends KeelWebFutureReceptionist {
         return Future.succeededFuture(jsonObject);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected KeelIssueRecordCenter issueRecordCenter() {
         return KeelIssueRecordCenter.outputCenter();

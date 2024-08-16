@@ -2,8 +2,8 @@ package io.github.sinri.keel.facade.async;
 
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Function;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
@@ -15,18 +15,18 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 public class FutureRepeat {
     private final Function<RoutineResult, Future<Void>> routineFunction;
 
-    private FutureRepeat(@Nonnull Function<RoutineResult, Future<Void>> routineFunction) {
+    private FutureRepeat(@NotNull Function<RoutineResult, Future<Void>> routineFunction) {
         this.routineFunction = routineFunction;
     }
 
-    static Future<Void> call(@Nonnull Function<RoutineResult, Future<Void>> routineFunction) {
+    static Future<Void> call(@NotNull Function<RoutineResult, Future<Void>> routineFunction) {
         Promise<Void> promise = Promise.promise();
         RoutineResult routineResult = new RoutineResult(false);
         new FutureRepeat(routineFunction).routine(routineResult, promise);
         return promise.future();
     }
 
-    private void routine(@Nonnull RoutineResult routineResult, @Nonnull Promise<Void> finalPromise) {
+    private void routine(@NotNull RoutineResult routineResult, @NotNull Promise<Void> finalPromise) {
         Future.succeededFuture()
                 .compose(v -> routineFunction.apply(routineResult))
                 .andThen(shouldStopAR -> {

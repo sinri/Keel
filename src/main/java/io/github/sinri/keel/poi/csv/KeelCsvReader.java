@@ -2,9 +2,9 @@ package io.github.sinri.keel.poi.csv;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.Charset;
 
@@ -15,23 +15,23 @@ import java.nio.charset.Charset;
 public class KeelCsvReader {
     //private Charset charset = StandardCharsets.UTF_8;
     private final BufferedReader br;
-    //private final @Nonnull InputStream inputStream;
+    //private final @NotNull InputStream inputStream;
     private String separator = ",";
 
-    public KeelCsvReader(@Nonnull InputStream inputStream, Charset charset) {
+    public KeelCsvReader(@NotNull InputStream inputStream, Charset charset) {
         this(new BufferedReader(new InputStreamReader(inputStream, charset)));
     }
 
-    public KeelCsvReader(@Nonnull BufferedReader br) {
+    public KeelCsvReader(@NotNull BufferedReader br) {
         this.br = br;
     }
 
-    public static Future<KeelCsvReader> create(@Nonnull InputStream inputStream, @Nonnull Charset charset) {
+    public static Future<KeelCsvReader> create(@NotNull InputStream inputStream, @NotNull Charset charset) {
         var x = new KeelCsvReader(inputStream, charset);
         return Future.succeededFuture(x);
     }
 
-    public static Future<KeelCsvReader> create(@Nonnull File file, @Nonnull Charset charset) {
+    public static Future<KeelCsvReader> create(@NotNull File file, @NotNull Charset charset) {
         return Future.succeededFuture()
                 .compose(v -> {
                     try {
@@ -44,7 +44,7 @@ public class KeelCsvReader {
 
     }
 
-    public static Future<KeelCsvReader> create(@Nonnull String file, @Nonnull Charset charset) {
+    public static Future<KeelCsvReader> create(@NotNull String file, @NotNull Charset charset) {
         return create(new File(file), charset);
     }
 

@@ -1,6 +1,8 @@
 package io.github.sinri.keel.helper.encryption.aes;
 
-import javax.annotation.Nonnull;
+
+import org.jetbrains.annotations.NotNull;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.nio.charset.Charset;
@@ -22,22 +24,16 @@ public interface KeelAes {
      */
     Charset ENCODING = StandardCharsets.UTF_8;
 
-    static @Nonnull KeelAes create(@Nonnull SupportedCipherAlgorithm cipherAlgorithm, @Nonnull String key) {
+    static @NotNull KeelAes create(@NotNull SupportedCipherAlgorithm cipherAlgorithm, @NotNull String key) {
         Objects.requireNonNull(cipherAlgorithm);
         Objects.requireNonNull(key);
-        switch (cipherAlgorithm) {
-            case AesCbcPkcs7Padding:
-                return new KeelAesCbcPkcs7Padding(key);
-            case AesCbcPkcs5Padding:
-                return new KeelAesCbcPkcs5Padding(key);
-            case AesEcbPkcs5Padding:
-                return new KeelAesEcbPkcs5Padding(key);
-            case AesEcbPkcs7Padding:
-                return new KeelAesEcbPkcs7Padding(key);
-            case AesEcbNoPadding:
-                return new KeelAesEcbNoPadding(key);
-        }
-        throw new IllegalArgumentException();
+        return switch (cipherAlgorithm) {
+            case AesCbcPkcs7Padding -> new KeelAesCbcPkcs7Padding(key);
+            case AesCbcPkcs5Padding -> new KeelAesCbcPkcs5Padding(key);
+            case AesEcbPkcs5Padding -> new KeelAesEcbPkcs5Padding(key);
+            case AesEcbPkcs7Padding -> new KeelAesEcbPkcs7Padding(key);
+            case AesEcbNoPadding -> new KeelAesEcbNoPadding(key);
+        };
     }
 
     /**

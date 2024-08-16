@@ -2,9 +2,9 @@ package io.github.sinri.keel.helper;
 
 import io.vertx.core.json.JsonArray;
 import io.vertx.ext.web.RoutingContext;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class KeelNetHelper {
         }
     }
 
-    @Nonnull
+
     public byte[] convertIPv4ToAddressBytes(long ipv4AsLong) {
         return new byte[]{
                 (byte) (ipv4AsLong >> 24),
@@ -71,7 +71,6 @@ public class KeelNetHelper {
         };
     }
 
-    @Nonnull
     public byte[] convertIPv4ToAddressBytes(@Nullable String ipv4) {
         long x = Objects.requireNonNull(this.convertIPv4ToNumber(ipv4));
         return convertIPv4ToAddressBytes(x);
@@ -123,8 +122,8 @@ public class KeelNetHelper {
      * @return List of Client IP, combined with X-Forwarded-For and remote address.
      * @since 2.9.2
      */
-    @Nonnull
-    public List<String> parseWebClientIPChain(@Nonnull RoutingContext ctx) {
+    @NotNull
+    public List<String> parseWebClientIPChain(@NotNull RoutingContext ctx) {
         // X-Forwarded-For
         JsonArray clientIPChain = new JsonArray();
         String xForwardedFor = ctx.request().getHeader("X-Forwarded-For");

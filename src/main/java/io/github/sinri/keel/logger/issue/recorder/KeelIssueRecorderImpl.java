@@ -5,9 +5,9 @@ import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.vertx.core.Handler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -17,44 +17,44 @@ import java.util.function.Supplier;
  */
 @TechnicalPreview(since = "3.1.10")
 class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>> implements KeelIssueRecorder<T> {
-    protected final @Nonnull Supplier<T> issueRecordBuilder;
-    private final @Nonnull KeelIssueRecordCenter issueRecordCenter;
-    private final @Nonnull String topic;
+    protected final @NotNull Supplier<T> issueRecordBuilder;
+    private final @NotNull KeelIssueRecordCenter issueRecordCenter;
+    private final @NotNull String topic;
     private KeelLogLevel visibleLevel = KeelLogLevel.INFO;
 
     public KeelIssueRecorderImpl(
-            @Nonnull KeelIssueRecordCenter issueRecordCenter,
-            @Nonnull Supplier<T> issueRecordBuilder,
-            @Nonnull String topic
+            @NotNull KeelIssueRecordCenter issueRecordCenter,
+            @NotNull Supplier<T> issueRecordBuilder,
+            @NotNull String topic
     ) {
         this.issueRecordCenter = issueRecordCenter;
         this.issueRecordBuilder = issueRecordBuilder;
         this.topic = topic;
     }
 
-    @Nonnull
+
     @Override
-    public KeelLogLevel getVisibleLevel() {
+    public @NotNull KeelLogLevel getVisibleLevel() {
         return visibleLevel;
     }
 
     @Override
-    public void setVisibleLevel(@Nonnull KeelLogLevel visibleLevel) {
+    public void setVisibleLevel(@NotNull KeelLogLevel visibleLevel) {
         this.visibleLevel = visibleLevel;
     }
 
-    @Nonnull
+
     @Override
-    public KeelIssueRecordCenter issueRecordCenter() {
+    public @NotNull KeelIssueRecordCenter issueRecordCenter() {
         return issueRecordCenter;
     }
 
     /**
      * @return an instance of issue, to be modified for details.
      */
-    @Nonnull
+
     @Override
-    public Supplier<T> issueRecordBuilder() {
+    public @NotNull Supplier<T> issueRecordBuilder() {
         return issueRecordBuilder;
     }
 
@@ -66,22 +66,20 @@ class KeelIssueRecorderImpl<T extends KeelIssueRecord<?>> implements KeelIssueRe
      * @since 3.2.0
      */
     @Override
-    public void addBypassIssueRecorder(@Nonnull KeelIssueRecorder<T> bypassIssueRecorder) {
+    public void addBypassIssueRecorder(@NotNull KeelIssueRecorder<T> bypassIssueRecorder) {
         bypassIssueRecorders.add(bypassIssueRecorder);
     }
 
-    @Nonnull
     @Override
-    public String topic() {
+    public @NotNull String topic() {
         return topic;
     }
 
     /**
      * @since 3.2.0
      */
-    @Nonnull
     @Override
-    public List<KeelIssueRecorder<T>> getBypassIssueRecorders() {
+    public @NotNull List<KeelIssueRecorder<T>> getBypassIssueRecorders() {
         return bypassIssueRecorders;
     }
 

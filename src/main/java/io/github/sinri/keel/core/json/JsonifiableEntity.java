@@ -4,9 +4,9 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.pointer.JsonPointer;
 import io.vertx.core.shareddata.ClusterSerializable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Map;
@@ -20,18 +20,25 @@ import java.util.function.Function;
  */
 public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, ClusterSerializable {
 
-    @Nonnull
+    /**
+     * @since 3.2.11
+     */
+    static SimpleJsonifiableEntity wrap(@NotNull JsonObject jsonObject) {
+        return new SimpleJsonifiableEntity(jsonObject);
+    }
+
+    @NotNull
     JsonObject toJsonObject();
 
-    @Nonnull
-    E reloadDataFromJsonObject(@Nonnull JsonObject jsonObject);
+    @NotNull
+    E reloadDataFromJsonObject(@NotNull JsonObject jsonObject);
 
     /**
      * @since 2.7
      * @since 2.8 If java.lang.ClassCastException occurred, return null instead.
      * @since 3.1.10 moved here from UnmodifiableJsonifiableEntity
      */
-    default <T> @Nullable T read(@Nonnull Function<JsonPointer, Class<T>> func) {
+    default <T> @Nullable T read(@NotNull Function<JsonPointer, Class<T>> func) {
         try {
             JsonPointer jsonPointer = JsonPointer.create();
             Class<T> tClass = func.apply(jsonPointer);
@@ -49,7 +56,7 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
      * @param <B> an implementation class of JsonifiableEntity, with constructor B() or B(JsonObject).
      * @since 2.7
      */
-    default @Nullable <B extends JsonifiableEntity<?>> B readJsonifiableEntity(@Nonnull Class<B> bClass, String... args) {
+    default @Nullable <B extends JsonifiableEntity<?>> B readJsonifiableEntity(@NotNull Class<B> bClass, String... args) {
         JsonObject jsonObject = readJsonObject(args);
         if (jsonObject == null) return null;
         try {
@@ -67,30 +74,19 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
         }
     }
 
-
     /**
      * @since 2.8
      */
-    default void fromBuffer(@Nonnull Buffer buffer) {
+    default void fromBuffer(@NotNull Buffer buffer) {
         this.reloadDataFromJsonObject(new JsonObject(buffer));
     }
 
     /**
      * @since 2.8
      */
-    default void writeToBuffer(@Nonnull Buffer buffer) {
+    default void writeToBuffer(@NotNull Buffer buffer) {
         JsonObject jsonObject = this.toJsonObject();
         jsonObject.writeToBuffer(buffer);
-    }
-
-    /**
-     * @since 2.8
-     */
-    default int readFromBuffer(int pos, @Nonnull Buffer buffer) {
-        JsonObject jsonObject = new JsonObject();
-        int i = jsonObject.readFromBuffer(pos, buffer);
-        this.reloadDataFromJsonObject(jsonObject);
-        return i;
     }
 
     /**
@@ -102,12 +98,13 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
     }
 
     /**
-     * @since 3.1.10 moved here from UnmodifiableJsonifiableEntity
+     * @since 2.8
      */
-    @Override
-    @Nonnull
-    default Iterator<Map.Entry<String, Object>> iterator() {
-        return toJsonObject().iterator();
+    default int readFromBuffer(int pos, @NotNull Buffer buffer) {
+        JsonObject jsonObject = new JsonObject();
+        int i = jsonObject.readFromBuffer(pos, buffer);
+        this.reloadDataFromJsonObject(jsonObject);
+        return i;
     }
 
     /**
@@ -119,9 +116,11 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
     }
 
     /**
-     * @since 3.2.11
+     * @since 3.1.10 moved here from UnmodifiableJsonifiableEntity
      */
-    static SimpleJsonifiableEntity wrap(@Nonnull JsonObject jsonObject) {
-        return new SimpleJsonifiableEntity(jsonObject);
+    @Override
+
+    default @NotNull Iterator<Map.Entry<String, Object>> iterator() {
+        return toJsonObject().iterator();
     }
 }

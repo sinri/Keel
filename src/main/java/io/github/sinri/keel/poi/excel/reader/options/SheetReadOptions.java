@@ -3,9 +3,9 @@ package io.github.sinri.keel.poi.excel.reader.options;
 import io.github.sinri.keel.core.ValueBox;
 import io.vertx.core.Handler;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,7 +16,7 @@ public class SheetReadOptions {
     /**
      * Load sheet with 3 kinds of cell formula evaluator: None, Cached, and Evaluate.
      */
-    private final @Nonnull ValueBox<FormulaEvaluator> formulaEvaluatorBox = new ValueBox<>();
+    private final @NotNull ValueBox<FormulaEvaluator> formulaEvaluatorBox = new ValueBox<>();
 
 
     /**
@@ -46,7 +46,7 @@ public class SheetReadOptions {
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public ValueBox<FormulaEvaluator> getFormulaEvaluatorBox() {
         return formulaEvaluatorBox;
     }

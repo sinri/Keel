@@ -1,20 +1,21 @@
 package io.github.sinri.keel.test.lab.logger.issue;
 
 import io.github.sinri.keel.logger.issue.record.BaseIssueRecord;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+
 
 public class AlefIssueRecord extends BaseIssueRecord<AlefIssueRecord> {
 
-    @Nonnull
+
     @Override
-    public AlefIssueRecord getImplementation() {
+    public @NotNull AlefIssueRecord getImplementation() {
         return this;
     }
 
-    @Nonnull
+
     @Override
-    public String topic() {
+    public @NotNull String topic() {
         return "alef";
     }
 }

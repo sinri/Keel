@@ -2,8 +2,8 @@ package io.github.sinri.keel.helper;
 
 import io.github.sinri.keel.helper.encryption.base32.Base32;
 import io.vertx.core.buffer.Buffer;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Base64;
 
 public class KeelBinaryHelper {
@@ -20,7 +20,7 @@ public class KeelBinaryHelper {
         return instance;
     }
 
-    private @Nonnull String encodeHexWithDigits(final char[] HEX_DIGITS, @Nonnull Buffer buffer, int since, int length) {
+    private @NotNull String encodeHexWithDigits(final char[] HEX_DIGITS, @NotNull Buffer buffer, int since, int length) {
         StringBuilder hex = new StringBuilder();
         for (int i = since; i < since + length; i++) {
             hex
@@ -36,7 +36,7 @@ public class KeelBinaryHelper {
      * @return expression with hex using lower digits as string
      * @since 1.11
      */
-    public String encodeHexWithLowerDigits(@Nonnull final byte[] data) {
+    public String encodeHexWithLowerDigits(final byte[] data) {
         return encodeHexWithLowerDigits(Buffer.buffer(data));
     }
 
@@ -45,7 +45,7 @@ public class KeelBinaryHelper {
      * @return expression with hex using lower digits as string
      * @since 1.11
      */
-    public @Nonnull String encodeHexWithLowerDigits(@Nonnull Buffer buffer) {
+    public @NotNull String encodeHexWithLowerDigits(@NotNull Buffer buffer) {
         return encodeHexWithLowerDigits(buffer, 0, buffer.length());
     }
 
@@ -56,7 +56,7 @@ public class KeelBinaryHelper {
      * @return expression of the substring with hex using lower digits as string
      * @since 1.11
      */
-    public @Nonnull String encodeHexWithLowerDigits(@Nonnull Buffer buffer, int since, int length) {
+    public @NotNull String encodeHexWithLowerDigits(@NotNull Buffer buffer, int since, int length) {
         return encodeHexWithDigits(HEX_DIGITS_LOWER, buffer, since, length);
     }
 
@@ -65,7 +65,7 @@ public class KeelBinaryHelper {
      * @return expression with hex using upper digits as string
      * @since 1.11
      */
-    public @Nonnull String encodeHexWithUpperDigits(@Nonnull final byte[] data) {
+    public @NotNull String encodeHexWithUpperDigits(final byte[] data) {
         return encodeHexWithUpperDigits(Buffer.buffer(data));
     }
 
@@ -74,7 +74,7 @@ public class KeelBinaryHelper {
      * @return expression of the substring with hex using upper digits as string
      * @since 1.11
      */
-    public @Nonnull String encodeHexWithUpperDigits(@Nonnull Buffer buffer) {
+    public @NotNull String encodeHexWithUpperDigits(@NotNull Buffer buffer) {
         return encodeHexWithUpperDigits(buffer, 0, buffer.length());
     }
 
@@ -85,59 +85,58 @@ public class KeelBinaryHelper {
      * @return expression of the substring with hex using upper digits as string
      * @since 1.11
      */
-    public @Nonnull String encodeHexWithUpperDigits(@Nonnull Buffer buffer, int since, int length) {
+    public @NotNull String encodeHexWithUpperDigits(@NotNull Buffer buffer, int since, int length) {
         return encodeHexWithDigits(HEX_DIGITS_UPPER, buffer, since, length);
     }
 
     /**
      * @since 2.9.4
      */
-    public @Nonnull byte[] decodeWithBase64(@Nonnull byte[] bytes) {
+    public byte[] decodeWithBase64(byte[] bytes) {
         return Base64.getDecoder().decode(bytes);
     }
 
     /**
      * @since 2.9.4
      */
-    @Nonnull
-    public byte[] encodeWithBase64(@Nonnull byte[] bytes) {
+    public byte[] encodeWithBase64(byte[] bytes) {
         return Base64.getEncoder().encode(bytes);
     }
 
     /**
      * @since 2.9.4
      */
-    @Nonnull
-    public String encodeWithBase64ToString(@Nonnull byte[] bytes) {
+    @NotNull
+    public String encodeWithBase64ToString(byte[] bytes) {
         return new String(encodeWithBase64(bytes));
     }
 
     /**
      * @since 2.9.4
      */
-    public @Nonnull byte[] encodeWithBase32(@Nonnull byte[] bytes) {
+    public byte[] encodeWithBase32(byte[] bytes) {
         return encodeWithBase32ToString(bytes).getBytes();
     }
 
     /**
      * @since 2.9.4
      */
-    @Nonnull
-    public String encodeWithBase32ToString(@Nonnull byte[] bytes) {
+    @NotNull
+    public String encodeWithBase32ToString(byte[] bytes) {
         return Base32.encode(bytes);
     }
 
     /**
      * @since 2.9.4
      */
-    public @Nonnull byte[] decodeWithBase32(@Nonnull byte[] bytes) {
+    public byte[] decodeWithBase32(byte[] bytes) {
         return Base32.decode(new String(bytes));
     }
 
     /**
      * @since 2.9.4
      */
-    public @Nonnull String decodeWithBase32ToString(@Nonnull byte[] bytes) {
+    public @NotNull String decodeWithBase32ToString(byte[] bytes) {
         return new String(decodeWithBase32(bytes));
     }
 }

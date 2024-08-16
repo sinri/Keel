@@ -8,9 +8,9 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -25,10 +25,10 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * @since 3.0.18 Finished Technical Preview.
      */
     static <K, T extends ResultRow> Future<Map<K, List<T>>> fetchResultRowsToCategorizedMap(
-            @Nonnull NamedMySQLConnection namedSqlConnection,
-            @Nonnull AbstractReadStatement readStatement,
-            @Nonnull Class<T> classOfTableRow,
-            @Nonnull Function<T, K> categoryGenerator
+            @NotNull NamedMySQLConnection namedSqlConnection,
+            @NotNull AbstractReadStatement readStatement,
+            @NotNull Class<T> classOfTableRow,
+            @NotNull Function<T, K> categoryGenerator
     ) {
         return fetchResultRowsToCategorizedMap(namedSqlConnection.getSqlConnection(), readStatement, classOfTableRow, categoryGenerator);
     }
@@ -38,10 +38,10 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * @since 3.0.18 Finished Technical Preview.
      */
     static <K, T extends ResultRow> Future<Map<K, T>> fetchResultRowsToUniqueKeyBoundMap(
-            @Nonnull NamedMySQLConnection namedMySQLConnection,
-            @Nonnull AbstractReadStatement readStatement,
-            @Nonnull Class<T> classOfTableRow,
-            @Nonnull Function<T, K> uniqueKeyGenerator
+            @NotNull NamedMySQLConnection namedMySQLConnection,
+            @NotNull AbstractReadStatement readStatement,
+            @NotNull Class<T> classOfTableRow,
+            @NotNull Function<T, K> uniqueKeyGenerator
     ) {
         return fetchResultRowsToUniqueKeyBoundMap(namedMySQLConnection.getSqlConnection(), readStatement, classOfTableRow, uniqueKeyGenerator);
     }
@@ -51,9 +51,9 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * @since 3.0.18 Finished Technical Preview.
      */
     static <T extends ResultRow> Future<List<T>> fetchResultRows(
-            @Nonnull NamedMySQLConnection namedMySQLConnection,
-            @Nonnull AbstractReadStatement readStatement,
-            @Nonnull Class<T> classOfTableRow
+            @NotNull NamedMySQLConnection namedMySQLConnection,
+            @NotNull AbstractReadStatement readStatement,
+            @NotNull Class<T> classOfTableRow
     ) {
         return fetchResultRows(namedMySQLConnection.getSqlConnection(), readStatement, classOfTableRow);
     }
@@ -63,9 +63,9 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * @since 3.0.18 Finished Technical Preview.
      */
     static <T extends ResultRow> Future<T> fetchResultRow(
-            @Nonnull NamedMySQLConnection namedMySQLConnection,
-            @Nonnull AbstractReadStatement readStatement,
-            @Nonnull Class<T> classOfTableRow
+            @NotNull NamedMySQLConnection namedMySQLConnection,
+            @NotNull AbstractReadStatement readStatement,
+            @NotNull Class<T> classOfTableRow
     ) {
         return fetchResultRow(namedMySQLConnection.getSqlConnection(), readStatement, classOfTableRow);
     }
@@ -75,10 +75,10 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * @since 2.9.4
      */
     static <K, T extends ResultRow> Future<Map<K, List<T>>> fetchResultRowsToCategorizedMap(
-            @Nonnull SqlConnection sqlConnection,
-            @Nonnull AbstractReadStatement readStatement,
-            @Nonnull Class<T> classOfTableRow,
-            @Nonnull Function<T, K> categoryGenerator
+            @NotNull SqlConnection sqlConnection,
+            @NotNull AbstractReadStatement readStatement,
+            @NotNull Class<T> classOfTableRow,
+            @NotNull Function<T, K> categoryGenerator
     ) {
         Map<K, List<T>> map = new HashMap<>();
         return fetchResultRows(sqlConnection, readStatement, classOfTableRow)
@@ -95,10 +95,10 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * @since 2.9.4
      */
     static <K, T extends ResultRow> Future<Map<K, T>> fetchResultRowsToUniqueKeyBoundMap(
-            @Nonnull SqlConnection sqlConnection,
-            @Nonnull AbstractReadStatement readStatement,
-            @Nonnull Class<T> classOfTableRow,
-            @Nonnull Function<T, K> uniqueKeyGenerator
+            @NotNull SqlConnection sqlConnection,
+            @NotNull AbstractReadStatement readStatement,
+            @NotNull Class<T> classOfTableRow,
+            @NotNull Function<T, K> uniqueKeyGenerator
     ) {
         Map<K, T> map = new HashMap<>();
         return fetchResultRows(sqlConnection, readStatement, classOfTableRow)
@@ -117,9 +117,9 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * 如果存在，将所有行以classOfTableRow指定的类进行封装，异步返回此实例构成的List。
      */
     static <T extends ResultRow> Future<List<T>> fetchResultRows(
-            @Nonnull SqlConnection sqlConnection,
-            @Nonnull AbstractReadStatement readStatement,
-            @Nonnull Class<T> classOfTableRow
+            @NotNull SqlConnection sqlConnection,
+            @NotNull AbstractReadStatement readStatement,
+            @NotNull Class<T> classOfTableRow
     ) {
         return readStatement.execute(sqlConnection)
                 .compose(resultMatrix -> {
@@ -135,9 +135,9 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * 如果存在，将第一行以classOfTableRow指定的类进行封装，异步返回此实例。
      */
     static <T extends ResultRow> Future<T> fetchResultRow(
-            @Nonnull SqlConnection sqlConnection,
-            @Nonnull AbstractReadStatement readStatement,
-            @Nonnull Class<T> classOfTableRow
+            @NotNull SqlConnection sqlConnection,
+            @NotNull AbstractReadStatement readStatement,
+            @NotNull Class<T> classOfTableRow
     ) {
         return readStatement.execute(sqlConnection)
                 .compose(resultMatrix -> {
@@ -150,13 +150,13 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
                 });
     }
 
-    static JsonArray batchToJsonArray(@Nonnull Collection<? extends ResultRow> rows) {
+    static JsonArray batchToJsonArray(@NotNull Collection<? extends ResultRow> rows) {
         JsonArray array = new JsonArray();
         rows.forEach(row -> array.add(row.getRow()));
         return array;
     }
 
-    static JsonArray batchToJsonArray(@Nonnull Collection<? extends ResultRow> rows, @Nonnull Function<ResultRow, JsonObject> transformer) {
+    static JsonArray batchToJsonArray(@NotNull Collection<? extends ResultRow> rows, @NotNull Function<ResultRow, JsonObject> transformer) {
         JsonArray array = new JsonArray();
         rows.forEach(row -> array.add(transformer.apply(row)));
         return array;
@@ -171,7 +171,7 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * @since 2.9.4 fix null field error
      */
     @Nullable
-    default String readDateTime(@Nonnull  String field) {
+    default String readDateTime(@NotNull String field) {
         String s = readString(field);
         if (s == null) return null;
         return LocalDateTime.parse(s)
@@ -179,7 +179,7 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
     }
 
     @Nullable
-    default String readDate(@Nonnull String field) {
+    default String readDate(@NotNull String field) {
         return readString(field);
     }
 
@@ -187,7 +187,7 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
      * @since 2.9.4 fix null field error
      */
     @Nullable
-    default String readTime(@Nonnull String field) {
+    default String readTime(@NotNull String field) {
         var s = readString(field);
         if (s == null) return null;
         return s
@@ -196,7 +196,7 @@ public interface ResultRow extends JsonifiableEntity<ResultRow> {
     }
 
     @Nullable
-    default String readTimestamp(@Nonnull String field) {
+    default String readTimestamp(@NotNull String field) {
         return readDateTime(field);
     }
 }

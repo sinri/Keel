@@ -3,8 +3,8 @@ package io.github.sinri.keel.logger.metric;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.issue.record.BaseIssueRecord;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,12 +15,12 @@ import java.util.Map;
  */
 @TechnicalPreview(since = "3.1.9")
 public class KeelMetricRecord extends BaseIssueRecord<KeelMetricRecord> {
-    private final @Nonnull String topic;
-    private final @Nonnull Map<String, String> labelMap = new HashMap<>();
-    private final @Nonnull String metricName;
+    private final @NotNull String topic;
+    private final @NotNull Map<String, String> labelMap = new HashMap<>();
+    private final @NotNull String metricName;
     private final double value;
 
-    public KeelMetricRecord(@Nonnull String topic, @Nonnull String metricName, double value) {
+    public KeelMetricRecord(@NotNull String topic, @NotNull String metricName, double value) {
         super();
         this.topic = topic;
         this.metricName = metricName;
@@ -38,7 +38,7 @@ public class KeelMetricRecord extends BaseIssueRecord<KeelMetricRecord> {
     }
 
 
-    @Nonnull
+    @NotNull
     public String metricName() {
         return metricName;
     }
@@ -56,15 +56,14 @@ public class KeelMetricRecord extends BaseIssueRecord<KeelMetricRecord> {
         return this;
     }
 
-    @Nonnull
+
     @Override
-    public KeelMetricRecord getImplementation() {
+    public @NotNull KeelMetricRecord getImplementation() {
         return this;
     }
 
-    @Nonnull
     @Override
-    public String topic() {
+    public @NotNull String topic() {
         return topic;
     }
 }

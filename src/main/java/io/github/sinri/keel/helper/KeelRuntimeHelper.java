@@ -3,11 +3,11 @@ package io.github.sinri.keel.helper;
 import io.github.sinri.keel.helper.runtime.CPUTimeResult;
 import io.github.sinri.keel.helper.runtime.GCStatResult;
 import io.github.sinri.keel.helper.runtime.JVMMemoryResult;
+import org.jetbrains.annotations.NotNull;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 
-import javax.annotation.Nonnull;
 import java.lang.management.*;
 import java.util.Set;
 
@@ -53,7 +53,7 @@ public class KeelRuntimeHelper {
         return Runtime.getRuntime();
     }
 
-    @Nonnull
+    @NotNull
     public GCStatResult getGCSnapshot() {
         GCStatResult gcStat = new GCStatResult();
         for (GarbageCollectorMXBean gc : ManagementFactory.getGarbageCollectorMXBeans()) {
@@ -69,7 +69,7 @@ public class KeelRuntimeHelper {
     /**
      * @since 2.9.4
      */
-    @Nonnull
+    @NotNull
     public CPUTimeResult getCPUTimeSnapshot() {
         CentralProcessor processor = systemInfo.getHardware().getProcessor();
         long[] systemCpuLoadTicks = processor.getSystemCpuLoadTicks();

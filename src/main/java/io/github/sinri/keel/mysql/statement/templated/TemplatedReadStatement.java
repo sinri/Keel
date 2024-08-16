@@ -2,8 +2,8 @@ package io.github.sinri.keel.mysql.statement.templated;
 
 import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
 import io.vertx.core.Handler;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 /**
  * @since 3.0.8
@@ -13,12 +13,12 @@ public class TemplatedReadStatement extends AbstractReadStatement implements Tem
     private final String templateSql;
     private final TemplateArgumentMapping argumentMapping;
 
-    public TemplatedReadStatement(@Nonnull String templateSql) {
+    public TemplatedReadStatement(@NotNull String templateSql) {
         this.templateSql = templateSql;
         this.argumentMapping = new TemplateArgumentMapping();
     }
 
-    public TemplatedReadStatement bindArguments(@Nonnull Handler<TemplateArgumentMapping> binder) {
+    public TemplatedReadStatement bindArguments(@NotNull Handler<TemplateArgumentMapping> binder) {
         binder.handle(this.argumentMapping);
         return this;
     }

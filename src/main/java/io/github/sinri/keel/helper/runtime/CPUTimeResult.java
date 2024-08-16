@@ -1,8 +1,8 @@
 package io.github.sinri.keel.helper.runtime;
 
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 
 /**

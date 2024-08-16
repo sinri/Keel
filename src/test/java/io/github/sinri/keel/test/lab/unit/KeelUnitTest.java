@@ -6,8 +6,8 @@ import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.github.sinri.keel.tesuto.TestUnitResult;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
@@ -15,7 +15,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 public class KeelUnitTest extends KeelTest {
 
     @Override
-    protected @Nonnull Future<Void> starting() {
+    protected @NotNull Future<Void> starting() {
         Keel.getConfiguration().loadPropertiesFile("config.properties");
         System.out.println("prepared");
         return Future.succeededFuture();
@@ -36,7 +36,7 @@ public class KeelUnitTest extends KeelTest {
                 });
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> ending(List<TestUnitResult> testUnitResults) {
         System.out.println("cleaned with " + testUnitResults.size() + " results");

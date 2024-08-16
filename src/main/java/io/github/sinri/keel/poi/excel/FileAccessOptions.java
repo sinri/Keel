@@ -2,8 +2,8 @@ package io.github.sinri.keel.poi.excel;
 
 import com.github.pjfanning.xlsx.StreamingReader;
 import io.vertx.core.Handler;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.InputStream;
 
@@ -52,12 +52,12 @@ public class FileAccessOptions {
         return this.file;
     }
 
-    public FileAccessOptions setFile(@Nonnull File file) {
+    public FileAccessOptions setFile(@NotNull File file) {
         this.file = file;
         return this;
     }
 
-    public FileAccessOptions setFile(@Nonnull String filePath) {
+    public FileAccessOptions setFile(@NotNull String filePath) {
         this.file = new File(filePath);
         return this;
     }
@@ -66,7 +66,7 @@ public class FileAccessOptions {
         return inputStream;
     }
 
-    public FileAccessOptions setInputStream(@Nonnull InputStream inputStream) {
+    public FileAccessOptions setInputStream(@NotNull InputStream inputStream) {
         this.inputStream = inputStream;
         return this;
     }
@@ -92,7 +92,7 @@ public class FileAccessOptions {
      *
      * @see <a href="https://github.com/pjfanning/excel-streaming-reader">PJFANNING::ExcelStreamingReader</a>
      */
-    public FileAccessOptions setStreamingReaderBuilder(@Nonnull Handler<StreamingReader.Builder> streamingReaderBuilderHandler) {
+    public FileAccessOptions setStreamingReaderBuilder(@NotNull Handler<StreamingReader.Builder> streamingReaderBuilderHandler) {
         this.streamingReaderBuilder = new StreamingReader.Builder();
 
         // number of rows to keep in memory (defaults to 10)

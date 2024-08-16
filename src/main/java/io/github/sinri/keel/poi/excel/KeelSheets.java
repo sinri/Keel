@@ -11,9 +11,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.*;
 import java.util.Objects;
 
@@ -27,7 +27,7 @@ public class KeelSheets implements AutoCloseable {
      * @since 3.1.3
      */
     private final @Nullable FormulaEvaluator formulaEvaluator;
-    protected final @Nonnull Workbook workbook;
+    protected final @NotNull Workbook workbook;
 
     /**
      * Open an existed workbook or create, with formula evaluator if required.
@@ -48,7 +48,7 @@ public class KeelSheets implements AutoCloseable {
     /**
      * @since 4.0.0
      */
-    public static KeelSheets loadToRead(@Nonnull Handler<FileAccessOptions> fileAccessOptionsHandler) {
+    public static KeelSheets loadToRead(@NotNull Handler<FileAccessOptions> fileAccessOptionsHandler) {
         FileAccessOptions fileAccessOptions = new FileAccessOptions();
         fileAccessOptionsHandler.handle(fileAccessOptions);
         return loadToRead(fileAccessOptions);
@@ -57,7 +57,7 @@ public class KeelSheets implements AutoCloseable {
     /**
      * @since 3.2.11
      */
-    public static KeelSheets loadToRead(@Nonnull FileAccessOptions fileAccessOptions) {
+    public static KeelSheets loadToRead(@NotNull FileAccessOptions fileAccessOptions) {
         try {
             if (fileAccessOptions.isUseStreamReading()) {
                 // use stream reading
@@ -87,7 +87,7 @@ public class KeelSheets implements AutoCloseable {
     /**
      * @since 4.0.0
      */
-    public static KeelSheets createToWrite(@Nonnull FileWriteStyle fileWriteStyle) {
+    public static KeelSheets createToWrite(@NotNull FileWriteStyle fileWriteStyle) {
         return switch (fileWriteStyle) {
             case Xlsx -> new KeelSheets(new XSSFWorkbook(), false);
             case StreamingXlsx -> new KeelSheets(new SXSSFWorkbook(new XSSFWorkbook()), false);
@@ -98,7 +98,7 @@ public class KeelSheets implements AutoCloseable {
     /**
      * @since 3.2.16
      */
-    public KeelSheetReader generateReaderForSheet(@Nonnull String sheetName, @Nonnull Handler<SheetReadOptions> readOptionsHandler) {
+    public KeelSheetReader generateReaderForSheet(@NotNull String sheetName, @NotNull Handler<SheetReadOptions> readOptionsHandler) {
         var sheet = this.getWorkbook().getSheet(sheetName);
         var readOptions = new SheetReadOptions();
         readOptions.setFormulaEvaluator(formulaEvaluator);
@@ -109,7 +109,7 @@ public class KeelSheets implements AutoCloseable {
     /**
      * @since 3.2.16
      */
-    public KeelSheetReader generateReaderForSheet(int sheetIndex, @Nonnull Handler<SheetReadOptions> readOptionsHandler) {
+    public KeelSheetReader generateReaderForSheet(int sheetIndex, @NotNull Handler<SheetReadOptions> readOptionsHandler) {
         var sheet = this.getWorkbook().getSheetAt(sheetIndex);
         var readOptions = new SheetReadOptions();
         readOptions.setFormulaEvaluator(formulaEvaluator);
@@ -117,7 +117,7 @@ public class KeelSheets implements AutoCloseable {
         return new KeelSheetReader(sheet, readOptions);
     }
 
-    public KeelSheetWriter generateWriterForSheet(@Nonnull String sheetName, Integer pos) {
+    public KeelSheetWriter generateWriterForSheet(@NotNull String sheetName, Integer pos) {
         Sheet sheet = this.getWorkbook().createSheet(sheetName);
         if (pos != null) {
             this.getWorkbook().setSheetOrder(sheetName, pos);
@@ -125,7 +125,7 @@ public class KeelSheets implements AutoCloseable {
         return new KeelSheetWriter(sheet);
     }
 
-    public KeelSheetWriter generateWriterForSheet(@Nonnull String sheetName) {
+    public KeelSheetWriter generateWriterForSheet(@NotNull String sheetName) {
         return generateWriterForSheet(sheetName, null);
     }
 
@@ -136,7 +136,7 @@ public class KeelSheets implements AutoCloseable {
     /**
      * @return Raw Apache POI Workbook instance.
      */
-    @Nonnull
+    @NotNull
     public Workbook getWorkbook() {
         return workbook;
     }

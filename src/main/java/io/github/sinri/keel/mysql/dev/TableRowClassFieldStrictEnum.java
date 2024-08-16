@@ -1,7 +1,9 @@
 package io.github.sinri.keel.mysql.dev;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Objects;
 
 /**
@@ -14,7 +16,7 @@ public class TableRowClassFieldStrictEnum {
     private final String enumClass;
     private final String enumClassRef;
 
-    public TableRowClassFieldStrictEnum(@Nonnull String fieldName, @Nullable String enumPackage, @Nonnull String enumClass) {
+    public TableRowClassFieldStrictEnum(@NotNull String fieldName, @Nullable String enumPackage, @NotNull String enumClass) {
         this.fieldName = fieldName;
         this.enumPackage = Objects.requireNonNullElse(enumPackage, "");
         this.enumClass = enumClass;

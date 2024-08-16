@@ -5,9 +5,9 @@ import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.vertx.core.Future;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.sqlclient.SqlConnection;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -86,7 +86,7 @@ public class TableRowClassSourceCodeGenerator {
     /**
      * @param strictEnumPackage empty or a package path. No dot in tail.
      */
-    public TableRowClassSourceCodeGenerator setStrictEnumPackage(@Nonnull String strictEnumPackage) {
+    public TableRowClassSourceCodeGenerator setStrictEnumPackage(@NotNull String strictEnumPackage) {
         this.strictEnumPackage = strictEnumPackage;
         return this;
     }
@@ -95,7 +95,7 @@ public class TableRowClassSourceCodeGenerator {
      * @param envelopePackage empty or a package path. No dot in tail.
      * @since 3.1.0
      */
-    public TableRowClassSourceCodeGenerator setEnvelopePackage(@Nonnull String envelopePackage) {
+    public TableRowClassSourceCodeGenerator setEnvelopePackage(@NotNull String envelopePackage) {
         this.envelopePackage = envelopePackage;
         return this;
     }
@@ -192,7 +192,7 @@ public class TableRowClassSourceCodeGenerator {
     /**
      * Fetch comment of a table (in schema).
      */
-    private Future<String> getCommentOfTable(@Nonnull String table, @Nullable String schema) {
+    private Future<String> getCommentOfTable(@NotNull String table, @Nullable String schema) {
         String sql_for_table_comment = "SELECT TABLE_COMMENT " +
                 "FROM INFORMATION_SCHEMA.TABLES " +
                 "WHERE TABLE_NAME = '" + table + "' " +
@@ -207,7 +207,7 @@ public class TableRowClassSourceCodeGenerator {
                 });
     }
 
-    private Future<List<TableRowClassField>> getFieldsOfTable(@Nonnull String table, @Nullable String schema) {
+    private Future<List<TableRowClassField>> getFieldsOfTable(@NotNull String table, @Nullable String schema) {
         String sql_for_columns = "show full columns in ";
         if (schema != null && !schema.isEmpty() && !schema.isBlank()) {
             sql_for_columns += "`" + schema + "`.";
@@ -236,7 +236,7 @@ public class TableRowClassSourceCodeGenerator {
                 });
     }
 
-    private Future<String> getCreationOfTable(@Nonnull String table, @Nullable String schema) {
+    private Future<String> getCreationOfTable(@NotNull String table, @Nullable String schema) {
         String sql_sct = "show create table ";
         if (schema != null) {
             sql_sct += "`" + schema + "`.";

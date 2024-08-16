@@ -3,9 +3,9 @@ package io.github.sinri.keel.facade.async;
 import io.github.sinri.keel.verticles.KeelVerticle;
 import io.github.sinri.keel.verticles.KeelVerticleImplPure;
 import io.vertx.core.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +26,7 @@ public interface KeelAsyncKit {
      * @since 2.9.3 callFutureRepeat
      * @since 3.0.0 repeatedlyCall
      */
-    static Future<Void> repeatedlyCall(@Nonnull Function<FutureRepeat.RoutineResult, Future<Void>> routineResultFutureFunction) {
+    static Future<Void> repeatedlyCall(@NotNull Function<FutureRepeat.RoutineResult, Future<Void>> routineResultFutureFunction) {
         return FutureRepeat.call(routineResultFutureFunction);
     }
 
@@ -34,14 +34,14 @@ public interface KeelAsyncKit {
      * @since 2.9 callFutureForEach
      * @since 3.0.0 iterativelyCall
      */
-    static <T> Future<Void> iterativelyCall(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    static <T> Future<Void> iterativelyCall(@NotNull Iterable<T> collection, @NotNull Function<T, Future<Void>> itemProcessor) {
         return FutureForEach.call(collection, itemProcessor);
     }
 
     /**
      * @since 3.0.13
      */
-    static <T> Future<Void> iterativelyCall(@Nonnull Iterator<T> iterator, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    static <T> Future<Void> iterativelyCall(@NotNull Iterator<T> iterator, @NotNull Function<T, Future<Void>> itemProcessor) {
         return repeatedlyCall(routineResult -> {
             if (iterator.hasNext()) {
                 T t = iterator.next();
@@ -56,7 +56,7 @@ public interface KeelAsyncKit {
     /**
      * @since 3.0.13
      */
-    static <T> Future<Void> iterativelyBatchCall(@Nonnull Iterator<T> iterator, @Nonnull Function<List<T>, Future<Void>> itemsProcessor, int batchSize) {
+    static <T> Future<Void> iterativelyBatchCall(@NotNull Iterator<T> iterator, @NotNull Function<List<T>, Future<Void>> itemsProcessor, int batchSize) {
         if (batchSize < 1) throw new IllegalArgumentException("BATCH SIZE IS AT LEAST 1.");
         return repeatedlyCall(routineResult -> {
             List<T> buffer = new ArrayList<>();
@@ -85,7 +85,7 @@ public interface KeelAsyncKit {
     /**
      * @since 3.2.3
      */
-    static <R> Future<Void> iterativelyCall(@Nonnull Iterable<R> iterable, @Nonnull BiFunction<R, FutureRepeat.RoutineResult, Future<Void>> itemProcessor) {
+    static <R> Future<Void> iterativelyCall(@NotNull Iterable<R> iterable, @NotNull BiFunction<R, FutureRepeat.RoutineResult, Future<Void>> itemProcessor) {
         return FutureForEachBreakable.call(iterable, itemProcessor);
     }
 
@@ -93,7 +93,7 @@ public interface KeelAsyncKit {
      * @since 2.9 callFutureForRange
      * @since 3.0.0 stepwiseCall
      */
-    static Future<Void> stepwiseCall(@Nonnull FutureForRange.Options options, @Nonnull Function<Integer, Future<Void>> handleFunction) {
+    static Future<Void> stepwiseCall(@NotNull FutureForRange.Options options, @NotNull Function<Integer, Future<Void>> handleFunction) {
         return FutureForRange.call(options, handleFunction);
     }
 
@@ -101,7 +101,7 @@ public interface KeelAsyncKit {
      * @since 2.9 callFutureForRange
      * @since 3.0.0 stepwiseCall
      */
-    static Future<Void> stepwiseCall(int times, @Nonnull Function<Integer, Future<Void>> handleFunction) {
+    static Future<Void> stepwiseCall(int times, @NotNull Function<Integer, Future<Void>> handleFunction) {
         return FutureForRange.call(times, handleFunction);
     }
 
@@ -117,26 +117,26 @@ public interface KeelAsyncKit {
         return FutureSleep.call(t, interrupter);
     }
 
-    static <T> Future<Void> parallelForAllSuccess(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    static <T> Future<Void> parallelForAllSuccess(@NotNull Iterable<T> collection, @NotNull Function<T, Future<Void>> itemProcessor) {
         return FutureForEachParallel.all(collection, itemProcessor);
     }
 
-    static <T> Future<Void> parallelForAnySuccess(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    static <T> Future<Void> parallelForAnySuccess(@NotNull Iterable<T> collection, @NotNull Function<T, Future<Void>> itemProcessor) {
         return FutureForEachParallel.any(collection, itemProcessor);
     }
 
-    static <T> Future<Void> parallelForAllComplete(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    static <T> Future<Void> parallelForAllComplete(@NotNull Iterable<T> collection, @NotNull Function<T, Future<Void>> itemProcessor) {
         return FutureForEachParallel.join(collection, itemProcessor);
     }
 
-    static <T, R> Future<FutureForEachParallel.ParallelResult<R>> parallelForAllResult(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<R>> itemProcessor) {
+    static <T, R> Future<FutureForEachParallel.ParallelResult<R>> parallelForAllResult(@NotNull Iterable<T> collection, @NotNull Function<T, Future<R>> itemProcessor) {
         return FutureForEachParallel.call(collection, itemProcessor);
     }
 
     /**
      * @since 3.1.0
      */
-    static <T> Future<T> exclusivelyCall(@Nonnull String lockName, long waitTimeForLock, @Nonnull Supplier<Future<T>> exclusiveSupplier) {
+    static <T> Future<T> exclusivelyCall(@NotNull String lockName, long waitTimeForLock, @NotNull Supplier<Future<T>> exclusiveSupplier) {
         return Keel.getVertx().sharedData()
                 .getLockWithTimeout(lockName, waitTimeForLock)
                 .compose(lock -> Future.succeededFuture()
@@ -148,7 +148,7 @@ public interface KeelAsyncKit {
     /**
      * @since 3.0.11 not only Void!
      */
-    static <T> Future<T> exclusivelyCall(@Nonnull String lockName, @Nonnull Supplier<Future<T>> exclusiveSupplier) {
+    static <T> Future<T> exclusivelyCall(@NotNull String lockName, @NotNull Supplier<Future<T>> exclusiveSupplier) {
         return exclusivelyCall(lockName, 1000L, exclusiveSupplier);
     }
 
@@ -156,7 +156,7 @@ public interface KeelAsyncKit {
      * @param promiseHandler execute a regular job, even if it is blocking, handle method is decided by users.
      * @since 3.0.0
      */
-    static void endless(@Nonnull Handler<Promise<Void>> promiseHandler) {
+    static void endless(@NotNull Handler<Promise<Void>> promiseHandler) {
         Promise<Void> promise = Promise.promise();
         promiseHandler.handle(promise);
         promise.future()
@@ -168,7 +168,7 @@ public interface KeelAsyncKit {
      * @param supplier An async job handler, results a Void Future.
      * @since 3.0.1
      */
-    static void endless(@Nonnull Supplier<Future<Void>> supplier) {
+    static void endless(@NotNull Supplier<Future<Void>> supplier) {
         KeelAsyncKit.repeatedlyCall(routineResult -> Future.succeededFuture()
                 .compose(v -> supplier.get())
                 .eventually(() -> Future.succeededFuture()));
@@ -177,7 +177,7 @@ public interface KeelAsyncKit {
     /**
      * @since 3.0.1
      */
-    static <R> Future<R> vertxizedCompletableFuture(@Nonnull CompletableFuture<R> completableFuture) {
+    static <R> Future<R> vertxizedCompletableFuture(@NotNull CompletableFuture<R> completableFuture) {
         Promise<R> promise = Promise.promise();
         completableFuture.whenComplete((r, t) -> {
             if (t != null) {
@@ -192,7 +192,7 @@ public interface KeelAsyncKit {
     /**
      * @since 3.0.1
      */
-    static <R> Future<R> vertxizedRawFuture(@Nonnull java.util.concurrent.Future<R> rawFuture, long sleepTime) {
+    static <R> Future<R> vertxizedRawFuture(@NotNull java.util.concurrent.Future<R> rawFuture, long sleepTime) {
         return KeelAsyncKit.repeatedlyCall(routineResult -> {
                     if (rawFuture.isDone() || rawFuture.isCancelled()) {
                         routineResult.stop();
@@ -212,8 +212,8 @@ public interface KeelAsyncKit {
      * @since 3.0.10 Technical Preview: instead of Vertx::executeBlocking(Handler&lt;Promise&lt;T&gt;&gt; blockingCodeHandler)
      * @since 3.0.18 Finished Technical Preview.
      */
-    @Nonnull
-    static <T> Future<T> executeBlocking(@Nonnull Handler<Promise<T>> blockingCodeHandler) {
+    @NotNull
+    static <T> Future<T> executeBlocking(@NotNull Handler<Promise<T>> blockingCodeHandler) {
         Promise<T> promise = Promise.promise();
         KeelVerticle verticle = new KeelVerticleImplPure() {
 

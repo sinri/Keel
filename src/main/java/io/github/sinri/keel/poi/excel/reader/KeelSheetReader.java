@@ -8,9 +8,9 @@ import io.github.sinri.keel.poi.excel.reader.options.ColumnReadOptions;
 import io.github.sinri.keel.poi.excel.reader.options.SheetReadOptions;
 import io.vertx.core.Future;
 import org.apache.poi.ss.usermodel.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -26,7 +26,7 @@ public class KeelSheetReader extends KeelSheet {
     /**
      * @since 3.2.16
      */
-    public KeelSheetReader(@Nonnull Sheet sheet, @Nonnull SheetReadOptions readOptions) {
+    public KeelSheetReader(@NotNull Sheet sheet, @NotNull SheetReadOptions readOptions) {
         super(sheet);
         this.readOptions = readOptions;
     }
@@ -66,10 +66,10 @@ public class KeelSheetReader extends KeelSheet {
      * @since 3.1.3 return computed value for formula cells.
      * @since 3.1.4 add optional formulaEvaluator and becomes static again
      */
-    @Nonnull
+    @NotNull
     private static String dumpCellToString(
             @Nullable Cell cell,
-            @Nonnull SheetReadOptions readOptions,
+            @NotNull SheetReadOptions readOptions,
             @Nullable ColumnReadOptions columnReadOptions
     ) {
         if (cell == null) return "";
@@ -132,10 +132,10 @@ public class KeelSheetReader extends KeelSheet {
      * @since 3.0.20 add SheetRowFilter, and may return null if the row should be thrown.
      */
     private static @Nullable List<String> dumpRowToRawRow(
-            @Nonnull Row row,
+            @NotNull Row row,
             int maxColumns,
             @Nullable SheetRowFilter sheetRowFilter,
-            @Nonnull SheetReadOptions readOptions
+            @NotNull SheetReadOptions readOptions
     ) {
         List<String> rowDatum = new ArrayList<>();
 
@@ -192,7 +192,7 @@ public class KeelSheetReader extends KeelSheet {
         };
     }
 
-    public final void blockReadAllRows(@Nonnull Consumer<Row> rowConsumer) {
+    public final void blockReadAllRows(@NotNull Consumer<Row> rowConsumer) {
         Iterator<Row> it = getRowIterator();
 
         while (it.hasNext()) {
@@ -305,14 +305,14 @@ public class KeelSheetReader extends KeelSheet {
      * Consider calling this method in worker context.
      * Process row by row is not effective enough.
      */
-    public final Future<Void> readAllRows(@Nonnull Function<Row, Future<Void>> rowFunc) {
+    public final Future<Void> readAllRows(@NotNull Function<Row, Future<Void>> rowFunc) {
         return KeelAsyncKit.iterativelyCall(getRowIterator(), rowFunc);
     }
 
     /**
      * Consider calling this method in worker context.
      */
-    public final Future<Void> readAllRows(@Nonnull Function<List<Row>, Future<Void>> rowsFunc, int batchSize) {
+    public final Future<Void> readAllRows(@NotNull Function<List<Row>, Future<Void>> rowsFunc, int batchSize) {
         return KeelAsyncKit.iterativelyBatchCall(getRowIterator(), rowsFunc, batchSize);
     }
 
@@ -450,7 +450,7 @@ public class KeelSheetReader extends KeelSheet {
      */
     @TechnicalPreview(since = "3.2.11")
     public Iterator<KeelSheetMatrixTemplatedRow> getTemplatedMatrixRowIterator(
-            @Nonnull KeelSheetMatrixRowTemplate template,
+            @NotNull KeelSheetMatrixRowTemplate template,
             int maxColumns,
             @Nullable SheetRowFilter sheetRowFilter
     ) {

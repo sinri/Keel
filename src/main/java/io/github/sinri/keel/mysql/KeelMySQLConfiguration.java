@@ -7,8 +7,8 @@ import io.vertx.core.Future;
 import io.vertx.mysqlclient.MySQLBuilder;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -26,20 +26,20 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
  * tcpKeepAlive=false;
  */
 public class KeelMySQLConfiguration extends KeelConfigElement {
-    //private final @Nonnull String dataSourceName;
+    //private final @NotNull String dataSourceName;
 
-    public KeelMySQLConfiguration(@Nonnull KeelConfigElement base) {
+    public KeelMySQLConfiguration(@NotNull KeelConfigElement base) {
         super(base);
     }
 
 
-    @Nonnull
-    public static KeelMySQLConfiguration loadConfigurationForDataSource(@Nonnull KeelConfigElement configCenter, @Nonnull String dataSourceName) {
+    @NotNull
+    public static KeelMySQLConfiguration loadConfigurationForDataSource(@NotNull KeelConfigElement configCenter, @NotNull String dataSourceName) {
         KeelConfigElement keelConfigElement = configCenter.extract("mysql", dataSourceName);
         return new KeelMySQLConfiguration(Objects.requireNonNull(keelConfigElement));
     }
 
-    @Nonnull
+    @NotNull
     public MySQLConnectOptions getConnectOptions() {
         // mysql.XXX.connect::database,host,password,port,user,charset,useAffectedRows,connectionTimeout
         MySQLConnectOptions mySQLConnectOptions = new MySQLConnectOptions()
@@ -63,7 +63,7 @@ public class KeelMySQLConfiguration extends KeelConfigElement {
         return mySQLConnectOptions;
     }
 
-    @Nonnull
+    @NotNull
     public PoolOptions getPoolOptions() {
         // mysql.XXX.pool::poolConnectionTimeout
         PoolOptions poolOptions = new PoolOptions();
@@ -124,7 +124,7 @@ public class KeelMySQLConfiguration extends KeelConfigElement {
      * Use different name for actually different data sources;
      * if you want to create a temporary data source to perform instant query, UUID is a good component.
      */
-    @Nonnull
+    @NotNull
     public String getDataSourceName() {
         return getName();
     }

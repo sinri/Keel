@@ -1,9 +1,9 @@
 package io.github.sinri.keel.elasticsearch;
 
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,7 +42,7 @@ public class ElasticSearchConfig extends KeelConfigElement {
         return readString("password", null);
     }
 
-    public @Nonnull String clusterHost() {
+    public @NotNull String clusterHost() {
         return Objects.requireNonNull(readString(List.of("cluster", "host"), null));
     }
 
@@ -50,11 +50,11 @@ public class ElasticSearchConfig extends KeelConfigElement {
         return readInteger(List.of("cluster", "port"), 9200);
     }
 
-    public @Nonnull String clusterScheme() {
+    public @NotNull String clusterScheme() {
         return Objects.requireNonNull(readString(List.of("cluster", "scheme"), "http"));
     }
 
-    public @Nonnull String clusterApiUrl(@Nonnull String endpoint) {
+    public @NotNull String clusterApiUrl(@NotNull String endpoint) {
         return this.clusterScheme() + "://" + this.clusterHost() + ":" + this.clusterPort() + endpoint;
     }
 

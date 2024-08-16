@@ -1,8 +1,8 @@
 package io.github.sinri.keel.poi.csv;
 
 import io.github.sinri.keel.core.TechnicalPreview;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 
 /**

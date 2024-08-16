@@ -8,8 +8,8 @@ import io.vertx.core.Future;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,11 +17,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 3.2.16
  */
 public class KeelSheetWriter extends KeelSheet {
-    public KeelSheetWriter(@Nonnull Sheet sheet) {
+    public KeelSheetWriter(@NotNull Sheet sheet) {
         super(sheet);
     }
 
-    public void blockWriteAllRows(@Nonnull List<List<String>> rowData, int sinceRowIndex, int sinceCellIndex) {
+    public void blockWriteAllRows(@NotNull List<List<String>> rowData, int sinceRowIndex, int sinceCellIndex) {
         for (int rowIndex = 0; rowIndex < rowData.size(); rowIndex++) {
             Row row = getSheet().getRow(sinceRowIndex + rowIndex);
             if (row == null) {
@@ -32,11 +32,11 @@ public class KeelSheetWriter extends KeelSheet {
         }
     }
 
-    public void blockWriteAllRows(@Nonnull List<List<String>> rowData) {
+    public void blockWriteAllRows(@NotNull List<List<String>> rowData) {
         blockWriteAllRows(rowData, 0, 0);
     }
 
-    public void blockWriteMatrix(@Nonnull KeelSheetMatrix matrix) {
+    public void blockWriteMatrix(@NotNull KeelSheetMatrix matrix) {
         if (matrix.getHeaderRow().isEmpty()) {
             blockWriteAllRows(matrix.getRawRowList(), 0, 0);
         } else {
@@ -45,7 +45,7 @@ public class KeelSheetWriter extends KeelSheet {
         }
     }
 
-    public Future<Void> writeMatrix(@Nonnull KeelSheetMatrix matrix) {
+    public Future<Void> writeMatrix(@NotNull KeelSheetMatrix matrix) {
         AtomicInteger rowIndexRef = new AtomicInteger(0);
         if (!matrix.getHeaderRow().isEmpty()) {
             blockWriteAllRows(List.of(matrix.getHeaderRow()), 0, 0);
@@ -59,7 +59,7 @@ public class KeelSheetWriter extends KeelSheet {
         }, 1000);
     }
 
-    public void blockWriteTemplatedMatrix(@Nonnull KeelSheetTemplatedMatrix templatedMatrix) {
+    public void blockWriteTemplatedMatrix(@NotNull KeelSheetTemplatedMatrix templatedMatrix) {
         AtomicInteger rowIndexRef = new AtomicInteger(0);
         blockWriteAllRows(List.of(templatedMatrix.getTemplate().getColumnNames()), 0, 0);
         rowIndexRef.incrementAndGet();
@@ -68,7 +68,7 @@ public class KeelSheetWriter extends KeelSheet {
         });
     }
 
-    public Future<Void> writeTemplatedMatrix(@Nonnull KeelSheetTemplatedMatrix templatedMatrix) {
+    public Future<Void> writeTemplatedMatrix(@NotNull KeelSheetTemplatedMatrix templatedMatrix) {
         AtomicInteger rowIndexRef = new AtomicInteger(0);
         blockWriteAllRows(List.of(templatedMatrix.getTemplate().getColumnNames()), 0, 0);
         rowIndexRef.incrementAndGet();

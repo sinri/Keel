@@ -6,8 +6,7 @@ import io.vertx.core.Launcher;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
@@ -20,7 +19,7 @@ public final class KeelLauncher extends Launcher {
     private final KeelLauncherAdapter adapter;
     private final KeelEventLogger logger;
 
-    public KeelLauncher(@Nonnull KeelLauncherAdapter adapter) {
+    public KeelLauncher(@NotNull KeelLauncherAdapter adapter) {
         this.adapter = adapter;
         this.logger = adapter.buildEventLoggerForLauncher();
     }
@@ -28,7 +27,7 @@ public final class KeelLauncher extends Launcher {
     /**
      * @since 3.2.0
      */
-    @Nonnull
+    @NotNull
     private KeelEventLogger eventLogger() {
         return this.logger;
     }

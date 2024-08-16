@@ -5,8 +5,7 @@ import io.github.sinri.keel.verticles.KeelVerticleImplWithIssueRecorder;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.ThreadingModel;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
@@ -38,21 +37,21 @@ public abstract class KeelQueue extends KeelVerticleImplWithIssueRecorder<QueueM
      *
      * @since 3.0.9
      */
-    protected @Nonnull QueueWorkerPoolManager getQueueWorkerPoolManager() {
+    protected @NotNull QueueWorkerPoolManager getQueueWorkerPoolManager() {
         return new QueueWorkerPoolManager(0);
     }
 
     /**
      * Create a new instance of KeelQueueNextTaskSeeker when routine starts.
      */
-    abstract protected @Nonnull KeelQueueNextTaskSeeker getNextTaskSeeker();
+    abstract protected @NotNull KeelQueueNextTaskSeeker getNextTaskSeeker();
 
     /**
      * Create a new instance of SignalReader when routine starts.
      *
      * @since 3.0.1
      */
-    abstract protected @Nonnull SignalReader getSignalReader();
+    abstract protected @NotNull SignalReader getSignalReader();
 
     @Override
     protected void startAsKeelVerticle() {

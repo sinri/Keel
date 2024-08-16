@@ -9,8 +9,8 @@ import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
@@ -18,7 +18,7 @@ import static io.github.sinri.keel.facade.KeelInstance.Keel;
 public class GoogleTotpTest extends KeelTest {
     private AsyncGoogleAuthenticator asyncGoogleAuthenticator;
 
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> starting() {
         asyncGoogleAuthenticator = Keel.authenticationHelper().getAsyncGoogleAuthenticator();

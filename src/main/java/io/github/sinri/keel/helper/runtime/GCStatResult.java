@@ -1,8 +1,8 @@
 package io.github.sinri.keel.helper.runtime;
 
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.lang.management.GarbageCollectorMXBean;
 import java.util.HashSet;
 import java.util.Set;
@@ -149,7 +149,7 @@ public class GCStatResult implements RuntimeStatResult<GCStatResult> {
     /**
      * @since 3.1.4
      */
-    public GCStatResult refreshWithGC(@Nonnull GarbageCollectorMXBean gc) {
+    public GCStatResult refreshWithGC(@NotNull GarbageCollectorMXBean gc) {
         if (minorGCNames.contains(gc.getName())) {
             this.addGCCountAsYoung(gc.getCollectionCount());
             if (gc.getCollectionTime() >= 0) {

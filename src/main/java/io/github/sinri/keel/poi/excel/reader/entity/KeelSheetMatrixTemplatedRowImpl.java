@@ -1,8 +1,8 @@
 package io.github.sinri.keel.poi.excel.reader.entity;
 
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,7 +14,7 @@ public class KeelSheetMatrixTemplatedRowImpl implements KeelSheetMatrixTemplated
     private final KeelSheetMatrixRowTemplate template;
     private final List<String> rawRow;
 
-    KeelSheetMatrixTemplatedRowImpl(@Nonnull KeelSheetMatrixRowTemplate template, @Nonnull List<String> rawRow) {
+    KeelSheetMatrixTemplatedRowImpl(@NotNull KeelSheetMatrixRowTemplate template, @NotNull List<String> rawRow) {
         this.template = template;
         this.rawRow = rawRow;
     }

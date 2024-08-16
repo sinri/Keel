@@ -7,9 +7,9 @@ import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordRender;
 import io.github.sinri.keel.servant.intravenous.KeelIntravenous;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since 3.1.10
@@ -31,7 +31,7 @@ public class AsyncStdoutAdapter implements KeelIssueRecorderAdapter {
         return instance;
     }
 
-    private Future<Void> writeOneIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord) {
+    private Future<Void> writeOneIssueRecord(@NotNull KeelIssueRecord<?> issueRecord) {
         String s = this.issueRecordRender().renderIssueRecord(issueRecord);
         System.out.println(s);
         return Future.succeededFuture();
@@ -43,14 +43,14 @@ public class AsyncStdoutAdapter implements KeelIssueRecorderAdapter {
     }
 
     @Override
-    public void record(@Nonnull String topic, @Nullable KeelIssueRecord<?> issueRecord) {
+    public void record(@NotNull String topic, @Nullable KeelIssueRecord<?> issueRecord) {
         if (issueRecord != null) {
             this.intravenous.add(issueRecord);
         }
     }
 
     @Override
-    public void close(@Nonnull Promise<Void> promise) {
+    public void close(@NotNull Promise<Void> promise) {
         this.stopped = true;
         this.intravenous.shutdown()
                 .andThen(ar -> {

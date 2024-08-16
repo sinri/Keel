@@ -2,9 +2,9 @@ package io.github.sinri.keel.mysql.statement.component;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.Quoter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -31,27 +31,27 @@ public class CaseOperator {
         this.whenThenPairs = new ArrayList<>();
     }
 
-    public CaseOperator setCaseValueAsNumber(@Nonnull Number caseValueAsNumber) {
+    public CaseOperator setCaseValueAsNumber(@NotNull Number caseValueAsNumber) {
         this.caseValueExpression = String.valueOf(caseValueAsNumber);
         return this;
     }
 
-    public CaseOperator setCaseValueAsString(@Nonnull String caseValueAsString) {
+    public CaseOperator setCaseValueAsString(@NotNull String caseValueAsString) {
         this.caseValueExpression = new Quoter(caseValueAsString).toString();
         return this;
     }
 
-    public CaseOperator setElseResultAsNumber(@Nonnull String elseResultAsNumber) {
+    public CaseOperator setElseResultAsNumber(@NotNull String elseResultAsNumber) {
         this.elseResultExpression = elseResultAsNumber;
         return this;
     }
 
-    public CaseOperator setElseResultAsString(@Nonnull String elseResultAsString) {
+    public CaseOperator setElseResultAsString(@NotNull String elseResultAsString) {
         this.elseResultExpression = new Quoter(elseResultAsString).toString();
         return this;
     }
 
-    public CaseOperator addWhenThenPair(@Nonnull CaseOperatorPair caseOperatorPair) {
+    public CaseOperator addWhenThenPair(@NotNull CaseOperatorPair caseOperatorPair) {
         this.whenThenPairs.add(caseOperatorPair);
         return this;
     }
@@ -61,12 +61,12 @@ public class CaseOperator {
         return caseValueExpression;
     }
 
-    public CaseOperator setCaseValueExpression(@Nonnull String caseValueExpression) {
+    public CaseOperator setCaseValueExpression(@NotNull String caseValueExpression) {
         this.caseValueExpression = caseValueExpression;
         return this;
     }
 
-    @Nonnull
+    @NotNull
     public Collection<CaseOperatorPair> getWhenThenPairs() {
         return whenThenPairs;
     }
@@ -76,7 +76,7 @@ public class CaseOperator {
         return elseResultExpression;
     }
 
-    public CaseOperator setElseResultExpression(@Nonnull String elseResultExpression) {
+    public CaseOperator setElseResultExpression(@NotNull String elseResultExpression) {
         this.elseResultExpression = elseResultExpression;
         return this;
     }

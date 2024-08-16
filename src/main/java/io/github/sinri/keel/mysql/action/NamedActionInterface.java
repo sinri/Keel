@@ -1,14 +1,15 @@
 package io.github.sinri.keel.mysql.action;
 
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+
 
 /**
  * @param <C>
  * @since 3.2.11
  */
 public interface NamedActionInterface<C extends NamedMySQLConnection> {
-    @Nonnull
+    @NotNull
     C getNamedSqlConnection();
 }

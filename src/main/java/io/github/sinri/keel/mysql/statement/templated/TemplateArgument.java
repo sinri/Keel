@@ -2,8 +2,8 @@ package io.github.sinri.keel.mysql.statement.templated;
 
 
 import io.github.sinri.keel.mysql.Quoter;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,12 +17,12 @@ public class TemplateArgument {
     private final boolean asScalar;
     private final Collection<String> expressions;
 
-    private TemplateArgument(@Nonnull String expression) {
+    private TemplateArgument(@NotNull String expression) {
         this.asScalar = true;
         this.expressions = List.of(expression);
     }
 
-    private TemplateArgument(@Nonnull Collection<String> expressions) {
+    private TemplateArgument(@NotNull Collection<String> expressions) {
         this.asScalar = false;
         this.expressions = expressions;
     }
@@ -31,11 +31,11 @@ public class TemplateArgument {
         return forExpression("NULL");
     }
 
-    public static TemplateArgument forNumber(@Nonnull Number number) {
+    public static TemplateArgument forNumber(@NotNull Number number) {
         return forExpression(String.valueOf(number));
     }
 
-    public static TemplateArgument forNumbers(@Nonnull Collection<? extends Number> numbers) {
+    public static TemplateArgument forNumbers(@NotNull Collection<? extends Number> numbers) {
         List<String> list = new ArrayList<>();
         numbers.forEach(number -> {
             list.add(String.valueOf(number));
@@ -43,7 +43,7 @@ public class TemplateArgument {
         return forExpressions(list);
     }
 
-    public static TemplateArgument forString(@Nonnull String string) {
+    public static TemplateArgument forString(@NotNull String string) {
         String s1 = Quoter.escapeString(string);
 //        System.out.println("S1 | "+s1);
         String s2 = Quoter.quoteEscapedString(s1);
@@ -51,7 +51,7 @@ public class TemplateArgument {
         return forExpression(s2);
     }
 
-    public static TemplateArgument forStrings(@Nonnull Collection<String> strings) {
+    public static TemplateArgument forStrings(@NotNull Collection<String> strings) {
         List<String> list = new ArrayList<>();
         strings.forEach(string -> {
             list.add(Quoter.quoteEscapedString(Quoter.escapeString(string)));
@@ -59,14 +59,14 @@ public class TemplateArgument {
         return forExpressions(list);
     }
 
-    public static TemplateArgument forExpression(@Nonnull String string) {
+    public static TemplateArgument forExpression(@NotNull String string) {
         return new TemplateArgument(string);
     }
 
     /**
      * @since 3.0.11 the provided collection could be empty, leave the error to Database.
      */
-    public static TemplateArgument forExpressions(@Nonnull Collection<String> strings) {
+    public static TemplateArgument forExpressions(@NotNull Collection<String> strings) {
         // if (strings.isEmpty()) throw new IllegalArgumentException();
         return new TemplateArgument(strings);
     }

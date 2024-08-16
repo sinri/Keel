@@ -5,9 +5,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.pointer.JsonPointer;
 import io.vertx.core.shareddata.Shareable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.function.Function;
  * @since 3.0.0
  */
 public interface UnmodifiableJsonifiableEntity extends Iterable<Map.Entry<String, Object>>, Shareable {
-    static UnmodifiableJsonifiableEntity wrap(@Nonnull JsonObject jsonObject) {
+    static UnmodifiableJsonifiableEntity wrap(@NotNull JsonObject jsonObject) {
         return new UnmodifiableJsonifiableEntityImpl(jsonObject);
     }
 
@@ -30,7 +30,7 @@ public interface UnmodifiableJsonifiableEntity extends Iterable<Map.Entry<String
      * @since 2.8 If java.lang.ClassCastException occurred, return null instead.
      * @since 3.1.10 make it abstract.
      */
-    <T> @Nullable T read(@Nonnull Function<JsonPointer, Class<T>> func);
+    <T> @Nullable T read(@NotNull Function<JsonPointer, Class<T>> func);
 
     /**
      * @since 2.7
@@ -301,7 +301,7 @@ public interface UnmodifiableJsonifiableEntity extends Iterable<Map.Entry<String
      * @since 3.1.10 make it abstract.
      */
     @Override
-    @Nonnull
+    @NotNull
     Iterator<Map.Entry<String, Object>> iterator();
 
     /**

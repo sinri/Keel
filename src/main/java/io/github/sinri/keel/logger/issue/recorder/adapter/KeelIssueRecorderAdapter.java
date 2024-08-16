@@ -5,9 +5,8 @@ import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordRender;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @since 3.1.10
@@ -16,13 +15,13 @@ import javax.annotation.Nullable;
 public interface KeelIssueRecorderAdapter {
     KeelIssueRecordRender<?> issueRecordRender();
 
-    void record(@Nonnull String topic, @Nullable KeelIssueRecord<?> issueRecord);
+    void record(@NotNull String topic, @Nullable KeelIssueRecord<?> issueRecord);
 
 
-    void close(@Nonnull Promise<Void> promise);
+    void close(@NotNull Promise<Void> promise);
 
 
-    @Nonnull
+    @NotNull
     default Future<Void> gracefullyClose() {
         Promise<Void> voidPromise = Promise.promise();
         close(voidPromise);

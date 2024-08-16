@@ -1,8 +1,9 @@
 package io.github.sinri.keel.mysql.statement;
 
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -22,20 +23,20 @@ public class DeleteStatement extends AbstractModifyStatement {
      */
 
     @Nullable String schema;
-    @Nonnull String table="NOT-SET";
+    @NotNull String table = "NOT-SET";
     long limit = 0;
 
     public DeleteStatement() {
 
     }
 
-    public DeleteStatement from(@Nonnull String table) {
+    public DeleteStatement from(@NotNull String table) {
         this.schema = null;
         this.table = table;
         return this;
     }
 
-    public DeleteStatement from(@Nullable String schema, @Nonnull String table) {
+    public DeleteStatement from(@Nullable String schema, @NotNull String table) {
         this.schema = schema;
         this.table = table;
         return this;
@@ -46,17 +47,17 @@ public class DeleteStatement extends AbstractModifyStatement {
      * @return this
      * @since 1.4
      */
-    public DeleteStatement where(@Nonnull Function<ConditionsComponent, ConditionsComponent> function) {
+    public DeleteStatement where(@NotNull Function<ConditionsComponent, ConditionsComponent> function) {
         function.apply(whereConditionsComponent);
         return this;
     }
 
-    public DeleteStatement orderByAsc(@Nonnull String x) {
+    public DeleteStatement orderByAsc(@NotNull String x) {
         sortRules.add(x);
         return this;
     }
 
-    public DeleteStatement orderByDesc(@Nonnull String x) {
+    public DeleteStatement orderByDesc(@NotNull String x) {
         sortRules.add(x + " DESC");
         return this;
     }

@@ -7,19 +7,20 @@ import io.github.sinri.keel.servant.queue.KeelQueueNextTaskSeeker;
 import io.github.sinri.keel.servant.queue.QueueManageIssueRecord;
 import io.github.sinri.keel.servant.queue.QueueWorkerPoolManager;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
+
 
 public class TestQueue extends KeelQueue {
-    @Nonnull
+
     @Override
-    protected KeelQueueNextTaskSeeker getNextTaskSeeker() {
+    protected @NotNull KeelQueueNextTaskSeeker getNextTaskSeeker() {
         return new TestQueueTaskSeeker();
     }
 
-    @Nonnull
+
     @Override
-    protected SignalReader getSignalReader() {
+    protected @NotNull SignalReader getSignalReader() {
         return new SignalReader() {
             @Override
             public Future<QueueSignal> readSignal() {
@@ -28,15 +29,15 @@ public class TestQueue extends KeelQueue {
         };
     }
 
-    @Nonnull
+
     @Override
-    protected QueueWorkerPoolManager getQueueWorkerPoolManager() {
+    protected @NotNull QueueWorkerPoolManager getQueueWorkerPoolManager() {
         return new QueueWorkerPoolManager(3);
     }
 
-    @Nonnull
+
     @Override
-    protected KeelIssueRecorder<QueueManageIssueRecord> buildIssueRecorder() {
+    protected @NotNull KeelIssueRecorder<QueueManageIssueRecord> buildIssueRecorder() {
         return KeelIssueRecordCenter.outputCenter().generateIssueRecorder(QueueManageIssueRecord.TopicQueue, QueueManageIssueRecord::new);
     }
 }

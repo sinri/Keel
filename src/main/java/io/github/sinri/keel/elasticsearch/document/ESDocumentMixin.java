@@ -4,9 +4,9 @@ import io.github.sinri.keel.elasticsearch.ESApiMixin;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 
 public interface ESDocumentMixin extends ESApiMixin {
@@ -62,7 +62,7 @@ public interface ESDocumentMixin extends ESApiMixin {
      * @see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html">Bulk API</a>
      * @since 3.1.10
      */
-    default Future<ESDocumentBulkResponse> documentBulk(@Nullable String target, @Nullable ESApiQueries queries, @Nonnull List<JsonObject> requestBody) {
+    default Future<ESDocumentBulkResponse> documentBulk(@Nullable String target, @Nullable ESApiQueries queries, @NotNull List<JsonObject> requestBody) {
         // POST /_bulk
         // POST /<target>/_bulk
         String endpoint = "/_bulk";

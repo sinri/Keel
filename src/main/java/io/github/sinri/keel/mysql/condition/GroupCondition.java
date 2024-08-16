@@ -1,8 +1,8 @@
 package io.github.sinri.keel.mysql.condition;
 
 import io.github.sinri.keel.mysql.exception.KeelMySQLGenerateError;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,21 +13,21 @@ public class GroupCondition implements MySQLCondition {
     protected final List<MySQLCondition> conditions = new ArrayList<>();
     protected final String junction;
 
-    public GroupCondition(@Nonnull String junction) {
+    public GroupCondition(@NotNull String junction) {
         this.junction = junction;
     }
 
-    public GroupCondition(@Nonnull String junction, @Nonnull List<MySQLCondition> conditions) {
+    public GroupCondition(@NotNull String junction, @NotNull List<MySQLCondition> conditions) {
         this.junction = junction;
         this.conditions.addAll(conditions);
     }
 
-    public GroupCondition add(@Nonnull MySQLCondition condition) {
+    public GroupCondition add(@NotNull MySQLCondition condition) {
         this.conditions.add(condition);
         return this;
     }
 
-    public GroupCondition add(@Nonnull List<MySQLCondition> conditions) {
+    public GroupCondition add(@NotNull List<MySQLCondition> conditions) {
         this.conditions.addAll(conditions);
         return this;
     }

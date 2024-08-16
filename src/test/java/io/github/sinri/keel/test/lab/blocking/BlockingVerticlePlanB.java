@@ -6,8 +6,7 @@ import io.github.sinri.keel.logger.issue.center.KeelIssueRecordCenter;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.verticles.KeelVerticleImplWithIssueRecorder;
 import io.vertx.core.*;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
@@ -19,9 +18,8 @@ public class BlockingVerticlePlanB {
         var issueRecorder = KeelIssueRecordCenter.outputCenter().generateIssueRecorder("Sample", () -> new KeelEventLog("Sample"));
         Promise<Void> promise = Promise.promise();
         KeelVerticleImplWithIssueRecorder<KeelEventLog> verticle = new KeelVerticleImplWithIssueRecorder<>() {
-            @Nonnull
             @Override
-            public KeelIssueRecorder<KeelEventLog> buildIssueRecorder() {
+            public @NotNull KeelIssueRecorder<KeelEventLog> buildIssueRecorder() {
                 return issueRecorder;
             }
 

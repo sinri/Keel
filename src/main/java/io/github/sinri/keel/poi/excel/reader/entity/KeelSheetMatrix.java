@@ -1,8 +1,8 @@
 package io.github.sinri.keel.poi.excel.reader.entity;
 
 import io.github.sinri.keel.poi.excel.reader.options.ColumnReadOptions;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -123,7 +123,7 @@ public class KeelSheetMatrix {
      * @see <a href="https://github.com/FasterXML/jackson-databind">Jackson Databind</a>
      * @since 3.2.16
      */
-    public <T> List<T> toBoundDataEntities(@Nonnull List<ColumnReadOptions> columns, Class<T> tClass) {
+    public <T> List<T> toBoundDataEntities(@NotNull List<ColumnReadOptions> columns, Class<T> tClass) {
         List<T> list = new ArrayList<>();
         Iterator<KeelSheetMatrixRow> rowIterator = getRowIterator();
         while (rowIterator.hasNext()) {

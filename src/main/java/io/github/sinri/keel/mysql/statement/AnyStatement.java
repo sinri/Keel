@@ -9,8 +9,8 @@ import io.github.sinri.keel.mysql.statement.templated.TemplatedStatement;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.sqlclient.SqlConnection;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 /**
  * @since 3.0.9
@@ -21,7 +21,7 @@ public interface AnyStatement {
     /**
      * @since 3.0.9
      */
-    static AbstractStatement raw(@Nonnull String sql) {
+    static AbstractStatement raw(@NotNull String sql) {
         return new AbstractStatement() {
             @Override
             public String toString() {
@@ -30,25 +30,25 @@ public interface AnyStatement {
         };
     }
 
-    static SelectStatement select(@Nonnull Handler<SelectStatement> statementHandler) {
+    static SelectStatement select(@NotNull Handler<SelectStatement> statementHandler) {
         SelectStatement selectStatement = new SelectStatement();
         statementHandler.handle(selectStatement);
         return selectStatement;
     }
 
-    static UnionStatement union(@Nonnull Handler<UnionStatement> unionStatementHandler) {
+    static UnionStatement union(@NotNull Handler<UnionStatement> unionStatementHandler) {
         UnionStatement unionStatement = new UnionStatement();
         unionStatementHandler.handle(unionStatement);
         return unionStatement;
     }
 
-    static UpdateStatement update(@Nonnull Handler<UpdateStatement> updateStatementHandler) {
+    static UpdateStatement update(@NotNull Handler<UpdateStatement> updateStatementHandler) {
         UpdateStatement updateStatement = new UpdateStatement();
         updateStatementHandler.handle(updateStatement);
         return updateStatement;
     }
 
-    static DeleteStatement delete(@Nonnull Handler<DeleteStatement> deleteStatementHandler) {
+    static DeleteStatement delete(@NotNull Handler<DeleteStatement> deleteStatementHandler) {
         DeleteStatement deleteStatement = new DeleteStatement();
         deleteStatementHandler.handle(deleteStatement);
         return deleteStatement;
@@ -60,20 +60,20 @@ public interface AnyStatement {
         return writeIntoStatement;
     }
 
-    static WriteIntoStatement replace(@Nonnull Handler<WriteIntoStatement> statementHandler) {
+    static WriteIntoStatement replace(@NotNull Handler<WriteIntoStatement> statementHandler) {
         WriteIntoStatement writeIntoStatement = new WriteIntoStatement(WriteIntoStatement.REPLACE);
         statementHandler.handle(writeIntoStatement);
         return writeIntoStatement;
     }
 
-    static TemplatedReadStatement templatedRead(@Nonnull String path, @Nonnull Handler<TemplateArgumentMapping> templatedReadStatementHandler) {
+    static TemplatedReadStatement templatedRead(@NotNull String path, @NotNull Handler<TemplateArgumentMapping> templatedReadStatementHandler) {
         TemplatedReadStatement readStatement = TemplatedStatement.loadTemplateToRead(path);
         TemplateArgumentMapping arguments = readStatement.getArguments();
         templatedReadStatementHandler.handle(arguments);
         return readStatement;
     }
 
-    static TemplatedModifyStatement templatedModify(@Nonnull String path, @Nonnull Handler<TemplateArgumentMapping> templatedModifyStatementHandler) {
+    static TemplatedModifyStatement templatedModify(@NotNull String path, @NotNull Handler<TemplateArgumentMapping> templatedModifyStatementHandler) {
         TemplatedModifyStatement templatedModifyStatement = TemplatedStatement.loadTemplateToModify(path);
         TemplateArgumentMapping arguments = templatedModifyStatement.getArguments();
         templatedModifyStatementHandler.handle(arguments);
@@ -85,13 +85,13 @@ public interface AnyStatement {
      */
     String toString();
 
-    Future<ResultMatrix> execute(@Nonnull SqlConnection sqlConnection);
+    Future<ResultMatrix> execute(@NotNull SqlConnection sqlConnection);
 
     /**
      * @since 3.0.11
      * @since 3.0.18 Finished Technical Preview.
      */
-    default Future<ResultMatrix> execute(@Nonnull NamedMySQLConnection namedSqlConnection) {
+    default Future<ResultMatrix> execute(@NotNull NamedMySQLConnection namedSqlConnection) {
         return execute(namedSqlConnection.getSqlConnection());
     }
 }

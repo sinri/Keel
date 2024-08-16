@@ -2,9 +2,9 @@ package io.github.sinri.keel.poi.csv;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -26,11 +26,11 @@ public class KeelCsvWriter {
         this.outputStream = outputStream;
     }
 
-    public static Future<KeelCsvWriter> create(@Nonnull String file) {
+    public static Future<KeelCsvWriter> create(@NotNull String file) {
         return create(new File(file));
     }
 
-    public static Future<KeelCsvWriter> create(@Nonnull File file) {
+    public static Future<KeelCsvWriter> create(@NotNull File file) {
         return Future.succeededFuture()
                 .compose(v -> {
                     try {
@@ -42,12 +42,12 @@ public class KeelCsvWriter {
                 });
     }
 
-    public static Future<KeelCsvWriter> create(@Nonnull OutputStream outputStream) {
+    public static Future<KeelCsvWriter> create(@NotNull OutputStream outputStream) {
         var x = new KeelCsvWriter(outputStream);
         return Future.succeededFuture(x);
     }
 
-    public KeelCsvWriter setSeparator(@Nonnull String separator) {
+    public KeelCsvWriter setSeparator(@NotNull String separator) {
         this.separator = separator;
         return this;
     }
@@ -57,7 +57,7 @@ public class KeelCsvWriter {
         return this;
     }
 
-    public void blockWriteRow(@Nonnull List<String> list) throws IOException {
+    public void blockWriteRow(@NotNull List<String> list) throws IOException {
         List<String> components = new ArrayList<>();
         list.forEach(item -> {
             components.add(quote(item));

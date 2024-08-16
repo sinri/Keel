@@ -1,8 +1,8 @@
 package io.github.sinri.keel.cache.temporaryvalue;
 
 import io.github.sinri.keel.cache.impl.ValueWrapper;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
@@ -55,7 +55,7 @@ public class KeelTemporaryValue<P> {
         }
     }
 
-    public P getOrReload(@Nonnull Supplier<P> loader) {
+    public P getOrReload(@NotNull Supplier<P> loader) {
         ValueWrapper<P> pValueWrapper = this.valueWrapperAtomicReference.get();
         try {
             if (pValueWrapper == null) {

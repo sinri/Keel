@@ -7,9 +7,9 @@ import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.logger.issue.recorder.adapter.KeelIssueRecorderAdapter;
 import io.vertx.core.Handler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 /**
@@ -32,29 +32,29 @@ public interface KeelIssueRecordCenter {
         return silentCenter().generateIssueRecorder("Silent", () -> null);
     }
 
-    @Nonnull
+    @NotNull
     KeelIssueRecorderAdapter getAdapter();
 
     /**
      * @param issueRecordBuilder Sample for silent: {@code Supplier<T> issueRecordBuilder= () -> null;}
      */
-    @Nonnull
-    default <T extends KeelIssueRecord<?>> KeelIssueRecorder<T> generateIssueRecorder(@Nonnull String topic, @Nonnull Supplier<T> issueRecordBuilder) {
+    @NotNull
+    default <T extends KeelIssueRecord<?>> KeelIssueRecorder<T> generateIssueRecorder(@NotNull String topic, @NotNull Supplier<T> issueRecordBuilder) {
         return KeelIssueRecorder.build(this, issueRecordBuilder, topic);
     }
 
-    @Nonnull
-    default KeelEventLogger generateEventLogger(@Nonnull String topic) {
+    @NotNull
+    default KeelEventLogger generateEventLogger(@NotNull String topic) {
         return KeelEventLogger.from(generateIssueRecorderForEventLogger(topic));
     }
 
-    @Nonnull
-    default KeelEventLogger generateEventLogger(@Nonnull String topic, @Nullable Handler<KeelEventLog> templateEventLogEditor) {
+    @NotNull
+    default KeelEventLogger generateEventLogger(@NotNull String topic, @Nullable Handler<KeelEventLog> templateEventLogEditor) {
         return KeelEventLogger.from(generateIssueRecorderForEventLogger(topic), templateEventLogEditor);
     }
 
-    @Nonnull
-    default KeelIssueRecorder<KeelEventLog> generateIssueRecorderForEventLogger(@Nonnull String topic) {
+    @NotNull
+    default KeelIssueRecorder<KeelEventLog> generateIssueRecorderForEventLogger(@NotNull String topic) {
         return generateIssueRecorder(topic, () -> new KeelEventLog(topic));
     }
 

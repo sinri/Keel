@@ -30,9 +30,8 @@
 
 package io.github.sinri.keel.helper.authenticator.googleauth;
 
-//import org.apache.http.client.utils.URIBuilder;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
@@ -194,7 +193,7 @@ public final class GoogleAuthenticatorQRGenerator {
 //        return uri.toString();
     }
 
-    private static String getAlgorithmName(@Nonnull HmacHashFunction hashFunction) {
+    private static String getAlgorithmName(@NotNull HmacHashFunction hashFunction) {
         return switch (hashFunction) {
             case HmacSHA1 -> "SHA1";
             case HmacSHA256 -> "SHA256";

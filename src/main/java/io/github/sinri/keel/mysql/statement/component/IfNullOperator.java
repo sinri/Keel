@@ -2,9 +2,9 @@ package io.github.sinri.keel.mysql.statement.component;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.Quoter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * {@code IFNULL(expr1,expr2)}
@@ -45,7 +45,7 @@ public class IfNullOperator {
         return this;
     }
 
-    public IfNullOperator setExpressionForNull(@Nonnull String expressionForNull) {
+    public IfNullOperator setExpressionForNull(@NotNull String expressionForNull) {
         this.expressionForNull = expressionForNull;
         return this;
     }

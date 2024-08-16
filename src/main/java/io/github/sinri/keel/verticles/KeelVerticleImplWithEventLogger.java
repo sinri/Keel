@@ -3,21 +3,21 @@ package io.github.sinri.keel.verticles;
 import io.github.sinri.keel.logger.event.KeelEventLogger;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 /**
  * @since 3.2.0
  */
 abstract public class KeelVerticleImplWithEventLogger extends AbstractVerticle implements KeelVerticle {
-    private @Nonnull KeelEventLogger logger;
+    private @NotNull KeelEventLogger logger;
 
     public KeelVerticleImplWithEventLogger() {
         super();
         this.logger = buildEventLogger();
     }
 
-    @Nonnull
+    @NotNull
     public KeelEventLogger getLogger() {
         return logger;
     }

@@ -6,9 +6,9 @@ import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordRender;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -29,14 +29,14 @@ abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapter 
     }
 
     @Override
-    public void record(@Nonnull String topic, @Nullable KeelIssueRecord<?> issueRecord) {
+    public void record(@NotNull String topic, @Nullable KeelIssueRecord<?> issueRecord) {
         if (issueRecord != null) {
             this.fetchQueue(topic).add(issueRecord);
         }
     }
 
-    @Nonnull
-    private Queue<KeelIssueRecord<?>> fetchQueue(@Nonnull String topic) {
+    @NotNull
+    private Queue<KeelIssueRecord<?>> fetchQueue(@NotNull String topic) {
         return this.issueRecordQueueMap.computeIfAbsent(topic, x -> new ConcurrentLinkedQueue<>());
     }
 
@@ -82,7 +82,7 @@ abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapter 
         return 1000;
     }
 
-    private Future<Void> handleForTopic(@Nonnull final String topic) {
+    private Future<Void> handleForTopic(@NotNull final String topic) {
         //Keel.getLogger().warning("AliyunSLSIssueAdapter handleForTopic start for TOPIC "+topic);
         Queue<KeelIssueRecord<?>> keelIssueRecords = this.issueRecordQueueMap.get(topic);
         List<KeelIssueRecord<?>> buffer = new ArrayList<>();
@@ -101,7 +101,7 @@ abstract public class AliyunSLSIssueAdapter implements KeelIssueRecorderAdapter 
         return handleIssueRecordsForTopic(topic, buffer);
     }
 
-    abstract protected Future<Void> handleIssueRecordsForTopic(@Nonnull final String topic, @Nonnull final List<KeelIssueRecord<?>> buffer);
+    abstract protected Future<Void> handleIssueRecordsForTopic(@NotNull final String topic, @NotNull final List<KeelIssueRecord<?>> buffer);
 
     @Override
     public KeelIssueRecordRender<JsonObject> issueRecordRender() {

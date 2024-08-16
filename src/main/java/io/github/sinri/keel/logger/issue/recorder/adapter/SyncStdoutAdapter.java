@@ -4,9 +4,9 @@ import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordRender;
 import io.vertx.core.Promise;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since 3.1.10
@@ -30,7 +30,7 @@ public class SyncStdoutAdapter implements KeelIssueRecorderAdapter {
     }
 
     @Override
-    public void record(@Nonnull String topic, @Nullable KeelIssueRecord<?> issueRecord) {
+    public void record(@NotNull String topic, @Nullable KeelIssueRecord<?> issueRecord) {
         if (issueRecord != null) {
             String s = this.issueRecordRender().renderIssueRecord(issueRecord);
             System.out.println(s);
@@ -38,7 +38,7 @@ public class SyncStdoutAdapter implements KeelIssueRecorderAdapter {
     }
 
     @Override
-    public void close(@Nonnull Promise<Void> promise) {
+    public void close(@NotNull Promise<Void> promise) {
         closed = true;
         promise.complete();
     }

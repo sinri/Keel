@@ -8,9 +8,9 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClient;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -28,7 +28,7 @@ public interface ESApiMixin {
      * @since 3.1.10
      * For Bulk API, of which the body is not a json object.
      */
-    default Future<JsonObject> call(@Nonnull HttpMethod httpMethod, @Nonnull String endpoint, @Nullable ESApiQueries queries, @Nullable String requestBody) {
+    default Future<JsonObject> call(@NotNull HttpMethod httpMethod, @NotNull String endpoint, @Nullable ESApiQueries queries, @Nullable String requestBody) {
         WebClient webClient = WebClient.create(Keel.getVertx());
         String url = this.getEsConfig().clusterApiUrl(endpoint);
         HttpRequest<Buffer> bufferHttpRequest = webClient.requestAbs(httpMethod, url);
@@ -110,7 +110,7 @@ public interface ESApiMixin {
     /**
      * @since 3.1.10 based on `io.github.sinri.keel.elasticsearch.ESApiMixin#call(io.vertx.core.http.HttpMethod, java.lang.String, io.github.sinri.keel.elasticsearch.ESApiMixin.ESApiQueries, java.lang.String)`
      */
-    default Future<JsonObject> callPost(@Nonnull String endpoint, @Nullable ESApiQueries queries, @Nonnull JsonObject requestBody) {
+    default Future<JsonObject> callPost(@NotNull String endpoint, @Nullable ESApiQueries queries, @NotNull JsonObject requestBody) {
         return call(HttpMethod.POST, endpoint, queries, requestBody.toString());
     }
 
@@ -195,15 +195,15 @@ public interface ESApiMixin {
         private final int statusCode;
         private final @Nullable String response;
 
-        private final @Nonnull HttpMethod httpMethod;
-        private final @Nonnull String endpoint;
+        private final @NotNull HttpMethod httpMethod;
+        private final @NotNull String endpoint;
         private final @Nullable ESApiQueries queries;
         private final @Nullable String requestBody;
 
         public ESApiException(
                 int statusCode, @Nullable String response,
-                @Nonnull HttpMethod httpMethod,
-                @Nonnull String endpoint,
+                @NotNull HttpMethod httpMethod,
+                @NotNull String endpoint,
                 @Nullable ESApiQueries queries,
                 @Nullable String requestBody
         ) {
@@ -237,7 +237,7 @@ public interface ESApiMixin {
             return response;
         }
 
-        @Nonnull
+        @NotNull
         public String getEndpoint() {
             return endpoint;
         }
@@ -247,7 +247,7 @@ public interface ESApiMixin {
             return queries;
         }
 
-        @Nonnull
+        @NotNull
         public HttpMethod getHttpMethod() {
             return httpMethod;
         }

@@ -83,7 +83,7 @@ module io.github.sinri.keel {
 
     exports io.github.sinri.keel.web.udp;
 
-    requires jsr305;
+    //requires jsr305;
     requires org.apache.poi.ooxml;
     requires io.vertx.core;
     requires com.github.pjfanning.excelstreamingreader;
@@ -103,4 +103,5 @@ module io.github.sinri.keel {
     requires io.vertx.web.client;
     requires io.vertx.client.mail;
     requires org.apache.commons.collections4;
+    requires org.jetbrains.annotations;
 }

@@ -3,8 +3,8 @@ package io.github.sinri.keel.mysql.statement;
 import io.github.sinri.keel.mysql.NamedMySQLConnection;
 import io.vertx.core.Future;
 import io.vertx.sqlclient.SqlConnection;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 /**
  * @since 1.10
@@ -12,12 +12,24 @@ import javax.annotation.Nonnull;
 public abstract class AbstractModifyStatement extends AbstractStatement {
 
     /**
+     * @since 3.0.0
+     */
+    public static AbstractModifyStatement buildWithRawSQL(@NotNull String sql) {
+        return new AbstractModifyStatement() {
+            @Override
+            public String toString() {
+                return sql;
+            }
+        };
+    }
+
+    /**
      * @param sqlConnection get from pool
      * @return future with affected rows; failed future when failed
      * @since 1.7
      * @since 1.10 removed recover
      */
-    public Future<Integer> executeForAffectedRows(@Nonnull SqlConnection sqlConnection) {
+    public Future<Integer> executeForAffectedRows(@NotNull SqlConnection sqlConnection) {
         return execute(sqlConnection)
                 .compose(resultMatrix -> {
                     var afx = resultMatrix.getTotalAffectedRows();
@@ -29,19 +41,7 @@ public abstract class AbstractModifyStatement extends AbstractStatement {
      * @since 3.0.11
      * @since 3.0.18 Finished Technical Preview.
      */
-    public Future<Integer> executeForAffectedRows(@Nonnull NamedMySQLConnection namedMySQLConnection) {
+    public Future<Integer> executeForAffectedRows(@NotNull NamedMySQLConnection namedMySQLConnection) {
         return executeForAffectedRows(namedMySQLConnection.getSqlConnection());
-    }
-
-    /**
-     * @since 3.0.0
-     */
-    public static AbstractModifyStatement buildWithRawSQL(@Nonnull String sql) {
-        return new AbstractModifyStatement() {
-            @Override
-            public String toString() {
-                return sql;
-            }
-        };
     }
 }

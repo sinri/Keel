@@ -1,6 +1,7 @@
 package io.github.sinri.keel.mysql.statement.templated;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -8,12 +9,12 @@ import java.util.HashMap;
  * @since 3.0.8
  */
 public class TemplateArgumentMapping extends HashMap<String, TemplateArgument> {
-    public TemplateArgumentMapping bindNull(@Nonnull String argumentName) {
+    public TemplateArgumentMapping bindNull(@NotNull String argumentName) {
         this.put(argumentName, TemplateArgument.forNull());
         return this;
     }
 
-    public TemplateArgumentMapping bindNumber(@Nonnull String argumentName, @Nonnull Number number) {
+    public TemplateArgumentMapping bindNumber(@NotNull String argumentName, @NotNull Number number) {
         this.put(argumentName, TemplateArgument.forNumber(number));
         return this;
     }
@@ -21,12 +22,12 @@ public class TemplateArgumentMapping extends HashMap<String, TemplateArgument> {
     /**
      * @param numbers      Ensure not empty or use with bindLineCommentStarting
      */
-    public TemplateArgumentMapping bindNumbers(@Nonnull String argumentName, @Nonnull Collection<? extends Number> numbers) {
+    public TemplateArgumentMapping bindNumbers(@NotNull String argumentName, @NotNull Collection<? extends Number> numbers) {
         this.put(argumentName, TemplateArgument.forNumbers(numbers));
         return this;
     }
 
-    public TemplateArgumentMapping bindString(@Nonnull String argumentName, @Nonnull String string) {
+    public TemplateArgumentMapping bindString(@NotNull String argumentName, @NotNull String string) {
         this.put(argumentName, TemplateArgument.forString(string));
         return this;
     }
@@ -34,12 +35,12 @@ public class TemplateArgumentMapping extends HashMap<String, TemplateArgument> {
     /**
      * @param strings      Ensure not empty or use with bindLineCommentStarting
      */
-    public TemplateArgumentMapping bindStrings(@Nonnull String argumentName, @Nonnull Collection<String> strings) {
+    public TemplateArgumentMapping bindStrings(@NotNull String argumentName, @NotNull Collection<String> strings) {
         this.put(argumentName, TemplateArgument.forStrings(strings));
         return this;
     }
 
-    public TemplateArgumentMapping bindExpression(@Nonnull String argumentName, @Nonnull String expression) {
+    public TemplateArgumentMapping bindExpression(@NotNull String argumentName, @NotNull String expression) {
         this.put(argumentName, TemplateArgument.forExpression(expression));
         return this;
     }
@@ -47,7 +48,7 @@ public class TemplateArgumentMapping extends HashMap<String, TemplateArgument> {
     /**
      * @param expressions  Ensure not empty or use with bindLineCommentStarting
      */
-    public TemplateArgumentMapping bindExpressions(@Nonnull String argumentName, @Nonnull Collection<String> expressions) {
+    public TemplateArgumentMapping bindExpressions(@NotNull String argumentName, @NotNull Collection<String> expressions) {
         this.put(argumentName, TemplateArgument.forExpressions(expressions));
         return this;
     }
@@ -55,7 +56,7 @@ public class TemplateArgumentMapping extends HashMap<String, TemplateArgument> {
     /**
      * @since 3.0.11
      */
-    public TemplateArgumentMapping bindLineCommentStarting(@Nonnull String argumentName, boolean commentFromHere) {
+    public TemplateArgumentMapping bindLineCommentStarting(@NotNull String argumentName, boolean commentFromHere) {
         this.put(argumentName, TemplateArgument.forExpression((commentFromHere ? "-- " : " ")));
         return this;
     }

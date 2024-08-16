@@ -1,8 +1,9 @@
 package io.github.sinri.keel.helper;
 
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -36,7 +37,7 @@ public class KeelReflectionHelper {
      * @since 1.13
      */
     @Nullable
-    public <T extends Annotation> T getAnnotationOfMethod(@Nonnull Method method, @Nonnull Class<T> classOfAnnotation, @Nullable T defaultAnnotation) {
+    public <T extends Annotation> T getAnnotationOfMethod(@NotNull Method method, @NotNull Class<T> classOfAnnotation, @Nullable T defaultAnnotation) {
         T annotation = method.getAnnotation(classOfAnnotation);
         if (annotation == null) {
             return defaultAnnotation;
@@ -48,7 +49,7 @@ public class KeelReflectionHelper {
      * @since 2.6
      */
     @Nullable
-    public <T extends Annotation> T getAnnotationOfMethod(@Nonnull Method method, @Nonnull Class<T> classOfAnnotation) {
+    public <T extends Annotation> T getAnnotationOfMethod(@NotNull Method method, @NotNull Class<T> classOfAnnotation) {
         return getAnnotationOfMethod(method, classOfAnnotation, null);
     }
 
@@ -59,7 +60,7 @@ public class KeelReflectionHelper {
      * @since 2.8
      */
     @Nullable
-    public <T extends Annotation> T getAnnotationOfClass(@Nonnull Class<?> anyClass, @Nonnull Class<T> classOfAnnotation) {
+    public <T extends Annotation> T getAnnotationOfClass(@NotNull Class<?> anyClass, @NotNull Class<T> classOfAnnotation) {
         return anyClass.getAnnotation(classOfAnnotation);
     }
 
@@ -67,8 +68,8 @@ public class KeelReflectionHelper {
      * @since 3.1.8
      * For the repeatable annotations.
      */
-    @Nonnull
-    public <T extends Annotation> T[] getAnnotationsOfClass(@Nonnull Class<?> anyClass, @Nonnull Class<T> classOfAnnotation) {
+    @NotNull
+    public <T extends Annotation> T[] getAnnotationsOfClass(@NotNull Class<?> anyClass, @NotNull Class<T> classOfAnnotation) {
         return anyClass.getAnnotationsByType(classOfAnnotation);
     }
 
@@ -80,7 +81,7 @@ public class KeelReflectionHelper {
      * @since 3.0.6
      * @since 3.2.12.1 rewrite
      */
-    public <R> Set<Class<? extends R>> seekClassDescendantsInPackage(@Nonnull String packageName, @Nonnull Class<R> baseClass) {
+    public <R> Set<Class<? extends R>> seekClassDescendantsInPackage(@NotNull String packageName, @NotNull Class<R> baseClass) {
 //        Reflections reflections = new Reflections(packageName);
 //        return reflections.getSubTypesOf(baseClass);
 
@@ -103,7 +104,7 @@ public class KeelReflectionHelper {
     /**
      * @since 3.2.11
      */
-    protected <R> Set<Class<? extends R>> seekClassDescendantsInPackageForFileSystem(@Nonnull String packageName, @Nonnull Class<R> baseClass) {
+    protected <R> Set<Class<? extends R>> seekClassDescendantsInPackageForFileSystem(@NotNull String packageName, @NotNull Class<R> baseClass) {
         Set<Class<? extends R>> descendantClasses = new HashSet<>();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         // in file system
@@ -122,6 +123,7 @@ public class KeelReflectionHelper {
                             className = className.substring(className.indexOf(packageName));
 
                             try {
+                                @SuppressWarnings("unchecked")
                                 Class<? extends R> clazz = (Class<? extends R>) classLoader.loadClass(className);
                                 if (baseClass.isAssignableFrom(clazz)) {
                                     descendantClasses.add(clazz);
@@ -143,14 +145,16 @@ public class KeelReflectionHelper {
     /**
      * @since 3.2.11
      */
-    protected <R> Set<Class<? extends R>> seekClassDescendantsInPackageForRunningJar(@Nonnull String packageName, @Nonnull Class<R> baseClass) {
+    protected <R> Set<Class<? extends R>> seekClassDescendantsInPackageForRunningJar(@NotNull String packageName, @NotNull Class<R> baseClass) {
         Set<Class<? extends R>> descendantClasses = new HashSet<>();
         Set<String> strings = Keel.fileHelper().seekPackageClassFilesInRunningJar(packageName);
         for (String s : strings) {
             try {
                 Class<?> aClass = Class.forName(s);
                 if (baseClass.isAssignableFrom(aClass)) {
-                    descendantClasses.add((Class<? extends R>) aClass);
+                    @SuppressWarnings("unchecked")
+                    Class<? extends R> aClass1 = (Class<? extends R>) aClass;
+                    descendantClasses.add(aClass1);
                 }
             } catch (Throwable e) {
                 Keel.getLogger().debug(getClass() + " seekClassDescendantsInPackageForRunningJar for " + s + " error: " + e.getMessage());
@@ -162,13 +166,14 @@ public class KeelReflectionHelper {
     /**
      * @since 3.2.11
      */
-    protected <R> Set<Class<? extends R>> seekClassDescendantsInPackageForProvidedJar(@Nonnull String jarInClassPath, @Nonnull String packageName, @Nonnull Class<R> baseClass) {
+    protected <R> Set<Class<? extends R>> seekClassDescendantsInPackageForProvidedJar(@NotNull String jarInClassPath, @NotNull String packageName, @NotNull Class<R> baseClass) {
         Set<Class<? extends R>> descendantClasses = new HashSet<>();
         List<String> classNames = Keel.fileHelper().traversalInJarFile(new File(jarInClassPath));
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         classNames.forEach(className -> {
             if (className.startsWith(packageName + ".")) {
                 try {
+                    @SuppressWarnings("unchecked")
                     Class<? extends R> clazz = (Class<? extends R>) classLoader.loadClass(className);
                     if (baseClass.isAssignableFrom(clazz)) {
                         descendantClasses.add(clazz);
@@ -185,7 +190,7 @@ public class KeelReflectionHelper {
      * @return Whether the given `baseClass` is the base of the given `implementClass`.
      * @since 3.0.10
      */
-    public boolean isClassAssignable(@Nonnull Class<?> baseClass, @Nonnull Class<?> implementClass) {
+    public boolean isClassAssignable(@NotNull Class<?> baseClass, @NotNull Class<?> implementClass) {
         return baseClass.isAssignableFrom(implementClass);
     }
 }

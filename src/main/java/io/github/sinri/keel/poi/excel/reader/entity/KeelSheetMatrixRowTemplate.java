@@ -1,7 +1,9 @@
 package io.github.sinri.keel.poi.excel.reader.entity;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 /**
@@ -10,7 +12,7 @@ import java.util.List;
  * @since 3.0.18 Finished Technical Preview.
  */
 public interface KeelSheetMatrixRowTemplate {
-    static KeelSheetMatrixRowTemplate create(@Nonnull List<String> headerRow) {
+    static KeelSheetMatrixRowTemplate create(@NotNull List<String> headerRow) {
         return new KeelSheetMatrixRowTemplateImpl(headerRow);
     }
 
@@ -19,7 +21,7 @@ public interface KeelSheetMatrixRowTemplate {
      * @return Column name at index.
      * @throws RuntimeException if index is out of bound
      */
-    @Nonnull
+    @NotNull
     String getColumnName(int i);
 
     /**
@@ -29,6 +31,6 @@ public interface KeelSheetMatrixRowTemplate {
     @Nullable
     Integer getColumnIndex(String name);
 
-    @Nonnull
+    @NotNull
     List<String> getColumnNames();
 }

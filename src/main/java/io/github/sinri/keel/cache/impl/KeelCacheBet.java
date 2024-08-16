@@ -2,8 +2,8 @@ package io.github.sinri.keel.cache.impl;
 
 import io.github.sinri.keel.cache.KeelAsyncCacheInterface;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,13 +18,13 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
     }
 
     @Override
-    public Future<Void> save(@Nonnull K key, V value, long lifeInSeconds) {
+    public Future<Void> save(@NotNull K key, V value, long lifeInSeconds) {
         this.map.put(key, new ValueWrapper<>(value, lifeInSeconds));
         return Future.succeededFuture();
     }
 
     @Override
-    public Future<V> read(@Nonnull K key) {
+    public Future<V> read(@NotNull K key) {
         ValueWrapper<V> vw = this.map.get(key);
         if (vw == null || !vw.isAliveNow()) {
             return Future.failedFuture(new NotCached(key.toString()));
@@ -33,7 +33,7 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
     }
 
     @Override
-    public Future<V> read(@Nonnull K key, V fallbackValue) {
+    public Future<V> read(@NotNull K key, V fallbackValue) {
         ValueWrapper<V> vw = this.map.get(key);
         if (vw == null) {
             return Future.succeededFuture(fallbackValue);
@@ -47,7 +47,7 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
     }
 
     @Override
-    public Future<V> read(@Nonnull K key, Function<K, Future<V>> generator, long lifeInSeconds) {
+    public Future<V> read(@NotNull K key, Function<K, Future<V>> generator, long lifeInSeconds) {
         // i.e. computeIfAbsent
         ValueWrapper<V> vw = this.map.get(key);
         if (vw != null && vw.isAliveNow()) {
@@ -65,7 +65,7 @@ public class KeelCacheBet<K, V> implements KeelAsyncCacheInterface<K, V> {
     }
 
     @Override
-    public Future<Void> remove(@Nonnull K key) {
+    public Future<Void> remove(@NotNull K key) {
         this.map.remove(key);
         return Future.succeededFuture();
     }

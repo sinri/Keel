@@ -4,9 +4,9 @@ import io.github.sinri.keel.logger.KeelLogLevel;
 import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -15,11 +15,11 @@ import java.util.List;
  */
 public interface KeelEventLogger {
 
-    static KeelEventLogger from(@Nonnull KeelIssueRecorder<KeelEventLog> issueRecorder) {
+    static KeelEventLogger from(@NotNull KeelIssueRecorder<KeelEventLog> issueRecorder) {
         return from(issueRecorder, null);
     }
 
-    static KeelEventLogger from(@Nonnull KeelIssueRecorder<KeelEventLog> issueRecorder, @Nullable Handler<KeelEventLog> templateEventLogEditor) {
+    static KeelEventLogger from(@NotNull KeelIssueRecorder<KeelEventLog> issueRecorder, @Nullable Handler<KeelEventLog> templateEventLogEditor) {
         return new KeelEventLoggerImpl(issueRecorder, templateEventLogEditor);
     }
 
@@ -34,25 +34,25 @@ public interface KeelEventLogger {
     /**
      * @return Logs of this level or higher are visible.
      */
-    @Nonnull
+    @NotNull
     KeelLogLevel getVisibleLevel();
 
     /**
      * @param level Logs of this level or higher are visible.
      */
-    void setVisibleLevel(@Nonnull KeelLogLevel level);
+    void setVisibleLevel(@NotNull KeelLogLevel level);
 
-    void addBypassLogger(@Nonnull KeelEventLogger bypassLogger);
+    void addBypassLogger(@NotNull KeelEventLogger bypassLogger);
 
-    @Nonnull
+    @NotNull
     List<KeelEventLogger> getBypassLoggers();
 
-    @Nonnull
+    @NotNull
     String getPresetTopic();
 
-    void log(@Nonnull Handler<KeelEventLog> eventLogHandler);
+    void log(@NotNull Handler<KeelEventLog> eventLogHandler);
 
-    default void debug(@Nonnull Handler<KeelEventLog> eventLogHandler) {
+    default void debug(@NotNull Handler<KeelEventLog> eventLogHandler) {
         log(eventLog -> {
             eventLog.level(KeelLogLevel.DEBUG);
             eventLog.topic(getPresetTopic());
@@ -60,7 +60,7 @@ public interface KeelEventLogger {
         });
     }
 
-    default void info(@Nonnull Handler<KeelEventLog> eventLogHandler) {
+    default void info(@NotNull Handler<KeelEventLog> eventLogHandler) {
         log(eventLog -> {
             eventLog.level(KeelLogLevel.INFO);
             eventLog.topic(getPresetTopic());
@@ -68,7 +68,7 @@ public interface KeelEventLogger {
         });
     }
 
-    default void notice(@Nonnull Handler<KeelEventLog> eventLogHandler) {
+    default void notice(@NotNull Handler<KeelEventLog> eventLogHandler) {
         log(eventLog -> {
             eventLog.level(KeelLogLevel.NOTICE);
             eventLog.topic(getPresetTopic());
@@ -76,7 +76,7 @@ public interface KeelEventLogger {
         });
     }
 
-    default void warning(@Nonnull Handler<KeelEventLog> eventLogHandler) {
+    default void warning(@NotNull Handler<KeelEventLog> eventLogHandler) {
         log(eventLog -> {
             eventLog.level(KeelLogLevel.WARNING);
             eventLog.topic(getPresetTopic());
@@ -84,7 +84,7 @@ public interface KeelEventLogger {
         });
     }
 
-    default void error(@Nonnull Handler<KeelEventLog> eventLogHandler) {
+    default void error(@NotNull Handler<KeelEventLog> eventLogHandler) {
         log(eventLog -> {
             eventLog.level(KeelLogLevel.ERROR);
             eventLog.topic(getPresetTopic());
@@ -92,7 +92,7 @@ public interface KeelEventLogger {
         });
     }
 
-    default void fatal(@Nonnull Handler<KeelEventLog> eventLogHandler) {
+    default void fatal(@NotNull Handler<KeelEventLog> eventLogHandler) {
         log(eventLog -> {
             eventLog.level(KeelLogLevel.FATAL);
             eventLog.topic(getPresetTopic());
@@ -127,11 +127,11 @@ public interface KeelEventLogger {
         fatal(eventLog -> eventLog.message(msg));
     }
 
-    default void exception(@Nonnull Throwable throwable) {
+    default void exception(@NotNull Throwable throwable) {
         exception(throwable, "Exception Occurred");
     }
 
-    default void exception(@Nonnull Throwable throwable, @Nonnull String msg) {
+    default void exception(@NotNull Throwable throwable, @NotNull String msg) {
         exception(throwable, eventLog -> {
             eventLog.message(msg);
         });
@@ -140,14 +140,14 @@ public interface KeelEventLogger {
     /**
      * @since 3.0.1
      */
-    default void exception(@Nonnull Throwable throwable, @Nonnull String msg, @Nullable JsonObject context) {
+    default void exception(@NotNull Throwable throwable, @NotNull String msg, @Nullable JsonObject context) {
         exception(throwable, eventLog -> {
             eventLog.message(msg);
             if (context != null) eventLog.context(context);
         });
     }
 
-    default void exception(@Nonnull Throwable throwable, @Nonnull Handler<KeelEventLog> eventLogHandler) {
+    default void exception(@NotNull Throwable throwable, @NotNull Handler<KeelEventLog> eventLogHandler) {
         error(eventLog -> {
             eventLog.exception(throwable);
             eventLogHandler.handle(eventLog);
@@ -217,7 +217,7 @@ public interface KeelEventLogger {
     /**
      * @since 3.1.10
      */
-    default void debug(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+    default void debug(String msg, @NotNull Handler<JsonObject> contextHandler) {
         debug(event -> {
             JsonObject context = new JsonObject();
             contextHandler.handle(context);
@@ -229,7 +229,7 @@ public interface KeelEventLogger {
     /**
      * @since 3.1.10
      */
-    default void info(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+    default void info(String msg, @NotNull Handler<JsonObject> contextHandler) {
         info(event -> {
             JsonObject context = new JsonObject();
             contextHandler.handle(context);
@@ -241,7 +241,7 @@ public interface KeelEventLogger {
     /**
      * @since 3.1.10
      */
-    default void notice(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+    default void notice(String msg, @NotNull Handler<JsonObject> contextHandler) {
         notice(event -> {
             JsonObject context = new JsonObject();
             contextHandler.handle(context);
@@ -253,7 +253,7 @@ public interface KeelEventLogger {
     /**
      * @since 3.1.10
      */
-    default void warning(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+    default void warning(String msg, @NotNull Handler<JsonObject> contextHandler) {
         warning(event -> {
             JsonObject context = new JsonObject();
             contextHandler.handle(context);
@@ -265,7 +265,7 @@ public interface KeelEventLogger {
     /**
      * @since 3.1.10
      */
-    default void error(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+    default void error(String msg, @NotNull Handler<JsonObject> contextHandler) {
         error(event -> {
             JsonObject context = new JsonObject();
             contextHandler.handle(context);
@@ -277,7 +277,7 @@ public interface KeelEventLogger {
     /**
      * @since 3.1.10
      */
-    default void fatal(String msg, @Nonnull Handler<JsonObject> contextHandler) {
+    default void fatal(String msg, @NotNull Handler<JsonObject> contextHandler) {
         fatal(event -> {
             JsonObject context = new JsonObject();
             contextHandler.handle(context);
@@ -289,7 +289,7 @@ public interface KeelEventLogger {
     /**
      * @since 3.1.10
      */
-    default void exception(@Nonnull Throwable throwable, @Nonnull String msg, @Nonnull Handler<JsonObject> contextHandler) {
+    default void exception(@NotNull Throwable throwable, @NotNull String msg, @NotNull Handler<JsonObject> contextHandler) {
         exception(throwable, eventLog -> {
             JsonObject context = new JsonObject();
             contextHandler.handle(context);

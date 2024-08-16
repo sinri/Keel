@@ -6,14 +6,14 @@ import io.github.sinri.keel.logger.issue.recorder.adapter.SyncStdoutAdapter;
 import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 public class IssueStdOutLoggerTest extends KeelTest {
     private KeelIssueRecordCenterAsSync center;
 
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> starting() {
         center = new KeelIssueRecordCenterAsSync(SyncStdoutAdapter.getInstance());

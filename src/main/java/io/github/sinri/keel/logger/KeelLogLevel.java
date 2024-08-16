@@ -1,15 +1,16 @@
 package io.github.sinri.keel.logger;
 
-import javax.annotation.Nonnull;
+
+import org.jetbrains.annotations.NotNull;
 
 public enum KeelLogLevel {
     DEBUG, INFO, NOTICE, WARNING, ERROR, FATAL, SILENT;
 
-    public boolean isEnoughSeriousAs(@Nonnull KeelLogLevel standardLevel) {
+    public boolean isEnoughSeriousAs(@NotNull KeelLogLevel standardLevel) {
         return this.ordinal() >= standardLevel.ordinal();
     }
 
-    public boolean isNegligibleThan(@Nonnull KeelLogLevel standardLevel) {
+    public boolean isNegligibleThan(@NotNull KeelLogLevel standardLevel) {
         return this.ordinal() < standardLevel.ordinal();
     }
 

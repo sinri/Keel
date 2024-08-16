@@ -6,8 +6,8 @@ import io.github.sinri.keel.logger.issue.recorder.KeelIssueRecorder;
 import io.github.sinri.keel.servant.queue.KeelQueueTask;
 import io.github.sinri.keel.servant.queue.QueueTaskIssueRecord;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 public class TestQueueTask extends KeelQueueTask {
     String id;
@@ -18,15 +18,15 @@ public class TestQueueTask extends KeelQueueTask {
         this.life = life;
     }
 
-    @Nonnull
+
     @Override
-    public String getTaskReference() {
+    public @NotNull String getTaskReference() {
         return id;
     }
 
-    @Nonnull
+
     @Override
-    public String getTaskCategory() {
+    public @NotNull String getTaskCategory() {
         return "TEST";
     }
 
@@ -40,9 +40,8 @@ public class TestQueueTask extends KeelQueueTask {
                 });
     }
 
-    @Nonnull
     @Override
-    protected KeelIssueRecorder<QueueTaskIssueRecord> buildIssueRecorder() {
+    protected @NotNull KeelIssueRecorder<QueueTaskIssueRecord> buildIssueRecorder() {
         var x = KeelIssueRecordCenter.outputCenter().generateIssueRecorder(QueueTaskIssueRecord.TopicQueue, () -> new QueueTaskIssueRecord(getTaskReference(), getTaskCategory()));
         x.setRecordFormatter(r -> r.context("id", id).context("life", life));
         return x;

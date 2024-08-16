@@ -3,8 +3,8 @@ package io.github.sinri.keel.cache;
 import io.github.sinri.keel.cache.impl.KeelCacheBet;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -28,7 +28,7 @@ public interface KeelAsyncCacheInterface<K, V> {
      * @param value         value
      * @param lifeInSeconds The lifetime of the cache item, in seconds.
      */
-    Future<Void> save(@Nonnull K key, V value, long lifeInSeconds);
+    Future<Void> save(@NotNull K key, V value, long lifeInSeconds);
 
     /**
      * Read an available cached item with key in returned future,
@@ -37,7 +37,7 @@ public interface KeelAsyncCacheInterface<K, V> {
      * @param key key
      * @return value of found available cached item, or `null`
      */
-    Future<V> read(@Nonnull K key);
+    Future<V> read(@NotNull K key);
 
     /**
      * Read an available cached item with key, or return `fallbackValue` when not found;
@@ -47,7 +47,7 @@ public interface KeelAsyncCacheInterface<K, V> {
      * @param fallbackValue the certain value returned when not found
      * @return value of found available cached item, or `fallbackValue`
      */
-    Future<V> read(@Nonnull K key, V fallbackValue);
+    Future<V> read(@NotNull K key, V fallbackValue);
 
     /**
      * Read an available cached item with key;
@@ -60,14 +60,14 @@ public interface KeelAsyncCacheInterface<K, V> {
      * @return the valued read from cache
      * @since 2.5
      */
-    Future<V> read(@Nonnull K key, Function<K, Future<V>> generator, long lifeInSeconds);
+    Future<V> read(@NotNull K key, Function<K, Future<V>> generator, long lifeInSeconds);
 
     /**
      * Remove the cached item with key.
      *
      * @param key key
      */
-    Future<Void> remove(@Nonnull K key);
+    Future<Void> remove(@NotNull K key);
 
     /**
      * Remove all the cached items.

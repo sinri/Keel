@@ -3,8 +3,7 @@ package io.github.sinri.keel.logger.issue.recorder.render;
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.helper.KeelDateTimeHelper;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
 
@@ -23,9 +22,9 @@ public class KeelIssueRecordStringRender implements KeelIssueRecordRender<String
         return instance;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public String renderIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord) {
+    public String renderIssueRecord(@NotNull KeelIssueRecord<?> issueRecord) {
         StringBuilder s = new StringBuilder("㏒ ");
         s.append(KeelHelpers.datetimeHelper().getDateExpression(issueRecord.timestamp(), KeelDateTimeHelper.MYSQL_DATETIME_MS_PATTERN));
         s.append(" [").append(issueRecord.level().name()).append("]");
@@ -42,9 +41,9 @@ public class KeelIssueRecordStringRender implements KeelIssueRecordRender<String
         return s.toString();
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public String renderThrowable(@Nonnull Throwable throwable) {
+    public String renderThrowable(@NotNull Throwable throwable) {
         return KeelHelpers.stringHelper().renderThrowableChain(throwable, ignorableStackPackageSet());
     }
 }

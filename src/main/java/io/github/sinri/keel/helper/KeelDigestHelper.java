@@ -1,6 +1,8 @@
 package io.github.sinri.keel.helper;
 
-import javax.annotation.Nonnull;
+
+import org.jetbrains.annotations.NotNull;
+
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -38,8 +40,8 @@ public class KeelDigestHelper {
      * @return md5 with lower digits
      * @since 1.1
      */
-    @Nonnull
-    public String md5(@Nonnull String raw) {
+    @NotNull
+    public String md5(@NotNull String raw) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(raw.getBytes());
@@ -56,8 +58,8 @@ public class KeelDigestHelper {
      * @return MD5 with upper digits
      * @since 1.1
      */
-    @Nonnull
-    public String MD5(@Nonnull String raw) {
+    @NotNull
+    public String MD5(@NotNull String raw) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(raw.getBytes());
@@ -70,7 +72,7 @@ public class KeelDigestHelper {
     /**
      * @since 3.0.11
      */
-    public String digestToLower(@Nonnull String algorithm, @Nonnull String raw) throws NoSuchAlgorithmException {
+    public String digestToLower(@NotNull String algorithm, @NotNull String raw) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance(algorithm);
         md.update(raw.getBytes());
         return KeelHelpers.binaryHelper().encodeHexWithLowerDigits(md.digest());
@@ -79,7 +81,7 @@ public class KeelDigestHelper {
     /**
      * @since 3.0.11
      */
-    public String digestToUpper(@Nonnull String algorithm, @Nonnull String raw) throws NoSuchAlgorithmException {
+    public String digestToUpper(@NotNull String algorithm, @NotNull String raw) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance(algorithm);
         md.update(raw.getBytes());
         return KeelHelpers.binaryHelper().encodeHexWithUpperDigits(md.digest());
@@ -88,8 +90,8 @@ public class KeelDigestHelper {
     /**
      * @since 3.0.11
      */
-    @Nonnull
-    public String SHA512(@Nonnull String raw) {
+    @NotNull
+    public String SHA512(@NotNull String raw) {
         try {
             return digestToUpper("SHA-512", raw);
         } catch (NoSuchAlgorithmException e) {
@@ -100,8 +102,8 @@ public class KeelDigestHelper {
     /**
      * @since 3.0.11
      */
-    @Nonnull
-    public String sha512(@Nonnull String raw) {
+    @NotNull
+    public String sha512(@NotNull String raw) {
         try {
             return digestToLower("SHA-512", raw);
         } catch (NoSuchAlgorithmException e) {
@@ -112,8 +114,8 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    @Nonnull
-    public String SHA1(@Nonnull String raw) {
+    @NotNull
+    public String SHA1(@NotNull String raw) {
         try {
             return digestToUpper("SHA", raw);
         } catch (NoSuchAlgorithmException e) {
@@ -124,8 +126,8 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    @Nonnull
-    public String sha1(@Nonnull String raw) {
+    @NotNull
+    public String sha1(@NotNull String raw) {
         try {
             return digestToLower("SHA", raw);
         } catch (NoSuchAlgorithmException e) {
@@ -136,8 +138,7 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    @Nonnull
-    private byte[] compute_hmac_sha1(@Nonnull String raw, @Nonnull String key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
+    private byte[] compute_hmac_sha1(@NotNull String raw, @NotNull String key) throws UnsupportedEncodingException, NoSuchAlgorithmException, InvalidKeyException {
         String MAC_NAME = "HmacSHA1";
         String ENCODING = "UTF-8";
 
@@ -157,8 +158,8 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    @Nonnull
-    public String hmac_sha1_base64(@Nonnull String raw, @Nonnull String key) {
+    @NotNull
+    public String hmac_sha1_base64(@NotNull String raw, @NotNull String key) {
         byte[] bytes;
         try {
             bytes = compute_hmac_sha1(raw, key);
@@ -171,8 +172,8 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    @Nonnull
-    public String hmac_sha1_hex(@Nonnull String raw, @Nonnull String key) {
+    @NotNull
+    public String hmac_sha1_hex(@NotNull String raw, @NotNull String key) {
         byte[] bytes;
         try {
             bytes = compute_hmac_sha1(raw, key);
@@ -185,7 +186,7 @@ public class KeelDigestHelper {
     /**
      * @since 2.8
      */
-    public @Nonnull String HMAC_SHA1_HEX(@Nonnull String raw, @Nonnull String key) {
+    public @NotNull String HMAC_SHA1_HEX(@NotNull String raw, @NotNull String key) {
         byte[] bytes;
         try {
             bytes = compute_hmac_sha1(raw, key);

@@ -3,9 +3,9 @@ package io.github.sinri.keel.mysql.condition;
 import io.github.sinri.keel.mysql.Quoter;
 import io.github.sinri.keel.mysql.exception.KeelMySQLGenerateError;
 import io.github.sinri.keel.mysql.statement.AbstractReadStatement;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,7 +38,7 @@ public class AmongstCondition implements MySQLCondition {
      * @deprecated use any method named `elementAs[TYPE]` instead.
      */
     @Deprecated(since = "3.1.8", forRemoval = true)
-    public AmongstCondition element(@Nonnull Object element, boolean needQuoting) {
+    public AmongstCondition element(@NotNull Object element, boolean needQuoting) {
         if (needQuoting) {
             if (element instanceof Number) {
                 return elementAsValue((Number) element);
@@ -57,11 +57,11 @@ public class AmongstCondition implements MySQLCondition {
      * @deprecated use any method named `elementAsExpression` instead.
      */
     @Deprecated(since = "3.1.8", forRemoval = true)
-    public AmongstCondition element(@Nonnull Object element) {
+    public AmongstCondition element(@NotNull Object element) {
         return element(element, false);
     }
 
-    public AmongstCondition elementAsExpression(@Nonnull String element) {
+    public AmongstCondition elementAsExpression(@NotNull String element) {
         this.element = element;
         return this;
     }
@@ -81,7 +81,7 @@ public class AmongstCondition implements MySQLCondition {
      * @deprecated use method `amongst[Type]List` instead.
      */
     @Deprecated(since = "3.1.8", forRemoval = true)
-    public AmongstCondition amongst(@Nonnull Collection<?> targetSet, boolean needQuoting) {
+    public AmongstCondition amongst(@NotNull Collection<?> targetSet, boolean needQuoting) {
         if (needQuoting) {
             return amongstValueList(targetSet);
         } else {
@@ -98,7 +98,7 @@ public class AmongstCondition implements MySQLCondition {
      * @deprecated use method `amongstValueList` instead.
      */
     @Deprecated(since = "3.1.8", forRemoval = true)
-    public AmongstCondition amongst(@Nonnull Collection<?> targetSet) {
+    public AmongstCondition amongst(@NotNull Collection<?> targetSet) {
         return amongst(targetSet, true);
     }
 
@@ -106,7 +106,7 @@ public class AmongstCondition implements MySQLCondition {
      * @deprecated @deprecated use method `amongstLiteralValueList` instead.
      */
     @Deprecated(since = "3.1.8", forRemoval = true)
-    public AmongstCondition amongstValueList(@Nonnull Collection<?> targetSet) {
+    public AmongstCondition amongstValueList(@NotNull Collection<?> targetSet) {
         for (Object next : targetSet) {
             this.targetSet.add(new Quoter(String.valueOf(next)).toString());
         }
@@ -116,7 +116,7 @@ public class AmongstCondition implements MySQLCondition {
     /**
      * @since 3.1.8
      */
-    public AmongstCondition amongstLiteralValueList(@Nonnull Collection<?> targetSet) {
+    public AmongstCondition amongstLiteralValueList(@NotNull Collection<?> targetSet) {
         for (Object next : targetSet) {
             //this.targetSet.add(new Quoter(String.valueOf(next)).toString());
             this.amongstLiteralValue(next);
@@ -127,7 +127,7 @@ public class AmongstCondition implements MySQLCondition {
     /**
      * @since 3.1.8
      */
-    public AmongstCondition amongstNumericValueList(@Nonnull Collection<? extends Number> targetSet) {
+    public AmongstCondition amongstNumericValueList(@NotNull Collection<? extends Number> targetSet) {
         for (Number next : targetSet) {
             //this.targetSet.add(new Quoter(String.valueOf(next)).toString());
             this.amongstNumericValue(next);
@@ -139,7 +139,7 @@ public class AmongstCondition implements MySQLCondition {
      * @deprecated use method `amongstLiteralValueList` instead.
      */
     @Deprecated(since = "3.1.8", forRemoval = true)
-    public AmongstCondition amongstValueArray(@Nonnull Object[] targetSet) {
+    public AmongstCondition amongstValueArray(@NotNull Object[] targetSet) {
         for (Object next : targetSet) {
             this.targetSet.add(new Quoter(String.valueOf(next)).toString());
         }
@@ -195,7 +195,7 @@ public class AmongstCondition implements MySQLCondition {
     /**
      * @since 3.1.8 protected
      */
-    protected AmongstCondition amongstExpression(@Nonnull String value) {
+    protected AmongstCondition amongstExpression(@NotNull String value) {
         this.targetSet.add(Objects.requireNonNull(value));
         return this;
     }
@@ -203,7 +203,7 @@ public class AmongstCondition implements MySQLCondition {
     /**
      * @since 3.1.8 renamed from `amongstExpression`
      */
-    public AmongstCondition amongstExpressionList(@Nonnull List<String> values) {
+    public AmongstCondition amongstExpressionList(@NotNull List<String> values) {
         values.forEach(x -> this.amongstExpression(Objects.requireNonNull(x)));
         return this;
     }
@@ -212,7 +212,7 @@ public class AmongstCondition implements MySQLCondition {
      * @param readStatement A READ Statement, such as SELECT.
      * @since 3.2.4
      */
-    public AmongstCondition amongstReadStatement(@Nonnull AbstractReadStatement readStatement) {
+    public AmongstCondition amongstReadStatement(@NotNull AbstractReadStatement readStatement) {
         return this.amongstExpression(readStatement.toString());
     }
 

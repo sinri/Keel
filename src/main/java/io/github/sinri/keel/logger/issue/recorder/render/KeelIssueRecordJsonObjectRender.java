@@ -4,8 +4,8 @@ import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 
 import static io.github.sinri.keel.helper.KeelHelpersInterface.KeelHelpers;
@@ -25,9 +25,9 @@ public class KeelIssueRecordJsonObjectRender implements KeelIssueRecordRender<Js
         return instance;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public JsonObject renderIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord) {
+    public JsonObject renderIssueRecord(@NotNull KeelIssueRecord<?> issueRecord) {
         // by default, the topic is neglected for Aliyun SLS eco
 
         JsonObject x = new JsonObject();
@@ -48,9 +48,9 @@ public class KeelIssueRecordJsonObjectRender implements KeelIssueRecordRender<Js
         return x;
     }
 
-    @Nonnull
+    @NotNull
     @Override
-    public JsonObject renderThrowable(@Nonnull Throwable throwable) {
+    public JsonObject renderThrowable(@NotNull Throwable throwable) {
         return Objects.requireNonNull(KeelHelpers.jsonHelper().renderThrowableChain(throwable, ignorableStackPackageSet()));
     }
 }

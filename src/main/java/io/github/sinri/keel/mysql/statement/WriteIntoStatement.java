@@ -7,9 +7,9 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.sqlclient.SqlConnection;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,19 +23,19 @@ public class WriteIntoStatement extends AbstractModifyStatement {
 
     public static final String INSERT = "INSERT";
     public static final String REPLACE = "REPLACE";
-    @Nonnull
+    @NotNull
     final List<String> columns = new ArrayList<>();
-    @Nonnull
+    @NotNull
     final List<List<String>> batchValues = new ArrayList<>();
-    @Nonnull
+    @NotNull
     final Map<String, String> onDuplicateKeyUpdateAssignmentMap = new HashMap<>();
-    @Nonnull
+    @NotNull
     final String writeType;
-    @Nonnull
+    @NotNull
     String ignoreMark = "";
     @Nullable
     String schema;
-    @Nonnull
+    @NotNull
     String table = "TABLE-NOT-SET";
     @Nullable
     String sourceSelectSQL;
@@ -46,17 +46,17 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         this.writeType = INSERT;
     }
 
-    public WriteIntoStatement(@Nonnull String writeType) {
+    public WriteIntoStatement(@NotNull String writeType) {
         this.writeType = writeType;
     }
 
-    public WriteIntoStatement intoTable(@Nonnull String table) {
+    public WriteIntoStatement intoTable(@NotNull String table) {
         if (table.isBlank()) throw new IllegalArgumentException("Table is blank");
         this.table = table;
         return this;
     }
 
-    public WriteIntoStatement intoTable(@Nullable String schema, @Nonnull String table) {
+    public WriteIntoStatement intoTable(@Nullable String schema, @NotNull String table) {
         this.schema = schema;
         this.table = table;
         return this;
@@ -67,19 +67,19 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         return this;
     }
 
-    public WriteIntoStatement columns(@Nonnull List<String> columns) {
+    public WriteIntoStatement columns(@NotNull List<String> columns) {
         this.columns.addAll(columns);
         return this;
     }
 
-    public WriteIntoStatement addDataMatrix(@Nonnull List<List<Object>> batch) {
+    public WriteIntoStatement addDataMatrix(@NotNull List<List<Object>> batch) {
         for (List<Object> row : batch) {
             this.addDataRow(row);
         }
         return this;
     }
 
-    public WriteIntoStatement addDataRow(@Nonnull List<Object> row) {
+    public WriteIntoStatement addDataRow(@NotNull List<Object> row) {
         List<String> t = new ArrayList<>();
         for (Object item : row) {
             if (item == null) {
@@ -95,7 +95,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     /**
      * @since 3.0.0
      */
-    public WriteIntoStatement macroWriteRows(@Nonnull Collection<RowToWrite> rows) {
+    public WriteIntoStatement macroWriteRows(@NotNull Collection<RowToWrite> rows) {
         if (rows.isEmpty()) {
             throw new RuntimeException();
         }
@@ -127,7 +127,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     /**
      * @since 3.0.0
      */
-    public WriteIntoStatement macroWriteOneRow(@Nonnull RowToWrite row) {
+    public WriteIntoStatement macroWriteOneRow(@NotNull RowToWrite row) {
         columns.clear();
         this.batchValues.clear();
         List<String> dataRow = new ArrayList<>();
@@ -142,23 +142,23 @@ public class WriteIntoStatement extends AbstractModifyStatement {
     /**
      * @since 3.0.0
      */
-    public WriteIntoStatement macroWriteOneRow(@Nonnull Handler<RowToWrite> rowEditor) {
+    public WriteIntoStatement macroWriteOneRow(@NotNull Handler<RowToWrite> rowEditor) {
         RowToWrite rowToWrite = new RowToWrite();
         rowEditor.handle(rowToWrite);
         return macroWriteOneRow(rowToWrite);
     }
 
-    public WriteIntoStatement fromSelection(@Nonnull String selectionSQL) {
+    public WriteIntoStatement fromSelection(@NotNull String selectionSQL) {
         this.sourceSelectSQL = selectionSQL;
         return this;
     }
 
-    public WriteIntoStatement fromTable(@Nonnull String tableName) {
+    public WriteIntoStatement fromTable(@NotNull String tableName) {
         this.sourceTableName = tableName;
         return this;
     }
 
-    public WriteIntoStatement onDuplicateKeyUpdate(@Nonnull String column, @Nonnull String updateExpression) {
+    public WriteIntoStatement onDuplicateKeyUpdate(@NotNull String column, @NotNull String updateExpression) {
         this.onDuplicateKeyUpdateAssignmentMap.put(column, updateExpression);
         return this;
     }
@@ -168,7 +168,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @return as `onDuplicateKeyUpdate` does
      * @since 1.10
      */
-    public WriteIntoStatement onDuplicateKeyUpdateField(@Nonnull String fieldName) {
+    public WriteIntoStatement onDuplicateKeyUpdateField(@NotNull String fieldName) {
         return this.onDuplicateKeyUpdate(fieldName, "values(" + fieldName + ")");
     }
 
@@ -177,7 +177,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @return as `onDuplicateKeyUpdate` does
      * @since 1.10
      */
-    public WriteIntoStatement onDuplicateKeyUpdateFields(@Nonnull List<String> fieldNameList) {
+    public WriteIntoStatement onDuplicateKeyUpdateFields(@NotNull List<String> fieldNameList) {
         for (var fieldName : fieldNameList) {
             this.onDuplicateKeyUpdate(fieldName, "values(" + fieldName + ")");
         }
@@ -189,7 +189,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @return as `onDuplicateKeyUpdate` does
      * @since 1.10
      */
-    public WriteIntoStatement onDuplicateKeyUpdateExceptField(@Nonnull String fieldName) {
+    public WriteIntoStatement onDuplicateKeyUpdateExceptField(@NotNull String fieldName) {
         if (columns.isEmpty()) {
             throw new RuntimeException("Columns not set yet");
         }
@@ -207,7 +207,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @return as `onDuplicateKeyUpdate` does
      * @since 1.10
      */
-    public WriteIntoStatement onDuplicateKeyUpdateExceptFields(@Nonnull List<String> fieldNameList) {
+    public WriteIntoStatement onDuplicateKeyUpdateExceptFields(@NotNull List<String> fieldNameList) {
         if (columns.isEmpty()) {
             throw new RuntimeException("Columns not set yet");
         }
@@ -255,7 +255,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @since 1.7
      * @since 1.10, removed the recover block
      */
-    public Future<Long> executeForLastInsertedID(@Nonnull SqlConnection sqlConnection) {
+    public Future<Long> executeForLastInsertedID(@NotNull SqlConnection sqlConnection) {
         return execute(sqlConnection)
                 .compose(resultMatrix -> Future.succeededFuture(resultMatrix.getLastInsertedID()));
     }
@@ -264,7 +264,7 @@ public class WriteIntoStatement extends AbstractModifyStatement {
      * @since 3.0.11
      * @since 3.0.18 Finished Technical Preview.
      */
-    public Future<Long> executeForLastInsertedID(@Nonnull NamedMySQLConnection namedMySQLConnection) {
+    public Future<Long> executeForLastInsertedID(@NotNull NamedMySQLConnection namedMySQLConnection) {
         return executeForLastInsertedID(namedMySQLConnection.getSqlConnection());
     }
 
@@ -301,34 +301,10 @@ public class WriteIntoStatement extends AbstractModifyStatement {
         final Map<String, String> map = new ConcurrentHashMap<>();
 
         /**
-         * @since 3.0.1
-         */
-        public RowToWrite putNow(@Nonnull String columnName) {
-            return this.putExpression(columnName, "now()");
-        }
-
-        public RowToWrite putExpression(@Nonnull String columnName, @Nonnull String expression) {
-            map.put(columnName, expression);
-            return this;
-        }
-
-        /**
-         * @since 3.1.0
-         */
-        public RowToWrite put(@Nonnull String columnName, @Nullable Object value) {
-            if (value == null) return this.putExpression(columnName, "NULL");
-            else if (value instanceof Number) {
-                return putExpression(columnName, String.valueOf(value));
-            } else {
-                return putExpression(columnName, new Quoter(value.toString()).toString());
-            }
-        }
-
-        /**
          * @param jsonObject One row as a JsonObject
          * @since 3.1.2
          */
-        public static RowToWrite fromJsonObject(@Nonnull JsonObject jsonObject) {
+        public static RowToWrite fromJsonObject(@NotNull JsonObject jsonObject) {
             RowToWrite rowToWrite = new RowToWrite();
             jsonObject.forEach(entry -> {
                 rowToWrite.put(entry.getKey(), entry.getValue());
@@ -340,12 +316,11 @@ public class WriteIntoStatement extends AbstractModifyStatement {
          * @param jsonArray Rows in a JsonArray; each item of the array should be a JsonObject to be a row.
          * @since 3.1.2
          */
-        public static Collection<RowToWrite> fromJsonObjectArray(@Nonnull JsonArray jsonArray) {
+        public static Collection<RowToWrite> fromJsonObjectArray(@NotNull JsonArray jsonArray) {
             Collection<RowToWrite> rows = new ArrayList<>();
             jsonArray.forEach(item -> {
                 Objects.requireNonNull(item);
-                if (item instanceof JsonObject) {
-                    JsonObject o = (JsonObject) item;
+                if (item instanceof JsonObject o) {
                     rows.add(fromJsonObject(o));
                 } else {
                     throw new IllegalArgumentException("JsonArray contains non JsonObject item.");
@@ -358,13 +333,37 @@ public class WriteIntoStatement extends AbstractModifyStatement {
          * @param jsonObjects each item to be a row.
          * @since 3.1.2
          */
-        public static Collection<RowToWrite> fromJsonObjectArray(@Nonnull List<JsonObject> jsonObjects) {
+        public static Collection<RowToWrite> fromJsonObjectArray(@NotNull List<JsonObject> jsonObjects) {
             Collection<RowToWrite> rows = new ArrayList<>();
             jsonObjects.forEach(item -> {
                 Objects.requireNonNull(item);
                 rows.add(fromJsonObject(item));
             });
             return rows;
+        }
+
+        /**
+         * @since 3.0.1
+         */
+        public RowToWrite putNow(@NotNull String columnName) {
+            return this.putExpression(columnName, "now()");
+        }
+
+        public RowToWrite putExpression(@NotNull String columnName, @NotNull String expression) {
+            map.put(columnName, expression);
+            return this;
+        }
+
+        /**
+         * @since 3.1.0
+         */
+        public RowToWrite put(@NotNull String columnName, @Nullable Object value) {
+            if (value == null) return this.putExpression(columnName, "NULL");
+            else if (value instanceof Number) {
+                return putExpression(columnName, String.valueOf(value));
+            } else {
+                return putExpression(columnName, new Quoter(value.toString()).toString());
+            }
         }
     }
 }

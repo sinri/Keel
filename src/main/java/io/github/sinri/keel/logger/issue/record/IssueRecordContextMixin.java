@@ -2,9 +2,9 @@ package io.github.sinri.keel.logger.issue.record;
 
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @since 3.2.0
@@ -12,15 +12,15 @@ import javax.annotation.Nullable;
 public interface IssueRecordContextMixin<T> extends KeelIssueRecordCore<T> {
     String AttributeContext = "context";
 
-    T context(@Nonnull JsonObject context);
+    T context(@NotNull JsonObject context);
 
-    default T context(@Nonnull Handler<JsonObject> contextHandler) {
+    default T context(@NotNull Handler<JsonObject> contextHandler) {
         JsonObject context = new JsonObject();
         contextHandler.handle(context);
         return context(context);
     }
 
-    default T context(@Nonnull String name, @Nullable Object item) {
+    default T context(@NotNull String name, @Nullable Object item) {
         var context = attributes().readJsonObject(AttributeContext);
         if (context == null) {
             context = new JsonObject();

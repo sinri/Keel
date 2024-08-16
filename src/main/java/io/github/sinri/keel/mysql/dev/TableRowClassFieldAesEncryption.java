@@ -1,8 +1,8 @@
 package io.github.sinri.keel.mysql.dev;
 
 import io.github.sinri.keel.core.TechnicalPreview;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 /**
  * @since 3.1.0 Technical Preview
@@ -13,12 +13,12 @@ public class TableRowClassFieldAesEncryption {
     private final String envelopePackage;
     private final String envelopeName;
 
-    public TableRowClassFieldAesEncryption(@Nonnull String envelopeName, @Nonnull String envelopePackage) {
+    public TableRowClassFieldAesEncryption(@NotNull String envelopeName, @NotNull String envelopePackage) {
         this.envelopePackage = envelopePackage;
         this.envelopeName = envelopeName;
     }
 
-    public String buildCallClassMethodCode(@Nonnull String parameter) {
+    public String buildCallClassMethodCode(@NotNull String parameter) {
         return "new " + envelopePackage + "." + envelopeName + "().decrypt(" + parameter + ");";
     }
 }

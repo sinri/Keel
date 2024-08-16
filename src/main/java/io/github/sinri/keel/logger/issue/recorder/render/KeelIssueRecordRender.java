@@ -4,8 +4,8 @@ import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.helper.KeelRuntimeHelper;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.vertx.core.json.JsonObject;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Set;
 
 /**
@@ -22,13 +22,13 @@ public interface KeelIssueRecordRender<R> {
         return KeelIssueRecordJsonObjectRender.getInstance();
     }
 
-    @Nonnull
-    R renderIssueRecord(@Nonnull KeelIssueRecord<?> issueRecord);
+    @NotNull
+    R renderIssueRecord(@NotNull KeelIssueRecord<?> issueRecord);
 
-    @Nonnull
-    R renderThrowable(@Nonnull Throwable throwable);
+    @NotNull
+    R renderThrowable(@NotNull Throwable throwable);
 
-    @Nonnull
+    @NotNull
     default Set<String> ignorableStackPackageSet() {
         return KeelRuntimeHelper.ignorableCallStackPackage;
     }

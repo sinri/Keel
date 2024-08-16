@@ -1,7 +1,8 @@
 package io.github.sinri.keel.poi.excel.reader.entity;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ public class KeelSheetMatrixRowTemplateImpl implements KeelSheetMatrixRowTemplat
     private final List<String> headerRow;
     private final Map<String, Integer> headerMap;
 
-    KeelSheetMatrixRowTemplateImpl(@Nonnull List<String> headerRow) {
+    KeelSheetMatrixRowTemplateImpl(@NotNull List<String> headerRow) {
         this.headerRow = headerRow;
         this.headerMap = new LinkedHashMap<>();
         for (int i = 0; i < headerRow.size(); i++) {
@@ -23,7 +24,7 @@ public class KeelSheetMatrixRowTemplateImpl implements KeelSheetMatrixRowTemplat
         }
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public String getColumnName(int i) {
         return this.headerRow.get(i);
@@ -35,7 +36,7 @@ public class KeelSheetMatrixRowTemplateImpl implements KeelSheetMatrixRowTemplat
         return this.headerMap.get(name);
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public List<String> getColumnNames() {
         return headerRow;

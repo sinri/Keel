@@ -5,9 +5,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.AuthenticationHandler;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Tell who the user is, if not a legal user, fail the request with RequestDenied.
@@ -105,7 +105,7 @@ abstract public class KeelAuthenticationHandler implements AuthenticationHandler
         /**
          * @since 3.2.10 it became non-null.
          */
-        @Nonnull
+        @NotNull
         final JsonObject principle;
 
 
@@ -116,7 +116,7 @@ abstract public class KeelAuthenticationHandler implements AuthenticationHandler
             this.principle = new JsonObject();
         }
 
-        public AuthenticateResultImpl(@Nonnull JsonObject principle) {
+        public AuthenticateResultImpl(@NotNull JsonObject principle) {
             this.legal = true;
             this.throwable = null;
             this.respondStatusCode = 401;
@@ -148,7 +148,7 @@ abstract public class KeelAuthenticationHandler implements AuthenticationHandler
             return throwable;
         }
 
-        @Nonnull
+        @NotNull
         @Override
         public JsonObject authenticatedPrinciple() {
             return principle;

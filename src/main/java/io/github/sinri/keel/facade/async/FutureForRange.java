@@ -1,8 +1,8 @@
 package io.github.sinri.keel.facade.async;
 
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
@@ -14,14 +14,14 @@ import java.util.function.Function;
 public class FutureForRange {
     private final Options options;
 
-    private FutureForRange(@Nonnull Options options) {
+    private FutureForRange(@NotNull Options options) {
         this.options = options;
     }
 
     /**
      * @since 2.9
      */
-    static Future<Void> call(@Nonnull Options options, @Nonnull Function<Integer, Future<Void>> handleFunction) {
+    static Future<Void> call(@NotNull Options options, @NotNull Function<Integer, Future<Void>> handleFunction) {
         return new FutureForRange(options).run(handleFunction);
     }
 
@@ -29,7 +29,7 @@ public class FutureForRange {
      * @param times since 2.9 changed to int from Integer
      * @since 2.9
      */
-    static Future<Void> call(int times, @Nonnull Function<Integer, Future<Void>> handleFunction) {
+    static Future<Void> call(int times, @NotNull Function<Integer, Future<Void>> handleFunction) {
         Options options = new Options().setEnd(times);
         return new FutureForRange(options).run(handleFunction);
     }
@@ -37,7 +37,7 @@ public class FutureForRange {
     /**
      * @since 2.9 use FutureUntil to avoid Thread Blocking Issue.
      */
-    private Future<Void> run(@Nonnull Function<Integer, Future<Void>> handleFunction) {
+    private Future<Void> run(@NotNull Function<Integer, Future<Void>> handleFunction) {
         AtomicInteger indexRef = new AtomicInteger(options.getStart());
 
         return KeelAsyncKit.repeatedlyCall(routineResult -> {

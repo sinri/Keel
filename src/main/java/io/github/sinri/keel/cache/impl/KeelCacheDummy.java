@@ -1,8 +1,8 @@
 package io.github.sinri.keel.cache.impl;
 
 import io.github.sinri.keel.cache.KeelCacheInterface;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 
@@ -19,22 +19,22 @@ public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
     }
 
     @Override
-    public void save(@Nonnull K key, V value, long lifeInSeconds) {
+    public void save(@NotNull K key, V value, long lifeInSeconds) {
 
     }
 
     @Override
-    public V read(@Nonnull K key) {
+    public V read(@NotNull K key) {
         return null;
     }
 
     @Override
-    public V read(@Nonnull K key, V fallbackValue) {
+    public V read(@NotNull K key, V fallbackValue) {
         return fallbackValue;
     }
 
     @Override
-    public void remove(@Nonnull K key) {
+    public void remove(@NotNull K key) {
 
     }
 
@@ -48,9 +48,8 @@ public class KeelCacheDummy<K, V> implements KeelCacheInterface<K, V> {
 
     }
 
-    @Nonnull
     @Override
-    public Map<K, V> getSnapshotMap() {
+    public @NotNull Map<K, V> getSnapshotMap() {
         return Collections.emptyMap();
     }
 }

@@ -1,8 +1,8 @@
 package io.github.sinri.keel.facade.async;
 
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +20,7 @@ public class FutureForEachParallel {
 
     }
 
-    private static <T> List<Future<Void>> buildFutureList(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    private static <T> List<Future<Void>> buildFutureList(@NotNull Iterable<T> collection, @NotNull Function<T, Future<Void>> itemProcessor) {
         List<Future<Void>> futures = new ArrayList<>();
         collection.forEach(item -> {
             Future<Void> future = Future.succeededFuture().compose(v -> itemProcessor.apply(item));
@@ -29,28 +29,28 @@ public class FutureForEachParallel {
         return futures;
     }
 
-    public static <T> Future<Void> all(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    public static <T> Future<Void> all(@NotNull Iterable<T> collection, @NotNull Function<T, Future<Void>> itemProcessor) {
         List<Future<Void>> futures = buildFutureList(collection, itemProcessor);
         if (futures.isEmpty()) return Future.succeededFuture();
         return Future.all(futures)
                 .compose(compositeFuture -> Future.succeededFuture());
     }
 
-    public static <T> Future<Void> any(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    public static <T> Future<Void> any(@NotNull Iterable<T> collection, @NotNull Function<T, Future<Void>> itemProcessor) {
         List<Future<Void>> futures = buildFutureList(collection, itemProcessor);
         if (futures.isEmpty()) return Future.succeededFuture();
         return Future.any(futures)
                 .compose(compositeFuture -> Future.succeededFuture());
     }
 
-    public static <T> Future<Void> join(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<Void>> itemProcessor) {
+    public static <T> Future<Void> join(@NotNull Iterable<T> collection, @NotNull Function<T, Future<Void>> itemProcessor) {
         List<Future<Void>> futures = buildFutureList(collection, itemProcessor);
         if (futures.isEmpty()) return Future.succeededFuture();
         return Future.join(futures)
                 .compose(compositeFuture -> Future.succeededFuture());
     }
 
-    public static <T, R> Future<ParallelResult<R>> call(@Nonnull Iterable<T> collection, @Nonnull Function<T, Future<R>> itemProcessor) {
+    public static <T, R> Future<ParallelResult<R>> call(@NotNull Iterable<T> collection, @NotNull Function<T, Future<R>> itemProcessor) {
         // transform iterable to a temp map
         AtomicInteger counter = new AtomicInteger(0);
         Map<Integer, T> map = new HashMap<>();

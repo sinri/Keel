@@ -1,8 +1,8 @@
 package io.github.sinri.keel.poi.excel;
 
 import org.apache.poi.ss.usermodel.Sheet;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 
 /**
  * @since 3.0.13
@@ -15,7 +15,7 @@ public abstract class KeelSheet {
     /**
      * @since 3.3.0
      */
-    public KeelSheet(@Nonnull Sheet sheet) {
+    public KeelSheet(@NotNull Sheet sheet) {
         this.sheet = sheet;
     }
 

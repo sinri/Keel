@@ -5,9 +5,9 @@ import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.mail.MailMessage;
 import io.vertx.ext.mail.MailResult;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,7 +24,7 @@ public class KeelSmtpKit {
     /**
      * @since 3.0.6
      */
-    public KeelSmtpKit(@Nonnull MailConfig mailConfig, @Nullable String poolName) {
+    public KeelSmtpKit(@NotNull MailConfig mailConfig, @Nullable String poolName) {
         this.mailConfig = mailConfig;
         if (poolName != null) {
             this.mailClient = MailClient.createShared(Keel.getVertx(), this.mailConfig, poolName);
@@ -33,11 +33,11 @@ public class KeelSmtpKit {
         }
     }
 
-    public KeelSmtpKit(@Nonnull String smtpName, boolean shared) {
+    public KeelSmtpKit(@NotNull String smtpName, boolean shared) {
         this(buildMailConfig(smtpName), shared ? Objects.requireNonNull(smtpName) : null);
     }
 
-    public KeelSmtpKit(@Nonnull String smtpName) {
+    public KeelSmtpKit(@NotNull String smtpName) {
         this(smtpName, true);
     }
 
@@ -53,7 +53,7 @@ public class KeelSmtpKit {
     /**
      * As of 3.0.6, only five property keys supported.
      */
-    private static MailConfig buildMailConfig(@Nonnull String smtpName) {
+    private static MailConfig buildMailConfig(@NotNull String smtpName) {
         var smtpConfiguration = Keel.getConfiguration().extract("email", "smtp", smtpName);
         Objects.requireNonNull(smtpConfiguration);
 

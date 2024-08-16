@@ -4,8 +4,8 @@ import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.verticles.KeelVerticleImplPure;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -32,12 +32,12 @@ abstract public class KeelEverlastingCacheVerticle extends KeelVerticleImplPure 
      * @param value value
      */
     @Override
-    public void save(@Nonnull String key, String value) {
+    public void save(@NotNull String key, String value) {
         this.map.put(key, value);
     }
 
     @Override
-    public void save(@Nonnull Map<String, String> appendEntries) {
+    public void save(@NotNull Map<String, String> appendEntries) {
         this.map.putAll(appendEntries);
     }
 
@@ -47,7 +47,7 @@ abstract public class KeelEverlastingCacheVerticle extends KeelVerticleImplPure 
      * @return @return cache value or default when not-existed
      */
     @Override
-    public String read(@Nonnull String key, String value) {
+    public String read(@NotNull String key, String value) {
         return map.getOrDefault(key, value);
     }
 
@@ -57,12 +57,12 @@ abstract public class KeelEverlastingCacheVerticle extends KeelVerticleImplPure 
      * @param key key
      */
     @Override
-    public void remove(@Nonnull String key) {
+    public void remove(@NotNull String key) {
         this.map.remove(key);
     }
 
     @Override
-    public void remove(@Nonnull Collection<String> keys) {
+    public void remove(@NotNull Collection<String> keys) {
         keys.forEach(this.map::remove);
     }
 
@@ -80,7 +80,7 @@ abstract public class KeelEverlastingCacheVerticle extends KeelVerticleImplPure 
      * @param newEntries new map of entries
      */
     @Override
-    public void replaceAll(@Nonnull Map<String, String> newEntries) {
+    public void replaceAll(@NotNull Map<String, String> newEntries) {
         newEntries.forEach(map::replace);
     }
 
@@ -88,7 +88,7 @@ abstract public class KeelEverlastingCacheVerticle extends KeelVerticleImplPure 
      * @return ConcurrentMap K → V alive value only
      * @since 1.14
      */
-    @Nonnull
+    @NotNull
     @Override
     public Map<String, String> getSnapshotMap() {
         return Collections.unmodifiableMap(map);

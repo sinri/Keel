@@ -1,21 +1,23 @@
 package io.github.sinri.keel.facade.async;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 /**
  * @since 2.9.4
  */
 public class FailedInParallel extends Exception {
-    private final @Nonnull List<Throwable> causes;
+    private final @NotNull List<Throwable> causes;
 
-    public FailedInParallel(@Nonnull List<Throwable> causes) {
+    public FailedInParallel(@NotNull List<Throwable> causes) {
         super("Totally " + causes.size() + " cause(s).");
         this.causes = causes;
     }
 
-    public @Nonnull List<Throwable> getCauses() {
+    public @NotNull List<Throwable> getCauses() {
         return causes;
     }
 

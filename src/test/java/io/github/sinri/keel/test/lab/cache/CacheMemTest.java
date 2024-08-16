@@ -7,13 +7,12 @@ import io.github.sinri.keel.tesuto.TestUnit;
 import io.vertx.core.Future;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
-
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
 public class CacheMemTest extends KeelTest {
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> starting() {
         new KeelRuntimeMonitor().startRuntimeMonitor(5_000L, ms -> {

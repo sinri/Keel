@@ -1,7 +1,8 @@
 package io.github.sinri.keel.mysql.statement;
 
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,11 +15,11 @@ public class UnionStatement extends AbstractReadStatement {
 
     }
 
-    public UnionStatement(@Nonnull String firstSelection) {
+    public UnionStatement(@NotNull String firstSelection) {
         selections.add("(" + AbstractStatement.SQL_COMPONENT_SEPARATOR + firstSelection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
     }
 
-    public UnionStatement union(@Nonnull String selection) {
+    public UnionStatement union(@NotNull String selection) {
         if (this.selections.isEmpty()) {
             selections.add("(" + AbstractStatement.SQL_COMPONENT_SEPARATOR + selection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
         } else {
@@ -27,7 +28,7 @@ public class UnionStatement extends AbstractReadStatement {
         return this;
     }
 
-    public UnionStatement unionAll(@Nonnull String selection) {
+    public UnionStatement unionAll(@NotNull String selection) {
         if (this.selections.isEmpty()) {
             selections.add("(" + AbstractStatement.SQL_COMPONENT_SEPARATOR + selection + AbstractStatement.SQL_COMPONENT_SEPARATOR + ")");
         } else {
@@ -36,14 +37,14 @@ public class UnionStatement extends AbstractReadStatement {
         return this;
     }
 
-    public UnionStatement union(@Nonnull List<String> list) {
+    public UnionStatement union(@NotNull List<String> list) {
         for (String selection : list) {
             union(selection);
         }
         return this;
     }
 
-    public UnionStatement unionAll(@Nonnull List<String> list) {
+    public UnionStatement unionAll(@NotNull List<String> list) {
         for (String selection : list) {
             unionAll(selection);
         }

@@ -2,9 +2,9 @@ package io.github.sinri.keel.mysql.statement.component;
 
 import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.mysql.Quoter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * If expr1 is TRUE (expr1 is not equal to 0 and expr1 IS NOT NULL), IF() returns expr2. Otherwise, it returns expr3.
@@ -22,12 +22,12 @@ public class IfOperator {
 
     }
 
-    public IfOperator setConditionNumber(@Nonnull Number conditionNumber) {
+    public IfOperator setConditionNumber(@NotNull Number conditionNumber) {
         this.conditionExpression = String.valueOf(conditionNumber);
         return this;
     }
 
-    public IfOperator setConditionExpression(@Nonnull String conditionExpression) {
+    public IfOperator setConditionExpression(@NotNull String conditionExpression) {
         this.conditionExpression = conditionExpression;
         return this;
     }
@@ -47,7 +47,7 @@ public class IfOperator {
         return this;
     }
 
-    public IfOperator setExpressionForNonEmpty(@Nonnull String expressionForNonEmpty) {
+    public IfOperator setExpressionForNonEmpty(@NotNull String expressionForNonEmpty) {
         this.expressionForNonEmpty = expressionForNonEmpty;
         return this;
     }
@@ -67,7 +67,7 @@ public class IfOperator {
         return this;
     }
 
-    public IfOperator setExpressionForEmpty(@Nonnull String expressionForEmpty) {
+    public IfOperator setExpressionForEmpty(@NotNull String expressionForEmpty) {
         this.expressionForEmpty = expressionForEmpty;
         return this;
     }

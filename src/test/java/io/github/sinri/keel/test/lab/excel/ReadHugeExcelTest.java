@@ -8,8 +8,8 @@ import io.github.sinri.keel.tesuto.KeelTest;
 import io.github.sinri.keel.tesuto.TestUnit;
 import io.github.sinri.keel.tesuto.TestUnitResult;
 import io.vertx.core.Future;
+import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ReadHugeExcelTest extends KeelTest {
     private static final String file = "/Users/leqee/code/Keel/src/test/resources/excel/excel_0.xlsx";
 
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> starting() {
         var issueRecorder = KeelIssueRecordCenter.outputCenter().generateEventLogger(getClass().getSimpleName());
@@ -31,7 +31,7 @@ public class ReadHugeExcelTest extends KeelTest {
         return Future.succeededFuture();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     protected Future<Void> ending(List<TestUnitResult> testUnitResults) {
 //        try {

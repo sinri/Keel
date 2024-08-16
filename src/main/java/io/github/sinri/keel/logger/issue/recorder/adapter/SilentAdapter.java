@@ -4,9 +4,8 @@ import io.github.sinri.keel.core.TechnicalPreview;
 import io.github.sinri.keel.logger.issue.record.KeelIssueRecord;
 import io.github.sinri.keel.logger.issue.recorder.render.KeelIssueRecordRender;
 import io.vertx.core.Promise;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @since 3.1.10
@@ -28,12 +27,12 @@ public final class SilentAdapter implements KeelIssueRecorderAdapter {
     }
 
     @Override
-    public void record(@Nonnull String topic, @Nullable KeelIssueRecord<?> issueRecord) {
+    public void record(@NotNull String topic, @Nullable KeelIssueRecord<?> issueRecord) {
         // do nothing
     }
 
     @Override
-    public void close(@Nonnull Promise<Void> promise) {
+    public void close(@NotNull Promise<Void> promise) {
         promise.complete();
     }
 
