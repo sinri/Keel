@@ -123,4 +123,12 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
     default @NotNull Iterator<Map.Entry<String, Object>> iterator() {
         return toJsonObject().iterator();
     }
+
+    /**
+     * @since 4.0.0
+     */
+    @Override
+    default SimpleJsonifiableEntity copy() {
+        return new SimpleJsonifiableEntity(new JsonObject(toString()));
+    }
 }

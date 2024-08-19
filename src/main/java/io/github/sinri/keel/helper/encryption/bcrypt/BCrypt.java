@@ -444,7 +444,7 @@ public class BCrypt {
      * @return an array containing the decoded bytes
      * @throws IllegalArgumentException if maxolen is invalid
      */
-    private static @NotNull byte[] decode_base64(@NotNull String stringToDecode, int maxLengthToDecode)
+    private static byte[] decode_base64(@NotNull String stringToDecode, int maxLengthToDecode)
             throws IllegalArgumentException {
         StringBuilder rs = new StringBuilder();
         int off = 0, slen = stringToDecode.length(), olen = 0;
@@ -493,7 +493,7 @@ public class BCrypt {
      *             current offset into data
      * @return the next word of material from data
      */
-    private static int streamtoword(@NotNull byte[] data, @NotNull int[] offp) {
+    private static int streamtoword(byte[] data, int[] offp) {
         int i;
         int word = 0;
         int off = offp[0];
