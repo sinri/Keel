@@ -42,7 +42,7 @@ public class CutterOnString implements Cutter<String> {
      * @since 3.2.15
      */
     @Override
-    public Future<Void> end() {
+    public final Future<Void> end() {
         if (!buffer.isEmpty()) {
             List<String> list = new ArrayList<>();
             if (buffer.contains("\n\n")) {
@@ -63,7 +63,7 @@ public class CutterOnString implements Cutter<String> {
     }
 
     @Override
-    public void handle(Buffer piece) {
+    public final void handle(Buffer piece) {
         KeelAsyncKit.exclusivelyCall(this.cutterId, (Supplier<Future<Void>>) () -> {
                     buffer += piece.toString(StandardCharsets.UTF_8);
                     return Future.succeededFuture();
