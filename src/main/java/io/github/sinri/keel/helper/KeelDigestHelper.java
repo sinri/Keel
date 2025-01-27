@@ -1,5 +1,7 @@
 package io.github.sinri.keel.helper;
 
+import io.netty.util.concurrent.FastThreadLocal;
+
 import javax.annotation.Nonnull;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
@@ -40,13 +42,9 @@ public class KeelDigestHelper {
      */
     @Nonnull
     public String md5(@Nonnull String raw) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(raw.getBytes());
-            return KeelHelpers.binaryHelper().encodeHexWithLowerDigits(md.digest());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        MessageDigest digest = KeelDigestHelper.getMD5MessageDigest();
+        byte[] digested = digest.digest(raw.getBytes());
+        return KeelHelpers.binaryHelper().encodeHexWithLowerDigits(digested);
     }
 
     /**
@@ -58,13 +56,9 @@ public class KeelDigestHelper {
      */
     @Nonnull
     public String MD5(@Nonnull String raw) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            md.update(raw.getBytes());
-            return KeelHelpers.binaryHelper().encodeHexWithUpperDigits(md.digest());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        MessageDigest digest = KeelDigestHelper.getMD5MessageDigest();
+        byte[] digested = digest.digest(raw.getBytes());
+        return KeelHelpers.binaryHelper().encodeHexWithUpperDigits(digested);
     }
 
     /**
@@ -201,5 +195,19 @@ public class KeelDigestHelper {
             throw new RuntimeException(e);
         }
         return KeelHelpers.binaryHelper().encodeHexWithUpperDigits(bytes);
+    }
+
+    private static MessageDigest getMD5MessageDigest() {
+        return MD5.HOLDER.get();
+    }
+
+    private static class MD5 {
+
+        private static final FastThreadLocal<MessageDigest> HOLDER = new FastThreadLocal<>() {
+            @Override
+            protected MessageDigest initialValue() throws Exception {
+                return MessageDigest.getInstance("MD5");
+            }
+        };
     }
 }
