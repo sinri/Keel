@@ -140,10 +140,10 @@ public class GCStatResult implements RuntimeStatResult<GCStatResult> {
         // ZGC (Z Garbage Collector)： "ZGC"
         // @see  https://armsword.com/2023/08/10/es-jdk17-and-zgc/
         //minorGCNames.add("ZGC");
-        ignoreGCNames.add("ZGC Pauses"); // since 3.2.5 统计的是ZGC在GC过程中暂停的次数及暂停时间，这是JDK17新增的指标bean，无法统计Allocation Stall导致的线程挂起时间
+        majorGCNames.add("ZGC Pauses"); // since 3.2.21 major since 3.2.5 统计的是ZGC在GC过程中暂停的次数及暂停时间，这是JDK17新增的指标bean，无法统计Allocation Stall导致的线程挂起时间
         minorGCNames.add("ZGC Cycles"); // since 3.2.5 统计的是ZGC发生的次数以及总耗时
         // Shenandoah： "Shenandoah Pauses"
-        minorGCNames.add("Shenandoah Pauses");
+        majorGCNames.add("Shenandoah Pauses");// since 3.2.21 major
     }
 
     /**
