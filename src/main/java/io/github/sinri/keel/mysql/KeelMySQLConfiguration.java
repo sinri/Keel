@@ -227,7 +227,7 @@ public class KeelMySQLConfiguration extends KeelConfigElement {
                                                             return Future.succeededFuture();
                                                         }
 
-                                                        return cursor.read(readWindowSize).compose(readWindowFunction::apply);
+                                                                   return cursor.read(readWindowSize).compose(readWindowFunction);
                                                     })
                                                     .eventually(() -> cursor.close());
                                         })
