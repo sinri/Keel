@@ -5,6 +5,7 @@ import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.facade.configuration.KeelConfigElement;
 import io.github.sinri.keel.mysql.matrix.ResultMatrix;
 import io.vertx.core.Future;
+import io.vertx.core.Promise;
 import io.vertx.mysqlclient.MySQLBuilder;
 import io.vertx.mysqlclient.MySQLConnectOptions;
 import io.vertx.sqlclient.*;
@@ -49,7 +50,8 @@ public class KeelMySQLConfiguration extends KeelConfigElement {
         mySQLConnectOptions.setHost(getHost())
                            .setPort(getPort())
                            .setUser(getUsername())
-                           .setPassword(getPassword());
+                           .setPassword(getPassword())
+        ;
         String charset = getCharset();
         if (charset != null) mySQLConnectOptions.setCharset(charset);
         String schema = getDatabase();
@@ -205,7 +207,7 @@ public class KeelMySQLConfiguration extends KeelConfigElement {
      * @since 3.2.21
      */
     @TechnicalPreview(since = "3.2.21")
-    public Future<Void> instantQueryForStream(String sql, int readWindowSize, Function<RowSet<Row>, Future<Void>> readWindowFunction) {
+    public Future<Void> instantQueryForStreamWithCursor(String sql, int readWindowSize, Function<RowSet<Row>, Future<Void>> readWindowFunction) {
         return Future.succeededFuture()
                      .compose(v -> {
                          Pool pool = MySQLBuilder.pool()
@@ -215,28 +217,75 @@ public class KeelMySQLConfiguration extends KeelConfigElement {
                                                  .build();
                          return Future.succeededFuture(pool);
                      })
-                     .compose(pool -> {
-                         return pool.getConnection()
-                                    .compose(sqlConnection -> {
-                                        return sqlConnection.prepare(sql)
-                                                            .compose(preparedStatement -> {
-                                                                Cursor cursor = preparedStatement.cursor();
-                                                                return KeelAsyncKit.repeatedlyCall(routineResult -> {
-                                                                                       return cursor.read(readWindowSize)
-                                                                                                    .compose(readWindowFunction)
-                                                                                                    .compose(v -> {
-                                                                                                        if (!cursor.hasMore()) {
-                                                                                                            routineResult.stop();
-                                                                                                            return Future.succeededFuture();
-                                                                                                        }
-                                                                                                        return Future.succeededFuture();
-                                                                                                    });
-                                                                                   })
-                                                                                   .eventually(() -> cursor.close());
+                     .compose(pool -> pool
+                             .getConnection()
+                             .compose(sqlConnection -> sqlConnection
+                                     .prepare(sql)
+                                     .compose(preparedStatement -> {
+                                         Cursor cursor = preparedStatement.cursor();
+                                         return KeelAsyncKit.repeatedlyCall(routineResult -> {
+                                                                return cursor.read(readWindowSize)
+                                                                             .compose(readWindowFunction)
+                                                                             .compose(v -> {
+                                                                                 Keel.getLogger().fatal("before cursor.hasMore");
+                                                                                 boolean hasMore;
+                                                                                 try {
+                                                                                     hasMore = cursor.hasMore();
+                                                                                 } catch (Throwable e) {
+                                                                                     Keel.getLogger().exception(e, "has more error");
+                                                                                     hasMore = false;
+                                                                                 }
+                                                                                 if (!hasMore) {
+                                                                                     routineResult.stop();
+                                                                                     return Future.succeededFuture();
+                                                                                 }
+                                                                                 return Future.succeededFuture();
+                                                                             });
                                                             })
-                                                            .eventually(() -> sqlConnection.close());
-                                    })
-                                    .eventually(() -> pool.close());
-                     });
+                                                            .eventually(() -> cursor.close());
+                                     })
+                                     .eventually(() -> sqlConnection.close()))
+                             .eventually(() -> pool.close()));
     }
+
+    @TechnicalPreview(since = "3.2.23")
+    public Future<Void> instantQueryForStream(String sql, Function<Row, Future<Void>> readRowFunction) {
+        return Future.succeededFuture()
+                     .compose(v -> {
+                         Pool pool = MySQLBuilder.pool()
+                                                 .with(this.getPoolOptions())
+                                                 .connectingTo(this.getConnectOptions())
+                                                 .using(Keel.getVertx())
+                                                 .build();
+                         return Future.succeededFuture(pool);
+                     })
+                     .compose(pool -> pool
+                             .getConnection()
+                             .compose(sqlConnection -> sqlConnection
+                                     .prepare(sql)
+                                     .compose(preparedStatement -> {
+                                         Promise<Void> promise = Promise.promise();
+                                         RowStream<Row> stream = preparedStatement.createStream(1);
+                                         stream.handler(row -> {
+                                                   stream.pause();
+                                                   readRowFunction.apply(row)
+                                                                  .compose(v -> {
+                                                                      stream.resume();
+                                                                      return Future.succeededFuture();
+                                                                  }, throwable -> {
+                                                                      return stream.close();
+                                                                  });
+                                               })
+                                               .endHandler(v -> {
+                                                   promise.complete();
+                                               })
+                                               .exceptionHandler(throwable -> {
+                                                   promise.fail(throwable);
+                                               });
+                                         return promise.future().eventually(() -> stream.close());
+                                     })
+                                     .eventually(() -> sqlConnection.close()))
+                             .eventually(() -> pool.close()));
+    }
+
 }
