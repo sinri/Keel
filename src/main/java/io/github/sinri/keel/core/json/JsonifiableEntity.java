@@ -20,6 +20,13 @@ import java.util.function.Function;
  */
 public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, ClusterSerializable {
 
+    /**
+     * @since 3.2.11
+     */
+    static SimpleJsonifiableEntity wrap(@Nonnull JsonObject jsonObject) {
+        return new SimpleJsonifiableEntity(jsonObject);
+    }
+
     @Nonnull
     JsonObject toJsonObject();
 
@@ -34,7 +41,8 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
      * @since 2.8 If java.lang.ClassCastException occurred, return null instead.
      * @since 3.1.10 moved here from UnmodifiableJsonifiableEntity
      */
-    default <T> @Nullable T read(@Nonnull Function<JsonPointer, Class<T>> func) {
+    @Nullable
+    default <T> T read(@Nonnull Function<JsonPointer, Class<T>> func) {
         try {
             JsonPointer jsonPointer = JsonPointer.create();
             Class<T> tClass = func.apply(jsonPointer);
@@ -49,27 +57,29 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
     }
 
     /**
-     * @param <B> an implementation class of JsonifiableEntity, with constructor B() or B(JsonObject).
+     * @param <B> an implementation class of JsonifiableEntity, with constructor B()
+     *            or B(JsonObject).
      * @since 2.7
      */
-    default @Nullable <B extends JsonifiableEntity<?>> B readJsonifiableEntity(@Nonnull Class<B> bClass, String... args) {
+    default @Nullable <B extends JsonifiableEntity<?>> B readJsonifiableEntity(@Nonnull Class<B> bClass,
+                                                                               String... args) {
         JsonObject jsonObject = readJsonObject(args);
-        if (jsonObject == null) return null;
+        if (jsonObject == null)
+            return null;
         try {
             var x = bClass.getConstructor().newInstance();
             x.reloadDataFromJsonObject(jsonObject);
             return x;
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                 NoSuchMethodException ignored1) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                 | NoSuchMethodException ignored1) {
             try {
                 return bClass.getConstructor(JsonObject.class).newInstance(jsonObject);
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                     NoSuchMethodException ignored2) {
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                     | NoSuchMethodException ignored2) {
                 return null;
             }
         }
     }
-
 
     /**
      * @since 2.8
@@ -119,13 +129,6 @@ public interface JsonifiableEntity<E> extends UnmodifiableJsonifiableEntity, Clu
     @Override
     default boolean isEmpty() {
         return toJsonObject().isEmpty();
-    }
-
-    /**
-     * @since 3.2.11
-     */
-    static SimpleJsonifiableEntity wrap(@Nonnull JsonObject jsonObject) {
-        return new SimpleJsonifiableEntity(jsonObject);
     }
 
     /**
