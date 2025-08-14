@@ -10,7 +10,6 @@ import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.RowIterator;
 
 import javax.annotation.Nonnull;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.github.sinri.keel.facade.KeelInstance.Keel;
 
@@ -55,23 +54,23 @@ public class QuickQueryTest extends KeelTest {
                  });
     }
 
-    @TestUnit
-    public Future<Void> test3() {
-        NamedMySQLDataSource<DynamicNamedMySQLConnection> cs = KeelMySQLDataSourceProvider.initializeDynamicNamedMySQLDataSource("pioneer");
-        AtomicInteger count = new AtomicInteger(5);
-        return cs.getConfiguration().instantQueryForStreamV2(
-                         "select * from tiberias.tiberias_dim_warehouse limit 10",
-                         row -> {
-                             getLogger().info("row: " + row.getLong("dim_wh_id"));
-                             if (count.decrementAndGet() > 0) {
-                                 return Future.succeededFuture();
-                             } else {
-                                 throw new RuntimeException("count down to heaven");
-                             }
-                         })
-                 .compose(v -> {
-                     getLogger().info("fin");
-                     return Future.succeededFuture();
-                 });
-    }
+    //    @TestUnit
+    //    public Future<Void> test3() {
+    //        NamedMySQLDataSource<DynamicNamedMySQLConnection> cs = KeelMySQLDataSourceProvider.initializeDynamicNamedMySQLDataSource("pioneer");
+    //        AtomicInteger count = new AtomicInteger(5);
+    //        return cs.getConfiguration().instantQueryForStreamV2(
+    //                         "select * from tiberias.tiberias_dim_warehouse limit 10",
+    //                         row -> {
+    //                             getLogger().info("row: " + row.getLong("dim_wh_id"));
+    //                             if (count.decrementAndGet() > 0) {
+    //                                 return Future.succeededFuture();
+    //                             } else {
+    //                                 throw new RuntimeException("count down to heaven");
+    //                             }
+    //                         })
+    //                 .compose(v -> {
+    //                     getLogger().info("fin");
+    //                     return Future.succeededFuture();
+    //                 });
+    //    }
 }

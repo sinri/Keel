@@ -6,8 +6,8 @@
 
     <groupId>io.github.sinri</groupId>
     <artifactId>Keel</artifactId>
-    <version>3.2.23-SNAPSHOT</version>
-    <!--    <version>3.2.22</version>-->
+    <!--    <version>3.2.23-SNAPSHOT</version>-->
+    <version>3.2.23</version>
 
     <name>Keel</name>
     <description>
@@ -226,27 +226,27 @@
             <id>snapshot</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.4.1</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <transformers>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>io.github.sinri.keel.facade.KeelInstance</mainClass>
-                                        </transformer>
-                                    </transformers>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!--                    <plugin>-->
+                    <!--                        <groupId>org.apache.maven.plugins</groupId>-->
+                    <!--                        <artifactId>maven-shade-plugin</artifactId>-->
+                    <!--                        <version>2.4.1</version>-->
+                    <!--                        <executions>-->
+                    <!--                            <execution>-->
+                    <!--                                <phase>package</phase>-->
+                    <!--                                <goals>-->
+                    <!--                                    <goal>shade</goal>-->
+                    <!--                                </goals>-->
+                    <!--                                <configuration>-->
+                    <!--                                    <transformers>-->
+                    <!--                                        <transformer-->
+                    <!--                                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
+                    <!--                                            <mainClass>io.github.sinri.keel.facade.KeelInstance</mainClass>-->
+                    <!--                                        </transformer>-->
+                    <!--                                    </transformers>-->
+                    <!--                                </configuration>-->
+                    <!--                            </execution>-->
+                    <!--                        </executions>-->
+                    <!--                    </plugin>-->
                 </plugins>
             </build>
             <distributionManagement>
@@ -260,38 +260,38 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.4.1</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>shade</goal>
-                                </goals>
-                                <configuration>
-                                    <!--                                    <filters>-->
-                                    <!--                                        <filter>-->
-                                    <!--                                            <artifact>org.bouncycastle:*</artifact>-->
-                                    <!--                                            <excludes>-->
-                                    <!--                                                <exclude>META-INF/*.SF</exclude>-->
-                                    <!--                                                <exclude>META-INF/*.DSA</exclude>-->
-                                    <!--                                                <exclude>META-INF/*.RSA</exclude>-->
-                                    <!--                                            </excludes>-->
-                                    <!--                                        </filter>-->
-                                    <!--                                    </filters>-->
-                                    <!--                                    <shadedArtifactAttached>true</shadedArtifactAttached>-->
-                                    <transformers>
-                                        <transformer
-                                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>io.github.sinri.keel.facade.KeelInstance</mainClass>
-                                        </transformer>
-                                    </transformers>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
+                    <!--                    <plugin>-->
+                    <!--                        <groupId>org.apache.maven.plugins</groupId>-->
+                    <!--                        <artifactId>maven-shade-plugin</artifactId>-->
+                    <!--                        <version>2.4.1</version>-->
+                    <!--                        <executions>-->
+                    <!--                            <execution>-->
+                    <!--                                <phase>package</phase>-->
+                    <!--                                <goals>-->
+                    <!--                                    <goal>shade</goal>-->
+                    <!--                                </goals>-->
+                    <!--                                <configuration>-->
+                    <!--                                    &lt;!&ndash;                                    <filters>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                        <filter>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                            <artifact>org.bouncycastle:*</artifact>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                            <excludes>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                                <exclude>META-INF/*.SF</exclude>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                                <exclude>META-INF/*.DSA</exclude>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                                <exclude>META-INF/*.RSA</exclude>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                            </excludes>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                        </filter>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                    </filters>&ndash;&gt;-->
+                    <!--                                    &lt;!&ndash;                                    <shadedArtifactAttached>true</shadedArtifactAttached>&ndash;&gt;-->
+                    <!--                                    <transformers>-->
+                    <!--                                        <transformer-->
+                    <!--                                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
+                    <!--                                            <mainClass>io.github.sinri.keel.facade.KeelInstance</mainClass>-->
+                    <!--                                        </transformer>-->
+                    <!--                                    </transformers>-->
+                    <!--                                </configuration>-->
+                    <!--                            </execution>-->
+                    <!--                        </executions>-->
+                    <!--                    </plugin>-->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
@@ -339,7 +339,8 @@
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>ossrh</serverId>
-                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+                            <!--                            <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>-->
+                            <nexusUrl>https://ossrh-staging-api.central.sonatype.com</nexusUrl>
                             <autoReleaseAfterClose>true</autoReleaseAfterClose>
                             <stagingProgressTimeoutMinutes>20</stagingProgressTimeoutMinutes>
                         </configuration>

@@ -59,8 +59,12 @@ public interface KeelAsyncKit {
     static <T> Future<Void> iterativelyBatchCall(@Nonnull Iterator<T> iterator, @Nonnull Function<List<T>, Future<Void>> itemsProcessor, int batchSize) {
         if (batchSize < 1) throw new IllegalArgumentException("BATCH SIZE IS AT LEAST 1.");
         return repeatedlyCall(routineResult -> {
-            List<T> buffer = new ArrayList<>();
             boolean hasNext = iterator.hasNext();
+            if (!hasNext) {
+                routineResult.stop();
+                return Future.succeededFuture();
+            }
+            List<T> buffer = new ArrayList<>();
             while (hasNext) {
                 T t = iterator.next();
                 buffer.add(t);
@@ -138,11 +142,11 @@ public interface KeelAsyncKit {
      */
     static <T> Future<T> exclusivelyCall(@Nonnull String lockName, long waitTimeForLock, @Nonnull Supplier<Future<T>> exclusiveSupplier) {
         return Keel.getVertx().sharedData()
-                .getLockWithTimeout(lockName, waitTimeForLock)
-                .compose(lock -> Future.succeededFuture()
-                        .compose(v -> exclusiveSupplier.get())
-                        .andThen(ar -> lock.release())
-                );
+                   .getLockWithTimeout(lockName, waitTimeForLock)
+                   .compose(lock -> Future.succeededFuture()
+                                          .compose(v -> exclusiveSupplier.get())
+                                          .andThen(ar -> lock.release())
+                   );
     }
 
     /**
@@ -160,8 +164,8 @@ public interface KeelAsyncKit {
         Promise<Void> promise = Promise.promise();
         promiseHandler.handle(promise);
         promise.future()
-                .andThen(ar -> Keel.getVertx()
-                        .setTimer(1L, timerID -> endless(promiseHandler)));
+               .andThen(ar -> Keel.getVertx()
+                                  .setTimer(1L, timerID -> endless(promiseHandler)));
     }
 
     /**
@@ -170,8 +174,8 @@ public interface KeelAsyncKit {
      */
     static void endless(@Nonnull Supplier<Future<Void>> supplier) {
         KeelAsyncKit.repeatedlyCall(routineResult -> Future.succeededFuture()
-                .compose(v -> supplier.get())
-                .eventually(() -> Future.succeededFuture()));
+                                                           .compose(v -> supplier.get())
+                                                           .eventually(() -> Future.succeededFuture()));
     }
 
     /**
@@ -194,22 +198,23 @@ public interface KeelAsyncKit {
      */
     static <R> Future<R> vertxizedRawFuture(@Nonnull java.util.concurrent.Future<R> rawFuture, long sleepTime) {
         return KeelAsyncKit.repeatedlyCall(routineResult -> {
-                    if (rawFuture.isDone() || rawFuture.isCancelled()) {
-                        routineResult.stop();
-                    }
-                    return sleep(sleepTime);
-                })
-                .compose(slept -> {
-                    try {
-                        return Future.succeededFuture(rawFuture.get());
-                    } catch (InterruptedException | ExecutionException e) {
-                        return Future.failedFuture(e);
-                    }
-                });
+                               if (rawFuture.isDone() || rawFuture.isCancelled()) {
+                                   routineResult.stop();
+                               }
+                               return sleep(sleepTime);
+                           })
+                           .compose(slept -> {
+                               try {
+                                   return Future.succeededFuture(rawFuture.get());
+                               } catch (InterruptedException | ExecutionException e) {
+                                   return Future.failedFuture(e);
+                               }
+                           });
     }
 
     /**
-     * @since 3.0.10 Technical Preview: instead of Vertx::executeBlocking(Handler&lt;Promise&lt;T&gt;&gt; blockingCodeHandler)
+     * @since 3.0.10 Technical Preview: instead of Vertx::executeBlocking(Handler&lt;Promise&lt;T&gt;&gt;
+     *         blockingCodeHandler)
      * @since 3.0.18 Finished Technical Preview.
      */
     @Nonnull
@@ -224,7 +229,7 @@ public interface KeelAsyncKit {
             }
         };
         return verticle.deployMe(new DeploymentOptions().setThreadingModel(ThreadingModel.WORKER))
-                .compose(deploymentId -> promise.future());
+                       .compose(deploymentId -> promise.future());
     }
 
     /**
