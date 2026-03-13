@@ -3,7 +3,7 @@ package io.github.sinri.keel.test.unittest.tesuto;
 import io.github.sinri.keel.facade.async.KeelAsyncKit;
 import io.github.sinri.keel.tesuto.KeelUnitTest;
 
-public class FirstUnitTest extends KeelUnitTest {
+public class FirstUnitTest1 extends KeelUnitTest {
     @Override
     protected void prepareEnvironment() {
         super.prepareEnvironment();
