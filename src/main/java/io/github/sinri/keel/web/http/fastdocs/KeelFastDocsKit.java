@@ -61,8 +61,8 @@ public class KeelFastDocsKit {
         if (!urlPathBase.endsWith("/")) {
             urlPathBase = urlPathBase + "/";
         }
-        if (!docsDirPathBase.endsWith("/")) {
-            docsDirPathBase = docsDirPathBase + "/";
+        if (!docsDirPathBase.endsWith(File.separator)) {
+            docsDirPathBase = docsDirPathBase + File.separator;
         }
 
         KeelFastDocsKit keelFastDocsKit = new KeelFastDocsKit(urlPathBase, docsDirPathBase)

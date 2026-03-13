@@ -30,7 +30,7 @@ public class CataloguePageBuilder implements FastDocsContentResponder {
         if (x == null) {
             throw new IllegalArgumentException("rootMarkdownFilePath is not available in File System");
         }
-        this.embedded = x.toString().contains("!/");
+        this.embedded = x.toString().contains("!" + File.separator);
         this.actualFileRootOutsideJAR = x.getPath();
         // options.eventLogger.debug(r -> r.message("EMBEDDED: " + embedded + " url: " + x + " actualFileRootOutsideJAR: " + actualFileRootOutsideJAR));
     }

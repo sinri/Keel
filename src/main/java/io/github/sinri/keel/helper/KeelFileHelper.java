@@ -100,10 +100,10 @@ public class KeelFileHelper {
             if (url == null) {
                 throw new RuntimeException("Resource is not found");
             }
-            if (!url.toString().contains("!/")) {
+            if (!url.toString().contains("!"+File.separator)) {
                 throw new RuntimeException("Resource is not in JAR");
             }
-            String jarPath = url.toString().substring(0, url.toString().indexOf("!/") + 2);
+            String jarPath = url.toString().substring(0, url.toString().indexOf("!"+File.separator) + 2);
 
             URL jarURL = new URL(jarPath);
             JarURLConnection jarCon = (JarURLConnection) jarURL.openConnection();
@@ -183,7 +183,7 @@ public class KeelFileHelper {
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
         // Get the URL of the JAR file containing the current class
-        String currentClassUrlInJarFile = getClass().getName().replace('.', '/') + ".class";
+        String currentClassUrlInJarFile = getClass().getName().replace('.', File.separatorChar) + ".class";
         URL jarUrl = classLoader.getResource(currentClassUrlInJarFile);
 
         if (jarUrl != null && jarUrl.getProtocol().equals("jar")) {
@@ -233,7 +233,7 @@ public class KeelFileHelper {
                                 && !entryName.startsWith("META-INF")
                 ) {
                     // 将路径形式的类名转换为 Java 类名
-                    String className = entryName.replace("/", ".").replace(".class", "");
+                    String className = entryName.replace(File.separator, ".").replace(".class", "");
                     list.add(className);
                 }
             }
