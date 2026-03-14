@@ -26,4 +26,9 @@ public class SimpleResultRow implements ResultRow {
         this.row = jsonObject;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return this.toJsonObject().toString();
+    }
 }
